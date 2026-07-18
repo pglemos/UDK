@@ -449,19 +449,21 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
                     })}
                     <td>{record.updated_at ? new Date(record.updated_at).toLocaleString("pt-BR") : "—"}</td>
                     <td className="row-actions">
-                      {config.actions?.map((action, index) => (
-                        <button
-                          type="button"
-                          className="icon-button action-button"
-                          title={action.label}
-                          onClick={() => void runAction(record, index)}
-                          key={action.key}
-                          disabled={saving}
-                        >
-                          <RefreshCw size={16} />
-                        </button>
-                      ))}
-                      {!config.readOnly ? (
+                      {!config.readOnly
+                        ? config.actions?.map((action, index) => (
+                            <button
+                              type="button"
+                              className="icon-button action-button"
+                              title={action.label}
+                              onClick={() => void runAction(record, index)}
+                              key={action.key}
+                              disabled={saving}
+                            >
+                              <RefreshCw size={16} />
+                            </button>
+                          ))
+                        : null}
+                      {!config.readOnly && !config.createOnly ? (
                         <>
                           <button
                             type="button"

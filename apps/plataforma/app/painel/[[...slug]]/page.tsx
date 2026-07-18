@@ -26,6 +26,7 @@ import {
   Settings,
   ShieldAlert,
   Sparkles,
+  Timer,
   Trophy,
   Users,
   UsersRound,
@@ -172,14 +173,35 @@ const roleAccess: Record<Role, string[]> = {
     "responsaveis",
     "inscricoes",
     "documentos",
+    "termos",
+    "aceites",
+    "mudancas-categoria",
     "financeiro",
     "creditos",
     "calendario",
+    "sessoes",
+    "checkin",
+    "karts",
     "resultados",
     "classificacao",
+    "voltas",
+    "julgamentos",
     "recursos",
+    "endurance",
     "notificacoes",
   ],
+};
+
+const writableModulesByRole: Record<Role, string[]> = {
+  admin: allModuleKeys,
+  organization: allModuleKeys,
+  judge: ["resultados", "classificacao", "pontuacao", "importacoes", "voltas", "ocorrencias", "evidencias", "julgamentos", "recursos"],
+  marshal: ["sessoes", "checkin", "karts", "endurance", "membros-endurance", "stints", "ocorrencias", "evidencias"],
+  finance: ["financeiro", "creditos"],
+  editor: ["conteudo", "versoes-conteudo", "patrocinadores", "campanhas", "notificacoes"],
+  sponsor: [],
+  driver: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
+  guardian: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
 };
 
 const roleLabels: Record<Role, string> = {
@@ -312,6 +334,8 @@ export default function OperationsPage({
     .find((item) => item.key === activeKey);
   const config = getModuleConfig(activeKey);
   const authorized = activeKey === "dashboard" || allowedKeys.has(activeKey);
+  const canMutate = roles.some((role) => writableModulesByRole[role].includes(activeKey));
+  const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;
 
   async function signOut() {
     if (client) await client.auth.signOut();
@@ -444,7 +468,7 @@ export default function OperationsPage({
           ) : activeKey === "relatorios" ? (
             <ReportsPanel client={client} />
           ) : config ? (
-            <ModuleCrud client={client} config={config} />
+            <ModuleCrud client={client} config={effectiveConfig ?? config} />
           ) : (
             <div className="access-denied">
               <Settings />

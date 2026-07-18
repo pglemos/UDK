@@ -55,6 +55,7 @@ export type ModuleConfig = {
   ascending?: boolean;
   fields: ModuleField[];
   readOnly?: boolean;
+  createOnly?: boolean;
   actions?: ModuleAction[];
 };
 
@@ -656,6 +657,7 @@ export const moduleConfigs: ModuleConfig[] = [
     titleColumn: "accepted_at",
     orderBy: "accepted_at",
     ascending: false,
+    createOnly: true,
     fields: [
       relation("term_id", "Termo", "terms", "title"),
       relation("user_id", "Signatário", "profiles", "full_name"),
