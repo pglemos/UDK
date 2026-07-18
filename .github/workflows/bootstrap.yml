@@ -35,12 +35,17 @@ jobs:
           set +e
           : > verification.log
           status=0
+          failed_check=""
           run_check() {
             if [ "$status" -eq 0 ]; then
-              echo "### $1" >> verification.log
+              label="$1"
               shift
+              echo "### $label" >> verification.log
               "$@" >> verification.log 2>&1
               status=$?
+              if [ "$status" -ne 0 ]; then
+                failed_check="$label"
+              fi
             fi
           }
           run_check "workspace" pnpm verify
@@ -53,17 +58,25 @@ jobs:
           run_check "supabase-tests" supabase test db
           run_check "supabase-lint" supabase db lint --level warning
           if [ "$status" -ne 0 ]; then
-            tail -n 220 verification.log > verification-diagnostics.txt
+            {
+              echo "failed_check=$failed_check"
+              echo "exit_code=$status"
+              echo "generated_layout_patch=$(grep -c 'Array<\[string, string\]>' apps/web-publico/app/layout.tsx)"
+              echo "generated_home_patch=$(grep -c 'const nextStage=' apps/web-publico/app/page.tsx)"
+              echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              echo
+              tail -n 260 verification.log
+            } > verification-diagnostics.txt
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add verification-diagnostics.txt
-            git commit -m "ci: capture verification diagnostics"
+            git commit --allow-empty -m "ci: capture $failed_check diagnostics"
             git push origin HEAD:feat/deploy-ready-platform
             exit "$status"
           fi
       - name: Commit verified platform
         run: |
-          rm -f verification.log verification-diagnostics.txt
+          rm -f verification.log verification-diagnostics.txt lint-diagnostics.txt
           rm -f scripts/generate-apps.mjs scripts/patch-generated.mjs
           rm -f .github/workflows/bootstrap.yml
           git config user.name "github-actions[bot]"
