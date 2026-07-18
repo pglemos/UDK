@@ -8,7 +8,9 @@ import {
   enqueueOfflineOperation,
   flushOfflineQueue,
   getOfflineQueue,
+  type OfflineQueueOwner,
 } from "../lib/offline-queue";
+import { dateTimeLocalToIso, isoToDateTimeLocal } from "../lib/datetime";
 
 export type ModuleRecord = Record<string, unknown> & {
   id: string;
@@ -24,12 +26,13 @@ type RelationOption = {
 type ModuleCrudProps = {
   client: SupabaseClient;
   config: ModuleConfig;
+  owner: OfflineQueueOwner;
 };
 
 function normalizeDateValue(value: unknown, kind: ModuleField["kind"]): string {
   if (!value || typeof value !== "string") return "";
   if (kind === "date") return value.slice(0, 10);
-  if (kind === "datetime") return value.slice(0, 16);
+  if (kind === "datetime") return isoToDateTimeLocal(value);
   return value;
 }
 
@@ -102,7 +105,7 @@ function buildPayload(config: ModuleConfig, values: Record<string, unknown>): Re
     }
 
     if (field.kind === "datetime") {
-      payload[field.key] = new Date(String(raw)).toISOString();
+      payload[field.key] = dateTimeLocalToIso(String(raw));
       continue;
     }
 
@@ -137,7 +140,7 @@ function statusClass(value: unknown): string {
   return "status";
 }
 
-export function ModuleCrud({ client, config }: ModuleCrudProps) {
+export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [records, setRecords] = useState<ModuleRecord[]>([]);
   const [relationOptions, setRelationOptions] = useState<Record<string, RelationOption[]>>({});
   const [loading, setLoading] = useState(true);
@@ -204,16 +207,16 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
   }, [client, config, loadRelations]);
 
   const syncOffline = useCallback(async () => {
-    setPendingOffline((await getOfflineQueue()).length);
+    setPendingOffline((await getOfflineQueue(owner)).length);
     if (typeof navigator !== "undefined" && navigator.onLine) {
-      const result = await flushOfflineQueue(client);
+      const result = await flushOfflineQueue(client, owner);
       setPendingOffline(result.remaining);
       if (result.completed > 0) {
         setNotice(`${result.completed} operação(ões) offline sincronizada(s).`);
         await loadRecords();
       }
     }
-  }, [client, loadRecords]);
+  }, [client, loadRecords, owner]);
 
   useEffect(() => {
     void loadRecords();
@@ -221,7 +224,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
 
     const onlineHandler = () => void syncOffline();
     const queueHandler = () => {
-      void getOfflineQueue().then((queue) => setPendingOffline(queue.length));
+      void getOfflineQueue(owner).then((queue) => setPendingOffline(queue.length));
     };
     window.addEventListener("online", onlineHandler);
     window.addEventListener("udk:offline-queue", queueHandler);
@@ -297,11 +300,12 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
       if (mutationError) {
         if (shouldQueueMutation(mutationError)) {
           await enqueueOfflineOperation(
+            owner,
             editing
               ? { table: config.table, action: "update", payload, recordId: editing.id }
               : { table: config.table, action: "insert", payload },
           );
-          setPendingOffline((await getOfflineQueue()).length);
+          setPendingOffline((await getOfflineQueue(owner)).length);
           setNotice("Sem conexão. A operação foi salva na fila offline.");
           setModalOpen(false);
           return;
@@ -331,13 +335,13 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
       .eq("id", record.id);
     if (deleteError) {
       if (shouldQueueMutation(deleteError)) {
-        await enqueueOfflineOperation({
+        await enqueueOfflineOperation(owner, {
           table: config.table,
           action: "delete",
           payload: {},
           recordId: record.id,
         });
-        setPendingOffline((await getOfflineQueue()).length);
+        setPendingOffline((await getOfflineQueue(owner)).length);
         setNotice("Sem conexão. A exclusão foi adicionada à fila offline.");
         return;
       }

@@ -35,7 +35,8 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../../lib/supabase";
 import { getModuleConfig } from "../../../lib/module-config";
-import { getOfflineQueue } from "../../../lib/offline-queue";
+import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";
+import { computeAllowedModules, computeWritableModules, type RoleGrant, type RolePermission } from "../../../lib/access-control";
 import { ModuleCrud } from "../../../components/module-crud";
 import { Dashboard } from "../../../components/dashboard";
 import { ReportsPanel } from "../../../components/reports-panel";
@@ -240,6 +241,8 @@ export default function OperationsPage({
   const [user, setUser] = useState<User>();
   const [displayName, setDisplayName] = useState("Usuário UDK");
   const [roles, setRoles] = useState<Role[]>([]);
+  const [roleGrants, setRoleGrants] = useState<RoleGrant[]>([]);
+  const [permissions, setPermissions] = useState<RolePermission[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [online, setOnline] = useState(true);
   const [offlineCount, setOfflineCount] = useState(0);
@@ -247,21 +250,13 @@ export default function OperationsPage({
 
   useEffect(() => {
     setOnline(navigator.onLine);
-    void getOfflineQueue().then((queue) => setOfflineCount(queue.length));
-
     const onlineHandler = () => setOnline(true);
     const offlineHandler = () => setOnline(false);
-    const queueHandler = () => {
-      void getOfflineQueue().then((queue) => setOfflineCount(queue.length));
-    };
     window.addEventListener("online", onlineHandler);
     window.addEventListener("offline", offlineHandler);
-    window.addEventListener("udk:offline-queue", queueHandler);
-
     return () => {
       window.removeEventListener("online", onlineHandler);
       window.removeEventListener("offline", offlineHandler);
-      window.removeEventListener("udk:offline-queue", queueHandler);
     };
   }, []);
 
@@ -289,20 +284,59 @@ export default function OperationsPage({
 
       const [profileResult, rolesResult] = await Promise.all([
         activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),
-        activeClient.from("user_roles").select("role").eq("user_id", authenticatedUser.id),
+        activeClient
+          .from("user_roles")
+          .select("id,role,expires_at")
+          .eq("user_id", authenticatedUser.id),
       ]);
 
       if (!active) return;
 
       if (profileResult.error) setAuthError(profileResult.error.message);
-      if (rolesResult.error) setAuthError(rolesResult.error.message);
+      if (rolesResult.error) {
+        setRoles([]);
+        setRoleGrants([]);
+        setPermissions([]);
+        setAuthError(`Não foi possível carregar as permissões: ${rolesResult.error.message}`);
+        setReady(true);
+        return;
+      }
 
       const profile = profileResult.data;
       setDisplayName(profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK");
-      const loadedRoles = (rolesResult.data ?? [])
-        .map((item) => item.role as Role)
-        .filter((role) => role in roleAccess);
-      setRoles(loadedRoles.length > 0 ? loadedRoles : ["driver"]);
+      const now = Date.now();
+      const loadedGrants = (rolesResult.data ?? [])
+        .filter((item) => !item.expires_at || new Date(item.expires_at).getTime() > now)
+        .filter((item) => item.role in roleAccess)
+        .map((item) => ({ id: String(item.id), role: item.role as Role }));
+
+      if (loadedGrants.length === 0) {
+        setRoles([]);
+        setRoleGrants([]);
+        setPermissions([]);
+        setAuthError("Esta conta não possui papel ativo. Solicite a vinculação à organização do campeonato.");
+        setReady(true);
+        return;
+      }
+
+      const { data: permissionRows, error: permissionError } = await activeClient
+        .from("role_permissions")
+        .select("user_role_id,module,action,allowed,expires_at")
+        .in("user_role_id", loadedGrants.map((grant) => grant.id))
+        .is("deleted_at", null);
+
+      if (!active || permissionError) {
+        setRoles([]);
+        setRoleGrants([]);
+        setPermissions([]);
+        setAuthError(permissionError ? `Não foi possível validar permissões granulares: ${permissionError.message}` : "Sessão encerrada.");
+        setReady(true);
+        return;
+      }
+
+      setRoleGrants(loadedGrants);
+      setRoles(Array.from(new Set(loadedGrants.map((grant) => grant.role as Role))));
+      setPermissions((permissionRows ?? []) as RolePermission[]);
       setReady(true);
     }
 
@@ -317,13 +351,36 @@ export default function OperationsPage({
     };
   }, [client, router]);
 
-  const allowedKeys = useMemo(() => {
-    const keys = new Set<string>();
-    for (const role of roles) {
-      for (const key of roleAccess[role]) keys.add(key);
+  const allowedKeys = useMemo(
+    () => computeAllowedModules(roleAccess, roleGrants, permissions),
+    [permissions, roleGrants],
+  );
+  const writableKeys = useMemo(
+    () => computeWritableModules(writableModulesByRole, roleGrants, permissions),
+    [permissions, roleGrants],
+  );
+  const offlineOwner = useMemo(
+    () => (client && user ? createOfflineQueueOwner(client, user.id) : undefined),
+    [client, user],
+  );
+
+  useEffect(() => {
+    if (!offlineOwner) {
+      setOfflineCount(0);
+      return;
     }
-    return keys;
-  }, [roles]);
+    let active = true;
+    const refreshQueueCount = async () => {
+      const queue = await getOfflineQueue(offlineOwner);
+      if (active) setOfflineCount(queue.length);
+    };
+    void refreshQueueCount();
+    window.addEventListener("udk:offline-queue", refreshQueueCount);
+    return () => {
+      active = false;
+      window.removeEventListener("udk:offline-queue", refreshQueueCount);
+    };
+  }, [offlineOwner]);
 
   const visibleGroups = useMemo(
     () =>
@@ -337,8 +394,8 @@ export default function OperationsPage({
     .flatMap((group) => group.items)
     .find((item) => item.key === activeKey);
   const config = getModuleConfig(activeKey);
-  const authorized = activeKey === "dashboard" || allowedKeys.has(activeKey);
-  const canMutate = roles.some((role) => writableModulesByRole[role].includes(activeKey));
+  const authorized = allowedKeys.has(activeKey);
+  const canMutate = writableKeys.has(activeKey);
   const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;
 
   async function signOut() {
@@ -413,7 +470,7 @@ export default function OperationsPage({
           <span className="avatar">{initials(displayName) || "UD"}</span>
           <div>
             <b>{displayName}</b>
-            <small>{roleLabels[roles[0] ?? "driver"]}</small>
+            <small>{roles[0] ? roleLabels[roles[0]] : "Sem papel ativo"}</small>
           </div>
           <button type="button" title="Sair" onClick={() => void signOut()}>
             <LogOut size={17} />
@@ -458,7 +515,7 @@ export default function OperationsPage({
             </div>
           </div>
 
-          {authError ? <div className="alert alert-warning">{authError}</div> : null}
+          {authError ? <div className="alert alert-warning" role="alert">{authError}</div> : null}
 
           {!authorized ? (
             <div className="access-denied">
@@ -468,11 +525,11 @@ export default function OperationsPage({
               <Link href="/painel">Voltar ao painel</Link>
             </div>
           ) : activeKey === "dashboard" ? (
-            <Dashboard client={client} />
+            <Dashboard client={client} allowedKeys={allowedKeys} />
           ) : activeKey === "relatorios" ? (
             <ReportsPanel client={client} />
-          ) : config ? (
-            <ModuleCrud client={client} config={effectiveConfig ?? config} />
+          ) : config && offlineOwner ? (
+            <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
           ) : (
             <div className="access-denied">
               <Settings />
