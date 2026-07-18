@@ -1,0 +1,51 @@
+name: Diagnose operational domain UI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check expected source markers
+        shell: bash
+        run: |
+          mkdir -p diagnostics
+          node <<'NODE' > diagnostics/domain-ui.txt 2>&1
+          const fs = require('node:fs');
+          const files = {
+            config: fs.readFileSync('apps/plataforma/lib/module-config.ts', 'utf8'),
+            page: fs.readFileSync('apps/plataforma/app/painel/[[...slug]]/page.tsx', 'utf8'),
+            test: fs.readFileSync('apps/plataforma/lib/module-config.test.ts', 'utf8'),
+          };
+          const checks = [
+            ['config stage/category', 'config', '      relation("stage_id", "Etapa", "stages", "title"),\n      relation("category_id", "Categoria", "categories", "name", false),'],
+            ['config proof', 'config', '{ key: "proof_path", label: "Caminho do comprovante", kind: "text" },'],
+            ['config import path', 'config', '{ key: "original_path", label: "Caminho privado", kind: "text" },'],
+            ['config array marker', 'config', '\n];\n\nexport const moduleConfigByKey'],
+            ['page championship nav', 'page', '      { key: "documentos", label: "Documentos", icon: FileCheck2 },\n      { key: "calendario", label: "Calendário", icon: CalendarDays },\n      { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },\n      { key: "creditos", label: "Créditos", icon: HandCoins },'],
+            ['page sporting nav', 'page', '      { key: "resultados", label: "Resultados", icon: Flag },\n      { key: "classificacao", label: "Classificação", icon: Trophy },\n      { key: "importacoes", label: "Importações", icon: FileInput },\n      { key: "ocorrencias", label: "Ocorrências", icon: ShieldAlert },\n      { key: "julgamentos", label: "Penalidades", icon: Gavel },\n      { key: "recursos", label: "Recursos", icon: BookOpenText },'],
+            ['page endurance nav', 'page', '      { key: "endurance", label: "Equipes", icon: UsersRound },\n      { key: "stints", label: "Stints", icon: Sparkles },'],
+            ['page communication nav', 'page', '      { key: "conteudo", label: "Conteúdo", icon: LayoutGrid },\n      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },\n      { key: "notificacoes", label: "Notificações", icon: Bell },'],
+            ['page marshal role', 'page', '  marshal: ["dashboard", "calendario", "pilotos", "endurance", "stints", "ocorrencias", "notificacoes"],'],
+            ['page editor role', 'page', '  editor: ["dashboard", "conteudo", "patrocinadores", "notificacoes"],\n  sponsor: ["dashboard", "patrocinadores", "notificacoes"],'],
+            ['test notifications marker', 'test', '      "notificacoes",\n    ];'],
+          ];
+          for (const [label, file, marker] of checks) {
+            const source = files[file];
+            let count = 0;
+            let index = 0;
+            while ((index = source.indexOf(marker, index)) !== -1) { count++; index += marker.length; }
+            console.log(`${label}: ${count}`);
+          }
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: domain-ui-diagnostics
+          path: diagnostics/domain-ui.txt
+          retention-days: 3
