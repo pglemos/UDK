@@ -32,6 +32,19 @@ describe("module configuration", () => {
       "conteudo",
       "patrocinadores",
       "notificacoes",
+      "responsaveis",
+      "termos",
+      "aceites",
+      "mudancas-categoria",
+      "sessoes",
+      "checkin",
+      "karts",
+      "pontuacao",
+      "voltas",
+      "evidencias",
+      "membros-endurance",
+      "campanhas",
+      "versoes-conteudo",
     ];
 
     for (const key of required) {
