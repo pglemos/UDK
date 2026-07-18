@@ -1,0 +1,57 @@
+name: Build deploy-ready UDK platform
+on:
+  push:
+    branches: [feat/deploy-ready-platform]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  build-platform:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/deploy-ready-platform
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate applications
+        run: node scripts/generate-apps.mjs
+      - name: Remove bootstrap files
+        run: |
+          rm -f scripts/generate-apps.mjs
+          rm -f .github/workflows/bootstrap.yml
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --no-frozen-lockfile
+      - name: Verify workspace
+        run: pnpm verify
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Validate database
+        run: |
+          supabase start
+          supabase db reset
+          supabase test db
+          supabase db lint --level warning
+      - name: Commit verified platform
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: deliver deploy-ready UDK platform"
+          git push origin HEAD:feat/deploy-ready-platform
