@@ -10,17 +10,43 @@ const OFFLINE_TABLES = [
 
 export type OfflineCapableTable = (typeof OFFLINE_TABLES)[number];
 
-export type OfflineOperation = {
+export type OfflineQueueOwner = {
+  userId: string;
+  projectUrl: string;
+};
+
+type OfflineOperationBase = {
   id: string;
   table: OfflineCapableTable;
-  action: "insert" | "update" | "delete";
+  recordId: string;
   payload: Record<string, unknown>;
-  recordId?: string;
+  ownerUserId: string;
+  ownerProjectUrl: string;
   deviceId: string;
   sequence: number;
   createdAt: string;
   attempts: number;
 };
+
+export type OfflineOperation = OfflineOperationBase &
+  (
+    | { action: "insert" }
+    | { action: "update" }
+    | { action: "delete" }
+  );
+
+export type OfflineOperationInput =
+  | {
+      table: string;
+      action: "insert";
+      payload: Record<string, unknown>;
+    }
+  | {
+      table: string;
+      action: "update" | "delete";
+      payload: Record<string, unknown>;
+      recordId: string;
+    };
 
 export type EncryptedOfflineQueue = {
   version: 1;
@@ -42,8 +68,42 @@ let memoryDeviceId: string | undefined;
 let memorySequence = 0;
 let writeLock: Promise<void> = Promise.resolve();
 
+function normalizeProjectUrl(value: string): string {
+  try {
+    return new URL(value).origin.toLowerCase();
+  } catch {
+    return value.trim().replace(/\/$/, "").toLowerCase();
+  }
+}
+
+export function createOfflineQueueOwner(
+  client: SupabaseClient,
+  userId: string,
+): OfflineQueueOwner {
+  return {
+    userId,
+    projectUrl: normalizeProjectUrl(client.supabaseUrl),
+  };
+}
+
 export function isOfflineCapableTable(table: string): table is OfflineCapableTable {
   return (OFFLINE_TABLES as readonly string[]).includes(table);
+}
+
+export function filterOfflineQueueForOwner(
+  queue: OfflineOperation[],
+  owner: OfflineQueueOwner,
+): OfflineOperation[] {
+  const projectUrl = normalizeProjectUrl(owner.projectUrl);
+  return queue.filter(
+    (operation) =>
+      operation.ownerUserId === owner.userId &&
+      normalizeProjectUrl(operation.ownerProjectUrl) === projectUrl,
+  );
+}
+
+function belongsToOwner(operation: OfflineOperation, owner: OfflineQueueOwner): boolean {
+  return filterOfflineQueueForOwner([operation], owner).length === 1;
 }
 
 export function parseOfflineQueue(value: string | null): OfflineOperation[] {
@@ -61,6 +121,12 @@ export function parseOfflineQueue(value: string | null): OfflineOperation[] {
         typeof candidate.table === "string" &&
         isOfflineCapableTable(candidate.table) &&
         ["insert", "update", "delete"].includes(candidate.action ?? "") &&
+        typeof candidate.recordId === "string" &&
+        candidate.recordId.length > 0 &&
+        typeof candidate.ownerUserId === "string" &&
+        candidate.ownerUserId.length > 0 &&
+        typeof candidate.ownerProjectUrl === "string" &&
+        candidate.ownerProjectUrl.length > 0 &&
         typeof candidate.deviceId === "string" &&
         typeof candidate.sequence === "number" &&
         Number.isSafeInteger(candidate.sequence) &&
@@ -78,6 +144,12 @@ export function parseOfflineQueue(value: string | null): OfflineOperation[] {
 
 export function serializeOfflineQueue(queue: OfflineOperation[]): string {
   return JSON.stringify(queue);
+}
+
+export function buildIdempotentInsertPayload(
+  operation: Extract<OfflineOperation, { action: "insert" }>,
+): Record<string, unknown> {
+  return { ...operation.payload, id: operation.recordId };
 }
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -210,21 +282,20 @@ async function nextSequence(): Promise<number> {
   return next;
 }
 
-export async function getOfflineQueue(): Promise<OfflineOperation[]> {
+async function readRawQueue(): Promise<OfflineOperation[]> {
   if (typeof window === "undefined") return [];
   if (!indexedDbAvailable()) return memoryQueue;
 
-  const envelope = await readValue<EncryptedOfflineQueue>(QUEUE_KEY);
-  if (!envelope) return [];
-
   try {
+    const envelope = await readValue<EncryptedOfflineQueue>(QUEUE_KEY);
+    if (!envelope) return [];
     return await decryptOfflineQueue(envelope, await getEncryptionKey());
   } catch {
     return [];
   }
 }
 
-export async function saveOfflineQueue(queue: OfflineOperation[]): Promise<void> {
+async function saveRawQueue(queue: OfflineOperation[]): Promise<void> {
   if (typeof window === "undefined") return;
 
   if (!indexedDbAvailable()) {
@@ -234,7 +305,11 @@ export async function saveOfflineQueue(queue: OfflineOperation[]): Promise<void>
     await writeValue(QUEUE_KEY, encrypted);
   }
 
-  window.dispatchEvent(new CustomEvent("udk:offline-queue", { detail: queue.length }));
+  window.dispatchEvent(new CustomEvent("udk:offline-queue"));
+}
+
+export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
+  return filterOfflineQueueForOwner(await readRawQueue(), owner);
 }
 
 function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
@@ -247,31 +322,35 @@ function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 export async function enqueueOfflineOperation(
-  operation: Omit<OfflineOperation, "id" | "deviceId" | "sequence" | "createdAt" | "attempts"> & {
-    table: string;
-  },
+  owner: OfflineQueueOwner,
+  operation: OfflineOperationInput,
 ): Promise<OfflineOperation> {
   if (!isOfflineCapableTable(operation.table)) {
     throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
   }
 
   return withWriteLock(async () => {
+    const recordId = operation.action === "insert" ? crypto.randomUUID() : operation.recordId;
     const queued: OfflineOperation = {
       ...operation,
       table: operation.table,
+      recordId,
       id: crypto.randomUUID(),
+      ownerUserId: owner.userId,
+      ownerProjectUrl: normalizeProjectUrl(owner.projectUrl),
       deviceId: await getDeviceId(),
       sequence: await nextSequence(),
       createdAt: new Date().toISOString(),
       attempts: 0,
     };
 
-    const queue = await getOfflineQueue();
+    const queue = await readRawQueue();
     const withoutSupersededUpdates =
-      queued.action === "update" && queued.recordId
+      queued.action === "update"
         ? queue.filter(
             (existing) =>
               !(
+                belongsToOwner(existing, owner) &&
                 existing.table === queued.table &&
                 existing.action === "update" &&
                 existing.recordId === queued.recordId
@@ -279,20 +358,18 @@ export async function enqueueOfflineOperation(
           )
         : queue;
 
-    await saveOfflineQueue([...withoutSupersededUpdates, queued]);
+    await saveRawQueue([...withoutSupersededUpdates, queued]);
     return queued;
   });
 }
 
 async function executeOperation(client: SupabaseClient, operation: OfflineOperation): Promise<void> {
   if (operation.action === "insert") {
-    const { error } = await client.from(operation.table).insert(operation.payload);
+    const { error } = await client
+      .from(operation.table)
+      .upsert(buildIdempotentInsertPayload(operation), { onConflict: "id" });
     if (error) throw error;
     return;
-  }
-
-  if (!operation.recordId) {
-    throw new Error("Offline update or delete operation is missing recordId");
   }
 
   if (operation.action === "update") {
@@ -310,27 +387,38 @@ async function executeOperation(client: SupabaseClient, operation: OfflineOperat
 
 export async function flushOfflineQueue(
   client: SupabaseClient,
+  owner: OfflineQueueOwner,
 ): Promise<{ completed: number; remaining: number }> {
   return withWriteLock(async () => {
-    const queue = (await getOfflineQueue()).sort(
+    const initialQueue = await readRawQueue();
+    const ownerQueue = filterOfflineQueueForOwner(initialQueue, owner).sort(
       (left, right) =>
         left.createdAt.localeCompare(right.createdAt) ||
         left.deviceId.localeCompare(right.deviceId) ||
         left.sequence - right.sequence,
     );
-    const remaining: OfflineOperation[] = [];
+    const snapshotIds = new Set(ownerQueue.map((operation) => operation.id));
+    const failures: OfflineOperation[] = [];
     let completed = 0;
 
-    for (const operation of queue) {
+    for (const operation of ownerQueue) {
       try {
         await executeOperation(client, operation);
         completed += 1;
       } catch {
-        remaining.push({ ...operation, attempts: operation.attempts + 1 });
+        failures.push({ ...operation, attempts: operation.attempts + 1 });
       }
     }
 
-    await saveOfflineQueue(remaining);
-    return { completed, remaining: remaining.length };
+    const currentQueue = await readRawQueue();
+    const operationsFromOtherOwners = currentQueue.filter((operation) => !belongsToOwner(operation, owner));
+    const newlyQueuedForOwner = currentQueue.filter(
+      (operation) => belongsToOwner(operation, owner) && !snapshotIds.has(operation.id),
+    );
+    const merged = [...operationsFromOtherOwners, ...failures, ...newlyQueuedForOwner];
+    const unique = Array.from(new Map(merged.map((operation) => [operation.id, operation])).values());
+    await saveRawQueue(unique);
+
+    return { completed, remaining: failures.length + newlyQueuedForOwner.length };
   });
 }
