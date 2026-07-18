@@ -65,16 +65,20 @@ jobs:
               echo "generated_home_patch=$(grep -c 'const nextStage=' apps/web-publico/app/page.tsx)"
               echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
               echo
-              tail -n 260 verification.log
+              tail -n 320 verification.log
             } > verification-diagnostics.txt
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add verification-diagnostics.txt
-            git commit --allow-empty -m "ci: capture $failed_check diagnostics"
-            git push origin HEAD:feat/deploy-ready-platform
             exit "$status"
           fi
+      - name: Upload verification diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-diagnostics
+          path: verification-diagnostics.txt
+          if-no-files-found: error
+          retention-days: 3
       - name: Commit verified platform
+        if: success()
         run: |
           rm -f verification.log verification-diagnostics.txt lint-diagnostics.txt
           rm -f scripts/generate-apps.mjs scripts/patch-generated.mjs
