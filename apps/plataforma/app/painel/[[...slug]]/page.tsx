@@ -221,10 +221,11 @@ export default function OperationsPage({
       return;
     }
 
+    const activeClient = client;
     let active = true;
 
     async function loadIdentity() {
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      const { data: sessionData, error: sessionError } = await activeClient.auth.getSession();
       if (!active) return;
 
       if (sessionError || !sessionData.session) {
@@ -236,8 +237,8 @@ export default function OperationsPage({
       setUser(authenticatedUser);
 
       const [profileResult, rolesResult] = await Promise.all([
-        client.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),
-        client.from("user_roles").select("role").eq("user_id", authenticatedUser.id),
+        activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),
+        activeClient.from("user_roles").select("role").eq("user_id", authenticatedUser.id),
       ]);
 
       if (!active) return;
@@ -255,7 +256,7 @@ export default function OperationsPage({
     }
 
     void loadIdentity();
-    const { data: subscription } = client.auth.onAuthStateChange((event) => {
+    const { data: subscription } = activeClient.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") router.replace("/");
     });
 

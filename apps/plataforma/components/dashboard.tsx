@@ -24,12 +24,14 @@ type DashboardState = {
   pendingPayments: number;
   provisionalResults: number;
   pendingDocuments: number;
-  nextStage?: {
-    title: string;
-    track: string;
-    starts_at: string;
-    status: string;
-  };
+  nextStage:
+    | {
+        title: string;
+        track: string;
+        starts_at: string;
+        status: string;
+      }
+    | undefined;
 };
 
 const initialState: DashboardState = {
@@ -38,6 +40,7 @@ const initialState: DashboardState = {
   pendingPayments: 0,
   provisionalResults: 0,
   pendingDocuments: 0,
+  nextStage: undefined,
 };
 
 export function Dashboard({ client }: DashboardProps) {

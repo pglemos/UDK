@@ -23,10 +23,12 @@ describe("offline queue", () => {
 
   it("accepts inserts without a record id", () => {
     const insert: OfflineOperation = {
-      ...operation,
       id: "operation-2",
+      table: operation.table,
       action: "insert",
-      recordId: undefined,
+      payload: operation.payload,
+      createdAt: operation.createdAt,
+      attempts: operation.attempts,
     };
 
     expect(parseOfflineQueue(serializeOfflineQueue([insert]))).toEqual([insert]);

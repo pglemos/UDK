@@ -172,7 +172,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
 
           return [
             field.key,
-            (data ?? []).map((row: Record<string, unknown>) => ({
+            ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
               value: String(row[valueColumn]),
               label: String(row[relation.labelColumn] ?? row[valueColumn]),
             })),
@@ -294,12 +294,11 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
 
       if (mutationError) {
         if (shouldQueueMutation(mutationError)) {
-          enqueueOfflineOperation({
-            table: config.table,
-            action: editing ? "update" : "insert",
-            payload,
-            recordId: editing?.id,
-          });
+          enqueueOfflineOperation(
+            editing
+              ? { table: config.table, action: "update", payload, recordId: editing.id }
+              : { table: config.table, action: "insert", payload },
+          );
           setPendingOffline(getOfflineQueue().length);
           setNotice("Sem conexão. A operação foi salva na fila offline.");
           setModalOpen(false);
