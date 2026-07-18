@@ -1,9 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, CloudOff, LoaderCircle, Pencil, Plus, RefreshCw, Search, Trash2, X } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ModuleConfig, ModuleField } from "../lib/module-config";
+import {
+  Check,
+  CloudOff,
+  LoaderCircle,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
+import type { ModuleAction, ModuleConfig, ModuleField } from "../lib/module-config";
 import {
   enqueueOfflineOperation,
   flushOfflineQueue,
@@ -12,22 +22,18 @@ import {
 } from "../lib/offline-queue";
 import { dateTimeLocalToIso, isoToDateTimeLocal } from "../lib/datetime";
 
-export type ModuleRecord = Record<string, unknown> & {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-type RelationOption = {
-  value: string;
-  label: string;
-};
+type RecordRow = Record<string, unknown> & { id: string };
+type RelationOption = { value: string; label: string };
+type UploadedObject = { bucket: string; path: string; fieldKey: string };
+type StorageScope = { kind: "season" | "championship"; id: string };
 
 type ModuleCrudProps = {
   client: SupabaseClient;
   config: ModuleConfig;
   owner: OfflineQueueOwner;
 };
+
+const PAGE_SIZE = 500;
 
 function normalizeDateValue(value: unknown, kind: ModuleField["kind"]): string {
   if (!value || typeof value !== "string") return "";
@@ -42,177 +48,162 @@ function formatValue(
   relationOptions: Record<string, RelationOption[]>,
 ): string {
   if (value === null || value === undefined || value === "") return "—";
-
   if (field.kind === "relation") {
     return relationOptions[field.key]?.find((option) => option.value === String(value))?.label ?? String(value);
   }
-
   if (field.kind === "checkbox") return value ? "Sim" : "Não";
   if (field.kind === "currency") {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(Number(value) / 100);
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value) / 100);
   }
-  if (field.kind === "datetime") {
-    const date = new Date(String(value));
-    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("pt-BR");
-  }
-  if (field.kind === "date") {
-    const date = new Date(`${String(value)}T12:00:00`);
-    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString("pt-BR");
-  }
-  if (field.kind === "json") {
-    return typeof value === "string" ? value : JSON.stringify(value);
-  }
-
+  if (field.kind === "datetime") return new Date(String(value)).toLocaleString("pt-BR");
+  if (field.kind === "date") return new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString("pt-BR");
+  if (typeof value === "object") return JSON.stringify(value);
   return String(value);
 }
 
-function buildInitialValues(config: ModuleConfig, record?: ModuleRecord): Record<string, unknown> {
+function initialValues(config: ModuleConfig): Record<string, unknown> {
   return Object.fromEntries(
     config.fields.map((field) => {
-      const source = record?.[field.key];
-      if (field.kind === "checkbox") return [field.key, Boolean(source)];
-      if (field.kind === "json") {
-        return [field.key, source ? JSON.stringify(source, null, 2) : "{}"];
+      if (field.kind === "checkbox") return [field.key, false];
+      if (field.kind === "json") return [field.key, "{}"];
+      return [field.key, ""];
+    }),
+  );
+}
+
+function editValues(config: ModuleConfig, record: RecordRow): Record<string, unknown> {
+  return Object.fromEntries(
+    config.fields.map((field) => {
+      const value = record[field.key];
+      if (field.kind === "json") return [field.key, JSON.stringify(value ?? {}, null, 2)];
+      if (field.kind === "datetime" || field.kind === "date") {
+        return [field.key, normalizeDateValue(value, field.kind)];
       }
-      return [field.key, normalizeDateValue(source, field.kind)];
+      return [field.key, value ?? (field.kind === "checkbox" ? false : "")];
     }),
   );
 }
 
 function buildPayload(config: ModuleConfig, values: Record<string, unknown>): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
-
   for (const field of config.fields) {
     if (field.readOnly || field.kind === "file") continue;
     const raw = values[field.key];
-
     if (raw === "" || raw === undefined) {
-      payload[field.key] = null;
+      if (!field.required) payload[field.key] = null;
       continue;
     }
-
-    if (field.kind === "number" || field.kind === "currency") {
-      payload[field.key] = Number(raw);
-      continue;
-    }
-
-    if (field.kind === "checkbox") {
-      payload[field.key] = Boolean(raw);
-      continue;
-    }
-
-    if (field.kind === "datetime") {
-      payload[field.key] = dateTimeLocalToIso(String(raw));
-      continue;
-    }
-
-    if (field.kind === "json") {
-      payload[field.key] = typeof raw === "string" ? JSON.parse(raw) : raw;
-      continue;
-    }
-
-    payload[field.key] = raw;
+    if (field.kind === "number" || field.kind === "currency") payload[field.key] = Number(raw);
+    else if (field.kind === "json") payload[field.key] = JSON.parse(String(raw));
+    else if (field.kind === "datetime") payload[field.key] = dateTimeLocalToIso(String(raw));
+    else payload[field.key] = raw;
   }
-
   return payload;
 }
 
-function shouldQueueMutation(error: { message?: string } | null): boolean {
-  if (typeof navigator !== "undefined" && !navigator.onLine) return true;
-  const message = error?.message?.toLowerCase() ?? "";
-  return message.includes("fetch") || message.includes("network") || message.includes("timeout");
+function statusClass(value: unknown): string {
+  const normalized = String(value ?? "").toLowerCase();
+  if (["approved", "published", "homologated", "official", "active", "paid", "closed"].includes(normalized)) {
+    return "status-badge status-success";
+  }
+  if (["rejected", "cancelled", "disqualified", "revoked", "suspended", "failed"].includes(normalized)) {
+    return "status-badge status-danger";
+  }
+  if (["analysis", "submitted", "provisional", "pending", "review", "invited"].includes(normalized)) {
+    return "status-badge status-warning";
+  }
+  return "status-badge";
 }
 
-function statusClass(value: unknown): string {
-  const status = String(value ?? "").toLowerCase();
-  if (["approved", "homologated", "published", "official", "active", "available"].includes(status)) {
-    return "status status-success";
-  }
-  if (["rejected", "cancelled", "suspended", "disqualified", "failed", "annulled"].includes(status)) {
-    return "status status-danger";
-  }
-  if (["analysis", "review", "provisional", "pending", "submitted", "registration"].includes(status)) {
-    return "status status-warning";
-  }
-  return "status";
+function isNetworkError(error: unknown): boolean {
+  const message = String((error as { message?: string } | undefined)?.message ?? error).toLowerCase();
+  return !navigator.onLine || message.includes("fetch") || message.includes("network") || message.includes("timeout");
 }
 
 export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
-  const [records, setRecords] = useState<ModuleRecord[]>([]);
+  const [records, setRecords] = useState<RecordRow[]>([]);
   const [relationOptions, setRelationOptions] = useState<Record<string, RelationOption[]>>({});
+  const [values, setValues] = useState<Record<string, unknown>>(() => initialValues(config));
+  const [fileValues, setFileValues] = useState<Record<string, File | undefined>>({});
+  const [editing, setEditing] = useState<RecordRow>();
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [search, setSearch] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<ModuleRecord | undefined>();
-  const [values, setValues] = useState<Record<string, unknown>>(() => buildInitialValues(config));
-  const [fileValues, setFileValues] = useState<Record<string, File | undefined>>({});
   const [pendingOffline, setPendingOffline] = useState(0);
 
-  const loadRelations = useCallback(async () => {
-    const entries = await Promise.all(
-      config.fields
-        .filter((field) => field.kind === "relation" && field.relation)
-        .map(async (field) => {
-          const relation = field.relation!;
-          const valueColumn = relation.valueColumn ?? "id";
-          let query = client
-            .from(relation.table)
-            .select(`${valueColumn},${relation.labelColumn}`)
-            .limit(500);
-
-          for (const [key, value] of Object.entries(relation.filters ?? {})) {
-            query = query.eq(key, value);
-          }
-
-          const { data, error: relationError } = await query;
-          if (relationError) throw relationError;
-
-          return [
-            field.key,
-            ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
-              value: String(row[valueColumn]),
-              label: String(row[relation.labelColumn] ?? row[valueColumn]),
-            })),
-          ] as const;
-        }),
+  const visibleFields = useMemo(() => config.fields.slice(0, 5), [config.fields]);
+  const filteredRecords = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return records;
+    return records.filter((record) =>
+      config.fields.some((field) => formatValue(record[field.key], field, relationOptions).toLowerCase().includes(term)),
     );
+  }, [config.fields, records, relationOptions, search]);
 
+  const loadRelations = useCallback(async () => {
+    const relationFields = config.fields.filter((field) => field.kind === "relation" && field.relation);
+    const entries = await Promise.all(
+      relationFields.map(async (field) => {
+        const relation = field.relation!;
+        const valueColumn = relation.valueColumn ?? "id";
+        let query = client
+          .from(relation.table)
+          .select(`${valueColumn},${relation.labelColumn}`)
+          .is("deleted_at", null)
+          .limit(1000);
+        for (const [key, value] of Object.entries(relation.filters ?? {})) query = query.eq(key, value);
+        const { data, error: relationError } = await query;
+        if (relationError) throw relationError;
+        const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+          value: String(row[valueColumn]),
+          label: String(row[relation.labelColumn] ?? row[valueColumn]),
+        }));
+        return [field.key, options] as const;
+      }),
+    );
     setRelationOptions(Object.fromEntries(entries));
   }, [client, config.fields]);
 
   const loadRecords = useCallback(async () => {
     setLoading(true);
     setError("");
-
     try {
-      let query = client.from(config.table).select("*").is("deleted_at", null).limit(500);
-      if (config.orderBy) {
-        query = query.order(config.orderBy, { ascending: config.ascending ?? true });
+      const rows: RecordRow[] = [];
+      let offset = 0;
+      while (true) {
+        let query = client
+          .from(config.table)
+          .select("*")
+          .is("deleted_at", null)
+          .order(config.orderBy ?? "created_at", { ascending: config.ascending ?? true })
+          .order("id", { ascending: true })
+          .range(offset, offset + PAGE_SIZE - 1);
+        const { data, error: recordsError } = await query;
+        if (recordsError) throw recordsError;
+        const page = (data ?? []) as RecordRow[];
+        rows.push(...page);
+        if (page.length < PAGE_SIZE) break;
+        offset += PAGE_SIZE;
       }
-
-      const [{ data, error: recordsError }] = await Promise.all([query, loadRelations()]);
-      if (recordsError) throw recordsError;
-      setRecords((data ?? []) as ModuleRecord[]);
+      setRecords(rows);
+      await loadRelations();
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Não foi possível carregar os registros.");
+      setError(loadError instanceof Error ? loadError.message : "Não foi possível carregar os dados.");
     } finally {
       setLoading(false);
     }
-  }, [client, config, loadRelations]);
+  }, [client, config.ascending, config.orderBy, config.table, loadRelations]);
 
   const syncOffline = useCallback(async () => {
     setPendingOffline((await getOfflineQueue(owner)).length);
-    if (typeof navigator !== "undefined" && navigator.onLine) {
+    if (navigator.onLine) {
       const result = await flushOfflineQueue(client, owner);
       setPendingOffline(result.remaining);
       if (result.completed > 0) {
-        setNotice(`${result.completed} operação(ões) offline sincronizada(s).`);
+        setNotice(`${result.completed} operação(ões) sincronizada(s).`);
         await loadRecords();
       }
     }
@@ -221,64 +212,124 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   useEffect(() => {
     void loadRecords();
     void syncOffline();
-
     const onlineHandler = () => void syncOffline();
-    const queueHandler = () => {
-      void getOfflineQueue(owner).then((queue) => setPendingOffline(queue.length));
-    };
+    const queueHandler = () => void getOfflineQueue(owner).then((queue) => setPendingOffline(queue.length));
     window.addEventListener("online", onlineHandler);
     window.addEventListener("udk:offline-queue", queueHandler);
-
     return () => {
       window.removeEventListener("online", onlineHandler);
       window.removeEventListener("udk:offline-queue", queueHandler);
     };
-  }, [loadRecords, syncOffline]);
-
-  const filteredRecords = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return records;
-
-    return records.filter((record) =>
-      config.fields.some((field) =>
-        formatValue(record[field.key], field, relationOptions).toLowerCase().includes(term),
-      ),
-    );
-  }, [config.fields, records, relationOptions, search]);
-
-  const visibleFields = useMemo(() => config.fields.slice(0, 6), [config.fields]);
+  }, [loadRecords, owner, syncOffline]);
 
   function openCreate() {
     setEditing(undefined);
-    setValues(buildInitialValues(config));
+    setValues(initialValues(config));
     setFileValues({});
     setError("");
     setModalOpen(true);
   }
 
-  function openEdit(record: ModuleRecord) {
+  function openEdit(record: RecordRow) {
     setEditing(record);
-    setValues(buildInitialValues(config, record));
+    setValues(editValues(config, record));
     setFileValues({});
     setError("");
     setModalOpen(true);
   }
 
-  async function uploadFiles(payload: Record<string, unknown>): Promise<void> {
-    for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
-      const file = fileValues[field.key];
-      if (!file) continue;
+  async function loadSeasonId(payload: Record<string, unknown>): Promise<string | undefined> {
+    if (typeof payload.season_id === "string") return payload.season_id;
+    let stageId = typeof payload.stage_id === "string" ? payload.stage_id : undefined;
+    let driverId = typeof payload.driver_id === "string" ? payload.driver_id : undefined;
 
+    if (!driverId && typeof payload.registration_id === "string") {
+      const { data, error: relationError } = await client.from("registrations").select("driver_id").eq("id", payload.registration_id).single();
+      if (relationError) throw relationError;
+      driverId = data.driver_id;
+    }
+    if (!stageId && typeof payload.incident_id === "string") {
+      const { data, error: relationError } = await client.from("incidents").select("stage_id").eq("id", payload.incident_id).single();
+      if (relationError) throw relationError;
+      stageId = data.stage_id;
+    }
+    if (!stageId && typeof payload.result_id === "string") {
+      const { data, error: relationError } = await client.from("results").select("stage_id").eq("id", payload.result_id).single();
+      if (relationError) throw relationError;
+      stageId = data.stage_id;
+    }
+    if (!stageId && typeof payload.team_id === "string") {
+      const { data, error: relationError } = await client.from("endurance_teams").select("stage_id").eq("id", payload.team_id).single();
+      if (relationError) throw relationError;
+      stageId = data.stage_id;
+    }
+    if (driverId) {
+      const { data, error: relationError } = await client.from("drivers").select("season_id").eq("id", driverId).single();
+      if (relationError) throw relationError;
+      return data.season_id;
+    }
+    if (stageId) {
+      const { data, error: relationError } = await client.from("stages").select("season_id").eq("id", stageId).single();
+      if (relationError) throw relationError;
+      return data.season_id;
+    }
+    if (typeof payload.term_id === "string") {
+      const { data, error: relationError } = await client.from("terms").select("season_id").eq("id", payload.term_id).single();
+      if (relationError) throw relationError;
+      return data.season_id;
+    }
+    return undefined;
+  }
+
+  async function resolveStorageScope(bucket: string, payload: Record<string, unknown>): Promise<StorageScope> {
+    if (bucket === "public-media") {
+      if (typeof payload.championship_id === "string") return { kind: "championship", id: payload.championship_id };
+      if (typeof payload.sponsor_id === "string") {
+        const { data, error: relationError } = await client.from("sponsors").select("championship_id").eq("id", payload.sponsor_id).single();
+        if (relationError) throw relationError;
+        return { kind: "championship", id: data.championship_id };
+      }
+      throw new Error("Não foi possível identificar o campeonato do arquivo público.");
+    }
+    const seasonId = await loadSeasonId(payload);
+    if (!seasonId) throw new Error("Não foi possível identificar a temporada do arquivo privado.");
+    return { kind: "season", id: seasonId };
+  }
+
+  async function cleanupUploads(objects: UploadedObject[]): Promise<void> {
+    const groups = objects.reduce<Map<string, string[]>>((map, object) => {
+      map.set(object.bucket, [...(map.get(object.bucket) ?? []), object.path]);
+      return map;
+    }, new Map());
+    await Promise.all(
+      Array.from(groups.entries()).map(async ([bucket, paths]) => {
+        const { error: removalError } = await client.storage.from(bucket).remove(paths);
+        if (removalError) console.error("Falha ao remover upload órfão", removalError);
+      }),
+    );
+  }
+
+  async function uploadFiles(payload: Record<string, unknown>): Promise<UploadedObject[]> {
+    const uploaded: UploadedObject[] = [];
+    try {
       const { data: userData, error: userError } = await client.auth.getUser();
       if (userError || !userData.user) throw userError ?? new Error("Usuário não autenticado.");
-
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-      const path = `${userData.user.id}/${crypto.randomUUID()}-${safeName}`;
-      const { error: uploadError } = await client.storage
-        .from(field.storageBucket ?? "private-documents")
-        .upload(path, file, { upsert: false });
-      if (uploadError) throw uploadError;
-      payload[field.key] = path;
+      for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
+        const file = fileValues[field.key];
+        if (!file) continue;
+        const bucket = field.storageBucket ?? "private-documents";
+        const scope = await resolveStorageScope(bucket, payload);
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const path = `${scope.kind}/${scope.id}/${userData.user.id}/${crypto.randomUUID()}-${safeName}`;
+        const { error: uploadError } = await client.storage.from(bucket).upload(path, file, { upsert: false });
+        if (uploadError) throw uploadError;
+        uploaded.push({ bucket, path, fieldKey: field.key });
+        payload[field.key] = path;
+      }
+      return uploaded;
+    } catch (uploadError) {
+      await cleanupUploads(uploaded);
+      throw uploadError;
     }
   }
 
@@ -287,82 +338,85 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
     setSaving(true);
     setError("");
     setNotice("");
+    let uploaded: UploadedObject[] = [];
+    let keepUploads = false;
 
     try {
       const payload = buildPayload(config, values);
-      await uploadFiles(payload);
+      if (config.table === "term_acceptances") payload.user_id = owner.userId;
+      uploaded = await uploadFiles(payload);
 
       const mutation = editing
-        ? client.from(config.table).update(payload).eq("id", editing.id).select().single()
-        : client.from(config.table).insert(payload).select().single();
+        ? client.from(config.table).update(payload).eq("id", editing.id)
+        : client.from(config.table).insert(payload);
       const { error: mutationError } = await mutation;
 
       if (mutationError) {
-        if (shouldQueueMutation(mutationError)) {
+        if (isNetworkError(mutationError)) {
           await enqueueOfflineOperation(
             owner,
             editing
               ? { table: config.table, action: "update", payload, recordId: editing.id }
               : { table: config.table, action: "insert", payload },
           );
+          keepUploads = true;
           setPendingOffline((await getOfflineQueue(owner)).length);
-          setNotice("Sem conexão. A operação foi salva na fila offline.");
+          setNotice("Sem conexão. A operação foi salva na fila offline criptografada.");
           setModalOpen(false);
           return;
         }
         throw mutationError;
       }
 
+      if (editing && uploaded.length > 0) {
+        const replaced = uploaded.flatMap((object) => {
+          const previousPath = editing[object.fieldKey];
+          return typeof previousPath === "string" && previousPath !== object.path
+            ? [{ bucket: object.bucket, path: previousPath, fieldKey: object.fieldKey }]
+            : [];
+        });
+        await cleanupUploads(replaced);
+      }
+
       setNotice(`${config.singular.replace(/^./, (letter) => letter.toUpperCase())} salvo(a) com sucesso.`);
       setModalOpen(false);
       await loadRecords();
     } catch (saveError) {
+      if (!keepUploads) await cleanupUploads(uploaded);
       setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function deleteRecord(record: ModuleRecord) {
-    if (!window.confirm(`Arquivar ${config.singular} ${String(record[config.titleColumn] ?? "selecionado")}?`)) {
-      return;
-    }
-
-    setError("");
-    const { error: deleteError } = await client
-      .from(config.table)
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", record.id);
-    if (deleteError) {
-      if (shouldQueueMutation(deleteError)) {
-        await enqueueOfflineOperation(owner, {
-          table: config.table,
-          action: "delete",
-          payload: {},
-          recordId: record.id,
-        });
-        setPendingOffline((await getOfflineQueue(owner)).length);
-        setNotice("Sem conexão. A exclusão foi adicionada à fila offline.");
-        return;
-      }
-      setError(deleteError.message);
-      return;
-    }
-
-    setNotice("Registro arquivado com exclusão lógica.");
-    await loadRecords();
-  }
-
-  async function runAction(record: ModuleRecord, actionIndex: number) {
-    const action = config.actions?.[actionIndex];
-    if (!action || !window.confirm(action.confirmation)) return;
-
-    const parameters = Object.fromEntries(
-      Object.entries(action.parameterMap).map(([parameter, recordKey]) => [parameter, record[recordKey]]),
-    );
+  async function deleteRecord(record: RecordRow) {
+    if (!window.confirm(`Arquivar ${String(record[config.titleColumn] ?? config.singular)}?`)) return;
     setSaving(true);
     setError("");
+    const { error: deleteError } = await client.from(config.table).update({ deleted_at: new Date().toISOString() }).eq("id", record.id);
+    if (deleteError) {
+      if (isNetworkError(deleteError)) {
+        try {
+          await enqueueOfflineOperation(owner, { table: config.table, action: "delete", payload: {}, recordId: record.id });
+          setPendingOffline((await getOfflineQueue(owner)).length);
+          setNotice("Arquivamento adicionado à fila offline.");
+        } catch (queueError) {
+          setError(queueError instanceof Error ? queueError.message : deleteError.message);
+        }
+      } else setError(deleteError.message);
+      setSaving(false);
+      return;
+    }
+    setNotice("Registro arquivado com exclusão lógica.");
+    await loadRecords();
+    setSaving(false);
+  }
 
+  async function runAction(record: RecordRow, action: ModuleAction) {
+    if (!window.confirm(action.confirmation)) return;
+    setSaving(true);
+    setError("");
+    const parameters = Object.fromEntries(Object.entries(action.parameterMap).map(([parameter, recordKey]) => [parameter, record[recordKey]]));
     const { error: actionError } = await client.rpc(action.rpc, parameters);
     if (actionError) setError(actionError.message);
     else {
@@ -372,264 +426,46 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
     setSaving(false);
   }
 
-  function updateValue(field: ModuleField, value: unknown) {
-    setValues((current) => ({ ...current, [field.key]: value }));
-  }
+  const updateValue = (field: ModuleField, value: unknown) => setValues((current) => ({ ...current, [field.key]: value }));
 
   return (
     <section className="module-workspace">
       <div className="module-toolbar">
-        <div className="search-box">
-          <Search size={18} />
-          <input
-            aria-label={`Buscar em ${config.label}`}
-            placeholder="Buscar registros"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-        </div>
-        <button className="button-secondary" type="button" onClick={() => void loadRecords()} disabled={loading}>
-          <RefreshCw size={17} className={loading ? "spin" : ""} />
-          Atualizar
-        </button>
-        {!config.readOnly ? (
-          <button className="button-primary" type="button" onClick={openCreate}>
-            <Plus size={18} />
-            Novo
-          </button>
-        ) : null}
+        <div className="search-box"><Search size={18} /><input aria-label={`Buscar em ${config.label}`} placeholder="Buscar registros" value={search} onChange={(event) => setSearch(event.target.value)} /></div>
+        <button className="button-secondary" type="button" onClick={() => void loadRecords()} disabled={loading}><RefreshCw size={17} className={loading ? "spin" : ""} />Atualizar</button>
+        {!config.readOnly ? <button className="button-primary" type="button" onClick={openCreate}><Plus size={18} />Novo</button> : null}
       </div>
 
-      {pendingOffline > 0 ? (
-        <div className="offline-banner">
-          <CloudOff size={18} />
-          {pendingOffline} operação(ões) aguardando sincronização.
-          <button type="button" onClick={() => void syncOffline()}>
-            Sincronizar agora
-          </button>
-        </div>
-      ) : null}
-      {error ? <div className="alert alert-error">{error}</div> : null}
-      {notice ? <div className="alert alert-success">{notice}</div> : null}
+      {pendingOffline > 0 ? <div className="offline-banner" role="status"><CloudOff size={18} />{pendingOffline} operação(ões) aguardando sincronização.<button type="button" onClick={() => void syncOffline()}>Sincronizar agora</button></div> : null}
+      {error ? <div className="alert alert-error" role="alert">{error}</div> : null}
+      {notice ? <div className="alert alert-success" role="status">{notice}</div> : null}
 
       <div className="data-card">
-        <div className="data-card-head">
-          <div>
-            <strong>{filteredRecords.length}</strong>
-            <span>registro(s)</span>
-          </div>
-          <small>Dados protegidos pelas políticas RLS do Supabase</small>
-        </div>
-
-        {loading ? (
-          <div className="empty-state">
-            <LoaderCircle className="spin" />
-            <p>Carregando {config.label.toLowerCase()}...</p>
-          </div>
-        ) : filteredRecords.length === 0 ? (
-          <div className="empty-state">
-            <Check />
-            <h3>Nenhum registro encontrado</h3>
-            <p>Altere a busca ou crie o primeiro registro deste módulo.</p>
-          </div>
-        ) : (
-          <div className="table-scroll">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  {visibleFields.map((field) => (
-                    <th key={field.key}>{field.label}</th>
-                  ))}
-                  <th>Atualizado</th>
-                  <th className="actions-column">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRecords.map((record) => (
-                  <tr key={record.id}>
-                    {visibleFields.map((field) => {
-                      const formatted = formatValue(record[field.key], field, relationOptions);
-                      const isStatus = field.key === "status";
-                      return (
-                        <td key={field.key} title={formatted}>
-                          {isStatus ? <span className={statusClass(record[field.key])}>{formatted}</span> : formatted}
-                        </td>
-                      );
-                    })}
-                    <td>{record.updated_at ? new Date(record.updated_at).toLocaleString("pt-BR") : "—"}</td>
-                    <td className="row-actions">
-                      {!config.readOnly
-                        ? config.actions?.map((action, index) => (
-                            <button
-                              type="button"
-                              className="icon-button action-button"
-                              title={action.label}
-                              onClick={() => void runAction(record, index)}
-                              key={action.key}
-                              disabled={saving}
-                            >
-                              <RefreshCw size={16} />
-                            </button>
-                          ))
-                        : null}
-                      {!config.readOnly && !config.createOnly ? (
-                        <>
-                          <button
-                            type="button"
-                            className="icon-button"
-                            title="Editar"
-                            onClick={() => openEdit(record)}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            className="icon-button danger"
-                            title="Arquivar"
-                            onClick={() => void deleteRecord(record)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="data-card-head"><div><strong>{filteredRecords.length}</strong><span>registro(s)</span></div><small>Dados protegidos pelas políticas RLS do Supabase</small></div>
+        {loading ? <div className="empty-state"><LoaderCircle className="spin" /><p>Carregando {config.label.toLowerCase()}...</p></div> : filteredRecords.length === 0 ? <div className="empty-state"><Check /><h3>Nenhum registro encontrado</h3><p>Altere a busca ou crie o primeiro registro deste módulo.</p></div> : (
+          <div className="table-scroll"><table className="admin-table"><thead><tr>{visibleFields.map((field) => <th key={field.key}>{field.label}</th>)}<th>Atualizado</th><th className="actions-column">Ações</th></tr></thead><tbody>{filteredRecords.map((record) => (
+            <tr key={record.id}>{visibleFields.map((field) => { const formatted = formatValue(record[field.key], field, relationOptions); return <td key={field.key} title={formatted}>{field.key === "status" ? <span className={statusClass(record[field.key])}>{formatted}</span> : formatted}</td>; })}<td>{record.updated_at ? new Date(String(record.updated_at)).toLocaleString("pt-BR") : "—"}</td><td className="row-actions">
+              {!config.readOnly ? config.actions?.map((action) => <button type="button" className="icon-button action-button" title={action.label} aria-label={action.label} onClick={() => void runAction(record, action)} key={action.key} disabled={saving}><RefreshCw size={16} /></button>) : null}
+              {!config.readOnly && !config.createOnly ? <><button type="button" className="icon-button" title="Editar" aria-label="Editar registro" onClick={() => openEdit(record)}><Pencil size={16} /></button><button type="button" className="icon-button danger" title="Arquivar" aria-label="Arquivar registro" onClick={() => void deleteRecord(record)}><Trash2 size={16} /></button></> : null}
+            </td></tr>
+          ))}</tbody></table></div>
         )}
       </div>
 
-      {modalOpen ? (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => !saving && setModalOpen(false)}>
-          <div className="modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="modal-head">
-              <div>
-                <small>{editing ? "Editar" : "Novo registro"}</small>
-                <h2>{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2>
-              </div>
-              <button className="icon-button" type="button" onClick={() => setModalOpen(false)} disabled={saving}>
-                <X />
-              </button>
-            </div>
-
-            <form onSubmit={(event) => void saveRecord(event)}>
-              <div className="form-grid">
-                {config.fields.map((field) => {
-                  const value = values[field.key];
-                  const common = {
-                    id: `field-${field.key}`,
-                    required: field.required,
-                    disabled: field.readOnly || saving,
-                  };
-
-                  return (
-                    <label key={field.key} className={field.kind === "textarea" || field.kind === "json" ? "form-wide" : ""}>
-                      <span>
-                        {field.label}
-                        {field.required ? <b> *</b> : null}
-                      </span>
-
-                      {field.kind === "textarea" || field.kind === "json" ? (
-                        <textarea
-                          {...common}
-                          rows={field.kind === "json" ? 9 : 4}
-                          placeholder={field.placeholder}
-                          value={String(value ?? "")}
-                          onChange={(event) => updateValue(field, event.target.value)}
-                        />
-                      ) : null}
-
-                      {field.kind === "select" ? (
-                        <select
-                          {...common}
-                          value={String(value ?? "")}
-                          onChange={(event) => updateValue(field, event.target.value)}
-                        >
-                          <option value="">Selecione</option>
-                          {field.options?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : null}
-
-                      {field.kind === "relation" ? (
-                        <select
-                          {...common}
-                          value={String(value ?? "")}
-                          onChange={(event) => updateValue(field, event.target.value)}
-                        >
-                          <option value="">Selecione</option>
-                          {relationOptions[field.key]?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : null}
-
-                      {field.kind === "checkbox" ? (
-                        <span className="checkbox-field">
-                          <input
-                            {...common}
-                            type="checkbox"
-                            checked={Boolean(value)}
-                            onChange={(event) => updateValue(field, event.target.checked)}
-                          />
-                          Ativo
-                        </span>
-                      ) : null}
-
-                      {field.kind === "file" ? (
-                        <input
-                          {...common}
-                          type="file"
-                          accept={field.accept}
-                          onChange={(event) =>
-                            setFileValues((current) => ({ ...current, [field.key]: event.target.files?.[0] }))
-                          }
-                        />
-                      ) : null}
-
-                      {["text", "number", "currency", "datetime", "date"].includes(field.kind) ? (
-                        <input
-                          {...common}
-                          type={
-                            field.kind === "number" || field.kind === "currency"
-                              ? "number"
-                              : field.kind === "datetime"
-                                ? "datetime-local"
-                                : field.kind
-                          }
-                          step={field.kind === "currency" ? "1" : undefined}
-                          placeholder={field.placeholder}
-                          value={String(value ?? "")}
-                          onChange={(event) => updateValue(field, event.target.value)}
-                        />
-                      ) : null}
-                    </label>
-                  );
-                })}
-              </div>
-
-              {error ? <div className="alert alert-error">{error}</div> : null}
-
-              <div className="modal-actions">
-                <button className="button-secondary" type="button" onClick={() => setModalOpen(false)} disabled={saving}>
-                  Cancelar
-                </button>
-                <button className="button-primary" type="submit" disabled={saving}>
-                  {saving ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}
-                  Salvar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      {modalOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={() => !saving && setModalOpen(false)}><div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}><div className="modal-head"><div><small>{editing ? "Editar" : "Novo registro"}</small><h2 id="module-modal-title">{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2></div><button className="icon-button" type="button" aria-label="Fechar formulário" onClick={() => setModalOpen(false)} disabled={saving}><X /></button></div>
+        <form onSubmit={(event) => void saveRecord(event)}><div className="form-grid">{config.fields.map((field) => {
+          const value = values[field.key];
+          const common = { id: `field-${field.key}`, required: field.kind === "file" ? Boolean(field.required && !value) : field.required, disabled: field.readOnly || saving };
+          return <label key={field.key} className={field.kind === "textarea" || field.kind === "json" ? "form-wide" : ""}><span>{field.label}{field.required ? <b> *</b> : null}</span>
+            {field.kind === "textarea" || field.kind === "json" ? <textarea {...common} rows={field.kind === "json" ? 9 : 4} placeholder={field.placeholder} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)} /> : null}
+            {field.kind === "select" ? <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}><option value="">Selecione</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : null}
+            {field.kind === "relation" ? <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}><option value="">Selecione</option>{relationOptions[field.key]?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : null}
+            {field.kind === "checkbox" ? <span className="checkbox-field"><input {...common} type="checkbox" checked={Boolean(value)} onChange={(event) => updateValue(field, event.target.checked)} />Ativo</span> : null}
+            {field.kind === "file" ? <input {...common} type="file" accept={field.accept} onChange={(event) => setFileValues((current) => ({ ...current, [field.key]: event.target.files?.[0] }))} /> : null}
+            {["text", "number", "currency", "datetime", "date"].includes(field.kind) ? <input {...common} type={field.kind === "number" || field.kind === "currency" ? "number" : field.kind === "datetime" ? "datetime-local" : field.kind} step={field.kind === "currency" ? "1" : undefined} placeholder={field.placeholder} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)} /> : null}
+          </label>;
+        })}</div>{error ? <div className="alert alert-error" role="alert">{error}</div> : null}<div className="modal-actions"><button className="button-secondary" type="button" onClick={() => setModalOpen(false)} disabled={saving}>Cancelar</button><button className="button-primary" type="submit" disabled={saving}>{saving ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}Salvar</button></div></form>
+      </div></div> : null}
     </section>
   );
 }
