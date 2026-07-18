@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, feat/complete-operational-modules]
 
 permissions:
   contents: write
@@ -164,7 +164,12 @@ jobs:
   }
 
   async function cleanupUploads(objects: UploadedObject[]): Promise<void> {
-    const grouped = Map.groupBy(objects, (object) => object.bucket);
+    const grouped = objects.reduce<Map<string, UploadedObject[]>>((map, object) => {
+      const existing = map.get(object.bucket) ?? [];
+      existing.push(object);
+      map.set(object.bucket, existing);
+      return map;
+    }, new Map());
     await Promise.all(
       Array.from(grouped.entries()).map(async ([bucket, bucketObjects]) => {
         const { error: removalError } = await client.storage
