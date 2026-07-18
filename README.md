@@ -1,5 +1,8 @@
 # UDK • Ultras do Kart
 
+[![Application CI](https://github.com/pglemos/UDK/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/pglemos/UDK/actions/workflows/ci.yml)
+[![Supabase CI](https://github.com/pglemos/UDK/actions/workflows/database.yml/badge.svg?branch=main)](https://github.com/pglemos/UDK/actions/workflows/database.yml)
+
 Plataforma oficial do campeonato **Ultras do Kart**, preparada para operar com dois projetos Next.js no Vercel e um projeto Supabase compartilhado.
 
 ## Aplicações
