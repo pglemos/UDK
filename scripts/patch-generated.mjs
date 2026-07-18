@@ -1,4 +1,4 @@
-import { writeFile, rm } from "node:fs/promises";
+import { readFile, writeFile, rm } from "node:fs/promises";
 
 await writeFile(
   "eslint.config.mjs",
@@ -24,5 +24,25 @@ export default defineConfig([
 `,
 );
 
+const layoutPath = "apps/web-publico/app/layout.tsx";
+const layout = await readFile(layoutPath, "utf8");
+await writeFile(
+  layoutPath,
+  layout.replace(
+    "const links=[[",
+    "const links: Array<[string, string]> = [[",
+  ),
+);
+
+const homePath = "apps/web-publico/app/page.tsx";
+let home = await readFile(homePath, "utf8");
+home = home.replace(
+  "export default async function Home(){const {drivers,stages}=await publicData();return",
+  'export default async function Home(){const {drivers,stages}=await publicData();const nextStage=stages[0]??{date:"18 AGO",title:"Endurance",track:"Traçado 01 invertido com chicane",time:"21h"};return',
+);
+home = home.replaceAll("stages[0].", "nextStage.");
+await writeFile(homePath, home);
+
 await rm("lint-diagnostics.txt", { force: true });
+await rm("verification-diagnostics.txt", { force: true });
 console.log("generated-files-patched");
