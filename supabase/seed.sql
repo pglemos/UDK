@@ -1,0 +1,3 @@
+-- Os dados iniciais versionados da temporada UDK 2026 são aplicados pela migration
+-- supabase/migrations/202607180002_seed.sql.
+-- Este arquivo existe para manter o fluxo padrão da Supabase CLI sem avisos.
