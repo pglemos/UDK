@@ -3,14 +3,14 @@ import { getModuleConfig, moduleConfigs } from "./module-config";
 
 describe("module configuration", () => {
   it("uses unique module keys", () => {
-    const keys = moduleConfigs.map((module) => module.key);
+    const keys = moduleConfigs.map((moduleConfig) => moduleConfig.key);
     expect(new Set(keys).size).toBe(keys.length);
   });
 
   it("declares a title column and at least one field for every module", () => {
-    for (const module of moduleConfigs) {
-      expect(module.titleColumn.length).toBeGreaterThan(0);
-      expect(module.fields.length).toBeGreaterThan(0);
+    for (const moduleConfig of moduleConfigs) {
+      expect(moduleConfig.titleColumn.length).toBeGreaterThan(0);
+      expect(moduleConfig.fields.length).toBeGreaterThan(0);
     }
   });
 
