@@ -22,13 +22,41 @@ const reports = [
   { key: "audit_events", label: "Auditoria", description: "Histórico imutável de alterações" },
 ] as const;
 
-function escapeCsv(value: unknown): string {
+const privateColumns = new Set([
+  "deleted_at",
+  "original_path",
+  "proof_path",
+  "file_path",
+  "signature_path",
+]);
+
+function safeSpreadsheetValue(value: unknown): string {
   if (value === null || value === undefined) return "";
   const normalized = typeof value === "object" ? JSON.stringify(value) : String(value);
+  return /^[=+\-@]/.test(normalized) ? `'${normalized}` : normalized;
+}
+
+function escapeCsv(value: unknown): string {
+  const normalized = safeSpreadsheetValue(value);
   return `"${normalized.replaceAll('"', '""')}"`;
 }
 
-function createCsv(rows: Record<string, unknown>[]): string {
+export function sanitizeReportRows(
+  table: string,
+  rows: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  return rows.map((row) =>
+    Object.fromEntries(
+      Object.entries(row).filter(([column]) => {
+        if (privateColumns.has(column)) return false;
+        if (table === "audit_events" && column === "actor_ip") return false;
+        return true;
+      }),
+    ),
+  );
+}
+
+export function createCsv(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";
   const columns = Array.from(new Set(rows.flatMap((row) => Object.keys(row))));
   const header = columns.map(escapeCsv).join(";");
@@ -46,14 +74,19 @@ export function ReportsPanel({ client }: ReportsPanelProps) {
     setError("");
     setNotice("");
 
-    const { data, error: reportError } = await client.from(table).select("*").limit(5000);
+    let query = client.from(table).select("*").limit(5000);
+    if (table !== "audit_events") {
+      query = query.is("deleted_at", null);
+    }
+
+    const { data, error: reportError } = await query;
     if (reportError) {
       setError(reportError.message);
       setLoading(undefined);
       return;
     }
 
-    const rows = (data ?? []) as Record<string, unknown>[];
+    const rows = sanitizeReportRows(table, (data ?? []) as Record<string, unknown>[]);
     if (rows.length === 0) {
       setNotice(`O relatório ${label} não possui registros no escopo atual.`);
       setLoading(undefined);
@@ -66,7 +99,7 @@ export function ReportsPanel({ client }: ReportsPanelProps) {
     anchor.href = url;
     anchor.download = `udk-${table}-${new Date().toISOString().slice(0, 10)}.csv`;
     anchor.click();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
 
     setNotice(`${rows.length} registro(s) exportado(s) em ${label}.`);
     setLoading(undefined);
