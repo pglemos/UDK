@@ -1,0 +1,352 @@
+name: Apply operational domain UI
+
+on:
+  push:
+    branches: [feat/complete-operational-modules]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-domain-ui:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+          fetch-depth: 0
+      - name: Wire modules and navigation
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          function replaceExact(path, before, after) {
+            const source = fs.readFileSync(path, 'utf8');
+            if (!source.includes(before)) throw new Error(`Expected source fragment not found in ${path}`);
+            fs.writeFileSync(path, source.replace(before, after));
+          }
+
+          const configPath = 'apps/plataforma/lib/module-config.ts';
+          replaceExact(
+            configPath,
+            '      relation("stage_id", "Etapa", "stages", "title"),\n      relation("category_id", "Categoria", "categories", "name", false),',
+            '      relation("stage_id", "Etapa", "stages", "title"),\n      relation("session_id", "Sessão", "sessions", "name", false),\n      relation("category_id", "Categoria", "categories", "name", false),',
+          );
+          replaceExact(
+            configPath,
+            '{ key: "proof_path", label: "Caminho do comprovante", kind: "text" },',
+            '{ key: "proof_path", label: "Comprovante", kind: "file", storageBucket: "payment-proofs", accept: "image/jpeg,image/png,application/pdf" },',
+          );
+          replaceExact(
+            configPath,
+            '{ key: "original_path", label: "Caminho privado", kind: "text" },',
+            '{ key: "original_path", label: "Arquivo original", kind: "file", storageBucket: "timing-imports", accept: "application/pdf,text/csv" },',
+          );
+
+          const extraModules = `  {
+    key: "responsaveis",
+    label: "Responsáveis legais",
+    description: "Vínculos de responsáveis com pilotos menores e homologação administrativa.",
+    table: "guardian_links",
+    singular: "vínculo",
+    titleColumn: "relationship",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("guardian_id", "Responsável", "profiles", "full_name"),
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
+      { key: "relationship", label: "Parentesco / vínculo", kind: "text", required: true },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("pending", "approved", "rejected", "revoked") },
+      relation("approved_by", "Aprovado por", "profiles", "full_name", false),
+      { key: "approved_at", label: "Data da aprovação", kind: "datetime" },
+    ],
+  },
+  {
+    key: "termos",
+    label: "Termos e regulamentos",
+    description: "Versões oficiais, vigência, obrigatoriedade e publicação.",
+    table: "terms",
+    singular: "termo",
+    titleColumn: "title",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("season_id", "Temporada", "seasons", "name"),
+      { key: "kind", label: "Tipo", kind: "select", required: true, options: statusOptions("regulation", "responsibility", "image_authorization", "privacy", "guardian_authorization", "payment_policy", "other") },
+      { key: "title", label: "Título", kind: "text", required: true },
+      { key: "version", label: "Versão", kind: "number", required: true },
+      { key: "content", label: "Conteúdo", kind: "textarea", required: true },
+      { key: "required", label: "Obrigatório", kind: "checkbox" },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("draft", "review", "published", "superseded", "archived") },
+      { key: "effective_at", label: "Vigência", kind: "datetime" },
+    ],
+  },
+  {
+    key: "aceites",
+    label: "Aceites",
+    description: "Evidência de aceite por usuário, piloto ou responsável legal.",
+    table: "term_acceptances",
+    singular: "aceite",
+    titleColumn: "accepted_at",
+    orderBy: "accepted_at",
+    ascending: false,
+    fields: [
+      relation("term_id", "Termo", "terms", "title"),
+      relation("user_id", "Signatário", "profiles", "full_name"),
+      relation("driver_id", "Piloto representado", "drivers", "sport_name", false),
+      { key: "accepted_at", label: "Aceito em", kind: "datetime", required: true },
+      { key: "signature_path", label: "Assinatura", kind: "file", storageBucket: "signatures", accept: "image/jpeg,image/png,application/pdf" },
+      { key: "metadata", label: "Metadados", kind: "json" },
+    ],
+  },
+  {
+    key: "mudancas-categoria",
+    label: "Mudanças de categoria",
+    description: "Solicitação, política de pontos, etapa de vigência e decisão.",
+    table: "category_change_requests",
+    singular: "mudança",
+    titleColumn: "status",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("season_id", "Temporada", "seasons", "name"),
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
+      relation("from_category_id", "Categoria atual", "categories", "name", false),
+      relation("to_category_id", "Nova categoria", "categories", "name"),
+      relation("effective_stage_id", "Etapa de vigência", "stages", "title", false),
+      { key: "points_policy", label: "Política de pontos", kind: "select", required: true, options: statusOptions("transfer", "zero", "convert", "maintain") },
+      { key: "reason", label: "Justificativa", kind: "textarea", required: true },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("draft", "submitted", "analysis", "approved", "rejected", "cancelled", "applied") },
+    ],
+  },
+  {
+    key: "sessoes",
+    label: "Sessões",
+    description: "Treinos, classificação, Super Pole, corrida e Endurance.",
+    table: "sessions",
+    singular: "sessão",
+    titleColumn: "name",
+    orderBy: "starts_at",
+    fields: [
+      relation("stage_id", "Etapa", "stages", "title"),
+      relation("category_id", "Categoria", "categories", "name", false),
+      { key: "name", label: "Nome", kind: "text", required: true },
+      { key: "kind", label: "Tipo", kind: "select", required: true, options: statusOptions("practice", "qualifying", "super_pole", "race", "endurance") },
+      { key: "starts_at", label: "Início", kind: "datetime" },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("scheduled", "open", "live", "provisional", "homologated", "cancelled") },
+    ],
+  },
+  {
+    key: "checkin",
+    label: "Check-in",
+    description: "Presença, atraso, ausência, bloqueio e observações operacionais.",
+    table: "checkins",
+    singular: "check-in",
+    titleColumn: "status",
+    orderBy: "updated_at",
+    ascending: false,
+    fields: [
+      relation("stage_id", "Etapa", "stages", "title"),
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("expected", "present", "late", "absent", "excused", "blocked") },
+      { key: "checked_in_at", label: "Horário", kind: "datetime" },
+      relation("checked_in_by", "Registrado por", "profiles", "full_name", false),
+      { key: "notes", label: "Observações", kind: "textarea" },
+    ],
+  },
+  {
+    key: "karts",
+    label: "Karts e sorteio",
+    description: "Kart por piloto ou equipe, confirmação, alteração e devolução.",
+    table: "kart_assignments",
+    singular: "atribuição",
+    titleColumn: "kart_number",
+    orderBy: "kart_number",
+    fields: [
+      relation("stage_id", "Etapa", "stages", "title"),
+      relation("session_id", "Sessão", "sessions", "name", false),
+      relation("driver_id", "Piloto", "drivers", "sport_name", false),
+      relation("team_id", "Equipe", "endurance_teams", "name", false),
+      { key: "kart_number", label: "Número do kart", kind: "number", required: true },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("assigned", "confirmed", "changed", "returned", "cancelled") },
+      { key: "notes", label: "Observações", kind: "textarea" },
+    ],
+  },
+  {
+    key: "pontuacao",
+    label: "Regras de pontuação",
+    description: "Tabela por formato, bônus, versão e ativação.",
+    table: "points_rules",
+    singular: "regra",
+    titleColumn: "event_format",
+    orderBy: "version",
+    ascending: false,
+    fields: [
+      relation("season_id", "Temporada", "seasons", "name"),
+      relation("category_id", "Categoria", "categories", "name", false),
+      { key: "event_format", label: "Formato", kind: "select", required: true, options: statusOptions("regular", "endurance", "special") },
+      { key: "position_points", label: "Pontos por posição", kind: "json", required: true },
+      { key: "pole_points", label: "Bônus pole", kind: "number" },
+      { key: "fastest_lap_points", label: "Bônus melhor volta", kind: "number" },
+      { key: "active", label: "Ativa", kind: "checkbox" },
+      { key: "version", label: "Versão", kind: "number", required: true },
+    ],
+  },
+  {
+    key: "voltas",
+    label: "Voltas",
+    description: "Volta a volta, tempo, velocidade, posição e validade.",
+    table: "laps",
+    singular: "volta",
+    titleColumn: "lap_number",
+    orderBy: "lap_number",
+    fields: [
+      relation("result_id", "Resultado", "results", "title"),
+      relation("result_entry_id", "Entrada", "result_entries", "position"),
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
+      { key: "lap_number", label: "Volta", kind: "number", required: true },
+      { key: "lap_time_ms", label: "Tempo (ms)", kind: "number" },
+      { key: "speed_kph", label: "Velocidade", kind: "number" },
+      { key: "position", label: "Posição", kind: "number" },
+      { key: "valid", label: "Válida", kind: "checkbox" },
+      { key: "invalid_reason", label: "Motivo da invalidação", kind: "text" },
+    ],
+  },
+  {
+    key: "evidencias",
+    label: "Evidências",
+    description: "Fotos, vídeos, relatórios, testemunhos e documentos disciplinares.",
+    table: "evidence",
+    singular: "evidência",
+    titleColumn: "evidence_type",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("incident_id", "Ocorrência", "incidents", "incident_type"),
+      { key: "evidence_type", label: "Tipo", kind: "select", required: true, options: statusOptions("photo", "video", "report", "witness", "document", "timing") },
+      { key: "file_path", label: "Arquivo", kind: "file", storageBucket: "disciplinary-evidence", accept: "image/jpeg,image/png,application/pdf,video/mp4,video/webm" },
+      { key: "statement", label: "Relato", kind: "textarea" },
+      { key: "visibility", label: "Visibilidade", kind: "select", required: true, options: statusOptions("private", "involved", "committee", "public", "restricted") },
+      { key: "content_hash", label: "Hash", kind: "text" },
+    ],
+  },
+  {
+    key: "membros-endurance",
+    label: "Membros de equipes",
+    description: "Capitão, titulares, reservas, convites e aprovação.",
+    table: "endurance_members",
+    singular: "membro",
+    titleColumn: "member_role",
+    orderBy: "created_at",
+    fields: [
+      relation("team_id", "Equipe", "endurance_teams", "name"),
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
+      { key: "member_role", label: "Função", kind: "select", required: true, options: statusOptions("captain", "starter", "reserve") },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("invited", "accepted", "declined", "approved") },
+    ],
+  },
+  {
+    key: "campanhas",
+    label: "Campanhas de patrocinadores",
+    description: "Aprovação, cupons, ativações, conteúdo e métricas.",
+    table: "sponsor_campaigns",
+    singular: "campanha",
+    titleColumn: "title",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("championship_id", "Campeonato", "championships", "name"),
+      relation("sponsor_id", "Patrocinador", "sponsors", "name"),
+      { key: "title", label: "Título", kind: "text", required: true },
+      { key: "kind", label: "Tipo", kind: "select", required: true, options: statusOptions("promotion", "coupon", "banner", "lead_campaign", "event_activation", "content") },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("draft", "approval", "adjustments", "approved", "scheduled", "published", "ended", "cancelled") },
+      { key: "starts_at", label: "Início", kind: "datetime" },
+      { key: "ends_at", label: "Fim", kind: "datetime" },
+      { key: "coupon_code", label: "Cupom", kind: "text" },
+      { key: "target_url", label: "Destino", kind: "text" },
+      { key: "content", label: "Conteúdo", kind: "json" },
+      { key: "metrics", label: "Métricas", kind: "json" },
+    ],
+  },
+  {
+    key: "versoes-conteudo",
+    label: "Versões de conteúdo",
+    description: "Histórico estruturado para revisão, restauração e publicação.",
+    table: "cms_versions",
+    singular: "versão",
+    titleColumn: "version",
+    orderBy: "version",
+    ascending: false,
+    fields: [
+      relation("page_id", "Página", "cms_pages", "title"),
+      { key: "version", label: "Versão", kind: "number", required: true },
+      { key: "content", label: "Conteúdo", kind: "json", required: true },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("draft", "review", "approved", "published", "archived") },
+      relation("created_by", "Criado por", "profiles", "full_name", false),
+    ],
+  },
+`;
+
+          const configSource = fs.readFileSync(configPath, 'utf8');
+          const configMarker = '\n];\n\nexport const moduleConfigByKey';
+          if (!configSource.includes(configMarker)) throw new Error('module config array marker not found');
+          fs.writeFileSync(configPath, configSource.replace(configMarker, `\n${extraModules}];\n\nexport const moduleConfigByKey`));
+
+          const pagePath = 'apps/plataforma/app/painel/[[...slug]]/page.tsx';
+          replaceExact(
+            pagePath,
+            '      { key: "documentos", label: "Documentos", icon: FileCheck2 },\n      { key: "calendario", label: "Calendário", icon: CalendarDays },\n      { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },\n      { key: "creditos", label: "Créditos", icon: HandCoins },',
+            '      { key: "documentos", label: "Documentos", icon: FileCheck2 },\n      { key: "responsaveis", label: "Responsáveis", icon: UsersRound },\n      { key: "termos", label: "Termos", icon: BookOpenText },\n      { key: "aceites", label: "Aceites", icon: FileCheck2 },\n      { key: "mudancas-categoria", label: "Mudanças de categoria", icon: ClipboardCheck },\n      { key: "calendario", label: "Calendário", icon: CalendarDays },\n      { key: "sessoes", label: "Sessões", icon: CalendarDays },\n      { key: "checkin", label: "Check-in", icon: ClipboardCheck },\n      { key: "karts", label: "Karts", icon: Flag },\n      { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },\n      { key: "creditos", label: "Créditos", icon: HandCoins },',
+          );
+          replaceExact(
+            pagePath,
+            '      { key: "resultados", label: "Resultados", icon: Flag },\n      { key: "classificacao", label: "Classificação", icon: Trophy },\n      { key: "importacoes", label: "Importações", icon: FileInput },\n      { key: "ocorrencias", label: "Ocorrências", icon: ShieldAlert },\n      { key: "julgamentos", label: "Penalidades", icon: Gavel },\n      { key: "recursos", label: "Recursos", icon: BookOpenText },',
+            '      { key: "resultados", label: "Resultados", icon: Flag },\n      { key: "classificacao", label: "Classificação", icon: Trophy },\n      { key: "pontuacao", label: "Pontuação", icon: Trophy },\n      { key: "importacoes", label: "Importações", icon: FileInput },\n      { key: "voltas", label: "Voltas", icon: Timer },\n      { key: "ocorrencias", label: "Ocorrências", icon: ShieldAlert },\n      { key: "evidencias", label: "Evidências", icon: ShieldAlert },\n      { key: "julgamentos", label: "Penalidades", icon: Gavel },\n      { key: "recursos", label: "Recursos", icon: BookOpenText },',
+          );
+          replaceExact(
+            pagePath,
+            '      { key: "endurance", label: "Equipes", icon: UsersRound },\n      { key: "stints", label: "Stints", icon: Sparkles },',
+            '      { key: "endurance", label: "Equipes", icon: UsersRound },\n      { key: "membros-endurance", label: "Membros", icon: Users },\n      { key: "stints", label: "Stints", icon: Sparkles },',
+          );
+          replaceExact(
+            pagePath,
+            '      { key: "conteudo", label: "Conteúdo", icon: LayoutGrid },\n      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },\n      { key: "notificacoes", label: "Notificações", icon: Bell },',
+            '      { key: "conteudo", label: "Conteúdo", icon: LayoutGrid },\n      { key: "versoes-conteudo", label: "Versões", icon: BookOpenText },\n      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },\n      { key: "campanhas", label: "Campanhas", icon: Sparkles },\n      { key: "notificacoes", label: "Notificações", icon: Bell },',
+          );
+
+          replaceExact(pagePath, '    "calendario",\n    "resultados",', '    "calendario",\n    "sessoes",\n    "resultados",');
+          replaceExact(pagePath, '    "classificacao",\n    "importacoes",', '    "classificacao",\n    "pontuacao",\n    "importacoes",\n    "voltas",');
+          replaceExact(pagePath, '    "ocorrencias",\n    "julgamentos",', '    "ocorrencias",\n    "evidencias",\n    "julgamentos",');
+          replaceExact(
+            pagePath,
+            '  marshal: ["dashboard", "calendario", "pilotos", "endurance", "stints", "ocorrencias", "notificacoes"],',
+            '  marshal: ["dashboard", "calendario", "sessoes", "pilotos", "checkin", "karts", "endurance", "membros-endurance", "stints", "ocorrencias", "evidencias", "notificacoes"],',
+          );
+          replaceExact(
+            pagePath,
+            '  editor: ["dashboard", "conteudo", "patrocinadores", "notificacoes"],\n  sponsor: ["dashboard", "patrocinadores", "notificacoes"],',
+            '  editor: ["dashboard", "conteudo", "versoes-conteudo", "patrocinadores", "campanhas", "notificacoes"],\n  sponsor: ["dashboard", "patrocinadores", "campanhas", "notificacoes"],',
+          );
+          replaceExact(pagePath, '    "documentos",\n    "financeiro",', '    "documentos",\n    "termos",\n    "aceites",\n    "mudancas-categoria",\n    "financeiro",');
+          replaceExact(pagePath, '    "calendario",\n    "resultados",', '    "calendario",\n    "sessoes",\n    "checkin",\n    "karts",\n    "resultados",');
+          replaceExact(pagePath, '    "classificacao",\n    "recursos",', '    "classificacao",\n    "voltas",\n    "recursos",');
+          replaceExact(pagePath, '    "pilotos",\n    "inscricoes",', '    "pilotos",\n    "responsaveis",\n    "inscricoes",');
+
+          const testPath = 'apps/plataforma/lib/module-config.test.ts';
+          replaceExact(
+            testPath,
+            '      "notificacoes",\n    ];',
+            '      "notificacoes",\n      "responsaveis",\n      "termos",\n      "aceites",\n      "mudancas-categoria",\n      "sessoes",\n      "checkin",\n      "karts",\n      "pontuacao",\n      "voltas",\n      "evidencias",\n      "membros-endurance",\n      "campanhas",\n      "versoes-conteudo",\n    ];',
+          );
+          NODE
+      - name: Commit domain UI
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/plataforma
+          git diff --cached --check
+          git commit -m "feat: expose all operational domains"
+          git push origin HEAD:feat/complete-operational-modules
