@@ -1,0 +1,73 @@
+name: Apply final role-aware UI polish
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-polish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+          fetch-depth: 0
+      - name: Apply role-aware interface fixes
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          function replaceExact(path, before, after) {
+            const source = fs.readFileSync(path, 'utf8');
+            if (!source.includes(before)) throw new Error(`Expected fragment not found in ${path}`);
+            fs.writeFileSync(path, source.replace(before, after));
+          }
+
+          const page = 'apps/plataforma/app/painel/[[...slug]]/page.tsx';
+          replaceExact(page, '  Sparkles,\n  Trophy,', '  Sparkles,\n  Timer,\n  Trophy,');
+
+          replaceExact(
+            page,
+            '  guardian: [\n    "dashboard",\n    "pilotos",\n    "responsaveis",\n    "inscricoes",\n    "documentos",\n    "financeiro",\n    "creditos",\n    "calendario",\n    "resultados",\n    "classificacao",\n    "recursos",\n    "notificacoes",\n  ],',
+            '  guardian: [\n    "dashboard",\n    "pilotos",\n    "responsaveis",\n    "inscricoes",\n    "documentos",\n    "termos",\n    "aceites",\n    "mudancas-categoria",\n    "financeiro",\n    "creditos",\n    "calendario",\n    "sessoes",\n    "checkin",\n    "karts",\n    "resultados",\n    "classificacao",\n    "voltas",\n    "julgamentos",\n    "recursos",\n    "endurance",\n    "notificacoes",\n  ],',
+          );
+
+          const writeAccess = `\nconst writableModulesByRole: Record<Role, string[]> = {\n  admin: allModuleKeys,\n  organization: allModuleKeys,\n  judge: ["resultados", "classificacao", "pontuacao", "importacoes", "voltas", "ocorrencias", "evidencias", "julgamentos", "recursos"],\n  marshal: ["sessoes", "checkin", "karts", "endurance", "membros-endurance", "stints", "ocorrencias", "evidencias"],\n  finance: ["financeiro", "creditos"],\n  editor: ["conteudo", "versoes-conteudo", "patrocinadores", "campanhas", "notificacoes"],\n  sponsor: [],\n  driver: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],\n  guardian: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],\n};\n`;
+          replaceExact(page, '\nconst roleLabels: Record<Role, string> = {', `${writeAccess}\nconst roleLabels: Record<Role, string> = {`);
+          replaceExact(
+            page,
+            '  const config = getModuleConfig(activeKey);\n  const authorized = activeKey === "dashboard" || allowedKeys.has(activeKey);',
+            '  const config = getModuleConfig(activeKey);\n  const authorized = activeKey === "dashboard" || allowedKeys.has(activeKey);\n  const canMutate = roles.some((role) => writableModulesByRole[role].includes(activeKey));\n  const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;',
+          );
+          replaceExact(page, '<ModuleCrud client={client} config={config} />', '<ModuleCrud client={client} config={effectiveConfig ?? config} />');
+
+          const configPath = 'apps/plataforma/lib/module-config.ts';
+          replaceExact(configPath, '  readOnly?: boolean;\n  actions?: ModuleAction[];', '  readOnly?: boolean;\n  createOnly?: boolean;\n  actions?: ModuleAction[];');
+          replaceExact(
+            configPath,
+            '    ascending: false,\n    fields: [\n      relation("term_id", "Termo", "terms", "title"),',
+            '    ascending: false,\n    createOnly: true,\n    fields: [\n      relation("term_id", "Termo", "terms", "title"),',
+          );
+
+          const crud = 'apps/plataforma/components/module-crud.tsx';
+          replaceExact(
+            crud,
+            '                      {config.actions?.map((action, index) => (\n                        <button\n                          type="button"\n                          className="icon-button action-button"\n                          title={action.label}\n                          onClick={() => void runAction(record, index)}\n                          key={action.key}\n                          disabled={saving}\n                        >\n                          <RefreshCw size={16} />\n                        </button>\n                      ))}\n                      {!config.readOnly ? (',
+            '                      {!config.readOnly\n                        ? config.actions?.map((action, index) => (\n                            <button\n                              type="button"\n                              className="icon-button action-button"\n                              title={action.label}\n                              onClick={() => void runAction(record, index)}\n                              key={action.key}\n                              disabled={saving}\n                            >\n                              <RefreshCw size={16} />\n                            </button>\n                          ))\n                        : null}\n                      {!config.readOnly && !config.createOnly ? (',
+          );
+          NODE
+      - name: Verify and commit
+        run: |
+          git diff --check
+          grep -q 'Timer,' apps/plataforma/app/painel/[[...slug]]/page.tsx
+          grep -q 'writableModulesByRole' apps/plataforma/app/painel/[[...slug]]/page.tsx
+          grep -q 'createOnly: true' apps/plataforma/lib/module-config.ts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/plataforma
+          git commit -m "fix: enforce role-aware module capabilities"
+          git push origin HEAD:feat/complete-operational-modules
