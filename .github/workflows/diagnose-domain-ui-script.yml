@@ -1,4 +1,4 @@
-name: Diagnose domain UI patch script
+name: Export domain UI patch
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  diagnose-script:
+  export-patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,18 @@ jobs:
           status=$?
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
-      - uses: actions/upload-artifact@v4
+      - name: Upload patched files
+        if: steps.patch.outputs.status == '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-ui-patched-files
+          path: |
+            apps/plataforma/lib/module-config.ts
+            apps/plataforma/lib/module-config.test.ts
+            apps/plataforma/app/painel/[[...slug]]/page.tsx
+          retention-days: 3
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
         with:
           name: domain-ui-script-diagnostics
           path: diagnostics/domain-ui-script.txt
