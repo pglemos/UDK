@@ -45,6 +45,8 @@ describe("module configuration", () => {
       "membros-endurance",
       "campanhas",
       "versoes-conteudo",
+      "usuarios-patrocinador",
+      "permissoes",
     ];
 
     for (const key of required) {

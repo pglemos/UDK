@@ -853,6 +853,42 @@ export const moduleConfigs: ModuleConfig[] = [
       relation("created_by", "Criado por", "profiles", "full_name", false),
     ],
   },
+  {
+    key: "usuarios-patrocinador",
+    label: "Usuários de patrocinadores",
+    description: "Vínculos, funções e situação dos acessos empresariais.",
+    table: "sponsor_users",
+    singular: "usuário de patrocinador",
+    titleColumn: "member_role",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("sponsor_id", "Patrocinador", "sponsors", "name"),
+      relation("user_id", "Usuário", "profiles", "full_name"),
+      { key: "member_role", label: "Função", kind: "select", required: true, options: statusOptions("owner", "manager", "analyst", "viewer") },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("invited", "active", "suspended", "revoked") },
+    ],
+  },
+  {
+    key: "permissoes",
+    label: "Permissões granulares",
+    description: "Escopo por papel, categoria, etapa, sessão, módulo e ação.",
+    table: "role_permissions",
+    singular: "permissão",
+    titleColumn: "module",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("user_role_id", "Papel", "user_roles", "role"),
+      relation("category_id", "Categoria", "categories", "name", false),
+      relation("stage_id", "Etapa", "stages", "title", false),
+      relation("session_id", "Sessão", "sessions", "name", false),
+      { key: "module", label: "Módulo", kind: "text", required: true },
+      { key: "action", label: "Ação", kind: "select", required: true, options: statusOptions("read", "create", "update", "delete", "approve", "publish", "homologate", "export", "manage") },
+      { key: "allowed", label: "Permitida", kind: "checkbox" },
+      { key: "expires_at", label: "Expiração", kind: "datetime" },
+    ],
+  },
 ];
 
 export const moduleConfigByKey = new Map(moduleConfigs.map((module) => [module.key, module]));
