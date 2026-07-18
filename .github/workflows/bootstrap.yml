@@ -6,11 +6,15 @@ on:
     branches: [main]
 permissions:
   contents: read
+  pull-requests: write
+  issues: write
 jobs:
   lint:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,4 +24,13 @@ jobs:
           node-version: 22
       - run: node scripts/generate-apps.mjs
       - run: corepack enable && pnpm install --no-frozen-lockfile --reporter=silent
-      - run: pnpm lint
+      - name: Lint and publish diagnostics
+        run: |
+          if ! pnpm lint > lint.log 2>&1; then
+            printf '## Lint diagnostics\n\n```text\n' > lint-comment.md
+            tail -n 120 lint.log >> lint-comment.md
+            printf '\n```\n' >> lint-comment.md
+            gh pr comment 4 --body-file lint-comment.md
+            cat lint.log
+            exit 1
+          fi
