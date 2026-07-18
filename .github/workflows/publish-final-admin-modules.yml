@@ -1,0 +1,111 @@
+name: Publish final administration modules
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-admin-modules:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+          fetch-depth: 0
+      - name: Add administration modules
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          function replaceExact(path, before, after) {
+            const source = fs.readFileSync(path, 'utf8');
+            if (!source.includes(before)) throw new Error(`Expected fragment not found in ${path}`);
+            fs.writeFileSync(path, source.replace(before, after));
+          }
+
+          const configPath = 'apps/plataforma/lib/module-config.ts';
+          const modules = `  {
+    key: "usuarios-patrocinador",
+    label: "Usuários de patrocinadores",
+    description: "Vínculos, funções e situação dos acessos empresariais.",
+    table: "sponsor_users",
+    singular: "usuário de patrocinador",
+    titleColumn: "member_role",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("sponsor_id", "Patrocinador", "sponsors", "name"),
+      relation("user_id", "Usuário", "profiles", "full_name"),
+      { key: "member_role", label: "Função", kind: "select", required: true, options: statusOptions("owner", "manager", "analyst", "viewer") },
+      { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("invited", "active", "suspended", "revoked") },
+    ],
+  },
+  {
+    key: "permissoes",
+    label: "Permissões granulares",
+    description: "Escopo por papel, categoria, etapa, sessão, módulo e ação.",
+    table: "role_permissions",
+    singular: "permissão",
+    titleColumn: "module",
+    orderBy: "created_at",
+    ascending: false,
+    fields: [
+      relation("user_role_id", "Papel", "user_roles", "role"),
+      relation("category_id", "Categoria", "categories", "name", false),
+      relation("stage_id", "Etapa", "stages", "title", false),
+      relation("session_id", "Sessão", "sessions", "name", false),
+      { key: "module", label: "Módulo", kind: "text", required: true },
+      { key: "action", label: "Ação", kind: "select", required: true, options: statusOptions("read", "create", "update", "delete", "approve", "publish", "homologate", "export", "manage") },
+      { key: "allowed", label: "Permitida", kind: "checkbox" },
+      { key: "expires_at", label: "Expiração", kind: "datetime" },
+    ],
+  },
+`;
+          const source = fs.readFileSync(configPath, 'utf8');
+          const marker = '\n];\n\nexport const moduleConfigByKey';
+          if (!source.includes(marker)) throw new Error('module config marker not found');
+          fs.writeFileSync(configPath, source.replace(marker, `\n${modules}];\n\nexport const moduleConfigByKey`));
+
+          const page = 'apps/plataforma/app/painel/[[...slug]]/page.tsx';
+          replaceExact(
+            page,
+            '      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },\n      { key: "campanhas", label: "Campanhas", icon: Sparkles },\n      { key: "notificacoes", label: "Notificações", icon: Bell },',
+            '      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },\n      { key: "usuarios-patrocinador", label: "Usuários de patrocinadores", icon: UsersRound },\n      { key: "campanhas", label: "Campanhas", icon: Sparkles },\n      { key: "notificacoes", label: "Notificações", icon: Bell },',
+          );
+          replaceExact(
+            page,
+            '      { key: "configuracoes", label: "Configurações", icon: Settings },',
+            '      { key: "configuracoes", label: "Configurações", icon: Settings },\n      { key: "permissoes", label: "Permissões", icon: Settings },',
+          );
+          replaceExact(
+            page,
+            '  editor: ["dashboard", "conteudo", "versoes-conteudo", "patrocinadores", "campanhas", "notificacoes"],\n  sponsor: ["dashboard", "patrocinadores", "campanhas", "notificacoes"],',
+            '  editor: ["dashboard", "conteudo", "versoes-conteudo", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],\n  sponsor: ["dashboard", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],',
+          );
+          replaceExact(
+            page,
+            '  editor: ["conteudo", "versoes-conteudo", "patrocinadores", "campanhas", "notificacoes"],',
+            '  editor: ["conteudo", "versoes-conteudo", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],',
+          );
+
+          const testPath = 'apps/plataforma/lib/module-config.test.ts';
+          replaceExact(
+            testPath,
+            '      "versoes-conteudo",\n    ];',
+            '      "versoes-conteudo",\n      "usuarios-patrocinador",\n      "permissoes",\n    ];',
+          );
+          NODE
+      - name: Verify and commit
+        run: |
+          git diff --check
+          grep -q 'key: "permissoes"' apps/plataforma/lib/module-config.ts
+          grep -q 'key: "usuarios-patrocinador"' apps/plataforma/lib/module-config.ts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/plataforma
+          git commit -m "feat: add final administration modules"
+          git push origin HEAD:feat/complete-operational-modules
