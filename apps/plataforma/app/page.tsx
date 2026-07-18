@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, LoaderCircle, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
-type AuthMode = "signin" | "signup" | "reset";
+type AuthMode = "signin" | "signup" | "reset" | "recovery";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [sportName, setSportName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -21,13 +22,42 @@ export default function LoginPage() {
   useEffect(() => {
     const client = supabase();
     if (!client) return;
-    client.auth.getSession().then(({ data }) => {
+
+    let active = true;
+    const recoveryRequested =
+      new URLSearchParams(window.location.search).get("recovery") === "1" ||
+      window.location.hash.includes("type=recovery");
+
+    if (recoveryRequested) setMode("recovery");
+
+    void client.auth.getSession().then(({ data, error: sessionError }) => {
+      if (!active || sessionError) return;
+      if (data.session && recoveryRequested) {
+        setMode("recovery");
+        return;
+      }
       if (data.session) router.replace("/painel");
     });
+
+    const { data: subscription } = client.auth.onAuthStateChange((event) => {
+      if (!active) return;
+      if (event === "PASSWORD_RECOVERY") {
+        setMode("recovery");
+        setError("");
+        setNotice("Link validado. Defina uma nova senha para concluir a recuperação.");
+      }
+    });
+
+    return () => {
+      active = false;
+      subscription.subscription.unsubscribe();
+    };
   }, [router]);
 
   function changeMode(nextMode: AuthMode) {
     setMode(nextMode);
+    setPassword("");
+    setPasswordConfirmation("");
     setError("");
     setNotice("");
   }
@@ -47,8 +77,32 @@ export default function LoginPage() {
 
     setLoading(true);
 
+    if (mode === "recovery") {
+      if (password !== passwordConfirmation) {
+        setError("As senhas não coincidem.");
+        setLoading(false);
+        return;
+      }
+
+      const { error: updateError } = await client.auth.updateUser({ password });
+      if (updateError) {
+        setError(updateError.message);
+        setLoading(false);
+        return;
+      }
+
+      await client.auth.signOut();
+      window.history.replaceState({}, "", "/");
+      setPassword("");
+      setPasswordConfirmation("");
+      setMode("signin");
+      setNotice("Senha alterada com sucesso. Entre novamente com a nova senha.");
+      setLoading(false);
+      return;
+    }
+
     if (mode === "reset") {
-      const redirectTo = `${window.location.origin}/`;
+      const redirectTo = `${window.location.origin}/?recovery=1`;
       const { error: resetError } = await client.auth.resetPasswordForEmail(email, { redirectTo });
       if (resetError) setError(resetError.message);
       else setNotice("E-mail de recuperação enviado. Verifique sua caixa de entrada.");
@@ -86,6 +140,22 @@ export default function LoginPage() {
   }
 
   const configured = isSupabaseConfigured();
+  const title =
+    mode === "signin"
+      ? "Entrar"
+      : mode === "signup"
+        ? "Criar conta"
+        : mode === "reset"
+          ? "Recuperar senha"
+          : "Nova senha";
+  const submitLabel =
+    mode === "signin"
+      ? "Entrar"
+      : mode === "signup"
+        ? "Criar conta"
+        : mode === "reset"
+          ? "Enviar link"
+          : "Salvar nova senha";
 
   return (
     <main className="login">
@@ -113,24 +183,24 @@ export default function LoginPage() {
       <section className="login-panel">
         <form onSubmit={submit}>
           <span className="eyebrow">Acesso seguro</span>
-          <h2>
-            {mode === "signin" ? "Entrar" : mode === "signup" ? "Criar conta" : "Recuperar senha"}
-          </h2>
+          <h2>{title}</h2>
           <p className="form-intro">
             {mode === "signin"
               ? "Use sua conta única para acessar todos os papéis autorizados."
               : mode === "signup"
                 ? "O perfil inicial será criado como piloto e poderá receber outros papéis."
-                : "Enviaremos um link de recuperação para o e-mail cadastrado."}
+                : mode === "reset"
+                  ? "Enviaremos um link de recuperação para o e-mail cadastrado."
+                  : "Defina uma nova senha com pelo menos oito caracteres."}
           </p>
 
           {!configured ? (
-            <div className="alert alert-warning">
+            <div className="alert alert-warning" role="status">
               A interface está pronta, mas as variáveis do Supabase ainda não foram cadastradas.
             </div>
           ) : null}
-          {error ? <div className="alert alert-error">{error}</div> : null}
-          {notice ? <div className="alert alert-success">{notice}</div> : null}
+          {error ? <div className="alert alert-error" role="alert">{error}</div> : null}
+          {notice ? <div className="alert alert-success" role="status">{notice}</div> : null}
 
           {mode === "signup" ? (
             <div className="auth-grid">
@@ -162,30 +232,49 @@ export default function LoginPage() {
             </div>
           ) : null}
 
-          <label>
-            <span>E-mail</span>
-            <div className="input-with-icon">
-              <Mail size={18} />
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-                required
-              />
-            </div>
-          </label>
+          {mode !== "recovery" ? (
+            <label>
+              <span>E-mail</span>
+              <div className="input-with-icon">
+                <Mail size={18} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  autoComplete="email"
+                  required
+                />
+              </div>
+            </label>
+          ) : null}
 
           {mode !== "reset" ? (
             <label>
-              <span>Senha</span>
+              <span>{mode === "recovery" ? "Nova senha" : "Senha"}</span>
               <div className="input-with-icon">
                 <LockKeyhole size={18} />
                 <input
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  minLength={8}
+                  required
+                />
+              </div>
+            </label>
+          ) : null}
+
+          {mode === "recovery" ? (
+            <label>
+              <span>Confirmar nova senha</span>
+              <div className="input-with-icon">
+                <LockKeyhole size={18} />
+                <input
+                  type="password"
+                  value={passwordConfirmation}
+                  onChange={(event) => setPasswordConfirmation(event.target.value)}
+                  autoComplete="new-password"
                   minLength={8}
                   required
                 />
@@ -195,7 +284,7 @@ export default function LoginPage() {
 
           <button className="login-submit" type="submit" disabled={loading || !configured}>
             {loading ? <LoaderCircle className="spin" /> : <ArrowRight />}
-            {mode === "signin" ? "Entrar" : mode === "signup" ? "Criar conta" : "Enviar link"}
+            {submitLabel}
           </button>
 
           <div className="auth-links">
@@ -205,12 +294,8 @@ export default function LoginPage() {
               </button>
             ) : (
               <>
-                <button type="button" onClick={() => changeMode("signup")}>
-                  Criar conta
-                </button>
-                <button type="button" onClick={() => changeMode("reset")}>
-                  Esqueci a senha
-                </button>
+                <button type="button" onClick={() => changeMode("signup")}>Criar conta</button>
+                <button type="button" onClick={() => changeMode("reset")}>Esqueci a senha</button>
               </>
             )}
           </div>
