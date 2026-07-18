@@ -3,6 +3,8 @@ name: Diagnose operational lint
 on:
   push:
     branches: [feat/complete-operational-modules]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
