@@ -1,8 +1,8 @@
-const CACHE_NAME = "udk-platform-v1";
-const APP_SHELL = ["/", "/painel", "/udk.svg"];
+const CACHE_NAME = "udk-platform-v2";
+const PUBLIC_SHELL = ["/", "/offline.html", "/udk.svg"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PUBLIC_SHELL)));
   self.skipWaiting();
 });
 
@@ -21,14 +21,17 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
   if (url.pathname.startsWith("/_next/static/") || url.pathname.endsWith(".svg")) {
     event.respondWith(
       caches.match(request).then(
         (cached) =>
           cached ||
           fetch(request).then((response) => {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            if (response.ok && response.type === "basic") {
+              const copy = response.clone();
+              void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
             return response;
           }),
       ),
@@ -36,15 +39,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(async () => (await caches.match(request)) || (await caches.match("/painel")) || Response.error()),
-    );
+  if (request.mode !== "navigate") return;
+
+  if (url.pathname.startsWith("/painel") || url.pathname.startsWith("/auth")) {
+    event.respondWith(fetch(request).catch(() => caches.match("/offline.html")));
+    return;
   }
+
+  event.respondWith(
+    fetch(request).catch(async () => (await caches.match(request)) || (await caches.match("/offline.html"))),
+  );
 });
