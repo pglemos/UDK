@@ -1,12 +1,4 @@
-::endgroup::
-::group::@udk/notifications:lint
-cache miss, executing 80d28b7e22e4d646
-
-> @udk/notifications@0.1.0 lint /home/runner/work/UDK/UDK/packages/notifications
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/notifications/pages or /home/runner/work/UDK/UDK/packages/notifications/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/ui/pages or /home/runner/work/UDK/UDK/packages/ui/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
 ::endgroup::
 ::group::@udk/permissions:lint
 cache miss, executing c369cd743f6194f1
@@ -17,42 +9,6 @@ cache miss, executing c369cd743f6194f1
 Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
 Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/permissions/pages or /home/runner/work/UDK/UDK/packages/permissions/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
 ::endgroup::
-::group::@udk/results-importer:lint
-cache miss, executing 04da084eb2ae3de2
-
-> @udk/results-importer@0.1.0 lint /home/runner/work/UDK/UDK/packages/results-importer
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/results-importer/pages or /home/runner/work/UDK/UDK/packages/results-importer/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/audit:lint
-cache miss, executing e73a0f78fb2fca77
-
-> @udk/audit@0.1.0 lint /home/runner/work/UDK/UDK/packages/audit
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/audit/pages or /home/runner/work/UDK/UDK/packages/audit/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/endurance:lint
-cache miss, executing ebe05bc4eeb48b40
-
-> @udk/endurance@0.1.0 lint /home/runner/work/UDK/UDK/packages/endurance
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/endurance/pages or /home/runner/work/UDK/UDK/packages/endurance/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/database:lint
-cache miss, executing f1031a38d32d34e1
-
-> @udk/database@0.1.0 lint /home/runner/work/UDK/UDK/packages/database
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/database/pages or /home/runner/work/UDK/UDK/packages/database/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
 ::group::@udk/analytics:lint
 cache miss, executing 0f1588aa131de436
 
@@ -61,33 +17,6 @@ cache miss, executing 0f1588aa131de436
 
 Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
 Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/analytics/pages or /home/runner/work/UDK/UDK/packages/analytics/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/payments:lint
-cache miss, executing d203b0e9c8e1e71f
-
-> @udk/payments@0.1.0 lint /home/runner/work/UDK/UDK/packages/payments
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/payments/pages or /home/runner/work/UDK/UDK/packages/payments/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/offline-sync:lint
-cache miss, executing a8c43bfbd0111fea
-
-> @udk/offline-sync@0.1.0 lint /home/runner/work/UDK/UDK/packages/offline-sync
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/offline-sync/pages or /home/runner/work/UDK/UDK/packages/offline-sync/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
-::endgroup::
-::group::@udk/scoring-engine:lint
-cache miss, executing e368a34f54103338
-
-> @udk/scoring-engine@0.1.0 lint /home/runner/work/UDK/UDK/packages/scoring-engine
-> eslint src --max-warnings=0
-
-Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/scoring-engine/pages or /home/runner/work/UDK/UDK/packages/scoring-engine/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
 ::endgroup::
 ::group::@udk/cms:lint
 cache miss, executing e47882146981efd1
@@ -98,14 +27,64 @@ cache miss, executing e47882146981efd1
 Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
 Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/cms/pages or /home/runner/work/UDK/UDK/packages/cms/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
 ::endgroup::
-::group::@udk/ui:lint
-cache miss, executing afefddd9d4732d19
+::group::@udk/scoring-engine:lint
+cache miss, executing e368a34f54103338
 
-> @udk/ui@0.1.0 lint /home/runner/work/UDK/UDK/packages/ui
+> @udk/scoring-engine@0.1.0 lint /home/runner/work/UDK/UDK/packages/scoring-engine
 > eslint src --max-warnings=0
 
 Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
-Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/ui/pages or /home/runner/work/UDK/UDK/packages/ui/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/scoring-engine/pages or /home/runner/work/UDK/UDK/packages/scoring-engine/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+::endgroup::
+::group::@udk/audit:lint
+cache miss, executing e73a0f78fb2fca77
+
+> @udk/audit@0.1.0 lint /home/runner/work/UDK/UDK/packages/audit
+> eslint src --max-warnings=0
+
+Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/audit/pages or /home/runner/work/UDK/UDK/packages/audit/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+::endgroup::
+::group::@udk/payments:lint
+cache miss, executing d203b0e9c8e1e71f
+
+> @udk/payments@0.1.0 lint /home/runner/work/UDK/UDK/packages/payments
+> eslint src --max-warnings=0
+
+Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/payments/pages or /home/runner/work/UDK/UDK/packages/payments/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+::endgroup::
+::group::@udk/notifications:lint
+cache miss, executing 80d28b7e22e4d646
+
+> @udk/notifications@0.1.0 lint /home/runner/work/UDK/UDK/packages/notifications
+> eslint src --max-warnings=0
+
+Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/notifications/pages or /home/runner/work/UDK/UDK/packages/notifications/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+::endgroup::
+::group::@udk/endurance:lint
+cache miss, executing ebe05bc4eeb48b40
+
+> @udk/endurance@0.1.0 lint /home/runner/work/UDK/UDK/packages/endurance
+> eslint src --max-warnings=0
+
+Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
+Pages directory cannot be found at /home/runner/work/UDK/UDK/packages/endurance/pages or /home/runner/work/UDK/UDK/packages/endurance/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+::endgroup::
+::group::@udk/web-publico:lint
+cache miss, executing 8a49532bc0370fe8
+
+> @udk/web-publico@1.0.0 lint /home/runner/work/UDK/UDK/apps/web-publico
+> eslint .
+
+
+/home/runner/work/UDK/UDK/apps/web-publico/app/layout.tsx
+  4:144  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  4:350  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+✖ 2 problems (0 errors, 2 warnings)
+
 ::endgroup::
 [;31m@udk/plataforma:lint[;0m
 cache miss, executing 818fecfccbb4d218
@@ -135,25 +114,46 @@ Calling setState synchronously within an effect body causes cascading renders th
 
  ELIFECYCLE  Command failed with exit code 1.
 [ERROR] command finished with error: command (/home/runner/work/UDK/UDK/apps/plataforma) /opt/hostedtoolcache/node/22.23.1/x64/bin/pnpm run lint exited (1)
-::group::@udk/web-publico:lint
-cache miss, executing 8a49532bc0370fe8
+::group::@udk/auth:lint
+cache miss, executing 3767007d3e5e72fc
 
-> @udk/web-publico@1.0.0 lint /home/runner/work/UDK/UDK/apps/web-publico
-> eslint .
+> @udk/auth@0.1.0 lint /home/runner/work/UDK/UDK/packages/auth
+> eslint src --max-warnings=0
 
+::endgroup::
+::group::@udk/results-importer:lint
+cache miss, executing 04da084eb2ae3de2
 
-/home/runner/work/UDK/UDK/apps/web-publico/app/layout.tsx
-  4:144  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-  4:350  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+> @udk/results-importer@0.1.0 lint /home/runner/work/UDK/UDK/packages/results-importer
+> eslint src --max-warnings=0
 
-✖ 2 problems (0 errors, 2 warnings)
+::endgroup::
+::group::@udk/disciplinary:lint
+cache miss, executing bb9433b23582139a
+
+> @udk/disciplinary@0.1.0 lint /home/runner/work/UDK/UDK/packages/disciplinary
+> eslint src --max-warnings=0
+
+::endgroup::
+::group::@udk/database:lint
+cache miss, executing f1031a38d32d34e1
+
+> @udk/database@0.1.0 lint /home/runner/work/UDK/UDK/packages/database
+> eslint src --max-warnings=0
+
+::endgroup::
+::group::@udk/offline-sync:lint
+cache miss, executing a8c43bfbd0111fea
+
+> @udk/offline-sync@0.1.0 lint /home/runner/work/UDK/UDK/packages/offline-sync
+> eslint src --max-warnings=0
 
 ::endgroup::
 ::error::@udk/plataforma#lint: command (/home/runner/work/UDK/UDK/apps/plataforma) /opt/hostedtoolcache/node/22.23.1/x64/bin/pnpm run lint exited (1)
 
- Tasks:    14 successful, 16 total
+ Tasks:    10 successful, 16 total
 Cached:    0 cached, 16 total
-  Time:    15.549s 
+  Time:    12.826s 
 Failed:    @udk/plataforma#lint
 
  ERROR  run failed: command  exited (1)
