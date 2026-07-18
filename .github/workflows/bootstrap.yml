@@ -1,4 +1,4 @@
-name: Diagnose UDK platform
+name: Build deploy-ready UDK platform
 on:
   push:
     branches: [feat/deploy-ready-platform]
@@ -7,10 +7,10 @@ on:
 permissions:
   contents: write
 jobs:
-  lint:
+  build-platform:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,16 +19,55 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node scripts/generate-apps.mjs
-      - run: corepack enable && pnpm install --no-frozen-lockfile --reporter=silent
-      - name: Lint and persist diagnostics
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Generate applications
         run: |
-          if ! pnpm lint > lint.log 2>&1; then
-            tail -n 160 lint.log > lint-diagnostics.txt
+          node scripts/generate-apps.mjs
+          node scripts/patch-generated.mjs
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --no-frozen-lockfile --reporter=silent
+      - name: Verify application and database
+        run: |
+          set +e
+          : > verification.log
+          status=0
+          run_check() {
+            if [ "$status" -eq 0 ]; then
+              echo "### $1" >> verification.log
+              shift
+              "$@" >> verification.log 2>&1
+              status=$?
+            fi
+          }
+          run_check "workspace" pnpm verify
+          run_check "lint" pnpm lint
+          run_check "typecheck" pnpm typecheck
+          run_check "tests" pnpm test
+          run_check "build" pnpm build
+          run_check "supabase-start" supabase start
+          run_check "supabase-reset" supabase db reset
+          run_check "supabase-tests" supabase test db
+          run_check "supabase-lint" supabase db lint --level warning
+          if [ "$status" -ne 0 ]; then
+            tail -n 220 verification.log > verification-diagnostics.txt
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add lint-diagnostics.txt
-            git commit -m "ci: capture lint diagnostics"
+            git add verification-diagnostics.txt
+            git commit -m "ci: capture verification diagnostics"
             git push origin HEAD:feat/deploy-ready-platform
-            exit 1
+            exit "$status"
           fi
+      - name: Commit verified platform
+        run: |
+          rm -f verification.log verification-diagnostics.txt
+          rm -f scripts/generate-apps.mjs scripts/patch-generated.mjs
+          rm -f .github/workflows/bootstrap.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: deliver deploy-ready UDK platform"
+          git push origin HEAD:feat/deploy-ready-platform
