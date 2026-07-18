@@ -188,7 +188,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
     setError("");
 
     try {
-      let query = client.from(config.table).select("*").limit(500);
+      let query = client.from(config.table).select("*").is("deleted_at", null).limit(500);
       if (config.orderBy) {
         query = query.order(config.orderBy, { ascending: config.ascending ?? true });
       }
@@ -204,7 +204,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
   }, [client, config, loadRelations]);
 
   const syncOffline = useCallback(async () => {
-    setPendingOffline(getOfflineQueue().length);
+    setPendingOffline((await getOfflineQueue()).length);
     if (typeof navigator !== "undefined" && navigator.onLine) {
       const result = await flushOfflineQueue(client);
       setPendingOffline(result.remaining);
@@ -220,7 +220,9 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
     void syncOffline();
 
     const onlineHandler = () => void syncOffline();
-    const queueHandler = () => setPendingOffline(getOfflineQueue().length);
+    const queueHandler = () => {
+      void getOfflineQueue().then((queue) => setPendingOffline(queue.length));
+    };
     window.addEventListener("online", onlineHandler);
     window.addEventListener("udk:offline-queue", queueHandler);
 
@@ -294,12 +296,12 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
 
       if (mutationError) {
         if (shouldQueueMutation(mutationError)) {
-          enqueueOfflineOperation(
+          await enqueueOfflineOperation(
             editing
               ? { table: config.table, action: "update", payload, recordId: editing.id }
               : { table: config.table, action: "insert", payload },
           );
-          setPendingOffline(getOfflineQueue().length);
+          setPendingOffline((await getOfflineQueue()).length);
           setNotice("Sem conexão. A operação foi salva na fila offline.");
           setModalOpen(false);
           return;
@@ -318,21 +320,24 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
   }
 
   async function deleteRecord(record: ModuleRecord) {
-    if (!window.confirm(`Excluir ${config.singular} ${String(record[config.titleColumn] ?? "selecionado")}?`)) {
+    if (!window.confirm(`Arquivar ${config.singular} ${String(record[config.titleColumn] ?? "selecionado")}?`)) {
       return;
     }
 
     setError("");
-    const { error: deleteError } = await client.from(config.table).delete().eq("id", record.id);
+    const { error: deleteError } = await client
+      .from(config.table)
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", record.id);
     if (deleteError) {
       if (shouldQueueMutation(deleteError)) {
-        enqueueOfflineOperation({
+        await enqueueOfflineOperation({
           table: config.table,
           action: "delete",
           payload: {},
           recordId: record.id,
         });
-        setPendingOffline(getOfflineQueue().length);
+        setPendingOffline((await getOfflineQueue()).length);
         setNotice("Sem conexão. A exclusão foi adicionada à fila offline.");
         return;
       }
@@ -340,7 +345,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
       return;
     }
 
-    setNotice("Registro excluído.");
+    setNotice("Registro arquivado com exclusão lógica.");
     await loadRecords();
   }
 
@@ -476,7 +481,7 @@ export function ModuleCrud({ client, config }: ModuleCrudProps) {
                           <button
                             type="button"
                             className="icon-button danger"
-                            title="Excluir"
+                            title="Arquivar"
                             onClick={() => void deleteRecord(record)}
                           >
                             <Trash2 size={16} />

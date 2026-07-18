@@ -247,11 +247,13 @@ export default function OperationsPage({
 
   useEffect(() => {
     setOnline(navigator.onLine);
-    setOfflineCount(getOfflineQueue().length);
+    void getOfflineQueue().then((queue) => setOfflineCount(queue.length));
 
     const onlineHandler = () => setOnline(true);
     const offlineHandler = () => setOnline(false);
-    const queueHandler = () => setOfflineCount(getOfflineQueue().length);
+    const queueHandler = () => {
+      void getOfflineQueue().then((queue) => setOfflineCount(queue.length));
+    };
     window.addEventListener("online", onlineHandler);
     window.addEventListener("offline", offlineHandler);
     window.addEventListener("udk:offline-queue", queueHandler);
