@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  apply-access-integration:
+  apply-upload-hardening:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -23,95 +23,234 @@ jobs:
         with:
           ref: feat/complete-operational-modules
           fetch-depth: 0
-      - name: Apply identity and queue integration
+      - name: Apply scoped upload and accessibility fixes
         shell: bash
         run: |
           node <<'NODE'
           const fs = require('node:fs');
           function replaceExact(path, before, after) {
             const source = fs.readFileSync(path, 'utf8');
-            if (!source.includes(before)) throw new Error(`Expected fragment not found in ${path}: ${before.slice(0, 120)}`);
+            if (!source.includes(before)) throw new Error(`Expected fragment not found in ${path}: ${before.slice(0, 140)}`);
             fs.writeFileSync(path, source.replace(before, after));
           }
-
-          const page = 'apps/plataforma/app/painel/[[...slug]]/page.tsx';
-          replaceExact(
-            page,
-            'import { getOfflineQueue } from "../../../lib/offline-queue";',
-            'import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";\nimport { computeAllowedModules, computeWritableModules, type RoleGrant, type RolePermission } from "../../../lib/access-control";',
-          );
-          replaceExact(
-            page,
-            '  const [roles, setRoles] = useState<Role[]>([]);\n  const [sidebarOpen, setSidebarOpen] = useState(false);',
-            '  const [roles, setRoles] = useState<Role[]>([]);\n  const [roleGrants, setRoleGrants] = useState<RoleGrant[]>([]);\n  const [permissions, setPermissions] = useState<RolePermission[]>([]);\n  const [sidebarOpen, setSidebarOpen] = useState(false);',
-          );
-          replaceExact(
-            page,
-            '  useEffect(() => {\n    setOnline(navigator.onLine);\n    void getOfflineQueue().then((queue) => setOfflineCount(queue.length));\n\n    const onlineHandler = () => setOnline(true);\n    const offlineHandler = () => setOnline(false);\n    const queueHandler = () => {\n      void getOfflineQueue().then((queue) => setOfflineCount(queue.length));\n    };\n    window.addEventListener("online", onlineHandler);\n    window.addEventListener("offline", offlineHandler);\n    window.addEventListener("udk:offline-queue", queueHandler);\n\n    return () => {\n      window.removeEventListener("online", onlineHandler);\n      window.removeEventListener("offline", offlineHandler);\n      window.removeEventListener("udk:offline-queue", queueHandler);\n    };\n  }, []);',
-            '  useEffect(() => {\n    setOnline(navigator.onLine);\n    const onlineHandler = () => setOnline(true);\n    const offlineHandler = () => setOnline(false);\n    window.addEventListener("online", onlineHandler);\n    window.addEventListener("offline", offlineHandler);\n    return () => {\n      window.removeEventListener("online", onlineHandler);\n      window.removeEventListener("offline", offlineHandler);\n    };\n  }, []);',
-          );
-
-          replaceExact(
-            page,
-            '      const [profileResult, rolesResult] = await Promise.all([\n        activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),\n        activeClient.from("user_roles").select("role").eq("user_id", authenticatedUser.id),\n      ]);',
-            '      const [profileResult, rolesResult] = await Promise.all([\n        activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),\n        activeClient\n          .from("user_roles")\n          .select("id,role,expires_at")\n          .eq("user_id", authenticatedUser.id),\n      ]);',
-          );
-          replaceExact(
-            page,
-            '      if (profileResult.error) setAuthError(profileResult.error.message);\n      if (rolesResult.error) setAuthError(rolesResult.error.message);\n\n      const profile = profileResult.data;\n      setDisplayName(profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK");\n      const loadedRoles = (rolesResult.data ?? [])\n        .map((item) => item.role as Role)\n        .filter((role) => role in roleAccess);\n      setRoles(loadedRoles.length > 0 ? loadedRoles : ["driver"]);\n      setReady(true);',
-            '      if (profileResult.error) setAuthError(profileResult.error.message);\n      if (rolesResult.error) {\n        setRoles([]);\n        setRoleGrants([]);\n        setPermissions([]);\n        setAuthError(`Não foi possível carregar as permissões: ${rolesResult.error.message}`);\n        setReady(true);\n        return;\n      }\n\n      const profile = profileResult.data;\n      setDisplayName(profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK");\n      const now = Date.now();\n      const loadedGrants = (rolesResult.data ?? [])\n        .filter((item) => !item.expires_at || new Date(item.expires_at).getTime() > now)\n        .filter((item) => item.role in roleAccess)\n        .map((item) => ({ id: String(item.id), role: item.role as Role }));\n\n      if (loadedGrants.length === 0) {\n        setRoles([]);\n        setRoleGrants([]);\n        setPermissions([]);\n        setAuthError("Esta conta não possui papel ativo. Solicite a vinculação à organização do campeonato.");\n        setReady(true);\n        return;\n      }\n\n      const { data: permissionRows, error: permissionError } = await activeClient\n        .from("role_permissions")\n        .select("user_role_id,module,action,allowed,expires_at")\n        .in("user_role_id", loadedGrants.map((grant) => grant.id))\n        .is("deleted_at", null);\n\n      if (!active || permissionError) {\n        setRoles([]);\n        setRoleGrants([]);\n        setPermissions([]);\n        setAuthError(permissionError ? `Não foi possível validar permissões granulares: ${permissionError.message}` : "Sessão encerrada.");\n        setReady(true);\n        return;\n      }\n\n      setRoleGrants(loadedGrants);\n      setRoles(Array.from(new Set(loadedGrants.map((grant) => grant.role as Role))));\n      setPermissions((permissionRows ?? []) as RolePermission[]);\n      setReady(true);',
-          );
-          replaceExact(
-            page,
-            '  const allowedKeys = useMemo(() => {\n    const keys = new Set<string>();\n    for (const role of roles) {\n      for (const key of roleAccess[role]) keys.add(key);\n    }\n    return keys;\n  }, [roles]);',
-            '  const allowedKeys = useMemo(\n    () => computeAllowedModules(roleAccess, roleGrants, permissions),\n    [permissions, roleGrants],\n  );\n  const writableKeys = useMemo(\n    () => computeWritableModules(writableModulesByRole, roleGrants, permissions),\n    [permissions, roleGrants],\n  );\n  const offlineOwner = useMemo(\n    () => (client && user ? createOfflineQueueOwner(client, user.id) : undefined),\n    [client, user],\n  );\n\n  useEffect(() => {\n    if (!offlineOwner) {\n      setOfflineCount(0);\n      return;\n    }\n    let active = true;\n    const refreshQueueCount = async () => {\n      const queue = await getOfflineQueue(offlineOwner);\n      if (active) setOfflineCount(queue.length);\n    };\n    void refreshQueueCount();\n    window.addEventListener("udk:offline-queue", refreshQueueCount);\n    return () => {\n      active = false;\n      window.removeEventListener("udk:offline-queue", refreshQueueCount);\n    };\n  }, [offlineOwner]);',
-          );
-          replaceExact(
-            page,
-            '  const authorized = activeKey === "dashboard" || allowedKeys.has(activeKey);\n  const canMutate = roles.some((role) => writableModulesByRole[role].includes(activeKey));',
-            '  const authorized = allowedKeys.has(activeKey);\n  const canMutate = writableKeys.has(activeKey);',
-          );
-          replaceExact(page, '{roleLabels[roles[0] ?? "driver"]}', '{roles[0] ? roleLabels[roles[0]] : "Sem papel ativo"}');
-          replaceExact(page, '{authError ? <div className="alert alert-warning">{authError}</div> : null}', '{authError ? <div className="alert alert-warning" role="alert">{authError}</div> : null}');
-          replaceExact(page, '<Dashboard client={client} />', '<Dashboard client={client} allowedKeys={allowedKeys} />');
-          replaceExact(
-            page,
-            ') : config ? (\n            <ModuleCrud client={client} config={effectiveConfig ?? config} />',
-            ') : config && offlineOwner ? (\n            <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />',
-          );
 
           const crud = 'apps/plataforma/components/module-crud.tsx';
           replaceExact(
             crud,
-            'import {\n  enqueueOfflineOperation,\n  flushOfflineQueue,\n  getOfflineQueue,\n} from "../lib/offline-queue";',
-            'import {\n  enqueueOfflineOperation,\n  flushOfflineQueue,\n  getOfflineQueue,\n  type OfflineQueueOwner,\n} from "../lib/offline-queue";\nimport { dateTimeLocalToIso, isoToDateTimeLocal } from "../lib/datetime";',
+            'type RelationOption = {\n  value: string;\n  label: string;\n};',
+            'type RelationOption = {\n  value: string;\n  label: string;\n};\n\ntype UploadedObject = {\n  bucket: string;\n  path: string;\n  fieldKey: string;\n};\n\ntype StorageScope = {\n  kind: "season" | "championship";\n  id: string;\n};',
+          );
+
+          const oldUpload = `  async function uploadFiles(payload: Record<string, unknown>): Promise<void> {
+    for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
+      const file = fileValues[field.key];
+      if (!file) continue;
+
+      const { data: userData, error: userError } = await client.auth.getUser();
+      if (userError || !userData.user) throw userError ?? new Error("Usuário não autenticado.");
+
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const path = \`${'${userData.user.id}'}\/${'${crypto.randomUUID()}'}-${'${safeName}'}\`;
+      const { error: uploadError } = await client.storage
+        .from(field.storageBucket ?? "private-documents")
+        .upload(path, file, { upsert: false });
+      if (uploadError) throw uploadError;
+      payload[field.key] = path;
+    }
+  }`;
+
+          const newUpload = `  async function loadSeasonId(payload: Record<string, unknown>): Promise<string | undefined> {
+    if (typeof payload.season_id === "string") return payload.season_id;
+
+    let stageId = typeof payload.stage_id === "string" ? payload.stage_id : undefined;
+    let driverId = typeof payload.driver_id === "string" ? payload.driver_id : undefined;
+
+    if (!driverId && typeof payload.registration_id === "string") {
+      const { data, error: registrationError } = await client
+        .from("registrations")
+        .select("driver_id")
+        .eq("id", payload.registration_id)
+        .single();
+      if (registrationError) throw registrationError;
+      driverId = data.driver_id;
+    }
+
+    if (!stageId && typeof payload.incident_id === "string") {
+      const { data, error: incidentError } = await client
+        .from("incidents")
+        .select("stage_id")
+        .eq("id", payload.incident_id)
+        .single();
+      if (incidentError) throw incidentError;
+      stageId = data.stage_id;
+    }
+
+    if (!stageId && typeof payload.result_id === "string") {
+      const { data, error: resultError } = await client
+        .from("results")
+        .select("stage_id")
+        .eq("id", payload.result_id)
+        .single();
+      if (resultError) throw resultError;
+      stageId = data.stage_id;
+    }
+
+    if (!stageId && typeof payload.team_id === "string") {
+      const { data, error: teamError } = await client
+        .from("endurance_teams")
+        .select("stage_id")
+        .eq("id", payload.team_id)
+        .single();
+      if (teamError) throw teamError;
+      stageId = data.stage_id;
+    }
+
+    if (driverId) {
+      const { data, error: driverError } = await client
+        .from("drivers")
+        .select("season_id")
+        .eq("id", driverId)
+        .single();
+      if (driverError) throw driverError;
+      return data.season_id;
+    }
+
+    if (stageId) {
+      const { data, error: stageError } = await client
+        .from("stages")
+        .select("season_id")
+        .eq("id", stageId)
+        .single();
+      if (stageError) throw stageError;
+      return data.season_id;
+    }
+
+    if (typeof payload.term_id === "string") {
+      const { data, error: termError } = await client
+        .from("terms")
+        .select("season_id")
+        .eq("id", payload.term_id)
+        .single();
+      if (termError) throw termError;
+      return data.season_id;
+    }
+
+    return undefined;
+  }
+
+  async function resolveStorageScope(
+    bucket: string,
+    payload: Record<string, unknown>,
+  ): Promise<StorageScope> {
+    if (bucket === "public-media") {
+      if (typeof payload.championship_id === "string") {
+        return { kind: "championship", id: payload.championship_id };
+      }
+      if (typeof payload.sponsor_id === "string") {
+        const { data, error: sponsorError } = await client
+          .from("sponsors")
+          .select("championship_id")
+          .eq("id", payload.sponsor_id)
+          .single();
+        if (sponsorError) throw sponsorError;
+        return { kind: "championship", id: data.championship_id };
+      }
+      throw new Error("Não foi possível identificar o campeonato do arquivo público.");
+    }
+
+    const seasonId = await loadSeasonId(payload);
+    if (!seasonId) throw new Error("Não foi possível identificar a temporada do arquivo privado.");
+    return { kind: "season", id: seasonId };
+  }
+
+  async function cleanupUploads(objects: UploadedObject[]): Promise<void> {
+    const grouped = Map.groupBy(objects, (object) => object.bucket);
+    await Promise.all(
+      Array.from(grouped.entries()).map(async ([bucket, bucketObjects]) => {
+        const { error: removalError } = await client.storage
+          .from(bucket)
+          .remove(bucketObjects.map((object) => object.path));
+        if (removalError) console.error("Falha ao remover upload órfão", removalError);
+      }),
+    );
+  }
+
+  async function uploadFiles(payload: Record<string, unknown>): Promise<UploadedObject[]> {
+    const uploaded: UploadedObject[] = [];
+    try {
+      const { data: userData, error: userError } = await client.auth.getUser();
+      if (userError || !userData.user) throw userError ?? new Error("Usuário não autenticado.");
+
+      for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
+        const file = fileValues[field.key];
+        if (!file) continue;
+
+        const bucket = field.storageBucket ?? "private-documents";
+        const scope = await resolveStorageScope(bucket, payload);
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const path = \`${'${scope.kind}'}\/${'${scope.id}'}\/${'${userData.user.id}'}\/${'${crypto.randomUUID()}'}-${'${safeName}'}\`;
+        const { error: uploadError } = await client.storage
+          .from(bucket)
+          .upload(path, file, { upsert: false });
+        if (uploadError) throw uploadError;
+        uploaded.push({ bucket, path, fieldKey: field.key });
+        payload[field.key] = path;
+      }
+      return uploaded;
+    } catch (uploadError) {
+      await cleanupUploads(uploaded);
+      throw uploadError;
+    }
+  }`;
+
+          replaceExact(crud, oldUpload, newUpload);
+          replaceExact(
+            crud,
+            '    try {\n      const payload = buildPayload(config, values);\n      await uploadFiles(payload);',
+            '    let uploaded: UploadedObject[] = [];\n    let keepUploadsForOfflineQueue = false;\n    try {\n      const payload = buildPayload(config, values);\n      uploaded = await uploadFiles(payload);',
           );
           replaceExact(
             crud,
-            'type ModuleCrudProps = {\n  client: SupabaseClient;\n  config: ModuleConfig;\n};',
-            'type ModuleCrudProps = {\n  client: SupabaseClient;\n  config: ModuleConfig;\n  owner: OfflineQueueOwner;\n};',
+            '          setNotice("Sem conexão. A operação foi salva na fila offline.");\n          setModalOpen(false);\n          return;',
+            '          keepUploadsForOfflineQueue = true;\n          setNotice("Sem conexão. A operação foi salva na fila offline.");\n          setModalOpen(false);\n          return;',
           );
-          replaceExact(crud, 'export function ModuleCrud({ client, config }: ModuleCrudProps) {', 'export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {');
-          replaceExact(crud, '  if (kind === "datetime") return value.slice(0, 16);', '  if (kind === "datetime") return isoToDateTimeLocal(value);');
-          replaceExact(crud, '      payload[field.key] = new Date(String(raw)).toISOString();', '      payload[field.key] = dateTimeLocalToIso(String(raw));');
-          replaceExact(crud, '    setPendingOffline((await getOfflineQueue()).length);', '    setPendingOffline((await getOfflineQueue(owner)).length);');
-          replaceExact(crud, '      const result = await flushOfflineQueue(client);', '      const result = await flushOfflineQueue(client, owner);');
-          replaceExact(crud, '  }, [client, loadRecords]);', '  }, [client, loadRecords, owner]);');
-          replaceExact(crud, '      void getOfflineQueue().then((queue) => setPendingOffline(queue.length));', '      void getOfflineQueue(owner).then((queue) => setPendingOffline(queue.length));');
-          replaceExact(crud, '          await enqueueOfflineOperation(\n            editing', '          await enqueueOfflineOperation(\n            owner,\n            editing');
-          replaceExact(crud, '          setPendingOffline((await getOfflineQueue()).length);', '          setPendingOffline((await getOfflineQueue(owner)).length);');
-          replaceExact(crud, '        await enqueueOfflineOperation({', '        await enqueueOfflineOperation(owner, {');
-          replaceExact(crud, '        setPendingOffline((await getOfflineQueue()).length);', '        setPendingOffline((await getOfflineQueue(owner)).length);');
+          replaceExact(
+            crud,
+            '      setNotice(`${config.singular.replace(/^./, (letter) => letter.toUpperCase())} salvo(a) com sucesso.`);\n      setModalOpen(false);\n      await loadRecords();',
+            '      if (editing && uploaded.length > 0) {\n        const replaced = uploaded.flatMap((object) => {\n          const previousPath = editing[object.fieldKey];\n          return typeof previousPath === "string" && previousPath !== object.path\n            ? [{ bucket: object.bucket, path: previousPath, fieldKey: object.fieldKey }]\n            : [];\n        });\n        await cleanupUploads(replaced);\n      }\n      setNotice(`${config.singular.replace(/^./, (letter) => letter.toUpperCase())} salvo(a) com sucesso.`);\n      setModalOpen(false);\n      await loadRecords();',
+          );
+          replaceExact(
+            crud,
+            '    } catch (saveError) {\n      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");',
+            '    } catch (saveError) {\n      if (!keepUploadsForOfflineQueue) await cleanupUploads(uploaded);\n      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");',
+          );
+
+          replaceExact(crud, '{error ? <div className="alert alert-error">{error}</div> : null}', '{error ? <div className="alert alert-error" role="alert">{error}</div> : null}');
+          replaceExact(crud, '{notice ? <div className="alert alert-success">{notice}</div> : null}', '{notice ? <div className="alert alert-success" role="status">{notice}</div> : null}');
+          replaceExact(crud, 'title={action.label}\n                              onClick', 'title={action.label}\n                              aria-label={action.label}\n                              onClick');
+          replaceExact(crud, 'title="Editar"\n                            onClick', 'title="Editar"\n                            aria-label="Editar registro"\n                            onClick');
+          replaceExact(crud, 'title="Arquivar"\n                            onClick', 'title="Arquivar"\n                            aria-label="Arquivar registro"\n                            onClick');
+          replaceExact(
+            crud,
+            '<div className="modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>',
+            '<div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}>',
+          );
+          replaceExact(crud, '<h2>{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2>', '<h2 id="module-modal-title">{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2>');
+          replaceExact(
+            crud,
+            '<button className="icon-button" type="button" onClick={() => setModalOpen(false)} disabled={saving}>',
+            '<button className="icon-button" type="button" aria-label="Fechar formulário" onClick={() => setModalOpen(false)} disabled={saving}>',
+          );
           NODE
-      - name: Verify and commit integration
+      - name: Verify and commit upload hardening
         run: |
           git diff --check
-          grep -q 'computeAllowedModules' apps/plataforma/app/painel/[[...slug]]/page.tsx
-          grep -q 'OfflineQueueOwner' apps/plataforma/components/module-crud.tsx
+          grep -q 'resolveStorageScope' apps/plataforma/components/module-crud.tsx
+          grep -q 'cleanupUploads' apps/plataforma/components/module-crud.tsx
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/plataforma
-          git commit -m "fix: enforce granular access and owned offline queues"
+          git add apps/plataforma/components/module-crud.tsx
+          git commit -m "fix: scope uploads and clean orphaned files"
           git push origin HEAD:feat/complete-operational-modules
 
   quality:
