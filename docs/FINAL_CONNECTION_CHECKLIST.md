@@ -26,8 +26,19 @@ No painel do Supabase, em **Authentication → URL Configuration**, cadastre:
 
 - URL do portal público;
 - URL da plataforma;
-- URL da plataforma seguida de `/auth/callback`;
+- URL da plataforma com `/?recovery=1` para recuperação de senha;
 - URLs de preview do Vercel, quando necessárias.
+
+### Estrutura dos arquivos privados
+
+As políticas de Storage exigem escopo explícito. A aplicação grava automaticamente nos formatos:
+
+```text
+season/<season-id>/<user-id>/<arquivo>
+championship/<championship-id>/<user-id>/<arquivo>
+```
+
+Não mova objetos manualmente para caminhos sem temporada ou campeonato, pois eles serão recusados pelas políticas RLS.
 
 ## 2. Vercel: portal público
 
@@ -74,7 +85,7 @@ where user_id = (
 );
 ```
 
-A partir daí, papéis, escopos e permissões granulares são administrados pela própria plataforma.
+A partir daí, papéis, escopos e permissões granulares são administrados pela própria plataforma. Organizações não conseguem conceder o papel global de administrador.
 
 ## 5. Verificação após publicação
 
@@ -82,10 +93,13 @@ Confirme:
 
 - `/api/health` do portal retorna sucesso;
 - `/api/health` da plataforma retorna sucesso;
-- cadastro, login, recuperação e logout funcionam;
+- cadastro, login e logout funcionam;
+- o e-mail de recuperação abre a tela de nova senha e exige confirmação;
 - o usuário administrador abre todos os módulos;
+- contas sem papel ativo falham de forma fechada;
 - o portal lê calendário e classificação;
-- upload privado não gera URL pública;
+- upload privado não gera URL pública e fica dentro do escopo correto;
+- fila offline permanece vinculada à conta e ao projeto Supabase;
 - Application CI e Supabase CI continuam verdes na `main`.
 
 ## Segurança
