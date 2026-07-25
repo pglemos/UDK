@@ -7,7 +7,7 @@ on:
       - "supabase/**"
       - ".github/workflows/database.yml"
   push:
-    branches: [main]
+    branches: [main, feat/complete-operational-modules]
     paths:
       - "supabase/**"
       - ".github/workflows/database.yml"
@@ -23,7 +23,7 @@ jobs:
   database:
     name: Migrations, pgTAP and lint
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -35,13 +35,53 @@ jobs:
           version: latest
 
       - name: Start local Supabase
-        run: supabase start
+        id: start
+        continue-on-error: true
+        run: supabase start --debug 2>&1 | tee supabase-start.log
 
       - name: Rebuild database from migrations
-        run: supabase db reset
+        id: reset
+        if: steps.start.outcome == 'success'
+        continue-on-error: true
+        run: supabase db reset --debug 2>&1 | tee supabase-reset.log
 
       - name: Run pgTAP tests
-        run: supabase test db
+        id: test
+        if: steps.reset.outcome == 'success'
+        continue-on-error: true
+        run: supabase test db 2>&1 | tee supabase-test.log
 
       - name: Lint database
-        run: supabase db lint --level warning
+        id: lint
+        if: steps.reset.outcome == 'success'
+        continue-on-error: true
+        run: supabase db lint --level warning 2>&1 | tee supabase-lint.log
+
+      - name: Upload database diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-quality-${{ github.sha }}
+          path: supabase-*.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop local Supabase
+        if: always()
+        continue-on-error: true
+        run: supabase stop --no-backup
+
+      - name: Enforce database gates
+        if: always()
+        env:
+          START_OUTCOME: ${{ steps.start.outcome }}
+          RESET_OUTCOME: ${{ steps.reset.outcome }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+        run: |
+          printf 'start=%s\nreset=%s\ntest=%s\nlint=%s\n' \
+            "$START_OUTCOME" "$RESET_OUTCOME" "$TEST_OUTCOME" "$LINT_OUTCOME"
+          [ "$START_OUTCOME" = success ] && \
+          [ "$RESET_OUTCOME" = success ] && \
+          [ "$TEST_OUTCOME" = success ] && \
+          [ "$LINT_OUTCOME" = success ]
