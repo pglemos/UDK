@@ -7,279 +7,44 @@ on:
     branches: [main, feat/complete-operational-modules]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: application-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  apply-upload-hardening:
-    if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout feature branch
-        uses: actions/checkout@v4
-        with:
-          ref: feat/complete-operational-modules
-          fetch-depth: 0
-      - name: Apply scoped upload and accessibility fixes
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          function replaceExact(path, before, after) {
-            const source = fs.readFileSync(path, 'utf8');
-            if (!source.includes(before)) throw new Error(`Expected fragment not found in ${path}: ${before.slice(0, 140)}`);
-            fs.writeFileSync(path, source.replace(before, after));
-          }
-
-          const crud = 'apps/plataforma/components/module-crud.tsx';
-          replaceExact(
-            crud,
-            'type RelationOption = {\n  value: string;\n  label: string;\n};',
-            'type RelationOption = {\n  value: string;\n  label: string;\n};\n\ntype UploadedObject = {\n  bucket: string;\n  path: string;\n  fieldKey: string;\n};\n\ntype StorageScope = {\n  kind: "season" | "championship";\n  id: string;\n};',
-          );
-
-          const oldUpload = `  async function uploadFiles(payload: Record<string, unknown>): Promise<void> {
-    for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
-      const file = fileValues[field.key];
-      if (!file) continue;
-
-      const { data: userData, error: userError } = await client.auth.getUser();
-      if (userError || !userData.user) throw userError ?? new Error("Usuário não autenticado.");
-
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-      const path = \`${'${userData.user.id}'}\/${'${crypto.randomUUID()}'}-${'${safeName}'}\`;
-      const { error: uploadError } = await client.storage
-        .from(field.storageBucket ?? "private-documents")
-        .upload(path, file, { upsert: false });
-      if (uploadError) throw uploadError;
-      payload[field.key] = path;
-    }
-  }`;
-
-          const newUpload = `  async function loadSeasonId(payload: Record<string, unknown>): Promise<string | undefined> {
-    if (typeof payload.season_id === "string") return payload.season_id;
-
-    let stageId = typeof payload.stage_id === "string" ? payload.stage_id : undefined;
-    let driverId = typeof payload.driver_id === "string" ? payload.driver_id : undefined;
-
-    if (!driverId && typeof payload.registration_id === "string") {
-      const { data, error: registrationError } = await client
-        .from("registrations")
-        .select("driver_id")
-        .eq("id", payload.registration_id)
-        .single();
-      if (registrationError) throw registrationError;
-      driverId = data.driver_id;
-    }
-
-    if (!stageId && typeof payload.incident_id === "string") {
-      const { data, error: incidentError } = await client
-        .from("incidents")
-        .select("stage_id")
-        .eq("id", payload.incident_id)
-        .single();
-      if (incidentError) throw incidentError;
-      stageId = data.stage_id;
-    }
-
-    if (!stageId && typeof payload.result_id === "string") {
-      const { data, error: resultError } = await client
-        .from("results")
-        .select("stage_id")
-        .eq("id", payload.result_id)
-        .single();
-      if (resultError) throw resultError;
-      stageId = data.stage_id;
-    }
-
-    if (!stageId && typeof payload.team_id === "string") {
-      const { data, error: teamError } = await client
-        .from("endurance_teams")
-        .select("stage_id")
-        .eq("id", payload.team_id)
-        .single();
-      if (teamError) throw teamError;
-      stageId = data.stage_id;
-    }
-
-    if (driverId) {
-      const { data, error: driverError } = await client
-        .from("drivers")
-        .select("season_id")
-        .eq("id", driverId)
-        .single();
-      if (driverError) throw driverError;
-      return data.season_id;
-    }
-
-    if (stageId) {
-      const { data, error: stageError } = await client
-        .from("stages")
-        .select("season_id")
-        .eq("id", stageId)
-        .single();
-      if (stageError) throw stageError;
-      return data.season_id;
-    }
-
-    if (typeof payload.term_id === "string") {
-      const { data, error: termError } = await client
-        .from("terms")
-        .select("season_id")
-        .eq("id", payload.term_id)
-        .single();
-      if (termError) throw termError;
-      return data.season_id;
-    }
-
-    return undefined;
-  }
-
-  async function resolveStorageScope(
-    bucket: string,
-    payload: Record<string, unknown>,
-  ): Promise<StorageScope> {
-    if (bucket === "public-media") {
-      if (typeof payload.championship_id === "string") {
-        return { kind: "championship", id: payload.championship_id };
-      }
-      if (typeof payload.sponsor_id === "string") {
-        const { data, error: sponsorError } = await client
-          .from("sponsors")
-          .select("championship_id")
-          .eq("id", payload.sponsor_id)
-          .single();
-        if (sponsorError) throw sponsorError;
-        return { kind: "championship", id: data.championship_id };
-      }
-      throw new Error("Não foi possível identificar o campeonato do arquivo público.");
-    }
-
-    const seasonId = await loadSeasonId(payload);
-    if (!seasonId) throw new Error("Não foi possível identificar a temporada do arquivo privado.");
-    return { kind: "season", id: seasonId };
-  }
-
-  async function cleanupUploads(objects: UploadedObject[]): Promise<void> {
-    const grouped = objects.reduce<Map<string, UploadedObject[]>>((map, object) => {
-      const existing = map.get(object.bucket) ?? [];
-      existing.push(object);
-      map.set(object.bucket, existing);
-      return map;
-    }, new Map());
-    await Promise.all(
-      Array.from(grouped.entries()).map(async ([bucket, bucketObjects]) => {
-        const { error: removalError } = await client.storage
-          .from(bucket)
-          .remove(bucketObjects.map((object) => object.path));
-        if (removalError) console.error("Falha ao remover upload órfão", removalError);
-      }),
-    );
-  }
-
-  async function uploadFiles(payload: Record<string, unknown>): Promise<UploadedObject[]> {
-    const uploaded: UploadedObject[] = [];
-    try {
-      const { data: userData, error: userError } = await client.auth.getUser();
-      if (userError || !userData.user) throw userError ?? new Error("Usuário não autenticado.");
-
-      for (const field of config.fields.filter((candidate) => candidate.kind === "file")) {
-        const file = fileValues[field.key];
-        if (!file) continue;
-
-        const bucket = field.storageBucket ?? "private-documents";
-        const scope = await resolveStorageScope(bucket, payload);
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-        const path = \`${'${scope.kind}'}\/${'${scope.id}'}\/${'${userData.user.id}'}\/${'${crypto.randomUUID()}'}-${'${safeName}'}\`;
-        const { error: uploadError } = await client.storage
-          .from(bucket)
-          .upload(path, file, { upsert: false });
-        if (uploadError) throw uploadError;
-        uploaded.push({ bucket, path, fieldKey: field.key });
-        payload[field.key] = path;
-      }
-      return uploaded;
-    } catch (uploadError) {
-      await cleanupUploads(uploaded);
-      throw uploadError;
-    }
-  }`;
-
-          replaceExact(crud, oldUpload, newUpload);
-          replaceExact(
-            crud,
-            '    try {\n      const payload = buildPayload(config, values);\n      await uploadFiles(payload);',
-            '    let uploaded: UploadedObject[] = [];\n    let keepUploadsForOfflineQueue = false;\n    try {\n      const payload = buildPayload(config, values);\n      uploaded = await uploadFiles(payload);',
-          );
-          replaceExact(
-            crud,
-            '          setNotice("Sem conexão. A operação foi salva na fila offline.");\n          setModalOpen(false);\n          return;',
-            '          keepUploadsForOfflineQueue = true;\n          setNotice("Sem conexão. A operação foi salva na fila offline.");\n          setModalOpen(false);\n          return;',
-          );
-          replaceExact(
-            crud,
-            '      setNotice(`${config.singular.replace(/^./, (letter) => letter.toUpperCase())} salvo(a) com sucesso.`);\n      setModalOpen(false);\n      await loadRecords();',
-            '      if (editing && uploaded.length > 0) {\n        const replaced = uploaded.flatMap((object) => {\n          const previousPath = editing[object.fieldKey];\n          return typeof previousPath === "string" && previousPath !== object.path\n            ? [{ bucket: object.bucket, path: previousPath, fieldKey: object.fieldKey }]\n            : [];\n        });\n        await cleanupUploads(replaced);\n      }\n      setNotice(`${config.singular.replace(/^./, (letter) => letter.toUpperCase())} salvo(a) com sucesso.`);\n      setModalOpen(false);\n      await loadRecords();',
-          );
-          replaceExact(
-            crud,
-            '    } catch (saveError) {\n      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");',
-            '    } catch (saveError) {\n      if (!keepUploadsForOfflineQueue) await cleanupUploads(uploaded);\n      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");',
-          );
-
-          replaceExact(crud, '{error ? <div className="alert alert-error">{error}</div> : null}', '{error ? <div className="alert alert-error" role="alert">{error}</div> : null}');
-          replaceExact(crud, '{notice ? <div className="alert alert-success">{notice}</div> : null}', '{notice ? <div className="alert alert-success" role="status">{notice}</div> : null}');
-          replaceExact(crud, 'title={action.label}\n                              onClick', 'title={action.label}\n                              aria-label={action.label}\n                              onClick');
-          replaceExact(crud, 'title="Editar"\n                            onClick', 'title="Editar"\n                            aria-label="Editar registro"\n                            onClick');
-          replaceExact(crud, 'title="Arquivar"\n                            onClick', 'title="Arquivar"\n                            aria-label="Arquivar registro"\n                            onClick');
-          replaceExact(
-            crud,
-            '<div className="modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>',
-            '<div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}>',
-          );
-          replaceExact(crud, '<h2>{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2>', '<h2 id="module-modal-title">{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2>');
-          replaceExact(
-            crud,
-            '<button className="icon-button" type="button" onClick={() => setModalOpen(false)} disabled={saving}>',
-            '<button className="icon-button" type="button" aria-label="Fechar formulário" onClick={() => setModalOpen(false)} disabled={saving}>',
-          );
-          NODE
-      - name: Verify and commit upload hardening
-        run: |
-          git diff --check
-          grep -q 'resolveStorageScope' apps/plataforma/components/module-crud.tsx
-          grep -q 'cleanupUploads' apps/plataforma/components/module-crud.tsx
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/plataforma/components/module-crud.tsx
-          git commit -m "fix: scope uploads and clean orphaned files"
-          git push origin HEAD:feat/complete-operational-modules
-
   quality:
     name: Lint, types, tests and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Enable pnpm
         run: corepack enable
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
       - name: Verify workspace
         run: pnpm verify
+
       - name: Lint
         run: pnpm lint
+
       - name: Typecheck
         run: pnpm typecheck
+
       - name: Test
         run: pnpm test
+
       - name: Build both applications
         run: pnpm build
