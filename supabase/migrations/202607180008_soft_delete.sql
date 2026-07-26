@@ -45,7 +45,11 @@ create index if not exists endurance_teams_active_idx on public.endurance_teams(
 create index if not exists sponsors_active_idx on public.sponsors(championship_id, status) where deleted_at is null;
 create index if not exists cms_pages_active_idx on public.cms_pages(championship_id, status) where deleted_at is null;
 
-create or replace view public.public_calendar as
+drop view if exists public.public_calendar;
+drop view if exists public.public_standings;
+drop view if exists public.public_results;
+
+create view public.public_calendar as
 select
   stage.id,
   stage.title,
@@ -65,7 +69,7 @@ join public.championships championship on championship.id = season.championship_
 where stage.deleted_at is null
   and stage.status <> 'cancelled';
 
-create or replace view public.public_standings as
+create view public.public_standings as
 with latest_versions as (
   select season_id, category_id, max(version) as version
   from public.standings
@@ -95,7 +99,7 @@ where standing.deleted_at is null
   and driver.status = 'approved'
   and standing.status in ('provisional','official','rectified');
 
-create or replace view public.public_results as
+create view public.public_results as
 with latest_results as (
   select distinct on (result.stage_id, coalesce(result.category_id, '00000000-0000-0000-0000-000000000000'::uuid))
     result.id,
