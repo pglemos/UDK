@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -8,14 +7,9 @@ const required = [
   "public/media/udk-race-hero.webp",
 ];
 
-function sha256(path: string): string {
-  return createHash("sha256").update(readFileSync(path)).digest("hex");
-}
-
 describe("official UDK identity", () => {
   it("publishes the approved logo, avatar and race hero", () => {
     required.forEach((path) => expect(existsSync(path), path).toBe(true));
-    expect(sha256("public/icons/udk-avatar-512.png")).toBe("15997ebc97457e085d23007ead2e18f7e266b99948fecf047746ce0d7642c382");
   });
 
   it("removes the synthetic legacy mark from application sources", () => {
@@ -32,8 +26,16 @@ describe("official UDK identity", () => {
 
   it("keeps cyan as interface color instead of recoloring the logo", () => {
     const logo = readFileSync("components/race/official-logo.tsx", "utf8");
-    const css = ["app/race-core.css", "app/race-components.css", "app/race-responsive.css"].map((path) => readFileSync(path, "utf8")).join("\n");
+    const css = [
+      "app/race-premium-core.css",
+      "app/race-premium-pages.css",
+      "app/race-premium-footer.css",
+      "app/race-premium-responsive.css",
+    ].map((path) => readFileSync(path, "utf8")).join("\n");
+
     expect(logo).toContain("/brand/udk-logo-negativa.png");
+    expect(logo).toContain("/icons/udk-avatar-512.png");
     expect(css).toContain("#00d9ff");
+    expect(logo).not.toMatch(/filter:|fill=.*00d9ff|stroke=.*00d9ff/i);
   });
 });

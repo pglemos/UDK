@@ -27,12 +27,15 @@ export function PageHero({
         <img src="/media/udk-race-hero.webp" alt="" />
       </div>
       <div className="race-container udk-page-hero-inner">
-        <div>
-          <h1>{title}</h1>
+        <div className="udk-page-hero-copy">
           <span>{eyebrow}</span>
+          <h1>{title}</h1>
           <p>{description}</p>
         </div>
-        <TrackGlyph label={`Identidade visual da página ${title}`} />
+        <div className="udk-page-hero-mark">
+          <TrackGlyph label={`Identidade visual da página ${title}`} />
+          <b>UDK • temporada 2026</b>
+        </div>
       </div>
     </section>
   );

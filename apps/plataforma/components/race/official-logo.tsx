@@ -1,11 +1,11 @@
 type LogoVariant = "principal" | "negative" | "dark" | "mark-light" | "mark-dark";
 
 const logoSources: Record<LogoVariant, string> = {
-  principal: "/brand/udk-logo-principal.svg",
-  negative: "/brand/udk-logo-negativa.svg",
-  dark: "/brand/udk-logo-monocromatica-escura.svg",
-  "mark-light": "/brand/udk-marca-branca.svg",
-  "mark-dark": "/brand/udk-marca-escura.svg",
+  principal: "/brand/udk-logo-negativa.png",
+  negative: "/brand/udk-logo-negativa.png",
+  dark: "/brand/udk-logo-negativa.png",
+  "mark-light": "/icons/udk-avatar-512.png",
+  "mark-dark": "/icons/udk-avatar-512.png",
 };
 
 export function OfficialLogo({
@@ -27,7 +27,7 @@ export function OfficialLogo({
       alt="Ultras do Kart"
       className={className}
       width={width}
-      height={compact ? width : Math.round(width * 0.31)}
+      height={compact ? width : Math.round(width * 0.245)}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
     />

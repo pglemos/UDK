@@ -3,10 +3,10 @@ import { PwaRegister } from "../components/pwa-register";
 import "./globals.css";
 import "./race.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udkkart.vercel.app";
 
 export const metadata: Metadata = {
-  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
+  metadataBase: new URL(siteUrl),
   title: {
     default: "UDK • Ultras do Kart",
     template: "%s • UDK",

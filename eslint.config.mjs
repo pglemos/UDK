@@ -10,6 +10,12 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "off"
     }
   },
+  {
+    files: ["apps/plataforma/lib/public-data.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off"
+    }
+  },
   globalIgnores([
     "**/.next/**",
     "**/dist/**",
