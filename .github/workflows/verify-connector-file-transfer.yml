@@ -1,0 +1,18 @@
+name: Verify connector file transfer
+
+on:
+  push:
+    branches: [fix/official-udk-brand-assets]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify transferred content
+        run: |
+          set -euo pipefail
+          test "$(cat .brand-payload/path-test.txt)" = "HELLO_FROM_FILE"
