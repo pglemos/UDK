@@ -26,3 +26,7 @@ Primary cyan against graphite exceeds WCAG AA contrast for normal text. Deep cya
 ## Regression protection
 
 Automated tests reject the retired `--lime` tokens, the old lime hexadecimal values and their hard-coded RGB derivatives. The same tests verify the approved tokens and contrast ratios.
+
+## Public portal coverage
+
+The public portal uses dedicated cyan tokens for the primary accent, hover, deep text and soft badges. Previous green glow, divider, number and status colors are prohibited by the regression test.

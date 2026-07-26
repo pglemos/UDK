@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+const publicCss = readFileSync(new URL("../app/public.css", import.meta.url), "utf8");
 
 function relativeLuminance(hex: string): number {
   const value = hex.replace("#", "");
@@ -35,6 +36,14 @@ describe("UDK cyan brand theme", () => {
     expect(css).toContain("--cyan-hover: #32e5ff;");
     expect(css).toContain("--cyan-deep: #00687a;");
     expect(css).toContain("--cyan-glow: #004653;");
+  });
+
+  it("uses cyan consistently across the public portal", () => {
+    expect(publicCss).not.toMatch(/lime|#455000|#9db500|#657500|#eef5c0|#566400/i);
+    expect(publicCss).toContain("--public-cyan:#00d9ff");
+    expect(publicCss).toContain("--public-cyan-hover:#32e5ff");
+    expect(publicCss).toContain("--public-cyan-deep:#00687a");
+    expect(publicCss).toContain("--public-cyan-soft:#dffaff");
   });
 
   it("keeps accessible contrast for primary and text uses", () => {
