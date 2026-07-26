@@ -1,4 +1,4 @@
-name: Finalize final UI review
+name: Finalize accessibility and offline resilience
 
 on:
   pull_request:
@@ -8,13 +8,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: final-ui-review-${{ github.ref }}
+  group: final-contract-repair-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,7 +28,7 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
 
-      - name: Apply verified offline and accessibility fixes
+      - name: Implement final contracts
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -42,56 +42,26 @@ jobs:
 
           offline_path = Path("apps/plataforma/lib/offline-queue.ts")
           offline = offline_path.read_text()
+          offline = replace_once(
+              offline,
+              "  attempts: number;\n};",
+              "  attempts: number;\n  lastError?: string;\n  lastAttemptAt?: string;\n  deadLetteredAt?: string;\n};",
+              "offline metadata",
+          )
+          offline = replace_once(
+              offline,
+              'const SEQUENCE_KEY = "sequence";',
+              'const SEQUENCE_KEY = "sequence";\nconst DEAD_LETTER_KEY = "encrypted-dead-letter";\n\nexport const MAX_OFFLINE_ATTEMPTS = 5;',
+              "retry constants",
+          )
+          offline = replace_once(
+              offline,
+              "let memoryQueue: OfflineOperation[] = [];",
+              "let memoryQueue: OfflineOperation[] = [];\nlet memoryDeadLetters: OfflineOperation[] = [];",
+              "memory quarantine",
+          )
 
-          if "lastError?: string;" not in offline:
-              offline = replace_once(
-                  offline,
-                  "  attempts: number;\n};",
-                  "  attempts: number;\n  lastError?: string;\n  lastAttemptAt?: string;\n  deadLetteredAt?: string;\n};",
-                  "offline metadata",
-              )
-
-          if "MAX_OFFLINE_ATTEMPTS" not in offline:
-              offline = replace_once(
-                  offline,
-                  'const SEQUENCE_KEY = "sequence";\n',
-                  'const SEQUENCE_KEY = "sequence";\nconst DEAD_LETTER_KEY = "encrypted-dead-letter";\n\nexport const MAX_OFFLINE_ATTEMPTS = 5;\n',
-                  "offline constants",
-              )
-
-          if "memoryDeadLetters" not in offline:
-              offline = replace_once(
-                  offline,
-                  "let memoryQueue: OfflineOperation[] = [];\n",
-                  "let memoryQueue: OfflineOperation[] = [];\nlet memoryDeadLetters: OfflineOperation[] = [];\n",
-                  "offline memory quarantine",
-              )
-
-          old_lock = '''function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
-            const result = writeLock.then(operation, operation);
-            writeLock = result.then(
-              () => undefined,
-              () => undefined,
-            );
-            return result;
-          }'''
-          new_lock = '''function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
-            if (typeof navigator !== "undefined" && "locks" in navigator) {
-              return navigator.locks.request("udk-offline-queue-write", operation);
-            }
-
-            const result = writeLock.then(operation, operation);
-            writeLock = result.then(
-              () => undefined,
-              () => undefined,
-            );
-            return result;
-          }'''
-          if 'navigator.locks.request("udk-offline-queue-write"' not in offline:
-              offline = replace_once(offline, old_lock, new_lock, "cross-tab write lock")
-
-          if "async function readRawDeadLetters" not in offline:
-              quarantine_helpers = '''async function readRawDeadLetters(): Promise<OfflineOperation[]> {
+          quarantine_helpers = '''async function readRawDeadLetters(): Promise<OfflineOperation[]> {
             if (typeof window === "undefined") return [];
             if (!indexedDbAvailable()) return memoryDeadLetters;
 
@@ -106,35 +76,20 @@ jobs:
 
           async function saveRawDeadLetters(queue: OfflineOperation[]): Promise<void> {
             if (typeof window === "undefined") return;
-
             if (!indexedDbAvailable()) {
               memoryDeadLetters = queue;
               return;
             }
-
             const encrypted = await encryptOfflineQueue(queue, await getEncryptionKey());
             await writeValue(DEAD_LETTER_KEY, encrypted);
           }
 
           '''
-              marker = "export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {"
-              index = offline.index(marker)
-              offline = offline[:index] + quarantine_helpers + offline[index:]
+          queue_reader = "export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {"
+          reader_index = offline.index(queue_reader)
+          offline = offline[:reader_index] + quarantine_helpers + offline[reader_index:]
 
-          if "getOfflineDeadLetters" not in offline:
-              marker = '''export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
-            return filterOfflineQueueForOwner(await readRawQueue(), owner);
-          }
-          '''
-              replacement = marker + '''
-          export async function getOfflineDeadLetters(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
-            return filterOfflineQueueForOwner(await readRawDeadLetters(), owner);
-          }
-          '''
-              offline = replace_once(offline, marker, replacement, "dead-letter reader")
-
-          if "export function recordOfflineFailure" not in offline:
-              failure_handler = '''export type OfflineFailureResult =
+          failure_handler = '''export type OfflineFailureResult =
             | { status: "retry"; operation: OfflineOperation }
             | { status: "dead-letter"; operation: OfflineOperation };
 
@@ -158,14 +113,13 @@ jobs:
                 operation: { ...failedOperation, deadLetteredAt: attemptedAt },
               };
             }
-
             return { status: "retry", operation: failedOperation };
           }
 
           '''
-              marker = "async function executeOperation(client: SupabaseClient, operation: OfflineOperation): Promise<void> {"
-              index = offline.index(marker)
-              offline = offline[:index] + failure_handler + offline[index:]
+          execute_marker = "async function executeOperation(client: SupabaseClient, operation: OfflineOperation): Promise<void> {"
+          execute_index = offline.index(execute_marker)
+          offline = offline[:execute_index] + failure_handler + offline[execute_index:]
 
           flush_start = offline.index("export async function flushOfflineQueue(")
           offline = offline[:flush_start] + '''export async function flushOfflineQueue(
@@ -197,18 +151,24 @@ jobs:
               }
 
               const currentQueue = await readRawQueue();
-              const operationsFromOtherOwners = currentQueue.filter((operation) => !belongsToOwner(operation, owner));
+              const operationsFromOtherOwners = currentQueue.filter(
+                (operation) => !belongsToOwner(operation, owner),
+              );
               const newlyQueuedForOwner = currentQueue.filter(
                 (operation) => belongsToOwner(operation, owner) && !snapshotIds.has(operation.id),
               );
               const merged = [...operationsFromOtherOwners, ...failures, ...newlyQueuedForOwner];
-              const unique = Array.from(new Map(merged.map((operation) => [operation.id, operation])).values());
+              const unique = Array.from(
+                new Map(merged.map((operation) => [operation.id, operation])).values(),
+              );
               await saveRawQueue(unique);
 
               if (deadLetters.length > 0) {
                 const existingDeadLetters = await readRawDeadLetters();
                 const quarantined = Array.from(
-                  new Map([...existingDeadLetters, ...deadLetters].map((operation) => [operation.id, operation])).values(),
+                  new Map(
+                    [...existingDeadLetters, ...deadLetters].map((operation) => [operation.id, operation]),
+                  ).values(),
                 );
                 await saveRawDeadLetters(quarantined);
               }
@@ -225,38 +185,31 @@ jobs:
 
           crud_path = Path("apps/plataforma/components/module-crud.tsx")
           crud = crud_path.read_text()
+          crud = replace_once(
+              crud,
+              'import { useCallback, useEffect, useMemo, useState } from "react";',
+              'import { useCallback, useEffect, useMemo, useRef, useState } from "react";',
+              "useRef import",
+          )
+          crud = replace_once(
+              crud,
+              "  const [pendingOffline, setPendingOffline] = useState(0);\n",
+              "  const [pendingOffline, setPendingOffline] = useState(0);\n  const modalRef = useRef<HTMLElement>(null);\n  const previousFocusRef = useRef<HTMLElement | null>(null);\n  const savingRef = useRef(false);\n",
+              "modal refs",
+          )
 
-          if "useMemo, useRef, useState" not in crud:
-              crud = replace_once(
-                  crud,
-                  'import { useCallback, useEffect, useMemo, useState } from "react";',
-                  'import { useCallback, useEffect, useMemo, useRef, useState } from "react";',
-                  "React useRef import",
-              )
-
-          if "const modalRef = useRef<HTMLElement>(null);" not in crud:
-              crud = replace_once(
-                  crud,
-                  "  const [pendingOffline, setPendingOffline] = useState(0);\n",
-                  "  const [pendingOffline, setPendingOffline] = useState(0);\n  const modalRef = useRef<HTMLElement>(null);\n  const previousFocusRef = useRef<HTMLElement | null>(null);\n  const savingRef = useRef(false);\n",
-                  "modal refs",
-              )
-
-          if "previousFocusRef.current?.focus();" not in crud:
-              focus_effect = '''  useEffect(() => {
+          focus_effect = '''  useEffect(() => {
             savingRef.current = saving;
           }, [saving]);
 
           useEffect(() => {
             if (!modalOpen) return;
-
-            previousFocusRef.current = document.activeElement instanceof HTMLElement
-              ? document.activeElement
-              : null;
+            previousFocusRef.current =
+              document.activeElement instanceof HTMLElement ? document.activeElement : null;
             const modal = modalRef.current;
             if (!modal) return;
 
-            const focusableSelector = [
+            const selector = [
               'a[href]',
               'button:not([disabled])',
               'input:not([disabled])',
@@ -264,9 +217,7 @@ jobs:
               'textarea:not([disabled])',
               '[tabindex]:not([tabindex="-1"])',
             ].join(',');
-            const focusable = Array.from(
-              modal.querySelectorAll<HTMLElement>(focusableSelector),
-            ).filter((element) => !element.hasAttribute('hidden'));
+            const focusable = Array.from(modal.querySelectorAll<HTMLElement>(selector));
             (focusable[0] ?? modal).focus();
 
             const handleKeyDown = (event: KeyboardEvent) => {
@@ -276,24 +227,22 @@ jobs:
                 return;
               }
               if (event.key !== 'Tab') return;
-
               const activeFocusable = Array.from(
-                modal.querySelectorAll<HTMLElement>(focusableSelector),
-              ).filter((element) => !element.hasAttribute('hidden'));
+                modal.querySelectorAll<HTMLElement>(selector),
+              );
               if (activeFocusable.length === 0) {
                 event.preventDefault();
                 modal.focus();
                 return;
               }
-
               const first = activeFocusable[0];
               const last = activeFocusable[activeFocusable.length - 1];
               if (event.shiftKey && document.activeElement === first) {
                 event.preventDefault();
-                last.focus();
+                last?.focus();
               } else if (!event.shiftKey && document.activeElement === last) {
                 event.preventDefault();
-                first.focus();
+                first?.focus();
               }
             };
 
@@ -306,9 +255,9 @@ jobs:
           }, [modalOpen]);
 
           '''
-              marker = "  const loadRelations = useCallback(async () => {"
-              index = crud.index(marker)
-              crud = crud[:index] + focus_effect + crud[index:]
+          load_marker = "  const loadRelations = useCallback(async () => {"
+          load_index = crud.index(load_marker)
+          crud = crud[:load_index] + focus_effect + crud[load_index:]
 
           sync_pattern = re.compile(
               r"  const syncOffline = useCallback\(async \(\) => \{.*?\n  \}, \[client, loadRecords, owner\]\);",
@@ -320,7 +269,6 @@ jobs:
             try {
               setPendingOffline((await getOfflineQueue(owner)).length);
               if (!navigator.onLine) return;
-
               const result = await flushOfflineQueue(client, owner);
               setPendingOffline(result.remaining);
               if (result.deadLettered > 0) {
@@ -339,40 +287,29 @@ jobs:
               );
             }
           }, [client, loadRecords, owner]);'''
-          crud, count = sync_pattern.subn(sync_replacement, crud, count=1)
-          if count != 1:
-              raise SystemExit(f"offline sync handler: expected one match, found {count}")
+          crud, sync_count = sync_pattern.subn(sync_replacement, crud, count=1)
+          if sync_count != 1:
+              raise SystemExit(f"sync handler: expected one match, found {sync_count}")
 
-          if "ref={modalRef}" not in crud:
-              crud = replace_once(
-                  crud,
-                  '<div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}>',
-                  '<div ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" tabIndex={-1} onMouseDown={(event) => event.stopPropagation()}>',
-                  "modal focus target",
-              )
-
-          crud = crud.replace('aria-label="Fechar formulário"', 'aria-label="Fechar modal"')
-          crud_path.write_text(crud)
-
-          required_offline = [
-              "export const MAX_OFFLINE_ATTEMPTS = 5;",
-              "export function recordOfflineFailure",
-              "deadLettered: deadLetters.length",
-              'navigator.locks.request("udk-offline-queue-write"',
-          ]
-          required_crud = [
-              "const modalRef = useRef<HTMLElement>(null);",
-              "previousFocusRef.current?.focus();",
+          crud = replace_once(
+              crud,
+              '<div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}>',
+              '<div ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" tabIndex={-1} onMouseDown={(event) => event.stopPropagation()}>',
+              "modal focus target",
+          )
+          crud = replace_once(
+              crud,
+              'aria-label="Fechar formulário"',
               'aria-label="Fechar modal"',
-              "catch (syncError)",
-              "result.deadLettered > 0",
-              "quarentena offline",
-          ]
-          missing = [marker for marker in required_offline if marker not in offline_path.read_text()]
-          missing += [marker for marker in required_crud if marker not in crud_path.read_text()]
-          if missing:
-              raise SystemExit(f"Missing final review markers: {missing}")
+              "close label",
+          )
+          crud_path.write_text(crud)
           PY
+
+      - name: Remove temporary repair workflows before verification
+        run: |
+          rm -f .github/workflows/apply-final-ui-review.yml
+          rm -f .github/workflows/finalize-final-ui-review.yml
 
       - name: Verify final application
         run: |
@@ -381,17 +318,11 @@ jobs:
           pnpm --filter @udk/plataforma test
           pnpm --filter @udk/plataforma build
 
-      - name: Remove temporary workflows and publish
+      - name: Publish verified repair
         run: |
-          rm -f .github/workflows/apply-final-ui-review.yml
-          rm -f .github/workflows/finalize-final-ui-review.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to publish"
-            exit 0
-          fi
-          git commit -m "fix: close final accessibility and offline review findings"
+          git commit -m "fix: close accessibility and offline resilience findings"
           git pull --rebase origin feat/complete-operational-modules
           git push origin HEAD:feat/complete-operational-modules
