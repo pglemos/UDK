@@ -1,104 +1,101 @@
-name: Apply Task 1 Verified Patch
+name: Application CI
 
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [feat/complete-operational-modules]
+    branches: [main, feat/complete-operational-modules]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: apply-task1-${{ github.ref }}
+  group: application-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  patch:
+  quality:
+    name: Lint, types, tests and build
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feat/complete-operational-modules
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      - name: Enable pnpm
+        run: corepack enable
 
-      - name: Apply structural changes
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify workspace
+        id: verify
+        continue-on-error: true
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
+          set -o pipefail
+          pnpm verify 2>&1 | tee verify.log
 
-          def replace_once(path: str, pattern: str, replacement: str, flags: int = 0) -> None:
-              file = Path(path)
-              text = file.read_text()
-              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
-              if count != 1:
-                  raise SystemExit(f"Expected exactly one match in {path}, found {count}: {pattern[:120]}")
-              file.write_text(updated)
-
-          queue_path = "apps/plataforma/lib/offline-queue.ts"
-          replace_once(
-              queue_path,
-              r'''export function createOfflineQueueOwner\(\s*client: SupabaseClient,\s*userId: string,\s*\): OfflineQueueOwner \{\s*return \{\s*userId,\s*projectUrl: normalizeProjectUrl\(client\.supabaseUrl\),\s*\};\s*\}''',
-              '''export function createOfflineQueueOwner(\n  projectUrl: string,\n  userId: string,\n): OfflineQueueOwner {\n  return {\n    userId,\n    projectUrl: normalizeProjectUrl(projectUrl),\n  };\n}''',
-              re.MULTILINE,
-          )
-          replace_once(
-              queue_path,
-              r'''(if \(!isOfflineCapableTable\(operation\.table\)\) \{\s*throw new Error\(`O módulo \$\{operation\.table\} não pode armazenar dados offline\.`\);\s*\}\s*)return withWriteLock''',
-              r'''\1const table = operation.table;\n  return withWriteLock''',
-              re.MULTILINE,
-          )
-          replace_once(queue_path, r'''table: operation\.table,''', '''table,''')
-
-          panel_path = "apps/plataforma/app/painel/[[...slug]]/page.tsx"
-          replace_once(
-              panel_path,
-              re.escape('import { supabase } from "../../../lib/supabase";'),
-              'import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";',
-          )
-          replace_once(
-              panel_path,
-              re.escape('  const client = useMemo(() => supabase(), []);'),
-              '  const client = useMemo(() => supabase(), []);\n  const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);',
-          )
-
-          panel = Path(panel_path)
-          text = panel.read_text()
-          redirect_count = text.count('router.replace("/")')
-          if redirect_count != 3:
-              raise SystemExit(f"Expected 3 root redirects, found {redirect_count}")
-          text = text.replace('router.replace("/")', 'router.replace("/login")')
-          text = text.replace('<Link href="/">Voltar para o acesso</Link>', '<Link href="/login">Voltar para o acesso</Link>')
-          owner_pattern = r'''  const offlineOwner = useMemo\(\s*\(\) => \(client && user \? createOfflineQueueOwner\(client, user\.id\) : undefined\),\s*\[client, user\],\s*\);'''
-          owner_replacement = '''  const offlineOwner = useMemo(\n    () =>\n      client && user && projectUrl\n        ? createOfflineQueueOwner(projectUrl, user.id)\n        : undefined,\n    [client, projectUrl, user],\n  );'''
-          text, count = re.subn(owner_pattern, owner_replacement, text, count=1, flags=re.MULTILINE)
-          if count != 1:
-              raise SystemExit(f"Expected one offline owner block, found {count}")
-          panel.write_text(text)
-          PY
-
-      - name: Verify exact fix
+      - name: Lint
+        id: lint
+        continue-on-error: true
         run: |
-          pnpm --filter @udk/plataforma test -- offline-queue.test.ts
-          pnpm --filter @udk/plataforma typecheck
-          pnpm --filter @udk/plataforma build
+          set -o pipefail
+          pnpm lint 2>&1 | tee lint.log
 
-      - name: Commit verified patch
+      - name: Typecheck
+        id: typecheck
+        continue-on-error: true
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/plataforma/lib/offline-queue.ts 'apps/plataforma/app/painel/[[...slug]]/page.tsx'
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "fix: use explicit Supabase project URL for offline queue"
-          git push origin HEAD:feat/complete-operational-modules
+          set -o pipefail
+          pnpm typecheck 2>&1 | tee typecheck.log
+
+      - name: Test
+        id: test
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm test 2>&1 | tee test.log
+
+      - name: Build both applications
+        id: build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm build 2>&1 | tee build.log
+
+      - name: Upload quality diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-quality-${{ github.sha }}
+          path: |
+            verify.log
+            lint.log
+            typecheck.log
+            test.log
+            build.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce quality gates
+        if: always()
+        env:
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          TYPECHECK_OUTCOME: ${{ steps.typecheck.outcome }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        run: |
+          printf 'verify=%s\nlint=%s\ntypecheck=%s\ntest=%s\nbuild=%s\n' \
+            "$VERIFY_OUTCOME" "$LINT_OUTCOME" "$TYPECHECK_OUTCOME" "$TEST_OUTCOME" "$BUILD_OUTCOME"
+          [ "$VERIFY_OUTCOME" = success ] && \
+          [ "$LINT_OUTCOME" = success ] && \
+          [ "$TYPECHECK_OUTCOME" = success ] && \
+          [ "$TEST_OUTCOME" = success ] && \
+          [ "$BUILD_OUTCOME" = success ]
