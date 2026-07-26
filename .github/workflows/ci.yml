@@ -29,94 +29,60 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
 
-      - name: Apply exact changes
+      - name: Apply structural changes
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
-          def replace_exact(path: str, old: str, new: str) -> None:
+          def replace_once(path: str, pattern: str, replacement: str, flags: int = 0) -> None:
               file = Path(path)
               text = file.read_text()
-              if old not in text:
-                  raise SystemExit(f"Expected marker not found in {path}: {old[:120]!r}")
-              file.write_text(text.replace(old, new, 1))
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"Expected exactly one match in {path}, found {count}: {pattern[:120]}")
+              file.write_text(updated)
 
-          replace_exact(
-              "apps/plataforma/lib/offline-queue.ts",
-              '''export function createOfflineQueueOwner(
-            client: SupabaseClient,
-            userId: string,
-          ): OfflineQueueOwner {
-            return {
-              userId,
-              projectUrl: normalizeProjectUrl(client.supabaseUrl),
-            };
-          }
-          ''',
-              '''export function createOfflineQueueOwner(
-            projectUrl: string,
-            userId: string,
-          ): OfflineQueueOwner {
-            return {
-              userId,
-              projectUrl: normalizeProjectUrl(projectUrl),
-            };
-          }
-          ''',
+          queue_path = "apps/plataforma/lib/offline-queue.ts"
+          replace_once(
+              queue_path,
+              r'''export function createOfflineQueueOwner\(\s*client: SupabaseClient,\s*userId: string,\s*\): OfflineQueueOwner \{\s*return \{\s*userId,\s*projectUrl: normalizeProjectUrl\(client\.supabaseUrl\),\s*\};\s*\}''',
+              '''export function createOfflineQueueOwner(\n  projectUrl: string,\n  userId: string,\n): OfflineQueueOwner {\n  return {\n    userId,\n    projectUrl: normalizeProjectUrl(projectUrl),\n  };\n}''',
+              re.MULTILINE,
           )
-          replace_exact(
-              "apps/plataforma/lib/offline-queue.ts",
-              '''  if (!isOfflineCapableTable(operation.table)) {
-            throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
-          }
-
-          return withWriteLock(async () => {
-          ''',
-              '''  if (!isOfflineCapableTable(operation.table)) {
-            throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
-          }
-
-          const table = operation.table;
-          return withWriteLock(async () => {
-          ''',
+          replace_once(
+              queue_path,
+              r'''(if \(!isOfflineCapableTable\(operation\.table\)\) \{\s*throw new Error\(`O módulo \$\{operation\.table\} não pode armazenar dados offline\.`\);\s*\}\s*)return withWriteLock''',
+              r'''\1const table = operation.table;\n  return withWriteLock''',
+              re.MULTILINE,
           )
-          replace_exact(
-              "apps/plataforma/lib/offline-queue.ts",
-              '      table: operation.table,\n',
-              '      table,\n',
+          replace_once(queue_path, r'''table: operation\.table,''', '''table,''')
+
+          panel_path = "apps/plataforma/app/painel/[[...slug]]/page.tsx"
+          replace_once(
+              panel_path,
+              re.escape('import { supabase } from "../../../lib/supabase";'),
+              'import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";',
+          )
+          replace_once(
+              panel_path,
+              re.escape('  const client = useMemo(() => supabase(), []);'),
+              '  const client = useMemo(() => supabase(), []);\n  const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);',
           )
 
-          replace_exact(
-              "apps/plataforma/app/painel/[[...slug]]/page.tsx",
-              'import { supabase } from "../../../lib/supabase";\n',
-              'import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";\n',
-          )
-          replace_exact(
-              "apps/plataforma/app/painel/[[...slug]]/page.tsx",
-              '  const client = useMemo(() => supabase(), []);\n',
-              '  const client = useMemo(() => supabase(), []);\n  const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);\n',
-          )
-
-          panel = Path("apps/plataforma/app/painel/[[...slug]]/page.tsx")
+          panel = Path(panel_path)
           text = panel.read_text()
-          if text.count('router.replace("/")') != 3:
-              raise SystemExit("Unexpected number of root redirects")
+          redirect_count = text.count('router.replace("/")')
+          if redirect_count != 3:
+              raise SystemExit(f"Expected 3 root redirects, found {redirect_count}")
           text = text.replace('router.replace("/")', 'router.replace("/login")')
           text = text.replace('<Link href="/">Voltar para o acesso</Link>', '<Link href="/login">Voltar para o acesso</Link>')
-          old_owner = '''  const offlineOwner = useMemo(
-            () => (client && user ? createOfflineQueueOwner(client, user.id) : undefined),
-            [client, user],
-          );'''
-          new_owner = '''  const offlineOwner = useMemo(
-            () =>
-              client && user && projectUrl
-                ? createOfflineQueueOwner(projectUrl, user.id)
-                : undefined,
-            [client, projectUrl, user],
-          );'''
-          if old_owner not in text:
-              raise SystemExit("Offline owner marker not found")
-          panel.write_text(text.replace(old_owner, new_owner, 1))
+          owner_pattern = r'''  const offlineOwner = useMemo\(\s*\(\) => \(client && user \? createOfflineQueueOwner\(client, user\.id\) : undefined\),\s*\[client, user\],\s*\);'''
+          owner_replacement = '''  const offlineOwner = useMemo(\n    () =>\n      client && user && projectUrl\n        ? createOfflineQueueOwner(projectUrl, user.id)\n        : undefined,\n    [client, projectUrl, user],\n  );'''
+          text, count = re.subn(owner_pattern, owner_replacement, text, count=1, flags=re.MULTILINE)
+          if count != 1:
+              raise SystemExit(f"Expected one offline owner block, found {count}")
+          panel.write_text(text)
           PY
 
       - name: Verify exact fix
