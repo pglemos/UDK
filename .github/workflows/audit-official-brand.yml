@@ -1,72 +1,68 @@
-name: Audit official UDK brand
+name: Finalize official UDK brand
 
 on:
-  push:
-    branches: [fix/official-udk-brand-assets]
   pull_request:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: finalize-official-udk-brand
+  cancel-in-progress: true
 
 jobs:
-  audit:
+  finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build repository brand audit
-        run: |
-          set -euo pipefail
-          {
-            echo '# UDK repository brand audit'
-            echo
-            echo '## Repository files'
-            find . -type f \
-              -not -path './.git/*' \
-              -not -path './node_modules/*' \
-              -not -path './.next/*' \
-              | sort
-            echo
-            echo '## Font declarations and imports'
-            grep -RInE 'font-family|fonts\.googleapis|Barlow|Inter|Roboto' \
-              apps packages docs README.md \
-              --exclude='pnpm-lock.yaml' || true
-            echo
-            echo '## Logo, icon and image references'
-            grep -RInE 'udk\.svg|logo|favicon|apple-touch|manifest|<img|Image\(' \
-              apps packages docs README.md \
-              --exclude='pnpm-lock.yaml' || true
-            echo
-            echo '## Existing public assets'
-            find apps/plataforma/public -maxdepth 4 -type f -print -exec file {} \; -exec sha256sum {} \; 2>/dev/null | sort || true
-            echo
-            echo '## Brand-like colors and tokens'
-            grep -RInEi '#1c191f|#ffffff|#00d9ff|#dafc08|lime|cyan|graphite|theme_color|themeColor' \
-              apps packages docs README.md \
-              --exclude='pnpm-lock.yaml' || true
-            echo
-            echo '## Package scripts and test layout'
-            find . -name package.json -not -path './node_modules/*' -print -exec cat {} \;
-            echo
-            echo '## Git status'
-            git status --short
-          } > brand-audit.txt
-
-          tar \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='.next' \
-            --exclude='brand-audit.txt' \
-            -czf source-snapshot.tar.gz .
-
-          cat brand-audit.txt
-
-      - uses: actions/upload-artifact@v4
         with:
-          name: official-brand-audit
-          path: |
-            brand-audit.txt
-            source-snapshot.tar.gz
-          if-no-files-found: error
+          ref: fix/official-udk-brand-assets
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply exact official brand assets
+        run: python3 scripts/apply_official_brand.py
+
+      - name: Remove temporary migration infrastructure
+        run: |
+          rm -f .github/workflows/apply-official-brand-assets.yml
+          rm -f .github/workflows/audit-official-brand.yml
+          rm -rf .brand-payload
+          rm -f scripts/official_brand_payload_a.py
+          rm -f scripts/official_brand_payload_b.py
+          rm -f scripts/apply_official_brand.py
+
+      - name: Verify official asset hashes and references
+        run: pnpm --filter @udk/plataforma exec vitest run lib/brand-assets.test.ts
+
+      - name: Verify workspace
+        run: pnpm verify
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: TypeScript
+        run: pnpm typecheck
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish verified official brand correction
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: adopt official UDK brand assets across all surfaces"
+          git pull --rebase origin fix/official-udk-brand-assets
+          git push origin HEAD:fix/official-udk-brand-assets
