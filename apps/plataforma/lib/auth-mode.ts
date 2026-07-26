@@ -12,3 +12,7 @@ export function authModeForPath(value: string): AuthMode {
 export function passwordRecoveryRedirect(origin: string): string {
   return new URL("/nova-senha", origin).toString();
 }
+
+export function registrationDestination(hasSession: boolean): string {
+  return hasSession ? "/painel/inscricoes" : "/login?cadastro=1";
+}
