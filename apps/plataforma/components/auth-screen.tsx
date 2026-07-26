@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, LoaderCircle, LockKeyhole, Mail, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  UserRound,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { passwordRecoveryRedirect, type AuthMode } from "../lib/auth-mode";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import { OfficialLogo } from "./race/official-logo";
 
 export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
   const router = useRouter();
@@ -15,6 +25,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -28,7 +39,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
       initialMode === "recovery" || window.location.hash.includes("type=recovery");
 
     if (new URLSearchParams(window.location.search).get("senha") === "alterada") {
-      setNotice("Senha alterada com sucesso. Entre novamente com a nova senha.");
+      setNotice("Senha alterada. Entre novamente com a nova senha.");
     }
 
     void client.auth.getSession().then(({ data, error: sessionError }) => {
@@ -62,6 +73,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     setPasswordConfirmation("");
     setError("");
     setNotice("");
+    setShowPassword(false);
   }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -71,7 +83,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
 
     const client = supabase();
     if (!client) {
-      setError("Supabase ainda não conectado. Configure a URL e a chave pública do projeto.");
+      setError("A plataforma está temporariamente indisponível. Tente novamente em instantes.");
       return;
     }
 
@@ -144,7 +156,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
           : "Nova senha";
   const submitLabel =
     mode === "signin"
-      ? "Entrar"
+      ? "Entrar na plataforma"
       : mode === "signup"
         ? "Criar conta"
         : mode === "reset"
@@ -152,117 +164,153 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
           : "Salvar nova senha";
 
   return (
-    <main className="login">
-      <section className="login-visual">
+    <main className="race-auth">
+      <section className="race-auth-visual">
         <Link href="/" aria-label="Voltar para o portal UDK">
-          <img src="/udk.svg" alt="UDK" />
+          <OfficialLogo variant="negative" width={190} priority />
         </Link>
-        <div>
-          <span className="login-kicker">Plataforma oficial • Temporada 2026</span>
-          <h1>Controle<br /><b>de prova</b></h1>
+
+        <div className="race-auth-copy">
+          <span className="race-kicker">Plataforma oficial • 2026</span>
+          <h1>
+            Sua temporada
+            <em>começa aqui.</em>
+          </h1>
           <p>
-            Pilotos, inscrições, pagamentos, resultados, julgamento, Endurance e conteúdo em uma
-            operação auditável.
+            Acompanhe sua inscrição, documentos, etapas e resultados dentro do ambiente oficial
+            do campeonato.
           </p>
         </div>
-        <div className="login-features">
-          <span><CheckCircle2 /> Dados protegidos por RLS</span>
-          <span><CheckCircle2 /> Operação offline sincronizável</span>
-          <span><CheckCircle2 /> Resultados versionados</span>
+
+        <div className="race-auth-features">
+          <span><CheckCircle2 aria-hidden="true" /> Inscrição acompanhada</span>
+          <span><CheckCircle2 aria-hidden="true" /> Documentos organizados</span>
+          <span><CheckCircle2 aria-hidden="true" /> Resultados oficiais</span>
         </div>
       </section>
 
-      <section className="login-panel">
-        <form onSubmit={submit}>
-          <span className="eyebrow">Acesso seguro</span>
+      <section className="race-auth-panel">
+        <form className="race-auth-form" onSubmit={submit}>
+          <span className="race-kicker">Acesso UDK</span>
           <h2>{title}</h2>
-          <p className="form-intro">
+          <p>
             {mode === "signin"
-              ? "Use sua conta única para acessar todos os papéis autorizados."
+              ? "Use sua conta para acompanhar sua participação no campeonato."
               : mode === "signup"
-                ? "Crie sua conta para iniciar a inscrição e enviar os documentos necessários."
+                ? "Crie sua conta para iniciar a inscrição e entrar no grid."
                 : mode === "reset"
-                  ? "Enviaremos um link de recuperação para o e-mail cadastrado."
+                  ? "Enviaremos um link seguro para o e-mail cadastrado."
                   : "Defina uma nova senha com pelo menos oito caracteres."}
           </p>
 
           {!configured ? (
-            <div className="alert alert-warning" role="status">
-              A interface está pronta, mas as variáveis públicas do Supabase ainda não foram cadastradas.
+            <div className="race-alert race-alert-warning" role="status">
+              O acesso está temporariamente indisponível porque a conexão da plataforma não foi configurada.
             </div>
           ) : null}
-          {error ? <div className="alert alert-error" role="alert">{error}</div> : null}
-          {notice ? <div className="alert alert-success" role="status">{notice}</div> : null}
+          {error ? <div className="race-alert race-alert-error" role="alert">{error}</div> : null}
+          {notice ? <div className="race-alert race-alert-success" role="status">{notice}</div> : null}
 
-          {mode === "signup" ? (
-            <div className="auth-grid">
-              <label>
-                <span>Nome completo</span>
-                <div className="input-with-icon">
-                  <UserRound size={18} />
-                  <input type="text" value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" required />
+          <div className={`race-form-grid${mode === "signup" ? " is-two" : ""}`}>
+            {mode === "signup" ? (
+              <>
+                <label className="race-field">
+                  <span>Nome completo</span>
+                  <div className="race-field-control">
+                    <UserRound aria-hidden="true" />
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(event) => setFullName(event.target.value)}
+                      autoComplete="name"
+                      required
+                    />
+                  </div>
+                </label>
+                <label className="race-field">
+                  <span>Nome esportivo</span>
+                  <div className="race-field-control">
+                    <UserRound aria-hidden="true" />
+                    <input
+                      type="text"
+                      value={sportName}
+                      onChange={(event) => setSportName(event.target.value)}
+                      autoComplete="nickname"
+                    />
+                  </div>
+                </label>
+              </>
+            ) : null}
+
+            {mode !== "recovery" ? (
+              <label className="race-field">
+                <span>E-mail</span>
+                <div className="race-field-control">
+                  <Mail aria-hidden="true" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    autoComplete="email"
+                    required
+                  />
                 </div>
               </label>
-              <label>
-                <span>Nome esportivo</span>
-                <div className="input-with-icon">
-                  <UserRound size={18} />
-                  <input type="text" value={sportName} onChange={(event) => setSportName(event.target.value)} autoComplete="nickname" />
+            ) : null}
+
+            {mode !== "reset" ? (
+              <label className="race-field">
+                <span>{mode === "recovery" ? "Nova senha" : "Senha"}</span>
+                <div className="race-field-control">
+                  <LockKeyhole aria-hidden="true" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    minLength={8}
+                    required
+                  />
+                  <button
+                    className="race-password-toggle"
+                    type="button"
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    onClick={() => setShowPassword((current) => !current)}
+                  >
+                    {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                  </button>
                 </div>
               </label>
-            </div>
-          ) : null}
+            ) : null}
 
-          {mode !== "recovery" ? (
-            <label>
-              <span>E-mail</span>
-              <div className="input-with-icon">
-                <Mail size={18} />
-                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
-              </div>
-            </label>
-          ) : null}
+            {mode === "recovery" ? (
+              <label className="race-field">
+                <span>Confirmar nova senha</span>
+                <div className="race-field-control">
+                  <LockKeyhole aria-hidden="true" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={passwordConfirmation}
+                    onChange={(event) => setPasswordConfirmation(event.target.value)}
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
+                </div>
+              </label>
+            ) : null}
+          </div>
 
-          {mode !== "reset" ? (
-            <label>
-              <span>{mode === "recovery" ? "Nova senha" : "Senha"}</span>
-              <div className="input-with-icon">
-                <LockKeyhole size={18} />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  minLength={8}
-                  required
-                />
-              </div>
-            </label>
-          ) : null}
-
-          {mode === "recovery" ? (
-            <label>
-              <span>Confirmar nova senha</span>
-              <div className="input-with-icon">
-                <LockKeyhole size={18} />
-                <input
-                  type="password"
-                  value={passwordConfirmation}
-                  onChange={(event) => setPasswordConfirmation(event.target.value)}
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                />
-              </div>
-            </label>
-          ) : null}
-
-          <button className="login-submit" type="submit" disabled={loading || !configured}>
-            {loading ? <LoaderCircle className="spin" /> : <ArrowRight />}
+          <button
+            className="race-button race-button-primary race-auth-submit"
+            type="submit"
+            disabled={loading || !configured}
+          >
+            {loading ? <LoaderCircle className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
             {submitLabel}
           </button>
 
-          <div className="auth-links">
+          <div className="race-auth-links">
             {mode !== "signin" ? (
               <button type="button" onClick={() => changeMode("signin")}>Voltar para o login</button>
             ) : (

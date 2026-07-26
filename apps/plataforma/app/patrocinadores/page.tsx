@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { PublicLayout } from "../../components/public-layout";
-import { PublicPageHero } from "../../components/public-page-hero";
-import { getPublicContentBundle } from "../../lib/public-content";
+import { Reveal } from "../../components/race/motion";
+import { RaceShell } from "../../components/race/race-shell";
+import { EmptyState, SectionHeading } from "../../components/race/ui";
+import { getSponsors } from "../../lib/public-content";
 
 export const metadata: Metadata = {
   title: "Patrocinadores",
@@ -10,35 +11,74 @@ export const metadata: Metadata = {
 };
 
 export default async function SponsorsPage() {
-  const { sponsors } = await getPublicContentBundle();
+  const sponsors = await getSponsors();
+
   return (
-    <PublicLayout>
-      <main>
-        <PublicPageHero title="Patrocinadores" description="Marcas que aceleram com o UDK." />
-        <section className="public-section">
-          {sponsors.length ? (
-            <div className="public-cards">
-              {sponsors.map((sponsor) => {
-                const card = (
-                  <article className="public-card">
-                    {sponsor.logoUrl ? <img src={sponsor.logoUrl} alt={`Logo ${sponsor.name}`} style={{ maxWidth: 180, maxHeight: 90, objectFit: "contain" }} /> : null}
-                    <span className="public-number">{sponsor.tier}</span>
-                    <h3>{sponsor.name}</h3>
-                  </article>
-                );
-                return sponsor.websiteUrl ? (
-                  <a key={sponsor.slug} href={sponsor.websiteUrl} target="_blank" rel="noreferrer">{card}</a>
-                ) : <div key={sponsor.slug}>{card}</div>;
-              })}
-            </div>
-          ) : (
-            <div className="public-empty">
-              <h2>Espaço para parceiros</h2>
-              <p>Patrocinadores ativos serão exibidos aqui após aprovação e publicação.</p>
-            </div>
-          )}
+    <RaceShell>
+      <main id="conteudo">
+        <section className="race-page-hero race-page-hero-sponsors">
+          <div className="race-container">
+            <span className="race-kicker">Parceiros oficiais</span>
+            <h1>Patrocinadores</h1>
+            <p>Marcas que compartilham o grid, a pista e a evolução do UDK.</p>
+          </div>
+        </section>
+
+        <section className="race-section">
+          <div className="race-container">
+            <Reveal>
+              <SectionHeading
+                eyebrow="Quem acelera conosco"
+                title="Parcerias que movem o campeonato"
+                description="Exposição oficial com contexto esportivo, presença editorial e conexão real com a comunidade do kart."
+              />
+            </Reveal>
+
+            {sponsors.length ? (
+              <div className="race-sponsor-grid">
+                {sponsors.map((sponsor, index) => {
+                  const content = (
+                    <>
+                      <div className="race-sponsor-logo">
+                        {sponsor.logoUrl ? (
+                          <img src={sponsor.logoUrl} alt={`Logo ${sponsor.name}`} loading="lazy" />
+                        ) : (
+                          <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>
+                        )}
+                      </div>
+                      <span>{sponsor.tier || "Parceiro oficial"}</span>
+                      <h2>{sponsor.name}</h2>
+                    </>
+                  );
+
+                  return (
+                    <Reveal key={sponsor.slug} delay={index * 60}>
+                      {sponsor.websiteUrl ? (
+                        <a
+                          className="race-sponsor-card"
+                          href={sponsor.websiteUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <article className="race-sponsor-card">{content}</article>
+                      )}
+                    </Reveal>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState
+                eyebrow="Grid de parceiros"
+                title="Espaço reservado às marcas oficiais"
+                description="Os patrocinadores ativos serão exibidos assim que a organização concluir a publicação no Supabase."
+              />
+            )}
+          </div>
         </section>
       </main>
-    </PublicLayout>
+    </RaceShell>
   );
 }
