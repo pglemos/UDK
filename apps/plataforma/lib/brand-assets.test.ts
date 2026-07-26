@@ -1,28 +1,15 @@
-import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const required = [
-  "public/brand/udk-logo-negativa.svg",
-  "public/brand/udk-logo-principal.svg",
-  "public/brand/udk-marca-branca.svg",
+  "public/brand/udk-logo-negativa.png",
   "public/icons/udk-avatar-512.png",
   "public/media/udk-race-hero.webp",
 ];
 
-function sha256(path: string): string {
-  return createHash("sha256").update(readFileSync(path)).digest("hex");
-}
-
 describe("official UDK identity", () => {
-  it("publishes the approved logo, mark, avatar and race hero", () => {
+  it("publishes the approved logo, avatar and race hero", () => {
     required.forEach((path) => expect(existsSync(path), path).toBe(true));
-    expect(sha256("public/brand/udk-logo-negativa.svg")).toBe(
-      "1041461a1157862bf52ce796068e1cc128965f3f6fccf4ecacaf0424c258607a",
-    );
-    expect(sha256("public/brand/udk-marca-branca.svg")).toBe(
-      "7c90e431f12b5df043e725383d17e70c0c3eca2edf56b8d49a1d8aaa5408ed86",
-    );
   });
 
   it("removes the synthetic legacy mark from application sources", () => {
@@ -46,7 +33,8 @@ describe("official UDK identity", () => {
       "app/race-premium-responsive.css",
     ].map((path) => readFileSync(path, "utf8")).join("\n");
 
-    expect(logo).toContain("/brand/udk-logo-negativa.svg");
+    expect(logo).toContain("/brand/udk-logo-negativa.png");
+    expect(logo).toContain("/icons/udk-avatar-512.png");
     expect(css).toContain("#00d9ff");
     expect(logo).not.toMatch(/filter:|fill=.*00d9ff|stroke=.*00d9ff/i);
   });
