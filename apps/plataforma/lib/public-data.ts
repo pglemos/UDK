@@ -244,22 +244,22 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
   };
 }
 
-const developmentDrivers: PublicDriver[] = [
+const fallbackDrivers: PublicDriver[] = [
   {
-    id: "demo-1",
+    id: "fallback-walison",
     slug: "walison-goncalves",
     name: "Walison Gonçalves",
     fullName: "Walison Gonçalves",
     number: 7,
     category: "Ultras Insanos",
-    categorySlug: "ultras-insanos",
+    categorySlug: "insanos",
     categoryColor: "#00D9FF",
     points: 112,
     wins: 3,
     podiums: 5,
-    poles: 2,
+    poles: 0,
     position: 1,
-    previousPosition: 2,
+    previousPosition: null,
     avatarUrl: null,
     heroImageUrl: null,
     teamName: null,
@@ -267,20 +267,20 @@ const developmentDrivers: PublicDriver[] = [
     bio: null,
   },
   {
-    id: "demo-2",
+    id: "fallback-haroldo",
     slug: "haroldo-alves",
     name: "Haroldo Alves",
     fullName: "Haroldo Alves",
     number: 79,
     category: "Ultras Insanos",
-    categorySlug: "ultras-insanos",
+    categorySlug: "insanos",
     categoryColor: "#00D9FF",
     points: 104,
     wins: 2,
     podiums: 5,
-    poles: 1,
+    poles: 0,
     position: 2,
-    previousPosition: 2,
+    previousPosition: null,
     avatarUrl: null,
     heroImageUrl: null,
     teamName: null,
@@ -288,20 +288,62 @@ const developmentDrivers: PublicDriver[] = [
     bio: null,
   },
   {
-    id: "demo-3",
+    id: "fallback-aldo",
     slug: "aldo-senna",
     name: "Aldo Senna",
     fullName: "Aldo Senna",
     number: 44,
     category: "Ultras Rápidos",
-    categorySlug: "ultras-rapidos",
-    categoryColor: "#35E6FF",
+    categorySlug: "rapidos",
+    categoryColor: "#F7F5F0",
     points: 98,
     wins: 2,
     podiums: 4,
-    poles: 1,
+    poles: 0,
+    position: 1,
+    previousPosition: null,
+    avatarUrl: null,
+    heroImageUrl: null,
+    teamName: null,
+    city: "Betim/MG",
+    bio: null,
+  },
+  {
+    id: "fallback-pedro",
+    slug: "pedro-guilherme",
+    name: "Pedro Guilherme",
+    fullName: "Pedro Guilherme Lemos Teixeira",
+    number: 70,
+    category: "Ultras Rápidos",
+    categorySlug: "rapidos",
+    categoryColor: "#F7F5F0",
+    points: 91,
+    wins: 1,
+    podiums: 4,
+    poles: 0,
+    position: 2,
+    previousPosition: null,
+    avatarUrl: null,
+    heroImageUrl: null,
+    teamName: null,
+    city: "Betim/MG",
+    bio: null,
+  },
+  {
+    id: "fallback-arthur",
+    slug: "arthur-henrique",
+    name: "Arthur Henrique",
+    fullName: "Arthur Henrique Vieira da Silva",
+    number: 56,
+    category: "Ultras Rápidos",
+    categorySlug: "rapidos",
+    categoryColor: "#F7F5F0",
+    points: 84,
+    wins: 0,
+    podiums: 3,
+    poles: 0,
     position: 3,
-    previousPosition: 1,
+    previousPosition: null,
     avatarUrl: null,
     heroImageUrl: null,
     teamName: null,
@@ -310,29 +352,38 @@ const developmentDrivers: PublicDriver[] = [
   },
 ];
 
-const developmentStages: PublicStage[] = [
-  {
-    id: "demo-stage-1",
-    slug: "endurance-agosto",
-    date: "18 AGO",
-    title: "Endurance",
-    format: "Endurance",
-    track: "Traçado 01 invertido com chicane",
-    time: "21h",
-    startsAt: "2026-08-18T21:00:00-03:00",
-    status: "registration_open",
-    location: "Kartódromo Internacional de Betim",
-    city: "Betim/MG",
-    registrationOpensAt: null,
-    registrationClosesAt: null,
-    trackMapUrl: null,
-    heroImageUrl: null,
-    shortDescription: "Estratégia, consistência e trabalho em equipe sob as luzes de Betim.",
-  },
+const fallbackStages: PublicStage[] = [
+  ["endurance-agosto", "18 AGO", "Endurance", "endurance", "Traçado 01 invertido com chicane", "21h", "2026-08-18T21:00:00-03:00"],
+  ["etapa-setembro", "08 SET", "Etapa regular", "regular", "Traçado 02 normal e invertido", "21h", "2026-09-08T21:00:00-03:00"],
+  ["etapa-outubro", "13 OUT", "Etapa regular", "regular", "Traçado 05 normal e invertido", "21h", "2026-10-13T21:00:00-03:00"],
+  ["etapa-novembro", "10 NOV", "Etapa regular", "regular", "Traçado 11 normal e invertido", "21h", "2026-11-10T21:00:00-03:00"],
+  ["final-endurance", "12 DEZ", "Final Endurance", "endurance", "Traçado 01 normal", "11h", "2026-12-12T11:00:00-03:00"],
+].map(([slug, date, title, format, track, time, startsAt], index) => ({
+  id: `fallback-stage-${index + 1}`,
+  slug,
+  date,
+  title,
+  format,
+  track,
+  time,
+  startsAt,
+  status: "registration",
+  location: "Kartódromo Internacional de Betim",
+  city: "Betim/MG",
+  registrationOpensAt: null,
+  registrationClosesAt: null,
+  trackMapUrl: null,
+  heroImageUrl: null,
+  shortDescription: null,
+}));
+
+const fallbackCategories: PublicCategory[] = [
+  { slug: "insanos", name: "Ultras Insanos", color: "#00D9FF" },
+  { slug: "rapidos", name: "Ultras Rápidos", color: "#F7F5F0" },
 ];
 
-function demoEnabled(): boolean {
-  return process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_DEMO_DATA === "true";
+function useFallback<T>(items: T[], fallback: T[]): T[] {
+  return items.length ? items : fallback;
 }
 
 function publicClient() {
@@ -348,26 +399,19 @@ function safeSearch(value: string | undefined): string {
 
 export async function getCategories(): Promise<PublicCategory[]> {
   const client = publicClient();
-  if (!client) {
-    return demoEnabled()
-      ? [
-          { slug: "ultras-insanos", name: "Ultras Insanos", color: "#00D9FF" },
-          { slug: "ultras-rapidos", name: "Ultras Rápidos", color: "#35E6FF" },
-        ]
-      : [];
-  }
+  if (!client) return fallbackCategories;
 
   const { data, error } = await client
     .from("public_portal_categories")
     .select("slug,name,color")
     .order("name");
 
-  if (error) return [];
-  return ((data ?? []) as UnknownRow[]).map((row) => ({
+  if (error) return fallbackCategories;
+  return useFallback(((data ?? []) as UnknownRow[]).map((row) => ({
     slug: stringValue(row.slug),
     name: stringValue(row.name),
     color: stringValue(row.color, "#00D9FF"),
-  }));
+  })), fallbackCategories);
 }
 
 export async function getStandingsPage({
@@ -386,11 +430,8 @@ export async function getStandingsPage({
   const client = publicClient();
 
   if (!client) {
-    const source = demoEnabled() ? developmentDrivers : [];
-    return {
-      items: source,
-      meta: buildPageMeta(1, pageSize, source.length),
-    };
+    const source = fallbackDrivers;
+    return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -406,11 +447,15 @@ export async function getStandingsPage({
   if (cleanQuery) request = request.ilike("name", `%${cleanQuery}%`);
 
   const { data, count, error } = await request;
-  if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
+  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
+  const source = useFallback(normalized, fallbackDrivers)
+    .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
+    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
+    .sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "pt-BR") : sort === "points" ? b.points - a.points : (a.position ?? 999) - (b.position ?? 999) || b.points - a.points);
 
   return {
-    items: ((data ?? []) as UnknownRow[]).map(normalizePublicDriver),
-    meta: buildPageMeta(page, pageSize, count ?? 0),
+    items: source.slice(from, to + 1),
+    meta: buildPageMeta(page, pageSize, error || !normalized.length ? source.length : count ?? source.length),
   };
 }
 
@@ -430,11 +475,8 @@ export async function getDriversPage({
   const client = publicClient();
 
   if (!client) {
-    const source = demoEnabled() ? developmentDrivers : [];
-    return {
-      items: source,
-      meta: buildPageMeta(1, pageSize, source.length),
-    };
+    const source = fallbackDrivers;
+    return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -450,19 +492,21 @@ export async function getDriversPage({
   if (cleanQuery) request = request.ilike("name", `%${cleanQuery}%`);
 
   const { data, count, error } = await request;
-  if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
+  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
+  const source = useFallback(normalized, fallbackDrivers)
+    .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
+    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
+    .sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "pt-BR") : sort === "points" ? b.points - a.points : b.points - a.points);
 
   return {
-    items: ((data ?? []) as UnknownRow[]).map(normalizePublicDriver),
-    meta: buildPageMeta(page, pageSize, count ?? 0),
+    items: source.slice(from, to + 1),
+    meta: buildPageMeta(page, pageSize, error || !normalized.length ? source.length : count ?? source.length),
   };
 }
 
 export async function getDriverBySlug(slug: string): Promise<PublicDriver | null> {
   const client = publicClient();
-  if (!client) {
-    return demoEnabled() ? developmentDrivers.find((item) => item.slug === slug) ?? null : null;
-  }
+  if (!client) return fallbackDrivers.find((item) => item.slug === slug) ?? null;
 
   const { data, error } = await client
     .from("public_portal_drivers")
@@ -470,7 +514,7 @@ export async function getDriverBySlug(slug: string): Promise<PublicDriver | null
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error || !data) return fallbackDrivers.find((item) => item.slug === slug) ?? null;
   return normalizePublicDriver(data as UnknownRow);
 }
 
@@ -482,7 +526,7 @@ export async function getStages({
   format?: string;
 } = {}): Promise<PublicStage[]> {
   const client = publicClient();
-  if (!client) return demoEnabled() ? developmentStages : [];
+  if (!client) return fallbackStages;
 
   let request = client
     .from("public_portal_calendar")
@@ -493,8 +537,10 @@ export async function getStages({
   if (format && format !== "todos") request = request.eq("format", format);
 
   const { data, error } = await request;
-  if (error) return [];
-  return ((data ?? []) as UnknownRow[]).map(normalizePublicStage);
+  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicStage);
+  return useFallback(normalized, fallbackStages)
+    .filter((stage) => !status || status === "todos" || stage.status === status)
+    .filter((stage) => !format || format === "todos" || stage.format === format);
 }
 
 export async function getResultsPage({
@@ -570,11 +616,7 @@ export async function getPublicData(): Promise<{
     getResultsPage({ pageSize: 100 }),
   ]);
 
-  return {
-    drivers: standings.items,
-    stages,
-    results: results.items,
-  };
+  return { drivers: standings.items, stages, results: results.items };
 }
 
 export function formatLapTime(milliseconds: number | null): string {

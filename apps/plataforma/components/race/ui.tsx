@@ -12,10 +12,9 @@ import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data"
 import { OfficialLogo } from "./official-logo";
 
 export function PageHero({
-  eyebrow = "UDK 2026",
+  eyebrow = "Temporada 2026",
   title,
   description,
-  compact = false,
 }: {
   eyebrow?: string;
   title: string;
@@ -23,12 +22,17 @@ export function PageHero({
   compact?: boolean;
 }) {
   return (
-    <section className={`race-page-hero${compact ? " is-compact" : ""}`}>
-      <div className="race-page-hero-grid" aria-hidden="true" />
-      <div className="race-container">
-        <span className="race-kicker">{eyebrow}</span>
-        <h1>{title}</h1>
-        <p>{description}</p>
+    <section className="udk-page-hero">
+      <div className="udk-page-hero-media" aria-hidden="true">
+        <img src="/media/udk-race-hero.webp" alt="" />
+      </div>
+      <div className="race-container udk-page-hero-inner">
+        <div>
+          <h1>{title}</h1>
+          <span>{eyebrow}</span>
+          <p>{description}</p>
+        </div>
+        <TrackGlyph label={`Identidade visual da página ${title}`} />
       </div>
     </section>
   );
@@ -64,6 +68,8 @@ export function SectionHeading({
 const statusLabels: Record<string, string> = {
   scheduled: "Programada",
   registration_open: "Inscrições abertas",
+  registration: "Inscrições abertas",
+  summary: "Resumo público",
   completed: "Concluída",
   cancelled: "Cancelada",
   provisional: "Provisório",

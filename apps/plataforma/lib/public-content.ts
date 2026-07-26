@@ -104,6 +104,75 @@ export function normalizePublicTerm(row: UnknownRow): PublicTerm {
   };
 }
 
+const fallbackNews: PublicContent[] = [
+  {
+    slug: "calendario-oficial-udk-2026",
+    title: "Calendário oficial da temporada UDK 2026",
+    summary: "Cinco encontros em Betim, incluindo duas provas de Endurance e a final de dezembro.",
+    content: "A temporada UDK 2026 reúne etapas regulares e provas de Endurance no Kartódromo Internacional de Betim.",
+    category: "Notícia",
+    coverImageUrl: "/media/udk-race-hero.webp",
+    publishedAt: "2026-07-30T12:00:00-03:00",
+    readingMinutes: 2,
+  },
+  {
+    slug: "categorias-rapidos-insanos",
+    title: "Ultras Rápidos e Ultras Insanos no mesmo grid",
+    summary: "Categorias distintas, uma única cultura de pista: evolução, respeito e disputa limpa.",
+    content: "O portal organiza a temporada por categoria e mantém classificação, pilotos e calendário em consulta pública.",
+    category: "Campeonato",
+    coverImageUrl: "/media/udk-race-hero.webp",
+    publishedAt: "2026-07-28T12:00:00-03:00",
+    readingMinutes: 2,
+  },
+  {
+    slug: "plataforma-oficial-udk",
+    title: "Plataforma oficial UDK entra no ar",
+    summary: "Calendário, classificação, pilotos, resultados e inscrição reunidos em uma experiência única.",
+    content: "A plataforma oficial do UDK centraliza as informações públicas e os fluxos de participação do campeonato.",
+    category: "Comunicado",
+    coverImageUrl: "/media/udk-race-hero.webp",
+    publishedAt: "2026-07-26T12:00:00-03:00",
+    readingMinutes: 2,
+  },
+  {
+    slug: "proxima-etapa-endurance",
+    title: "Endurance abre a sequência final da temporada",
+    summary: "A prova de agosto exige consistência, estratégia e trabalho de equipe sob as luzes de Betim.",
+    content: "A próxima etapa prevista no calendário é uma prova de Endurance no traçado 01 invertido com chicane.",
+    category: "Etapa",
+    coverImageUrl: "/media/udk-race-hero.webp",
+    publishedAt: "2026-07-25T12:00:00-03:00",
+    readingMinutes: 2,
+  },
+];
+
+const fallbackSponsors: PublicSponsor[] = [
+  ["TS Sports", "ts-sports"],
+  ["RS Design", "rs-design"],
+  ["Firepit", "firepit"],
+  ["LapTime", "laptime"],
+  ["Vlad Imagens", "vlad-imagens"],
+  ["Clique na Curva", "clique-na-curva"],
+].map(([name, slug]) => ({ name, slug, logoUrl: "", websiteUrl: "", tier: "oficial" }));
+
+const fallbackRegulations: PublicTerm[] = [
+  {
+    id: "public-summary-2026",
+    title: "Resumo público do campeonato UDK 2026",
+    version: 1,
+    content: [
+      "01. DISPOSIÇÕES GERAIS\nO UDK promove competição organizada, respeito entre pilotos e cumprimento das orientações da direção de prova.",
+      "02. INSCRIÇÕES E CATEGORIAS\nA participação depende de cadastro, enquadramento na categoria e confirmação da organização.",
+      "03. PONTUAÇÃO E RESULTADOS\nClassificações e resultados passam a valer após publicação oficial na plataforma.",
+      "04. CONDUTA E PENALIDADES\nOcorrências são analisadas pela organização conforme as regras vigentes da temporada.",
+    ].join("\n\n"),
+    effectiveAt: "2026-07-26T00:00:00-03:00",
+    status: "summary",
+    downloadUrl: null,
+  },
+];
+
 function publicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -127,7 +196,13 @@ export async function getNewsPage({
   query?: string;
 } = {}): Promise<PaginatedContent> {
   const client = publicClient();
-  if (!client) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
+  if (!client) {
+    const source = fallbackNews
+      .filter((item) => !category || category === "todas" || item.category === category)
+      .filter((item) => !query || item.title.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR")));
+    const { from, to } = getPageRange(page, pageSize);
+    return { items: source.slice(from, to + 1), meta: buildPageMeta(page, pageSize, source.length) };
+  }
 
   const { from, to } = getPageRange(page, pageSize);
   let request = client
@@ -141,17 +216,19 @@ export async function getNewsPage({
   if (cleanQuery) request = request.ilike("title", `%${cleanQuery}%`);
 
   const { data, count, error } = await request;
-  if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
-
+  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicContent);
+  const source = normalized.length ? normalized : fallbackNews
+    .filter((item) => !category || category === "todas" || item.category === category)
+    .filter((item) => !cleanQuery || item.title.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")));
   return {
-    items: ((data ?? []) as UnknownRow[]).map(normalizePublicContent),
-    meta: buildPageMeta(page, pageSize, count ?? 0),
+    items: normalized.length ? source : source.slice(from, to + 1),
+    meta: buildPageMeta(page, pageSize, normalized.length ? count ?? source.length : source.length),
   };
 }
 
 export async function getNewsBySlug(slug: string): Promise<PublicContent | null> {
   const client = publicClient();
-  if (!client) return null;
+  if (!client) return fallbackNews.find((item) => item.slug === slug) ?? null;
 
   const { data, error } = await client
     .from("public_portal_news")
@@ -159,13 +236,13 @@ export async function getNewsBySlug(slug: string): Promise<PublicContent | null>
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error || !data) return fallbackNews.find((item) => item.slug === slug) ?? null;
   return normalizePublicContent(data as UnknownRow);
 }
 
 export async function getSponsors(): Promise<PublicSponsor[]> {
   const client = publicClient();
-  if (!client) return [];
+  if (!client) return fallbackSponsors;
 
   const { data, error } = await client
     .from("public_portal_sponsors")
@@ -173,21 +250,23 @@ export async function getSponsors(): Promise<PublicSponsor[]> {
     .order("tier")
     .order("name");
 
-  if (error) return [];
-  return ((data ?? []) as UnknownRow[]).map(normalizePublicSponsor);
+  if (error) return fallbackSponsors;
+  const normalized = ((data ?? []) as UnknownRow[]).map(normalizePublicSponsor);
+  return normalized.length ? normalized : fallbackSponsors;
 }
 
 export async function getRegulations(): Promise<PublicTerm[]> {
   const client = publicClient();
-  if (!client) return [];
+  if (!client) return fallbackRegulations;
 
   const { data, error } = await client
     .from("public_portal_regulations")
     .select("*")
     .order("version", { ascending: false });
 
-  if (error) return [];
-  return ((data ?? []) as UnknownRow[]).map(normalizePublicTerm);
+  if (error) return fallbackRegulations;
+  const normalized = ((data ?? []) as UnknownRow[]).map(normalizePublicTerm);
+  return normalized.length ? normalized : fallbackRegulations;
 }
 
 export async function getPublicContentBundle(): Promise<{
