@@ -1,0 +1,160 @@
+name: Apply Task 1
+
+on:
+  push:
+    branches: [feat/complete-operational-modules]
+    paths:
+      - ".github/workflows/apply-task1.yml"
+      - "docs/superpowers/plans/2026-07-25-single-app-consolidation.md"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply exact Task 1 changes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text()
+              if old not in text:
+                  raise SystemExit(f"Expected marker not found in {path}: {old[:120]!r}")
+              file.write_text(text.replace(old, new, 1))
+
+          replace_exact(
+              "apps/plataforma/lib/supabase.ts",
+              '''export function isSupabaseConfigured(): boolean {
+            return Boolean(
+              process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            );
+          }
+          ''',
+              '''export function getSupabaseProjectUrl(): string | undefined {
+            return process.env.NEXT_PUBLIC_SUPABASE_URL;
+          }
+
+          export function isSupabaseConfigured(): boolean {
+            return Boolean(getSupabaseProjectUrl() && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+          }
+          ''',
+          )
+          replace_exact(
+              "apps/plataforma/lib/supabase.ts",
+              '  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;\n',
+              '  const url = getSupabaseProjectUrl();\n',
+          )
+
+          replace_exact(
+              "apps/plataforma/lib/offline-queue.ts",
+              '''export function createOfflineQueueOwner(
+            client: SupabaseClient,
+            userId: string,
+          ): OfflineQueueOwner {
+            return {
+              userId,
+              projectUrl: normalizeProjectUrl(client.supabaseUrl),
+            };
+          }
+          ''',
+              '''export function createOfflineQueueOwner(
+            projectUrl: string,
+            userId: string,
+          ): OfflineQueueOwner {
+            return {
+              userId,
+              projectUrl: normalizeProjectUrl(projectUrl),
+            };
+          }
+          ''',
+          )
+          replace_exact(
+              "apps/plataforma/lib/offline-queue.ts",
+              '''  if (!isOfflineCapableTable(operation.table)) {
+            throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
+          }
+
+          return withWriteLock(async () => {
+          ''',
+              '''  if (!isOfflineCapableTable(operation.table)) {
+            throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
+          }
+
+          const table = operation.table;
+          return withWriteLock(async () => {
+          ''',
+          )
+          replace_exact(
+              "apps/plataforma/lib/offline-queue.ts",
+              '      table: operation.table,\n',
+              '      table,\n',
+          )
+
+          replace_exact(
+              "apps/plataforma/app/painel/[[...slug]]/page.tsx",
+              'import { supabase } from "../../../lib/supabase";\n',
+              'import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";\n',
+          )
+          replace_exact(
+              "apps/plataforma/app/painel/[[...slug]]/page.tsx",
+              '  const client = useMemo(() => supabase(), []);\n',
+              '  const client = useMemo(() => supabase(), []);\n  const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);\n',
+          )
+          text_path = Path("apps/plataforma/app/painel/[[...slug]]/page.tsx")
+          text = text_path.read_text()
+          expected_redirects = text.count('router.replace("/")')
+          if expected_redirects != 3:
+              raise SystemExit(f"Expected 3 root redirects, found {expected_redirects}")
+          text = text.replace('router.replace("/")', 'router.replace("/login")')
+          text = text.replace('        <Link href="/">Voltar para o acesso</Link>', '        <Link href="/login">Voltar para o acesso</Link>')
+          old_owner = '''  const offlineOwner = useMemo(
+            () => (client && user ? createOfflineQueueOwner(client, user.id) : undefined),
+            [client, user],
+          );'''
+          new_owner = '''  const offlineOwner = useMemo(
+            () =>
+              client && user && projectUrl
+                ? createOfflineQueueOwner(projectUrl, user.id)
+                : undefined,
+            [client, projectUrl, user],
+          );'''
+          if old_owner not in text:
+              raise SystemExit("Offline owner marker not found in panel page")
+          text_path.write_text(text.replace(old_owner, new_owner, 1))
+          PY
+
+      - name: Verify Task 1
+        run: |
+          pnpm --filter @udk/plataforma test -- offline-queue.test.ts
+          pnpm --filter @udk/plataforma typecheck
+          pnpm --filter @udk/plataforma build
+
+      - name: Commit verified changes
+        run: |
+          if git diff --quiet; then
+            echo "Task 1 already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/plataforma/lib/supabase.ts \
+            apps/plataforma/lib/offline-queue.ts \
+            'apps/plataforma/app/painel/[[...slug]]/page.tsx'
+          git commit -m "fix: use explicit Supabase project URL for offline queue"
+          git push origin HEAD:feat/complete-operational-modules
