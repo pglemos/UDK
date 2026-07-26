@@ -37,25 +37,33 @@ jobs:
       - name: Start local Supabase
         id: start
         continue-on-error: true
-        run: supabase start --debug 2>&1 | tee supabase-start.log
+        run: |
+          set -o pipefail
+          supabase start --debug 2>&1 | tee supabase-start.log
 
       - name: Rebuild database from migrations
         id: reset
         if: steps.start.outcome == 'success'
         continue-on-error: true
-        run: supabase db reset --debug 2>&1 | tee supabase-reset.log
+        run: |
+          set -o pipefail
+          supabase db reset --debug 2>&1 | tee supabase-reset.log
 
       - name: Run pgTAP tests
         id: test
         if: steps.reset.outcome == 'success'
         continue-on-error: true
-        run: supabase test db 2>&1 | tee supabase-test.log
+        run: |
+          set -o pipefail
+          supabase test db 2>&1 | tee supabase-test.log
 
       - name: Lint database
         id: lint
         if: steps.reset.outcome == 'success'
         continue-on-error: true
-        run: supabase db lint --level warning 2>&1 | tee supabase-lint.log
+        run: |
+          set -o pipefail
+          supabase db lint --level warning 2>&1 | tee supabase-lint.log
 
       - name: Upload database diagnostics
         if: always()
