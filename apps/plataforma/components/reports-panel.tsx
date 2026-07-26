@@ -34,6 +34,7 @@ const privateColumns = new Set([
 
 function safeSpreadsheetValue(value: unknown): string {
   if (value === null || value === undefined) return "";
+  if (typeof value === "number" && !Number.isFinite(value)) return "";
   const normalized = typeof value === "object" ? JSON.stringify(value) : String(value);
   return /^[=+\-@\t\r\n]/.test(normalized) ? `'${normalized}` : normalized;
 }
