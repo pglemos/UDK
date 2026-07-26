@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(24);
+select plan(25);
 
 select ok(to_regprocedure('public.can_participate_as_driver(uuid)') is not null, 'participant scope helper exists');
 select ok(to_regprocedure('public.can_view_profile(uuid)') is not null, 'profile scope helper exists');
@@ -59,6 +59,20 @@ select ok(
       and coalesce(qual, '') like '%storage_path_scoped_to_roles%'
   ),
   'timing imports policy is resource scoped'
+);
+
+select ok(
+  exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'terms'
+      and policyname = 'public_regulations_read'
+      and roles::text like '%anon%'
+      and coalesce(qual, '') like '%regulation%'
+      and coalesce(qual, '') like '%published%'
+      and coalesce(qual, '') like '%deleted_at%'
+  ),
+  'anonymous visitors can read only published active regulations'
 );
 
 select ok(
