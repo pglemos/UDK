@@ -3,8 +3,10 @@
 :root {
   --graphite: #1c191f;
   --graphite-soft: #29252d;
-  --lime: #dafc08;
-  --lime-dark: #687700;
+  --cyan: #00d9ff;
+  --cyan-hover: #32e5ff;
+  --cyan-deep: #00687a;
+  --cyan-glow: #004653;
   --surface: #ffffff;
   --surface-muted: #f5f4f1;
   --canvas: #eceae6;
@@ -34,7 +36,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 95% 0%, rgba(218, 252, 8, 0.11), transparent 24rem),
+    radial-gradient(circle at 95% 0%, rgba(0, 217, 255, 0.11), transparent 24rem),
     var(--canvas);
 }
 
@@ -72,7 +74,7 @@ p {
 }
 
 .eyebrow {
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.18em;
@@ -140,9 +142,9 @@ p {
 
 .button-primary,
 .login-submit {
-  background: var(--lime);
+  background: var(--cyan);
   color: var(--graphite);
-  box-shadow: 0 8px 20px rgba(150, 174, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 151, 178, 0.26);
 }
 
 .button-secondary {
@@ -157,6 +159,17 @@ p {
   transform: translateY(-1px);
 }
 
+.button-primary:hover,
+.login-submit:hover {
+  background: var(--cyan-hover);
+  box-shadow: 0 12px 28px rgba(0, 151, 178, 0.3);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+
 .icon-button {
   display: inline-grid;
   width: 36px;
@@ -169,7 +182,7 @@ p {
 }
 
 .icon-button:hover {
-  border-color: var(--lime-dark);
+  border-color: var(--cyan-deep);
 }
 
 .icon-button.danger {
@@ -177,7 +190,7 @@ p {
 }
 
 .icon-button.action-button {
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 /* Authentication */
@@ -197,8 +210,8 @@ p {
   gap: 4rem;
   padding: clamp(2.2rem, 5vw, 5.5rem);
   background:
-    linear-gradient(150deg, rgba(218, 252, 8, 0.14), transparent 34%),
-    radial-gradient(circle at 78% 22%, #526000 0, transparent 28rem),
+    linear-gradient(150deg, rgba(0, 217, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 78% 22%, var(--cyan-glow) 0, transparent 28rem),
     var(--graphite);
   color: white;
 }
@@ -209,7 +222,7 @@ p {
   bottom: -15rem;
   width: 34rem;
   height: 34rem;
-  border: 5rem solid rgba(218, 252, 8, 0.08);
+  border: 5rem solid rgba(0, 217, 255, 0.08);
   border-radius: 50%;
   content: "";
 }
@@ -224,7 +237,7 @@ p {
 }
 
 .login-kicker {
-  color: var(--lime);
+  color: var(--cyan);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.18em;
@@ -242,7 +255,7 @@ p {
 }
 
 .login-visual h1 b {
-  color: var(--lime);
+  color: var(--cyan);
 }
 
 .login-visual p {
@@ -272,7 +285,7 @@ p {
 
 .login-features svg {
   width: 16px;
-  color: var(--lime);
+  color: var(--cyan);
 }
 
 .login-panel {
@@ -336,8 +349,8 @@ p {
 }
 
 .input-with-icon:focus-within {
-  border-color: var(--lime-dark);
-  box-shadow: 0 0 0 4px rgba(218, 252, 8, 0.17);
+  border-color: var(--cyan-deep);
+  box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.17);
 }
 
 .input-with-icon svg {
@@ -373,7 +386,7 @@ p {
   border: 0;
   padding: 0.2rem 0;
   background: none;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
   font-size: 0.78rem;
   font-weight: 800;
 }
@@ -410,7 +423,7 @@ p {
   width: 45%;
   height: 100%;
   animation: loading 1.2s ease-in-out infinite alternate;
-  background: var(--lime);
+  background: var(--cyan);
 }
 
 @keyframes loading {
@@ -438,7 +451,7 @@ p {
 .access-denied a {
   border-radius: 10px;
   padding: 0.8rem 1rem;
-  background: var(--lime);
+  background: var(--cyan);
   color: var(--graphite);
   font-weight: 900;
   text-transform: uppercase;
@@ -463,7 +476,7 @@ p {
   overflow: hidden;
   padding: 1.2rem;
   background:
-    linear-gradient(180deg, rgba(218, 252, 8, 0.05), transparent 20rem),
+    linear-gradient(180deg, rgba(0, 217, 255, 0.05), transparent 20rem),
     var(--graphite);
   color: white;
 }
@@ -571,7 +584,7 @@ p {
 }
 
 .nav-group a.active {
-  background: var(--lime);
+  background: var(--cyan);
   color: var(--graphite);
 }
 
@@ -594,7 +607,7 @@ p {
   height: 42px;
   place-items: center;
   border-radius: 50%;
-  background: var(--lime);
+  background: var(--cyan);
   color: var(--graphite);
   font-size: 0.76rem;
   font-weight: 900;
@@ -772,7 +785,7 @@ p {
   width: 54px;
   height: 54px;
   margin-bottom: 1rem;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .access-denied h2 {
@@ -836,7 +849,7 @@ p {
   width: 7rem;
   height: 7rem;
   border-radius: 50%;
-  background: rgba(218, 252, 8, 0.14);
+  background: rgba(0, 217, 255, 0.14);
   content: "";
 }
 
@@ -850,7 +863,7 @@ p {
   width: 22px;
   height: 22px;
   margin-bottom: 1rem;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .metrics span,
@@ -896,7 +909,7 @@ p {
 
 .next-stage-panel {
   background:
-    radial-gradient(circle at 90% 0%, rgba(218, 252, 8, 0.12), transparent 17rem),
+    radial-gradient(circle at 90% 0%, rgba(0, 217, 255, 0.12), transparent 17rem),
     var(--surface);
 }
 
@@ -910,11 +923,11 @@ p {
 .panel-title > svg {
   width: 30px;
   height: 30px;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .panel-title span {
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -952,7 +965,7 @@ p {
   width: 72%;
   height: 100%;
   border-radius: inherit;
-  background: var(--lime);
+  background: var(--cyan);
 }
 
 .stage-actions {
@@ -991,7 +1004,7 @@ p {
   padding: 0.5rem;
   border-radius: 9px;
   background: #f1f0ed;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .pending-list b,
@@ -1010,7 +1023,7 @@ p {
 }
 
 .pending-list a {
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
   font-size: 0.68rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -1204,7 +1217,7 @@ p {
   width: 34px;
   height: 34px;
   margin-bottom: 0.7rem;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .empty-state h3 {
@@ -1256,7 +1269,7 @@ p {
 }
 
 .modal-head small {
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
   font-size: 0.66rem;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -1306,8 +1319,8 @@ p {
 .form-grid input:focus,
 .form-grid select:focus,
 .form-grid textarea:focus {
-  border-color: var(--lime-dark);
-  box-shadow: 0 0 0 4px rgba(218, 252, 8, 0.17);
+  border-color: var(--cyan-deep);
+  box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.17);
 }
 
 .checkbox-field {
@@ -1326,7 +1339,7 @@ p {
 .checkbox-field input {
   width: 18px;
   min-height: 18px;
-  accent-color: var(--lime-dark);
+  accent-color: var(--cyan-deep);
 }
 
 .modal-actions {
@@ -1359,7 +1372,7 @@ p {
 .report-card > svg {
   width: 30px;
   height: 30px;
-  color: var(--lime-dark);
+  color: var(--cyan-deep);
 }
 
 .report-card h2 {
