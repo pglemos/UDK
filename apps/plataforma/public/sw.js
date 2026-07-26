@@ -1,6 +1,6 @@
-const CACHE_NAME = "udk-platform-v3";
-const RSC_CACHE_NAME = "udk-platform-rsc-v1";
+const CACHE_NAME = "udk-public-v4";
 const PUBLIC_SHELL = ["/", "/offline.html", "/udk.svg"];
+const PRIVATE_PREFIXES = ["/painel", "/login", "/recuperar-senha", "/nova-senha", "/api"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PUBLIC_SHELL)));
@@ -11,19 +11,15 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => ![CACHE_NAME, RSC_CACHE_NAME].includes(key))
-            .map((key) => caches.delete(key)),
-        ),
-      )
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
 
-function rscCacheKey(url) {
-  return new Request(`${url.origin}${url.pathname}?__udk_rsc_shell=1`);
+function isPrivatePath(pathname) {
+  return PRIVATE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
 self.addEventListener("fetch", (event) => {
@@ -33,14 +29,26 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.endsWith(".svg")) {
+  if (isPrivatePath(url.pathname) || url.searchParams.has("_rsc")) {
+    if (request.mode === "navigate") {
+      event.respondWith(fetch(request).catch(() => caches.match("/offline.html")));
+    }
+    return;
+  }
+
+  if (
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".webp") ||
+    url.pathname.endsWith(".ico")
+  ) {
     event.respondWith(
       caches.match(request).then(async (cached) => {
         if (cached) return cached;
         const response = await fetch(request);
         if (response.ok && response.type === "basic") {
-          const write = caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
-          event.waitUntil(write);
+          event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone())));
         }
         return response;
       }),
@@ -48,42 +56,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.searchParams.has("_rsc")) {
-    const cacheKey = rscCacheKey(url);
+  if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok && response.headers.get("content-type")?.includes("text/x-component")) {
-            const write = caches.open(RSC_CACHE_NAME).then((cache) => cache.put(cacheKey, response.clone()));
-            event.waitUntil(write);
-          }
-          return response;
-        })
-        .catch(async () => {
-          const cached = await caches.match(cacheKey);
-          return (
-            cached ||
-            new Response("", {
-              status: 503,
-              headers: {
-                "content-type": "text/x-component",
-                "x-udk-offline": "1",
-              },
-            })
-          );
-        }),
+      fetch(request).catch(async () => (await caches.match("/")) || (await caches.match("/offline.html"))),
     );
-    return;
   }
-
-  if (request.mode !== "navigate") return;
-
-  if (url.pathname.startsWith("/painel") || url.pathname.startsWith("/auth")) {
-    event.respondWith(fetch(request).catch(() => caches.match("/offline.html")));
-    return;
-  }
-
-  event.respondWith(
-    fetch(request).catch(async () => (await caches.match(request)) || (await caches.match("/offline.html"))),
-  );
 });
