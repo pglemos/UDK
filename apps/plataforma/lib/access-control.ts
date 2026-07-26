@@ -39,12 +39,12 @@ function activePermissions(
 
 function explicitlyDenied(
   permissions: RolePermission[],
-  module: string,
+  moduleKey: string,
   actions: Set<string>,
 ): boolean {
   return permissions.some(
     (permission) =>
-      permission.module === module &&
+      permission.module === moduleKey &&
       actions.has(permission.action) &&
       permission.allowed === false,
   );
@@ -52,19 +52,19 @@ function explicitlyDenied(
 
 function explicitlyAllowed(
   permissions: RolePermission[],
-  module: string,
+  moduleKey: string,
   actions: Set<string>,
 ): boolean {
   return permissions.some(
     (permission) =>
-      permission.module === module &&
+      permission.module === moduleKey &&
       actions.has(permission.action) &&
       permission.allowed === true,
   );
 }
 
 function allModules(roleModules: RoleModuleMap): Set<string> {
-  return new Set(Object.values(roleModules).flatMap((modules) => [...modules]));
+  return new Set(Object.values(roleModules).flatMap((moduleKeys) => [...moduleKeys]));
 }
 
 export function computeAllowedModules(
@@ -82,14 +82,14 @@ export function computeAllowedModules(
     const granular = activePermissions(permissions, grant.id, now);
 
     if (granular.length === 0) {
-      baseline.forEach((module) => allowed.add(module));
+      baseline.forEach((moduleKey) => allowed.add(moduleKey));
       continue;
     }
 
-    for (const module of baseline) {
-      if (module === "dashboard") continue;
-      if (explicitlyDenied(granular, module, readActions)) continue;
-      if (explicitlyAllowed(granular, module, readActions)) allowed.add(module);
+    for (const moduleKey of baseline) {
+      if (moduleKey === "dashboard") continue;
+      if (explicitlyDenied(granular, moduleKey, readActions)) continue;
+      if (explicitlyAllowed(granular, moduleKey, readActions)) allowed.add(moduleKey);
     }
   }
   return allowed;
@@ -110,13 +110,13 @@ export function computeWritableModules(
     const granular = activePermissions(permissions, grant.id, now);
 
     if (granular.length === 0) {
-      baseline.forEach((module) => writable.add(module));
+      baseline.forEach((moduleKey) => writable.add(moduleKey));
       continue;
     }
 
-    for (const module of baseline) {
-      if (explicitlyDenied(granular, module, writeActions)) continue;
-      if (explicitlyAllowed(granular, module, writeActions)) writable.add(module);
+    for (const moduleKey of baseline) {
+      if (explicitlyDenied(granular, moduleKey, writeActions)) continue;
+      if (explicitlyAllowed(granular, moduleKey, writeActions)) writable.add(moduleKey);
     }
   }
   return writable;
