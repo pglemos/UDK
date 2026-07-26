@@ -1,0 +1,39 @@
+name: Inspect exact UDK brand payload
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [fix/official-udk-brand-assets]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/official-udk-brand-assets
+
+      - name: Decode and inspect payload
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/udk-brand-payload
+          tr -d '\n\r ' < .brand-payload/part00.b64 | base64 --decode > /tmp/udk-brand-assets.tar.gz
+          echo '=== Archive digest ==='
+          sha256sum /tmp/udk-brand-assets.tar.gz
+          echo '=== Archive contents ==='
+          tar -tzvf /tmp/udk-brand-assets.tar.gz
+          tar -xzf /tmp/udk-brand-assets.tar.gz -C /tmp/udk-brand-payload
+          echo '=== Extracted file hashes ==='
+          find /tmp/udk-brand-payload -type f -print0 | sort -z | xargs -0 sha256sum
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inspected-exact-udk-brand-payload
+          path: /tmp/udk-brand-payload
+          if-no-files-found: error
+          retention-days: 1
