@@ -9,6 +9,14 @@ describe("report exports", () => {
     expect(csv).toContain("'+5511999999999");
   });
 
+  it("does not export non-finite numbers as spreadsheet values", () => {
+    const csv = createCsv([{ valid: 12.5, notANumber: Number.NaN, infinity: Number.POSITIVE_INFINITY }]);
+
+    expect(csv).toContain('"12.5"');
+    expect(csv).not.toContain("NaN");
+    expect(csv).not.toContain("Infinity");
+  });
+
   it("removes private storage paths and soft-deletion metadata", () => {
     expect(
       sanitizeReportRows("documents", [
