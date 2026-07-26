@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRegister } from "../components/pwa-register";
 import "./globals.css";
+import "./public.css";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: {
-    default: "Plataforma UDK",
-    template: "%s • Plataforma UDK",
+    default: "UDK • Ultras do Kart",
+    template: "%s • UDK",
   },
-  description: "Operação oficial do campeonato Ultras do Kart.",
+  description: "Portal e plataforma oficial do campeonato Ultras do Kart.",
   applicationName: "UDK",
+  alternates: { canonical: "/" },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
