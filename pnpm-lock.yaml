@@ -55,31 +55,6 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
 
-  apps/web-publico:
-    dependencies:
-      '@supabase/supabase-js':
-        specifier: 2.108.2
-        version: 2.108.2
-      lucide-react:
-        specifier: 0.555.0
-        version: 0.555.0(react@19.2.3)
-      next:
-        specifier: 16.0.10
-        version: 16.0.10(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react:
-        specifier: 19.2.3
-        version: 19.2.3
-      react-dom:
-        specifier: 19.2.3
-        version: 19.2.3(react@19.2.3)
-    devDependencies:
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.7)
-
   packages/analytics: {}
 
   packages/audit: {}

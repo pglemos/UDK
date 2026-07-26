@@ -1,4 +1,0 @@
-import type {Metadata} from "next";import Link from "next/link";import "./globals.css";
-export const metadata:Metadata={title:{default:"UDK • Ultras do Kart",template:"%s • UDK"},description:"Portal oficial do campeonato Ultras do Kart."};
-const links: Array<[string, string]> = [["/","Início"],["/calendario","Calendário"],["/classificacao","Classificação"],["/resultados","Resultados"],["/pilotos","Pilotos"],["/regulamento","Regulamento"]];
-export default function Layout({children}:{children:React.ReactNode}){return <html lang="pt-BR"><body><header><Link href="/" className="brand"><img src="/udk.svg" alt="UDK"/></Link><nav>{links.map(([href,label])=><Link key={href} href={href}>{label}</Link>)}</nav><Link className="cta" href="/inscricao">Inscreva-se</Link></header>{children}<footer><img src="/udk.svg" alt="UDK"/><p>Ultras do Kart • Kartódromo Internacional de Betim</p><p>Temporada 2026</p></footer></body></html>}

@@ -3,39 +3,36 @@
 [![Application CI](https://github.com/pglemos/UDK/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/pglemos/UDK/actions/workflows/ci.yml)
 [![Supabase CI](https://github.com/pglemos/UDK/actions/workflows/database.yml/badge.svg?branch=main)](https://github.com/pglemos/UDK/actions/workflows/database.yml)
 
-Plataforma oficial do campeonato **Ultras do Kart**, preparada para operar com dois projetos Next.js no Vercel e um projeto Supabase compartilhado.
+Portal público e plataforma operacional do campeonato **Ultras do Kart**, entregues por uma única aplicação Next.js, um projeto Vercel e um projeto Supabase.
 
-## Aplicações
+## Aplicação
 
-| Aplicação | Diretório | Porta local | Função |
-|---|---|---:|---|
-| Portal público | `apps/web-publico` | 3000 | Calendário, classificação, resultados, pilotos e inscrições |
-| Plataforma | `apps/plataforma` | 3001 | Autenticação, dashboard e módulos operacionais |
+| Diretório | Porta local | Superfícies |
+|---|---:|---|
+| `apps/plataforma` | 3001 | Portal público, autenticação, painel, PWA e API de saúde |
+
+Rotas principais:
+
+- `/`: portal público;
+- `/calendario`, `/classificacao`, `/resultados` e `/pilotos`: dados públicos;
+- `/regulamento`, `/noticias` e `/patrocinadores`: conteúdo publicável;
+- `/inscricao`: entrada no fluxo de inscrição;
+- `/login`, `/recuperar-senha` e `/nova-senha`: autenticação;
+- `/painel/**`: operação autenticada;
+- `/api/health`: saúde sem exposição de credenciais.
 
 ## Tecnologia
 
-- Next.js 16;
-- React 19;
+- Next.js 16 e React 19;
 - TypeScript 5.9;
 - pnpm e Turborepo;
-- Supabase Auth, PostgreSQL, RLS e Storage;
-- Vitest;
-- GitHub Actions;
-- Vercel.
+- Supabase Auth, PostgreSQL 17, RLS e Storage;
+- Vitest e pgTAP;
+- GitHub Actions e Vercel.
 
 ## Banco de dados
 
-As migrations em `supabase/migrations/` criam:
-
-- campeonato, temporadas, categorias e etapas;
-- perfis, papéis e permissões;
-- pilotos, inscrições e pagamentos;
-- resultados, classificação, penalidades e recursos;
-- equipes e stints de Endurance;
-- patrocinadores, CMS, notificações e auditoria;
-- views públicas;
-- RLS e buckets de arquivos;
-- dados iniciais da temporada UDK 2026.
+As migrations em `supabase/migrations/` criam o schema esportivo e administrativo, views públicas, funções, triggers, políticas RLS, buckets privados e dados iniciais da temporada 2026.
 
 ## Início local
 
@@ -43,10 +40,19 @@ As migrations em `supabase/migrations/` criam:
 corepack enable
 pnpm install
 supabase start
-cp apps/web-publico/.env.example apps/web-publico/.env.local
 cp apps/plataforma/.env.example apps/plataforma/.env.local
 pnpm dev
 ```
+
+Variáveis públicas necessárias:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SITE_URL
+```
+
+Nunca exponha `service_role`, senha do banco, tokens Vercel ou tokens administrativos do Supabase no navegador ou no repositório.
 
 ## Qualidade
 
@@ -61,14 +67,12 @@ supabase test db
 supabase db lint --level warning
 ```
 
-Essas verificações também são executadas pelo GitHub Actions.
+Os mesmos portões são executados pelo GitHub Actions com preservação dos logs como artifacts.
 
 ## Publicação
 
-O procedimento completo para criar o Supabase, aplicar migrations e conectar os dois projetos Vercel está em:
+O procedimento para aplicar migrations, configurar o único projeto Vercel e validar produção está em [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
-[`docs/DEPLOY.md`](docs/DEPLOY.md)
-
-## Especificação
+## Especificação e plano
 
 A especificação aprovada e os planos técnicos ficam em `docs/superpowers/`.
