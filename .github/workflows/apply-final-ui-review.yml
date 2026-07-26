@@ -1,0 +1,238 @@
+name: Apply final UI review fixes
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: final-ui-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply verified accessibility and error-handling patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("apps/plataforma/components/module-crud.tsx")
+          text = path.read_text()
+
+          def replace_once(old: str, new: str) -> None:
+              global text
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"Expected one marker, found {count}: {old[:120]!r}")
+              text = text.replace(old, new, 1)
+
+          replace_once(
+              'import { useCallback, useEffect, useMemo, useState } from "react";',
+              'import { useCallback, useEffect, useMemo, useRef, useState } from "react";',
+          )
+
+          replace_once(
+              '''  const [record, setRecord] = useState<Record<string, unknown>>({});
+          ''',
+              '''  const [record, setRecord] = useState<Record<string, unknown>>({});
+            const modalRef = useRef<HTMLElement>(null);
+            const previousFocusRef = useRef<HTMLElement | null>(null);
+            const savingRef = useRef(false);
+          ''',
+          )
+
+          replace_once(
+              '''  const title = config.singular.toLowerCase();
+
+            const loadRows = useCallback(async () => {
+          ''',
+              '''  const title = config.singular.toLowerCase();
+
+            useEffect(() => {
+              savingRef.current = saving;
+            }, [saving]);
+
+            useEffect(() => {
+              if (!modalOpen) return;
+
+              previousFocusRef.current =
+                document.activeElement instanceof HTMLElement ? document.activeElement : null;
+              const modal = modalRef.current;
+              if (!modal) return;
+
+              const focusableSelector = [
+                'a[href]',
+                'button:not([disabled])',
+                'input:not([disabled])',
+                'select:not([disabled])',
+                'textarea:not([disabled])',
+                '[tabindex]:not([tabindex="-1"])',
+              ].join(',');
+              const focusable = Array.from(
+                modal.querySelectorAll<HTMLElement>(focusableSelector),
+              ).filter((element) => !element.hasAttribute('hidden'));
+              (focusable[0] ?? modal).focus();
+
+              const handleKeyDown = (event: KeyboardEvent) => {
+                if (event.key === 'Escape' && !savingRef.current) {
+                  event.preventDefault();
+                  setModalOpen(false);
+                  return;
+                }
+                if (event.key !== 'Tab') return;
+
+                const activeFocusable = Array.from(
+                  modal.querySelectorAll<HTMLElement>(focusableSelector),
+                ).filter((element) => !element.hasAttribute('hidden'));
+                if (activeFocusable.length === 0) {
+                  event.preventDefault();
+                  modal.focus();
+                  return;
+                }
+
+                const first = activeFocusable[0];
+                const last = activeFocusable[activeFocusable.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                  event.preventDefault();
+                  last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                  event.preventDefault();
+                  first.focus();
+                }
+              };
+
+              document.addEventListener('keydown', handleKeyDown);
+              return () => {
+                document.removeEventListener('keydown', handleKeyDown);
+                previousFocusRef.current?.focus();
+                previousFocusRef.current = null;
+              };
+            }, [modalOpen]);
+
+            const loadRows = useCallback(async () => {
+          ''',
+          )
+
+          replace_once(
+              '''  async function syncOffline() {
+              if (!offlineOwner) return;
+              const result = await flushOfflineQueue(client, offlineOwner);
+              setPending((await getOfflineQueue(offlineOwner)).length);
+              setNotice(`${result.completed} operação(ões) sincronizada(s).`);
+              await loadRows();
+            }
+          ''',
+              '''  async function syncOffline() {
+              if (!offlineOwner) return;
+              setError("");
+              setNotice("");
+
+              try {
+                const result = await flushOfflineQueue(client, offlineOwner);
+                setPending((await getOfflineQueue(offlineOwner)).length);
+                if (result.deadLettered > 0) {
+                  setError(
+                    `${result.deadLettered} operação(ões) excederam o limite de tentativas e foram movidas para a quarentena offline.`,
+                  );
+                } else {
+                  setNotice(`${result.completed} operação(ões) sincronizada(s).`);
+                }
+                await loadRows();
+              } catch (syncError) {
+                setError(
+                  syncError instanceof Error
+                    ? syncError.message
+                    : "Não foi possível sincronizar a fila offline.",
+                );
+              }
+            }
+          ''',
+          )
+
+          replace_once(
+              '''          <div
+                    className="modal-backdrop"
+                    role="button"
+                    tabIndex={0}
+                    onClick={(event) => {
+                      if (event.target === event.currentTarget) setModalOpen(false);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") setModalOpen(false);
+                    }}
+                  >
+                    <section className="crud-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          ''',
+              '''          <div
+                    className="modal-backdrop"
+                    onMouseDown={(event) => {
+                      if (event.target === event.currentTarget && !saving) setModalOpen(false);
+                    }}
+                  >
+                    <section
+                      ref={modalRef}
+                      className="crud-modal"
+                      role="dialog"
+                      aria-modal="true"
+                      aria-labelledby="modal-title"
+                      tabIndex={-1}
+                    >
+          ''',
+          )
+
+          replace_once(
+              '''                <button type="button" className="icon-button" onClick={() => setModalOpen(false)} disabled={saving}>
+                          <X size={18} />
+                        </button>
+          ''',
+              '''                <button
+                          type="button"
+                          className="icon-button"
+                          aria-label="Fechar modal"
+                          onClick={() => setModalOpen(false)}
+                          disabled={saving}
+                        >
+                          <X size={18} />
+                        </button>
+          ''',
+          )
+
+          path.write_text(text)
+          PY
+
+      - name: Verify patch
+        run: |
+          pnpm --filter @udk/plataforma lint
+          pnpm --filter @udk/plataforma typecheck
+          pnpm --filter @udk/plataforma test
+          pnpm --filter @udk/plataforma build
+
+      - name: Commit verified patch
+        run: |
+          if git diff --quiet; then
+            echo "No UI changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/plataforma/components/module-crud.tsx
+          git commit -m "fix: handle offline sync failures and manage modal focus"
+          git pull --rebase origin feat/complete-operational-modules
+          git push origin HEAD:feat/complete-operational-modules
