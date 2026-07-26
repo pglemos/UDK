@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 
 function parseSections(content: string) {
   return content.split(/\n\n+/).map((block, index) => {
-    const [heading, ...body] = block.split("\n");
+    const [rawHeading, ...body] = block.split("\n");
+    const heading = rawHeading ?? `Seção ${index + 1}`;
     return { id: `secao-${index + 1}`, heading, body: body.join(" ") };
   });
 }
