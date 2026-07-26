@@ -1,0 +1,44 @@
+name: Normalize unified lockfile
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: normalize-lockfile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/complete-operational-modules
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+      - run: pnpm install --lockfile-only
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm verify
+
+      - name: Commit normalized lockfile
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "Lockfile already normalized"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "chore: normalize lockfile for single application"
+          git pull --rebase origin feat/complete-operational-modules
+          git push origin HEAD:feat/complete-operational-modules
