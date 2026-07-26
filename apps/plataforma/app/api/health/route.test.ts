@@ -10,6 +10,7 @@ describe("health endpoint", () => {
     expect(response.status).toBe(200);
     expect(body.status).toBe("ok");
     expect(body.app).toBe("udk");
+    expect(body.release).toBe("unified-2026-07-26");
     expect(body).toHaveProperty("supabaseConfigured");
     expect(body).toHaveProperty("timestamp");
     expect(serialized).not.toContain("service_role");
