@@ -3,6 +3,8 @@ name: Export official brand repository snapshot
 on:
   push:
     branches: [fix/official-udk-brand-assets]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
