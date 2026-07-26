@@ -1,0 +1,37 @@
+name: Export official brand repository snapshot
+
+on:
+  push:
+    branches: [fix/official-udk-brand-assets]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/official-udk-brand-assets
+          fetch-depth: 1
+
+      - name: Create source snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/udk-export
+          tar \
+            --exclude='./.git' \
+            --exclude='./node_modules' \
+            --exclude='./.next' \
+            --exclude='./udk-repository.tar.gz' \
+            -czf /tmp/udk-export/udk-repository.tar.gz .
+          sha256sum /tmp/udk-export/udk-repository.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: udk-official-brand-source
+          path: /tmp/udk-export/udk-repository.tar.gz
+          if-no-files-found: error
+          retention-days: 1
