@@ -18,6 +18,8 @@ select
   stage.format,
   stage.track,
   stage.starts_at,
+  upper(to_char(stage.starts_at at time zone 'America/Sao_Paulo', 'DD MON')) as date_label,
+  to_char(stage.starts_at at time zone 'America/Sao_Paulo', 'HH24"h"') as time_label,
   stage.registration_opens_at,
   stage.registration_closes_at,
   stage.status,
