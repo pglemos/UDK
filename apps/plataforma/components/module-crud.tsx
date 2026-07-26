@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   Check,
@@ -133,6 +133,9 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [pendingOffline, setPendingOffline] = useState(0);
+  const modalRef = useRef<HTMLElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const savingRef = useRef(false);
 
   const visibleFields = useMemo(() => config.fields.slice(0, 5), [config.fields]);
   const filteredRecords = useMemo(() => {
@@ -142,6 +145,61 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       config.fields.some((field) => formatValue(record[field.key], field, relationOptions).toLowerCase().includes(term)),
     );
   }, [config.fields, records, relationOptions, search]);
+
+  useEffect(() => {
+  savingRef.current = saving;
+}, [saving]);
+
+useEffect(() => {
+  if (!modalOpen) return;
+  previousFocusRef.current =
+    document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const modal = modalRef.current;
+  if (!modal) return;
+  const selector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+  const focusable = Array.from(modal.querySelectorAll<HTMLElement>(selector));
+  (focusable[0] ?? modal).focus();
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && !savingRef.current) {
+      event.preventDefault();
+      setModalOpen(false);
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const activeFocusable = Array.from(
+      modal.querySelectorAll<HTMLElement>(selector),
+    );
+    if (activeFocusable.length === 0) {
+      event.preventDefault();
+      modal.focus();
+      return;
+    }
+    const first = activeFocusable[0];
+    const last = activeFocusable[activeFocusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  };
+
+  document.addEventListener('keydown', handleKeyDown);
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+    previousFocusRef.current?.focus();
+    previousFocusRef.current = null;
+  };
+}, [modalOpen]);
 
   const loadRelations = useCallback(async () => {
     const relationFields = config.fields.filter((field) => field.kind === "relation" && field.relation);
@@ -198,16 +256,29 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }, [client, config.ascending, config.orderBy, config.table, loadRelations]);
 
   const syncOffline = useCallback(async () => {
+  setError("");
+  setNotice("");
+  try {
     setPendingOffline((await getOfflineQueue(owner)).length);
-    if (navigator.onLine) {
-      const result = await flushOfflineQueue(client, owner);
-      setPendingOffline(result.remaining);
-      if (result.completed > 0) {
-        setNotice(`${result.completed} operação(ões) sincronizada(s).`);
-        await loadRecords();
-      }
+    if (!navigator.onLine) return;
+    const result = await flushOfflineQueue(client, owner);
+    setPendingOffline(result.remaining);
+    if (result.deadLettered > 0) {
+      setError(
+        `${result.deadLettered} operação(ões) excederam o limite de tentativas e foram movidas para a quarentena offline.`,
+      );
+    } else if (result.completed > 0) {
+      setNotice(`${result.completed} operação(ões) sincronizada(s).`);
     }
-  }, [client, loadRecords, owner]);
+    if (result.completed > 0 || result.deadLettered > 0) await loadRecords();
+  } catch (syncError) {
+    setError(
+      syncError instanceof Error
+        ? syncError.message
+        : "Não foi possível sincronizar a fila offline.",
+    );
+  }
+}, [client, loadRecords, owner]);
 
   useEffect(() => {
     void loadRecords();
@@ -452,7 +523,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         )}
       </div>
 
-      {modalOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={() => !saving && setModalOpen(false)}><div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}><div className="modal-head"><div><small>{editing ? "Editar" : "Novo registro"}</small><h2 id="module-modal-title">{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2></div><button className="icon-button" type="button" aria-label="Fechar formulário" onClick={() => setModalOpen(false)} disabled={saving}><X /></button></div>
+      {modalOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={() => !saving && setModalOpen(false)}><section ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" tabIndex={-1} onMouseDown={(event) => event.stopPropagation()}><div className="modal-head"><div><small>{editing ? "Editar" : "Novo registro"}</small><h2 id="module-modal-title">{config.singular.replace(/^./, (letter) => letter.toUpperCase())}</h2></div><button className="icon-button" type="button" aria-label="Fechar modal" onClick={() => setModalOpen(false)} disabled={saving}><X /></button></div>
         <form onSubmit={(event) => void saveRecord(event)}><div className="form-grid">{config.fields.map((field) => {
           const value = values[field.key];
           const common = { id: `field-${field.key}`, required: field.kind === "file" ? Boolean(field.required && !value) : field.required, disabled: field.readOnly || saving };
@@ -465,7 +536,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             {["text", "number", "currency", "datetime", "date"].includes(field.kind) ? <input {...common} type={field.kind === "number" || field.kind === "currency" ? "number" : field.kind === "datetime" ? "datetime-local" : field.kind} step={field.kind === "currency" ? "1" : undefined} placeholder={field.placeholder} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)} /> : null}
           </label>;
         })}</div>{error ? <div className="alert alert-error" role="alert">{error}</div> : null}<div className="modal-actions"><button className="button-secondary" type="button" onClick={() => setModalOpen(false)} disabled={saving}>Cancelar</button><button className="button-primary" type="submit" disabled={saving}>{saving ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}Salvar</button></div></form>
-      </div></div> : null}
+      </section></div> : null}
     </section>
   );
 }

@@ -26,6 +26,9 @@ type OfflineOperationBase = {
   sequence: number;
   createdAt: string;
   attempts: number;
+  lastError?: string;
+  lastAttemptAt?: string;
+  deadLetteredAt?: string;
 };
 
 export type OfflineOperation = OfflineOperationBase &
@@ -61,8 +64,12 @@ const QUEUE_KEY = "encrypted-queue";
 const CRYPTO_KEY = "crypto-key";
 const DEVICE_KEY = "device-id";
 const SEQUENCE_KEY = "sequence";
+const DEAD_LETTER_KEY = "encrypted-dead-letter";
+
+export const MAX_OFFLINE_ATTEMPTS = 5;
 
 let memoryQueue: OfflineOperation[] = [];
+let memoryDeadLetters: OfflineOperation[] = [];
 let memoryKey: CryptoKey | undefined;
 let memoryDeviceId: string | undefined;
 let memorySequence = 0;
@@ -308,6 +315,28 @@ async function saveRawQueue(queue: OfflineOperation[]): Promise<void> {
   window.dispatchEvent(new CustomEvent("udk:offline-queue"));
 }
 
+async function readRawDeadLetters(): Promise<OfflineOperation[]> {
+  if (typeof window === "undefined") return [];
+  if (!indexedDbAvailable()) return memoryDeadLetters;
+  try {
+    const envelope = await readValue<EncryptedOfflineQueue>(DEAD_LETTER_KEY);
+    if (!envelope) return [];
+    return await decryptOfflineQueue(envelope, await getEncryptionKey());
+  } catch {
+    return [];
+  }
+}
+
+async function saveRawDeadLetters(queue: OfflineOperation[]): Promise<void> {
+  if (typeof window === "undefined") return;
+  if (!indexedDbAvailable()) {
+    memoryDeadLetters = queue;
+    return;
+  }
+  const encrypted = await encryptOfflineQueue(queue, await getEncryptionKey());
+  await writeValue(DEAD_LETTER_KEY, encrypted);
+}
+
 export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
   return filterOfflineQueueForOwner(await readRawQueue(), owner);
 }
@@ -364,6 +393,32 @@ export async function enqueueOfflineOperation(
   });
 }
 
+export type OfflineFailureResult =
+  | { status: "retry"; operation: OfflineOperation }
+  | { status: "dead-letter"; operation: OfflineOperation };
+
+export function recordOfflineFailure(
+  operation: OfflineOperation,
+  error: unknown,
+  attemptedAt = new Date().toISOString(),
+): OfflineFailureResult {
+  const attempts = operation.attempts + 1;
+  const message = error instanceof Error ? error.message : String(error);
+  const failedOperation: OfflineOperation = {
+    ...operation,
+    attempts,
+    lastError: message,
+    lastAttemptAt: attemptedAt,
+  };
+  if (attempts >= MAX_OFFLINE_ATTEMPTS) {
+    return {
+      status: "dead-letter",
+      operation: { ...failedOperation, deadLetteredAt: attemptedAt },
+    };
+  }
+  return { status: "retry", operation: failedOperation };
+}
+
 async function executeOperation(client: SupabaseClient, operation: OfflineOperation): Promise<void> {
   if (operation.action === "insert") {
     const { error } = await client
@@ -389,7 +444,7 @@ async function executeOperation(client: SupabaseClient, operation: OfflineOperat
 export async function flushOfflineQueue(
   client: SupabaseClient,
   owner: OfflineQueueOwner,
-): Promise<{ completed: number; remaining: number }> {
+): Promise<{ completed: number; remaining: number; deadLettered: number }> {
   return withWriteLock(async () => {
     const initialQueue = await readRawQueue();
     const ownerQueue = filterOfflineQueueForOwner(initialQueue, owner).sort(
@@ -400,26 +455,47 @@ export async function flushOfflineQueue(
     );
     const snapshotIds = new Set(ownerQueue.map((operation) => operation.id));
     const failures: OfflineOperation[] = [];
+    const deadLetters: OfflineOperation[] = [];
     let completed = 0;
 
     for (const operation of ownerQueue) {
       try {
         await executeOperation(client, operation);
         completed += 1;
-      } catch {
-        failures.push({ ...operation, attempts: operation.attempts + 1 });
+      } catch (operationError) {
+        const failure = recordOfflineFailure(operation, operationError);
+        if (failure.status === "dead-letter") deadLetters.push(failure.operation);
+        else failures.push(failure.operation);
       }
     }
 
     const currentQueue = await readRawQueue();
-    const operationsFromOtherOwners = currentQueue.filter((operation) => !belongsToOwner(operation, owner));
+    const operationsFromOtherOwners = currentQueue.filter(
+      (operation) => !belongsToOwner(operation, owner),
+    );
     const newlyQueuedForOwner = currentQueue.filter(
       (operation) => belongsToOwner(operation, owner) && !snapshotIds.has(operation.id),
     );
     const merged = [...operationsFromOtherOwners, ...failures, ...newlyQueuedForOwner];
-    const unique = Array.from(new Map(merged.map((operation) => [operation.id, operation])).values());
+    const unique = Array.from(
+      new Map(merged.map((operation) => [operation.id, operation])).values(),
+    );
     await saveRawQueue(unique);
 
-    return { completed, remaining: failures.length + newlyQueuedForOwner.length };
+    if (deadLetters.length > 0) {
+      const existingDeadLetters = await readRawDeadLetters();
+      const quarantined = Array.from(
+        new Map(
+          [...existingDeadLetters, ...deadLetters].map((operation) => [operation.id, operation]),
+        ).values(),
+      );
+      await saveRawDeadLetters(quarantined);
+    }
+
+    return {
+      completed,
+      remaining: failures.length + newlyQueuedForOwner.length,
+      deadLettered: deadLetters.length,
+    };
   });
 }
