@@ -33,7 +33,7 @@ import {
   X,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "../../../lib/supabase";
+import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";
 import { getModuleConfig } from "../../../lib/module-config";
 import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";
 import { computeAllowedModules, computeWritableModules, type RoleGrant, type RolePermission } from "../../../lib/access-control";
@@ -237,6 +237,7 @@ export default function OperationsPage({
   const activeKey = resolvedParams.slug?.[0] ?? "dashboard";
   const router = useRouter();
   const client = useMemo(() => supabase(), []);
+  const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<User>();
   const [displayName, setDisplayName] = useState("Usuário UDK");
@@ -275,7 +276,7 @@ export default function OperationsPage({
       if (!active) return;
 
       if (sessionError || !sessionData.session) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
 
@@ -342,7 +343,7 @@ export default function OperationsPage({
 
     void loadIdentity();
     const { data: subscription } = activeClient.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") router.replace("/");
+      if (event === "SIGNED_OUT") router.replace("/login");
     });
 
     return () => {
@@ -360,8 +361,11 @@ export default function OperationsPage({
     [permissions, roleGrants],
   );
   const offlineOwner = useMemo(
-    () => (client && user ? createOfflineQueueOwner(client, user.id) : undefined),
-    [client, user],
+    () =>
+      client && user && projectUrl
+        ? createOfflineQueueOwner(projectUrl, user.id)
+        : undefined,
+    [client, projectUrl, user],
   );
 
   useEffect(() => {
@@ -400,7 +404,7 @@ export default function OperationsPage({
 
   async function signOut() {
     if (client) await client.auth.signOut();
-    router.replace("/");
+    router.replace("/login");
   }
 
   if (!ready) {
@@ -420,7 +424,7 @@ export default function OperationsPage({
         <span className="eyebrow">Configuração necessária</span>
         <h1>Conecte o Supabase</h1>
         <p>{authError}</p>
-        <Link href="/">Voltar para o acesso</Link>
+        <Link href="/login">Voltar para o acesso</Link>
       </main>
     );
   }

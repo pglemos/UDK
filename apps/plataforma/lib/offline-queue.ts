@@ -77,12 +77,12 @@ function normalizeProjectUrl(value: string): string {
 }
 
 export function createOfflineQueueOwner(
-  client: SupabaseClient,
+  projectUrl: string,
   userId: string,
 ): OfflineQueueOwner {
   return {
     userId,
-    projectUrl: normalizeProjectUrl(client.supabaseUrl),
+    projectUrl: normalizeProjectUrl(projectUrl),
   };
 }
 
@@ -329,11 +329,12 @@ export async function enqueueOfflineOperation(
     throw new Error(`O módulo ${operation.table} não pode armazenar dados offline.`);
   }
 
+  const table = operation.table;
   return withWriteLock(async () => {
     const recordId = operation.action === "insert" ? crypto.randomUUID() : operation.recordId;
     const queued: OfflineOperation = {
       ...operation,
-      table: operation.table,
+      table,
       recordId,
       id: crypto.randomUUID(),
       ownerUserId: owner.userId,
