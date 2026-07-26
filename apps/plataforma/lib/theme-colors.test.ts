@@ -2,7 +2,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-const publicCss = readFileSync(new URL("../app/public.css", import.meta.url), "utf8");
+const publicCss = [
+  "../app/race-premium-core.css",
+  "../app/race-premium-pages.css",
+  "../app/race-premium-footer.css",
+  "../app/race-premium-responsive.css",
+]
+  .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"))
+  .join("\n");
 
 function relativeLuminance(hex: string): number {
   const value = hex.replace("#", "");
@@ -29,6 +36,7 @@ describe("UDK cyan brand theme", () => {
     expect(css).not.toMatch(/#dafc08|#687700|#526000/i);
     expect(css).not.toMatch(/rgba\(218,\s*252,\s*8,/i);
     expect(css).not.toMatch(/rgba\(150,\s*174,\s*0,/i);
+    expect(publicCss).not.toMatch(/lime|#455000|#9db500|#657500|#eef5c0|#566400/i);
   });
 
   it("defines the approved cyan design tokens", () => {
@@ -36,14 +44,9 @@ describe("UDK cyan brand theme", () => {
     expect(css).toContain("--cyan-hover: #32e5ff;");
     expect(css).toContain("--cyan-deep: #00687a;");
     expect(css).toContain("--cyan-glow: #004653;");
-  });
-
-  it("uses cyan consistently across the public portal", () => {
-    expect(publicCss).not.toMatch(/lime|#455000|#9db500|#657500|#eef5c0|#566400/i);
-    expect(publicCss).toContain("--public-cyan:#00d9ff");
-    expect(publicCss).toContain("--public-cyan-hover:#32e5ff");
-    expect(publicCss).toContain("--public-cyan-deep:#00687a");
-    expect(publicCss).toContain("--public-cyan-soft:#dffaff");
+    expect(publicCss).toContain("--race-cyan: #00d9ff;");
+    expect(publicCss).toContain("--race-cyan-soft: #63e9ff;");
+    expect(publicCss).toContain("--race-cyan-dark: #006e80;");
   });
 
   it("keeps accessible contrast for primary and text uses", () => {
