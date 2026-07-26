@@ -1,5 +1,6 @@
 name: Apply Task 1
 
+# Registered before this trigger commit so GitHub can execute it safely.
 on:
   push:
     branches: [feat/complete-operational-modules]
