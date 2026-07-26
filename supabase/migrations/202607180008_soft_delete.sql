@@ -4,6 +4,8 @@ alter table public.documents add column if not exists deleted_at timestamptz;
 alter table public.payments add column if not exists deleted_at timestamptz;
 alter table public.credits add column if not exists deleted_at timestamptz;
 alter table public.stages add column if not exists deleted_at timestamptz;
+alter table public.stages add column if not exists registration_opens_at timestamptz;
+alter table public.stages add column if not exists registration_closes_at timestamptz;
 alter table public.sessions add column if not exists deleted_at timestamptz;
 alter table public.checkins add column if not exists deleted_at timestamptz;
 alter table public.kart_assignments add column if not exists deleted_at timestamptz;
@@ -50,6 +52,8 @@ select
   stage.format,
   stage.track,
   stage.starts_at,
+  upper(to_char(stage.starts_at at time zone 'America/Sao_Paulo', 'DD MON')) as date_label,
+  to_char(stage.starts_at at time zone 'America/Sao_Paulo', 'HH24"h"') as time_label,
   stage.registration_opens_at,
   stage.registration_closes_at,
   stage.status,
