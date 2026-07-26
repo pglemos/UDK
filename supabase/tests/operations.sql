@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(45);
+select plan(49);
 
 select ok(to_regclass('public.documents') is not null, 'documents table exists');
 select ok(to_regclass('public.credits') is not null, 'credits table exists');
@@ -25,6 +25,10 @@ select ok(exists(select 1 from information_schema.columns where table_schema='pu
 select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='result_entries' and column_name='pole'), 'result entries pole column exists');
 select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='result_entries' and column_name='fastest_lap'), 'result entries fastest lap column exists');
 select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='results' and column_name='session_id'), 'results session column exists');
+select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='stages' and column_name='registration_opens_at'), 'stage registration opening column exists');
+select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='stages' and column_name='registration_closes_at'), 'stage registration closing column exists');
+select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='public_calendar' and column_name='date_label'), 'public calendar exposes date label');
+select ok(exists(select 1 from information_schema.columns where table_schema='public' and table_name='public_calendar' and column_name='time_label'), 'public calendar exposes time label');
 
 select ok(to_regprocedure('public.recalculate_result_points(uuid)') is not null, 'result points function exists');
 select ok(to_regprocedure('public.recalculate_standings(uuid,uuid)') is not null, 'standings function exists');
@@ -45,9 +49,9 @@ select ok((select relrowsecurity from pg_class where oid='public.terms'::regclas
 select ok((select relrowsecurity from pg_class where oid='public.term_acceptances'::regclass), 'term acceptances uses RLS');
 select ok((select relrowsecurity from pg_class where oid='public.sessions'::regclass), 'sessions uses RLS');
 select ok((select relrowsecurity from pg_class where oid='public.checkins'::regclass), 'checkins uses RLS');
-select ok((select relrowsecurity from pg_class where oid='public.kart_assignments'::regclass), 'kart assignments uses RLS');
-select ok((select relrowsecurity from pg_class where oid='public.sponsor_campaigns'::regclass), 'sponsor campaigns uses RLS');
-select ok((select relrowsecurity from pg_class where oid='public.cms_versions'::regclass), 'cms versions uses RLS');
+select ok((select relrowsecurity from pg_class where oid='public.kart_assignments'::regclass), 'kart assignments use RLS');
+select ok((select relrowsecurity from pg_class where oid='public.sponsor_campaigns'::regclass), 'sponsor campaigns use RLS');
+select ok((select relrowsecurity from pg_class where oid='public.cms_versions'::regclass), 'cms versions use RLS');
 
 select ok((select count(*) >= 3 from public.points_rules), 'default points rules are seeded');
 select ok((select count(*) = 6 from storage.buckets where id in ('public-media','private-documents','payment-proofs','disciplinary-evidence','timing-imports','signatures')), 'all storage buckets exist');
