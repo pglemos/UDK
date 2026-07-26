@@ -30,25 +30,22 @@ jobs:
               | sort
             echo
             echo '## Font declarations and imports'
-            rg -n -i 'font-family|fonts.googleapis|Barlow|Inter|Roboto' . \
-              --glob '!pnpm-lock.yaml' \
-              --glob '!node_modules/**' \
-              --glob '!.git/**' || true
+            grep -RInE 'font-family|fonts\.googleapis|Barlow|Inter|Roboto' \
+              apps packages docs README.md \
+              --exclude='pnpm-lock.yaml' || true
             echo
             echo '## Logo, icon and image references'
-            rg -n -i 'udk\.svg|logo|favicon|icon|apple-touch|manifest|<img|Image\(' . \
-              --glob '!pnpm-lock.yaml' \
-              --glob '!node_modules/**' \
-              --glob '!.git/**' || true
+            grep -RInE 'udk\.svg|logo|favicon|apple-touch|manifest|<img|Image\(' \
+              apps packages docs README.md \
+              --exclude='pnpm-lock.yaml' || true
             echo
             echo '## Existing public assets'
             find apps/plataforma/public -maxdepth 4 -type f -print -exec file {} \; -exec sha256sum {} \; 2>/dev/null | sort || true
             echo
             echo '## Brand-like colors and tokens'
-            rg -n -i '#1c191f|#ffffff|#00d9ff|#dafc08|lime|cyan|graphite|theme_color|themeColor' . \
-              --glob '!pnpm-lock.yaml' \
-              --glob '!node_modules/**' \
-              --glob '!.git/**' || true
+            grep -RInEi '#1c191f|#ffffff|#00d9ff|#dafc08|lime|cyan|graphite|theme_color|themeColor' \
+              apps packages docs README.md \
+              --exclude='pnpm-lock.yaml' || true
             echo
             echo '## Package scripts and test layout'
             find . -name package.json -not -path './node_modules/*' -print -exec cat {} \;
@@ -57,10 +54,19 @@ jobs:
             git status --short
           } > brand-audit.txt
 
+          tar \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='brand-audit.txt' \
+            -czf source-snapshot.tar.gz .
+
           cat brand-audit.txt
 
       - uses: actions/upload-artifact@v4
         with:
           name: official-brand-audit
-          path: brand-audit.txt
+          path: |
+            brand-audit.txt
+            source-snapshot.tar.gz
           if-no-files-found: error
