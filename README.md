@@ -5,6 +5,8 @@
 
 Portal público e plataforma operacional do campeonato **Ultras do Kart**, entregues por uma única aplicação Next.js, um projeto Vercel e um projeto Supabase.
 
+> Release unificada integrada à `main` em 26 de julho de 2026. Este marcador também aciona a verificação pós-merge da aplicação e da infraestrutura.
+
 ## Aplicação
 
 | Diretório | Porta local | Superfícies |
