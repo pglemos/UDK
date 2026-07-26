@@ -92,8 +92,8 @@ championship/<championship-id>/<user-id>/<arquivo>
 - [x] `pnpm typecheck`.
 - [x] `pnpm test`.
 - [x] `pnpm build`.
-- [ ] Supabase CI verde no head final.
-- [ ] Application CI verde no head final.
+- [x] Supabase CI verde no head final.
+- [x] Application CI verde no head final.
 - [ ] Preview Vercel `READY` no head final.
 - [ ] PR #13 mesclado por squash.
 - [ ] Deployment de produção `READY`.
