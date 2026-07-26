@@ -22,7 +22,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/udk-brand-payload
-          tr -d '\n\r ' < .brand-payload/part00.b64 | base64 --decode > /tmp/udk-brand-assets.tar.gz
+          echo '=== Encoded payload ==='
+          wc -c .brand-payload/part00.b64
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+
+          encoded = ''.join(Path('.brand-payload/part00.b64').read_text().split())
+          print(f'characters={len(encoded)} modulo4={len(encoded) % 4}')
+          print(f'prefix={encoded[:24]}')
+          print(f'suffix={encoded[-24:]}')
+          try:
+              decoded = base64.b64decode(encoded, validate=True)
+          except Exception as error:
+              print(f'base64_error={type(error).__name__}: {error}')
+              raise
+          Path('/tmp/udk-brand-assets.tar.gz').write_bytes(decoded)
+          print(f'decoded_bytes={len(decoded)}')
+          PY
           echo '=== Archive digest ==='
           sha256sum /tmp/udk-brand-assets.tar.gz
           echo '=== Archive contents ==='
