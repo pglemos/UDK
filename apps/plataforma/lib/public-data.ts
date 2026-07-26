@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fallbackCategories, fallbackDrivers, fallbackStages } from "./public-data-fallbacks";
 
 export type PageMeta = {
   page: number;
@@ -244,144 +245,6 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
   };
 }
 
-const fallbackDrivers: PublicDriver[] = [
-  {
-    id: "fallback-walison",
-    slug: "walison-goncalves",
-    name: "Walison Gonçalves",
-    fullName: "Walison Gonçalves",
-    number: 7,
-    category: "Ultras Insanos",
-    categorySlug: "insanos",
-    categoryColor: "#00D9FF",
-    points: 112,
-    wins: 3,
-    podiums: 5,
-    poles: 0,
-    position: 1,
-    previousPosition: null,
-    avatarUrl: null,
-    heroImageUrl: null,
-    teamName: null,
-    city: "Betim/MG",
-    bio: null,
-  },
-  {
-    id: "fallback-haroldo",
-    slug: "haroldo-alves",
-    name: "Haroldo Alves",
-    fullName: "Haroldo Alves",
-    number: 79,
-    category: "Ultras Insanos",
-    categorySlug: "insanos",
-    categoryColor: "#00D9FF",
-    points: 104,
-    wins: 2,
-    podiums: 5,
-    poles: 0,
-    position: 2,
-    previousPosition: null,
-    avatarUrl: null,
-    heroImageUrl: null,
-    teamName: null,
-    city: "Betim/MG",
-    bio: null,
-  },
-  {
-    id: "fallback-aldo",
-    slug: "aldo-senna",
-    name: "Aldo Senna",
-    fullName: "Aldo Senna",
-    number: 44,
-    category: "Ultras Rápidos",
-    categorySlug: "rapidos",
-    categoryColor: "#F7F5F0",
-    points: 98,
-    wins: 2,
-    podiums: 4,
-    poles: 0,
-    position: 1,
-    previousPosition: null,
-    avatarUrl: null,
-    heroImageUrl: null,
-    teamName: null,
-    city: "Betim/MG",
-    bio: null,
-  },
-  {
-    id: "fallback-pedro",
-    slug: "pedro-guilherme",
-    name: "Pedro Guilherme",
-    fullName: "Pedro Guilherme Lemos Teixeira",
-    number: 70,
-    category: "Ultras Rápidos",
-    categorySlug: "rapidos",
-    categoryColor: "#F7F5F0",
-    points: 91,
-    wins: 1,
-    podiums: 4,
-    poles: 0,
-    position: 2,
-    previousPosition: null,
-    avatarUrl: null,
-    heroImageUrl: null,
-    teamName: null,
-    city: "Betim/MG",
-    bio: null,
-  },
-  {
-    id: "fallback-arthur",
-    slug: "arthur-henrique",
-    name: "Arthur Henrique",
-    fullName: "Arthur Henrique Vieira da Silva",
-    number: 56,
-    category: "Ultras Rápidos",
-    categorySlug: "rapidos",
-    categoryColor: "#F7F5F0",
-    points: 84,
-    wins: 0,
-    podiums: 3,
-    poles: 0,
-    position: 3,
-    previousPosition: null,
-    avatarUrl: null,
-    heroImageUrl: null,
-    teamName: null,
-    city: "Betim/MG",
-    bio: null,
-  },
-];
-
-const fallbackStages: PublicStage[] = [
-  ["endurance-agosto", "18 AGO", "Endurance", "endurance", "Traçado 01 invertido com chicane", "21h", "2026-08-18T21:00:00-03:00"],
-  ["etapa-setembro", "08 SET", "Etapa regular", "regular", "Traçado 02 normal e invertido", "21h", "2026-09-08T21:00:00-03:00"],
-  ["etapa-outubro", "13 OUT", "Etapa regular", "regular", "Traçado 05 normal e invertido", "21h", "2026-10-13T21:00:00-03:00"],
-  ["etapa-novembro", "10 NOV", "Etapa regular", "regular", "Traçado 11 normal e invertido", "21h", "2026-11-10T21:00:00-03:00"],
-  ["final-endurance", "12 DEZ", "Final Endurance", "endurance", "Traçado 01 normal", "11h", "2026-12-12T11:00:00-03:00"],
-].map(([slug, date, title, format, track, time, startsAt], index) => ({
-  id: `fallback-stage-${index + 1}`,
-  slug,
-  date,
-  title,
-  format,
-  track,
-  time,
-  startsAt,
-  status: "registration",
-  location: "Kartódromo Internacional de Betim",
-  city: "Betim/MG",
-  registrationOpensAt: null,
-  registrationClosesAt: null,
-  trackMapUrl: null,
-  heroImageUrl: null,
-  shortDescription: null,
-}));
-
-const fallbackCategories: PublicCategory[] = [
-  { slug: "insanos", name: "Ultras Insanos", color: "#00D9FF" },
-  { slug: "rapidos", name: "Ultras Rápidos", color: "#F7F5F0" },
-];
-
 function useFallback<T>(items: T[], fallback: T[]): T[] {
   return items.length ? items : fallback;
 }
@@ -428,7 +291,6 @@ export async function getStandingsPage({
   sort?: "position" | "points" | "name";
 } = {}): Promise<PaginatedResult<PublicDriver>> {
   const client = publicClient();
-
   if (!client) {
     const source = fallbackDrivers;
     return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
@@ -473,7 +335,6 @@ export async function getDriversPage({
   sort?: "position" | "points" | "name";
 } = {}): Promise<PaginatedResult<PublicDriver>> {
   const client = publicClient();
-
   if (!client) {
     const source = fallbackDrivers;
     return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
