@@ -3,6 +3,8 @@ name: Audit official UDK brand
 on:
   push:
     branches: [fix/official-udk-brand-assets]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -40,7 +42,7 @@ jobs:
               --glob '!.git/**' || true
             echo
             echo '## Existing public assets'
-            find apps/plataforma/public -type f -maxdepth 4 -print -exec file {} \; -exec sha256sum {} \; 2>/dev/null | sort || true
+            find apps/plataforma/public -maxdepth 4 -type f -print -exec file {} \; -exec sha256sum {} \; 2>/dev/null | sort || true
             echo
             echo '## Brand-like colors and tokens'
             rg -n -i '#1c191f|#ffffff|#00d9ff|#dafc08|lime|cyan|graphite|theme_color|themeColor' . \
