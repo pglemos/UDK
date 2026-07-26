@@ -1,0 +1,28 @@
+file_bytes=8000
+characters=8000
+modulo4=0
+prefix=H4sIAAAAAAAAA+x9B3gV1bb/SaGFltA7
+suffix=bgDOcnM635tp8CgQdCzttjY0XpACc87m
+decoded_bytes=6000
+archive_sha256=ace1b3900222d205197f2c674b204d80eb67064f29ecbf067b70796130160f80
+error=EOFError: Compressed file ended before the end-of-stream marker was reached
+Traceback (most recent call last):
+  File "<stdin>", line 21, in <module>
+  File "/usr/lib/python3.12/tarfile.py", line 2074, in getmembers
+    self._load()        # all members, we first have to
+    ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/tarfile.py", line 2854, in _load
+    while self.next() is not None:
+          ^^^^^^^^^^^
+  File "/usr/lib/python3.12/tarfile.py", line 2760, in next
+    self.fileobj.seek(self.offset - 1)
+  File "/usr/lib/python3.12/gzip.py", line 421, in seek
+    return self._buffer.seek(offset, whence)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/_compression.py", line 153, in seek
+    data = self.read(min(io.DEFAULT_BUFFER_SIZE, offset))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/gzip.py", line 547, in read
+    raise EOFError("Compressed file ended before the "
+EOFError: Compressed file ended before the end-of-stream marker was reached
+
