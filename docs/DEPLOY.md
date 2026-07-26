@@ -1,40 +1,27 @@
-# Deploy da Plataforma UDK
+# Deploy da aplicação UDK
 
-Este repositório gera **dois projetos Vercel** conectados ao mesmo projeto Supabase:
+O repositório publica **uma única aplicação Next.js** em `apps/plataforma`, conectada a um único projeto Supabase.
 
-| Projeto | Diretório raiz | Finalidade |
-|---|---|---|
-| UDK Portal | `apps/web-publico` | Site, calendário, classificação, resultados e pilotos |
-| UDK Plataforma | `apps/plataforma` | Login e operação administrativa |
+## 1. Supabase
 
-## 1. Criar e conectar o Supabase
+Projeto conectado:
 
-1. Crie um projeto vazio no Supabase.
-2. Instale a CLI do Supabase e autentique-se.
-3. Na raiz do repositório, execute:
+```text
+Nome: UDK
+Project ref: gyhsirfwwsmugvirpwsi
+Região: sa-east-1
+PostgreSQL: 17
+```
+
+Aplique somente as migrations versionadas:
 
 ```bash
 supabase login
-supabase link --project-ref SEU_PROJECT_REF
+supabase link --project-ref gyhsirfwwsmugvirpwsi
 supabase db push
 ```
 
-O `db push` aplica:
-
-- campeonato, temporada, categorias e etapas;
-- perfis, papéis e permissões;
-- pilotos e inscrições;
-- pagamentos PIX;
-- resultados e classificação;
-- penalidades e recursos;
-- equipes e stints de Endurance;
-- patrocinadores, CMS e notificações;
-- auditoria;
-- RLS;
-- buckets público e privado;
-- dados iniciais da temporada UDK 2026.
-
-Antes de usar produção, valide o banco localmente:
+Antes de produção, reproduza o banco localmente:
 
 ```bash
 supabase start
@@ -43,163 +30,116 @@ supabase test db
 supabase db lint --level warning
 ```
 
-## 2. Criar o primeiro administrador
+As migrations criam schema, views públicas, funções, triggers, RLS, buckets e os dados iniciais de 2026. Não faça mudanças manuais em produção sem uma migration correspondente.
 
-1. Conecte temporariamente o projeto `apps/plataforma` ao Supabase.
-2. Crie a conta do administrador no Supabase Authentication.
-3. No SQL Editor, execute, substituindo o e-mail:
+## 2. Primeiro administrador
+
+Crie a conta pelo fluxo `/login?cadastro=1`. Depois, no SQL Editor, promova somente a conta inicial:
 
 ```sql
 insert into public.user_roles (user_id, role)
-select u.id, 'admin'
-from auth.users u
-where u.email = 'SEU_EMAIL_ADMIN'
-  and not exists (
-    select 1
-    from public.user_roles r
-    where r.user_id = u.id
-      and r.role = 'admin'
-  );
+select id, 'admin'
+from auth.users
+where email = 'SEU_EMAIL_ADMIN'
+on conflict do nothing;
 ```
 
-O cadastro de usuário cria automaticamente o perfil e o papel inicial `driver`.
+Organizações e operadores comuns não podem conceder o papel global de administrador.
 
-## 3. Variáveis do Supabase
+## 3. Projeto Vercel único
 
-No painel do Supabase, abra **Project Settings → API** e copie:
-
-- Project URL;
-- Publishable key ou anon key.
-
-Nunca coloque a `service_role` em variável `NEXT_PUBLIC_*`.
-
-## 4. Projeto Vercel do portal público
-
-Importe `pglemos/UDK` no Vercel e configure:
+Projeto conectado:
 
 ```text
-Root Directory: apps/web-publico
-Framework Preset: Next.js
-Node.js: 22
-```
-
-Variáveis:
-
-```text
-NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
-NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO_PUBLICO
-NEXT_PUBLIC_PLATFORM_URL=https://SEU_DOMINIO_DA_PLATAFORMA
-```
-
-O portal possui fallback visual para desenvolvimento, mas em produção deve receber as variáveis acima para carregar calendário e classificação do Supabase.
-
-## 5. Projeto Vercel da plataforma
-
-Importe o mesmo repositório novamente e configure:
-
-```text
+Time: ULTRAS
+Projeto: udk
 Root Directory: apps/plataforma
 Framework Preset: Next.js
-Node.js: 22
+Production Branch: main
+Node.js: 22.x
 ```
 
-Variáveis:
+Variáveis para Development, Preview e Production:
 
 ```text
-NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://gyhsirfwwsmugvirpwsi.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
-NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO_DA_PLATAFORMA
+NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO
 ```
 
-## 6. URLs de autenticação
+Nunca adicione `service_role`, senha do banco, token Vercel ou token administrativo do Supabase como variável `NEXT_PUBLIC_*`.
 
-No Supabase, abra **Authentication → URL Configuration**.
+## 4. URLs de autenticação
 
-Configure:
+Em **Supabase → Authentication → URL Configuration**:
 
 ```text
-Site URL: https://SEU_DOMINIO_DA_PLATAFORMA
+Site URL: https://SEU_DOMINIO
 ```
 
-Adicione como Redirect URLs:
+Redirect URLs:
 
 ```text
-https://SEU_DOMINIO_DA_PLATAFORMA/**
+https://SEU_DOMINIO/**
 https://SEU_PREVIEW_VERCEL.app/**
 http://localhost:3001/**
 ```
 
-## 7. Domínios
+A recuperação de senha retorna para `/nova-senha`.
 
-Sugestão:
+## 5. Superfícies de produção
 
-```text
-Portal público: udk.seudominio.com.br
-Plataforma: app.udk.seudominio.com.br
-```
-
-Depois de vincular os domínios, atualize `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_PLATFORM_URL` e as URLs autorizadas no Supabase.
-
-## 8. Ordem recomendada de publicação
-
-1. Criar o projeto Supabase.
-2. Executar `supabase db push`.
-3. Criar e promover o primeiro administrador.
-4. Publicar `apps/plataforma` no Vercel.
-5. Publicar `apps/web-publico` no Vercel.
-6. Configurar domínios.
-7. Atualizar URLs de autenticação.
-8. Testar `/api/health` nos dois projetos.
-9. Validar login, calendário, classificação e políticas de acesso.
-
-## 9. Verificação final
-
-Portal:
+Valide no mesmo domínio:
 
 ```text
-GET https://SEU_DOMINIO_PUBLICO/api/health
+/                       portal público
+/login                  autenticação
+/recuperar-senha        solicitação de recuperação
+/nova-senha             definição de nova senha
+/calendario             calendário público
+/classificacao          classificação pública
+/resultados              resultados públicos
+/pilotos                pilotos públicos
+/regulamento            regulamento publicado
+/noticias               CMS público
+/patrocinadores         parceiros ativos
+/inscricao              entrada de inscrição
+/painel                 operação autenticada
+/api/health             saúde da aplicação
 ```
 
-Resposta esperada:
+Resposta mínima de saúde:
 
 ```json
-{"status":"ok","app":"web-publico"}
+{
+  "status": "ok",
+  "app": "udk",
+  "supabaseConfigured": true,
+  "timestamp": "ISO-8601"
+}
 ```
 
-Plataforma:
+## 6. Verificação final
 
-```text
-GET https://SEU_DOMINIO_DA_PLATAFORMA/api/health
-```
+- home pública carrega;
+- login, cadastro, logout e recuperação funcionam;
+- `/painel` rejeita visitante;
+- conta sem papel ativo falha de forma fechada;
+- calendário, classificação e resultados usam views públicas;
+- arquivos privados não geram URL pública;
+- service worker não armazena páginas autenticadas;
+- Application CI e Supabase CI estão verdes na `main`;
+- deployment Vercel de produção termina em `READY`.
 
-Resposta esperada:
-
-```json
-{"status":"ok","app":"plataforma"}
-```
-
-## 10. Desenvolvimento local
+## 7. Desenvolvimento local
 
 ```bash
 corepack enable
 pnpm install
 supabase start
-```
-
-Crie os arquivos locais a partir dos exemplos:
-
-```bash
-cp apps/web-publico/.env.example apps/web-publico/.env.local
 cp apps/plataforma/.env.example apps/plataforma/.env.local
-```
-
-Depois:
-
-```bash
 pnpm dev
 ```
 
-- Portal: `http://localhost:3000`
-- Plataforma: `http://localhost:3001`
-- Supabase Studio: `http://localhost:54323`
+Aplicação: `http://localhost:3001`  
+Supabase Studio: `http://localhost:54323`
