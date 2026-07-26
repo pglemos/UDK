@@ -2,12 +2,14 @@
 
 ## Supabase UDK
 
-- [ ] Projeto `UDK` ativo na região `sa-east-1`.
-- [ ] Project ref `gyhsirfwwsmugvirpwsi` confirmado.
-- [ ] Todas as migrations locais aplicadas na ordem.
-- [ ] Schema, RLS, funções, views e buckets verificados.
-- [ ] Seed da temporada 2026 presente.
-- [ ] Advisors de segurança e desempenho revisados.
+- [x] Projeto `UDK` ativo na região `sa-east-1`.
+- [x] Project ref `gyhsirfwwsmugvirpwsi` confirmado.
+- [x] Migrations `202607180001` a `202607180015` aplicadas no projeto remoto.
+- [ ] Schema, RLS, funções, views e buckets verificados funcionalmente ponta a ponta.
+- [ ] Seed da temporada 2026 confirmado no ambiente remoto.
+- [x] Advisors de segurança e desempenho revisados.
+
+Os advisors ainda registram recomendações sobre permissões de funções `SECURITY DEFINER`, inicialização de `auth.uid()` em políticas RLS e políticas permissivas sobrepostas. Essas recomendações devem ser tratadas em uma migration dedicada, com testes de autorização, sem revogações genéricas que possam interromper as políticas atuais.
 
 Comandos de referência:
 
@@ -78,20 +80,21 @@ championship/<championship-id>/<user-id>/<arquivo>
 - [ ] `/painel` rejeita visitante.
 - [ ] Conta sem papel ativo falha de forma fechada.
 - [ ] Administrador acessa os módulos autorizados.
-- [ ] Fila offline permanece vinculada ao usuário e ao projeto.
+- [x] Fila offline permanece vinculada ao usuário e ao projeto, limita tentativas e coloca falhas persistentes em quarentena criptografada.
+- [x] Modal administrativo restaura foco, fecha com `Escape` e mantém navegação por `Tab` dentro do diálogo.
 - [ ] Service worker não cacheia painel, autenticação, API ou RSC privado.
 - [ ] `/api/health` retorna `app: udk` sem credenciais.
 
 ## Portões finais
 
 - [ ] `pnpm verify`.
-- [ ] `pnpm lint`.
-- [ ] `pnpm typecheck`.
-- [ ] `pnpm test`.
-- [ ] `pnpm build`.
-- [ ] Supabase CI verde.
-- [ ] Application CI verde.
-- [ ] Preview Vercel `READY`.
+- [x] `pnpm lint`.
+- [x] `pnpm typecheck`.
+- [x] `pnpm test`.
+- [x] `pnpm build`.
+- [ ] Supabase CI verde no head final.
+- [ ] Application CI verde no head final.
+- [ ] Preview Vercel `READY` no head final.
 - [ ] PR #13 mesclado por squash.
 - [ ] Deployment de produção `READY`.
 
