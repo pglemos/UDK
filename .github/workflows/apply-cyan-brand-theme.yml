@@ -86,10 +86,15 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
-          css_path = Path("apps/plataforma/app/globals.css")
-          css = css_path.read_text()
-
+          source_roots = [
+              Path("apps/plataforma/app"),
+              Path("apps/plataforma/components"),
+              Path("apps/plataforma/lib"),
+              Path("apps/plataforma/public"),
+          ]
+          source_suffixes = {".css", ".ts", ".tsx", ".js", ".jsx", ".svg", ".html", ".json"}
           replacements = [
               ("--lime-dark", "--cyan-deep"),
               ("--lime", "--cyan"),
@@ -101,19 +106,40 @@ jobs:
               ("rgba(150, 174, 0, 0.2)", "rgba(0, 151, 178, 0.26)"),
           ]
 
-          for old, new in replacements:
-              css = css.replace(old, new)
+          source_files = []
+          for root in source_roots:
+              if not root.exists():
+                  continue
+              for path in root.rglob("*"):
+                  if path.is_file() and not path.is_symlink() and path.suffix in source_suffixes:
+                      source_files.append(path)
 
-          root_marker = "  --cyan: #00d9ff;\n  --cyan-deep: #00687a;"
+          for path in source_files:
+              if path.name == "theme-colors.test.ts":
+                  continue
+              original = path.read_text(errors="ignore")
+              updated = original
+              for old, new in replacements:
+                  updated = updated.replace(old, new)
+              if updated != original:
+                  path.write_text(updated)
+                  print(f"updated {path}")
+
+          css_path = Path("apps/plataforma/app/globals.css")
+          css = css_path.read_text()
+
+          root_pattern = re.compile(
+              r"(?m)^  --cyan: #00d9ff;\n  --cyan-deep: #00687a;$"
+          )
           root_replacement = (
               "  --cyan: #00d9ff;\n"
               "  --cyan-hover: #32e5ff;\n"
               "  --cyan-deep: #00687a;\n"
               "  --cyan-glow: #004653;"
           )
-          if root_marker not in css:
-              raise SystemExit("Could not locate cyan root token marker after replacement")
-          css = css.replace(root_marker, root_replacement, 1)
+          css, root_count = root_pattern.subn(root_replacement, css, count=1)
+          if root_count != 1:
+              raise SystemExit(f"Expected one root token block, found {root_count}")
 
           css = css.replace(
               "radial-gradient(circle at 78% 22%, #004653 0, transparent 28rem)",
@@ -139,9 +165,8 @@ jobs:
           }
           '''
           if hover_marker not in css:
-              raise SystemExit("Could not locate button hover marker")
+              raise SystemExit("Could not locate button hover block")
           css = css.replace(hover_marker, hover_replacement, 1)
-
           css_path.write_text(css)
 
           forbidden = [
@@ -153,12 +178,12 @@ jobs:
               "rgba(150, 174, 0,",
           ]
           problems = []
-          for path in Path("apps/plataforma").rglob("*"):
-              if path.suffix not in {".css", ".ts", ".tsx", ".js", ".jsx"}:
+          for path in source_files:
+              if path.name == "theme-colors.test.ts":
                   continue
               text = path.read_text(errors="ignore").lower()
               for marker in forbidden:
-                  if marker.lower() in text and path.name != "theme-colors.test.ts":
+                  if marker.lower() in text:
                       problems.append(f"{path}: {marker}")
           if problems:
               raise SystemExit("Legacy green markers remain:\n" + "\n".join(problems))
