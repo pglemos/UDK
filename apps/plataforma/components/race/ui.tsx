@@ -201,7 +201,7 @@ export function RacePagination({
       <div>
         {visible.map((page, index) => (
           <span key={page} className="race-page-slot">
-            {index > 0 && page - visible[index - 1] > 1 ? <i aria-hidden="true">…</i> : null}
+            {index > 0 && page - (visible[index - 1] ?? page) > 1 ? <i aria-hidden="true">…</i> : null}
             <Link
               href={paginationHref(basePath, current, page)}
               aria-current={page === meta.page ? "page" : undefined}

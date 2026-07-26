@@ -24,8 +24,9 @@ export function Reveal({
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
           setVisible(true);
           observer.disconnect();
         }
@@ -84,8 +85,9 @@ export function CountUp({
       if (progress < 1) frame = requestAnimationFrame(run);
     };
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !started) {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry?.isIntersecting && !started) {
         started = true;
         frame = requestAnimationFrame(run);
         observer.disconnect();
