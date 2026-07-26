@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(25);
+select plan(34);
 
 select ok(to_regprocedure('public.can_participate_as_driver(uuid)') is not null, 'participant scope helper exists');
 select ok(to_regprocedure('public.can_view_profile(uuid)') is not null, 'profile scope helper exists');
@@ -154,6 +154,48 @@ select ok(
       and prosrc like '%for update%'
   ),
   'standing recalculation serializes version allocation'
+);
+
+select ok(
+  coalesce((select reloptions from pg_class where oid = 'public.public_calendar'::regclass), '{}'::text[]) @> array['security_invoker=true'],
+  'public calendar uses invoker security'
+);
+select ok(
+  coalesce((select reloptions from pg_class where oid = 'public.public_standings'::regclass), '{}'::text[]) @> array['security_invoker=true'],
+  'public standings use invoker security'
+);
+select ok(
+  coalesce((select reloptions from pg_class where oid = 'public.public_results'::regclass), '{}'::text[]) @> array['security_invoker=true'],
+  'public results use invoker security'
+);
+select ok(
+  coalesce((select proconfig from pg_proc where oid = 'public.set_updated_at()'::regprocedure), '{}'::text[]) @> array['search_path=public'],
+  'updated-at trigger fixes its search path'
+);
+select ok(
+  not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage'
+      and tablename = 'objects'
+      and policyname = 'public_media_read'
+  ),
+  'public media bucket does not expose object listing'
+);
+select ok(
+  not has_function_privilege('anon', 'public.audit_row_change()', 'EXECUTE'),
+  'anonymous users cannot execute the audit trigger function'
+);
+select ok(
+  not has_function_privilege('authenticated', 'public.audit_row_change()', 'EXECUTE'),
+  'signed-in users cannot invoke the audit trigger function directly'
+);
+select ok(
+  not has_function_privilege('anon', 'public.recalculate_standings(uuid,uuid)', 'EXECUTE'),
+  'anonymous users cannot recalculate standings'
+);
+select ok(
+  has_function_privilege('authenticated', 'public.recalculate_standings(uuid,uuid)', 'EXECUTE'),
+  'signed-in users may call the guarded standings recalculation function'
 );
 
 select * from finish();
