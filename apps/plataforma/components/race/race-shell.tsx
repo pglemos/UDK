@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Instagram, Youtube } from "lucide-react";
+import { ArrowUpRight, Instagram } from "lucide-react";
 import { OfficialLogo } from "./official-logo";
 import { RaceHeader } from "./race-header";
 import { ScrollProgress } from "./motion";
@@ -50,11 +50,8 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
           <div className="udk-footer-column udk-footer-contact">
             <span>Acompanhe</span>
             <div className="udk-footer-social">
-              <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer" aria-label="Instagram do UDK">
-                <Instagram aria-hidden="true" /> Instagram
-              </a>
-              <a href="https://www.youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube do UDK">
-                <Youtube aria-hidden="true" /> YouTube
+              <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer" aria-label="Instagram oficial do UDK">
+                <Instagram aria-hidden="true" /> Instagram oficial
               </a>
             </div>
             <p>Kartódromo Internacional de Betim<br />Betim, Minas Gerais</p>
