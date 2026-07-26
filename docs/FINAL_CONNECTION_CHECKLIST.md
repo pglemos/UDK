@@ -1,107 +1,100 @@
-# Checklist final de conexão
+# Checklist final da aplicação única
 
-O código, os aplicativos, as migrations, os testes e os workflows permanecem no GitHub. Depois do merge, somente as credenciais e os projetos externos precisam ser criados.
+## Supabase UDK
 
-## 1. Supabase
+- [ ] Projeto `UDK` ativo na região `sa-east-1`.
+- [ ] Project ref `gyhsirfwwsmugvirpwsi` confirmado.
+- [ ] Todas as migrations locais aplicadas na ordem.
+- [ ] Schema, RLS, funções, views e buckets verificados.
+- [ ] Seed da temporada 2026 presente.
+- [ ] Advisors de segurança e desempenho revisados.
 
-Crie um projeto vazio no Supabase e copie:
-
-- Project Reference;
-- Project URL;
-- Publishable/anon key.
-
-No terminal, na raiz do repositório:
+Comandos de referência:
 
 ```bash
-supabase login
-supabase link --project-ref SEU_PROJECT_REF
+supabase link --project-ref gyhsirfwwsmugvirpwsi
 supabase db push
 ```
 
-As migrations criam o schema, RLS, funções, views, buckets e dados iniciais. Não execute SQL manual fora das migrations.
+## Vercel UDK
 
-### URLs de autenticação
+Uma única configuração:
 
-No painel do Supabase, em **Authentication → URL Configuration**, cadastre:
+```text
+Time: ULTRAS
+Projeto: udk
+Root Directory: apps/plataforma
+Framework: Next.js
+Node.js: 22.x
+Production Branch: main
+```
 
-- URL do portal público;
-- URL da plataforma;
-- URL da plataforma com `/?recovery=1` para recuperação de senha;
-- URLs de preview do Vercel, quando necessárias.
+Variáveis públicas:
 
-### Estrutura dos arquivos privados
+```text
+NEXT_PUBLIC_SUPABASE_URL=https://gyhsirfwwsmugvirpwsi.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
+NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO
+```
 
-As políticas de Storage exigem escopo explícito. A aplicação grava automaticamente nos formatos:
+## Autenticação
+
+Em **Supabase → Authentication → URL Configuration**:
+
+- [ ] Site URL aponta para o único domínio da aplicação.
+- [ ] O domínio de produção está permitido.
+- [ ] Previews Vercel necessários estão permitidos.
+- [ ] `http://localhost:3001/**` está permitido para desenvolvimento.
+- [ ] Recuperação retorna para `/nova-senha`.
+
+## Primeiro administrador
+
+- [ ] Criar conta por `/login?cadastro=1`.
+- [ ] Confirmar o e-mail.
+- [ ] Conceder `admin` somente à conta inicial pelo SQL Editor.
+- [ ] Administrar papéis seguintes pelo painel.
+
+## Storage privado
+
+Caminhos aceitos:
 
 ```text
 season/<season-id>/<user-id>/<arquivo>
 championship/<championship-id>/<user-id>/<arquivo>
 ```
 
-Não mova objetos manualmente para caminhos sem temporada ou campeonato, pois eles serão recusados pelas políticas RLS.
+- [ ] Arquivo privado não possui URL pública.
+- [ ] Upload com falha remove objeto órfão.
+- [ ] Usuário sem escopo não acessa arquivo de outro campeonato ou temporada.
 
-## 2. Vercel: portal público
+## Verificação funcional
 
-Importe o repositório `pglemos/UDK`.
+- [ ] `/` carrega o portal público.
+- [ ] `/calendario`, `/classificacao`, `/resultados` e `/pilotos` respondem.
+- [ ] `/regulamento`, `/noticias` e `/patrocinadores` exibem somente conteúdo publicável.
+- [ ] `/login` permite autenticação e cadastro.
+- [ ] `/recuperar-senha` envia o link.
+- [ ] `/nova-senha` exige confirmação.
+- [ ] `/painel` rejeita visitante.
+- [ ] Conta sem papel ativo falha de forma fechada.
+- [ ] Administrador acessa os módulos autorizados.
+- [ ] Fila offline permanece vinculada ao usuário e ao projeto.
+- [ ] Service worker não cacheia painel, autenticação, API ou RSC privado.
+- [ ] `/api/health` retorna `app: udk` sem credenciais.
 
-- Root Directory: `apps/web-publico`
-- Framework: Next.js
-- Node.js: 22
+## Portões finais
 
-Variáveis:
-
-```text
-NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJETO.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
-NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO_PUBLICO
-NEXT_PUBLIC_PLATFORM_URL=https://SEU_DOMINIO_DA_PLATAFORMA
-```
-
-## 3. Vercel: plataforma
-
-Importe o mesmo repositório como um segundo projeto.
-
-- Root Directory: `apps/plataforma`
-- Framework: Next.js
-- Node.js: 22
-
-Variáveis:
-
-```text
-NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJETO.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
-NEXT_PUBLIC_SITE_URL=https://SEU_DOMINIO_DA_PLATAFORMA
-```
-
-## 4. Primeiro administrador
-
-Crie o primeiro usuário pelo fluxo de cadastro da plataforma. Depois, no SQL Editor do Supabase, promova somente essa conta inicial:
-
-```sql
-update public.user_roles
-set role = 'admin'
-where user_id = (
-  select id from auth.users where email = 'SEU_EMAIL'
-);
-```
-
-A partir daí, papéis, escopos e permissões granulares são administrados pela própria plataforma. Organizações não conseguem conceder o papel global de administrador.
-
-## 5. Verificação após publicação
-
-Confirme:
-
-- `/api/health` do portal retorna sucesso;
-- `/api/health` da plataforma retorna sucesso;
-- cadastro, login e logout funcionam;
-- o e-mail de recuperação abre a tela de nova senha e exige confirmação;
-- o usuário administrador abre todos os módulos;
-- contas sem papel ativo falham de forma fechada;
-- o portal lê calendário e classificação;
-- upload privado não gera URL pública e fica dentro do escopo correto;
-- fila offline permanece vinculada à conta e ao projeto Supabase;
-- Application CI e Supabase CI continuam verdes na `main`.
+- [ ] `pnpm verify`.
+- [ ] `pnpm lint`.
+- [ ] `pnpm typecheck`.
+- [ ] `pnpm test`.
+- [ ] `pnpm build`.
+- [ ] Supabase CI verde.
+- [ ] Application CI verde.
+- [ ] Preview Vercel `READY`.
+- [ ] PR #13 mesclado por squash.
+- [ ] Deployment de produção `READY`.
 
 ## Segurança
 
-Nunca cadastre `service_role` como variável pública ou em qualquer aplicativo do navegador. Os dois projetos usam somente URL e chave pública; privilégios são controlados pelo Supabase Auth e pelas políticas RLS.
+Nunca cadastre `service_role`, senha do banco ou tokens administrativos em variáveis públicas, arquivos do repositório, logs ou código do navegador. Revogue tokens enviados em conversas ou outros canais não destinados a segredos.
