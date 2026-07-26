@@ -133,7 +133,7 @@ function calculateCountdown(target: string): CountdownValue {
   };
 }
 
-export function RaceCountdown({ target }: { target?: string }) {
+export function RaceCountdown({ target }: { target?: string | undefined }) {
   const [value, setValue] = useState<CountdownValue>(() =>
     target ? calculateCountdown(target) : { days: 0, hours: 0, minutes: 0, seconds: 0, complete: true },
   );
