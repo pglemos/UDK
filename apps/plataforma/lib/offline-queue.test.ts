@@ -6,7 +6,9 @@ import {
   encryptOfflineQueue,
   filterOfflineQueueForOwner,
   isOfflineCapableTable,
+  MAX_OFFLINE_ATTEMPTS,
   parseOfflineQueue,
+  recordOfflineFailure,
   serializeOfflineQueue,
   type OfflineOperation,
   type OfflineQueueOwner,
@@ -95,6 +97,22 @@ describe("offline queue", () => {
     };
 
     expect(filterOfflineQueueForOwner([operation, anotherOwnerOperation], owner)).toEqual([operation]);
+  });
+
+  it("moves repeatedly failing operations to a dead letter after the retry cap", () => {
+    const retry = recordOfflineFailure(operation, "network unavailable", "2026-07-18T10:01:00.000Z");
+    expect(retry.status).toBe("retry");
+    expect(retry.operation.attempts).toBe(1);
+    expect(retry.operation.lastError).toBe("network unavailable");
+
+    const exhausted: OfflineOperation = {
+      ...operation,
+      attempts: MAX_OFFLINE_ATTEMPTS - 1,
+    };
+    const deadLetter = recordOfflineFailure(exhausted, "permission denied", "2026-07-18T10:02:00.000Z");
+    expect(deadLetter.status).toBe("dead-letter");
+    expect(deadLetter.operation.attempts).toBe(MAX_OFFLINE_ATTEMPTS);
+    expect(deadLetter.operation.deadLetteredAt).toBe("2026-07-18T10:02:00.000Z");
   });
 
   it("encrypts the persisted queue and restores it with the same key", async () => {
