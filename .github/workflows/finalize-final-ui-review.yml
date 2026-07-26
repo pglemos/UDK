@@ -14,7 +14,7 @@ concurrency:
 jobs:
   finalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,169 +28,350 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
 
-      - name: Apply patch only when missing
+      - name: Apply verified offline and accessibility fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
 
-          path = Path("apps/plataforma/components/module-crud.tsx")
-          text = path.read_text()
-
-          if "const modalRef = useRef<HTMLElement>(null);" not in text:
-            def sub_once(pattern: str, replacement: str, flags: int = 0) -> None:
-              global text
-              text, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
               if count != 1:
-                raise SystemExit(f"Expected one structural match, found {count}: {pattern[:140]}")
+                  raise SystemExit(f"{label}: expected one marker, found {count}")
+              return text.replace(old, new, 1)
 
-            sub_once(
-              re.escape('import { useCallback, useEffect, useMemo, useState } from "react";'),
-              'import { useCallback, useEffect, useMemo, useRef, useState } from "react";',
-            )
-            sub_once(
-              r'(  const \[record, setRecord\] = useState<Record<string, unknown>>\(\{\}\);\n)',
-              r'''\1  const modalRef = useRef<HTMLElement>(null);
-            const previousFocusRef = useRef<HTMLElement | null>(null);
-            const savingRef = useRef(false);
-          ''',
-            )
-            sub_once(
-              r'(  const title = config\.singular\.toLowerCase\(\);\n\n)',
-              r'''\1  useEffect(() => {
-              savingRef.current = saving;
-            }, [saving]);
+          offline_path = Path("apps/plataforma/lib/offline-queue.ts")
+          offline = offline_path.read_text()
 
-            useEffect(() => {
-              if (!modalOpen) return;
-              previousFocusRef.current = document.activeElement instanceof HTMLElement
-                ? document.activeElement
-                : null;
-              const modal = modalRef.current;
-              if (!modal) return;
+          if "lastError?: string;" not in offline:
+              offline = replace_once(
+                  offline,
+                  "  attempts: number;\n};",
+                  "  attempts: number;\n  lastError?: string;\n  lastAttemptAt?: string;\n  deadLetteredAt?: string;\n};",
+                  "offline metadata",
+              )
 
-              const focusableSelector = [
-                'a[href]',
-                'button:not([disabled])',
-                'input:not([disabled])',
-                'select:not([disabled])',
-                'textarea:not([disabled])',
-                '[tabindex]:not([tabindex="-1"])',
-              ].join(',');
-              const focusable = Array.from(
-                modal.querySelectorAll<HTMLElement>(focusableSelector),
-              ).filter((element) => !element.hasAttribute('hidden'));
-              (focusable[0] ?? modal).focus();
+          if "MAX_OFFLINE_ATTEMPTS" not in offline:
+              offline = replace_once(
+                  offline,
+                  'const SEQUENCE_KEY = "sequence";\n',
+                  'const SEQUENCE_KEY = "sequence";\nconst DEAD_LETTER_KEY = "encrypted-dead-letter";\n\nexport const MAX_OFFLINE_ATTEMPTS = 5;\n',
+                  "offline constants",
+              )
 
-              const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.key === 'Escape' && !savingRef.current) {
-                  event.preventDefault();
-                  setModalOpen(false);
-                  return;
-                }
-                if (event.key !== 'Tab') return;
-                const activeFocusable = Array.from(
-                  modal.querySelectorAll<HTMLElement>(focusableSelector),
-                ).filter((element) => !element.hasAttribute('hidden'));
-                if (activeFocusable.length === 0) {
-                  event.preventDefault();
-                  modal.focus();
-                  return;
-                }
-                const first = activeFocusable[0];
-                const last = activeFocusable[activeFocusable.length - 1];
-                if (event.shiftKey && document.activeElement === first) {
-                  event.preventDefault();
-                  last.focus();
-                } else if (!event.shiftKey && document.activeElement === last) {
-                  event.preventDefault();
-                  first.focus();
-                }
-              };
+          if "memoryDeadLetters" not in offline:
+              offline = replace_once(
+                  offline,
+                  "let memoryQueue: OfflineOperation[] = [];\n",
+                  "let memoryQueue: OfflineOperation[] = [];\nlet memoryDeadLetters: OfflineOperation[] = [];\n",
+                  "offline memory quarantine",
+              )
 
-              document.addEventListener('keydown', handleKeyDown);
-              return () => {
-                document.removeEventListener('keydown', handleKeyDown);
-                previousFocusRef.current?.focus();
-                previousFocusRef.current = null;
-              };
-            }, [modalOpen]);
-
-          ''',
-            )
-            sub_once(
-              r'''  async function syncOffline\(\) \{.*?\n  \}\n\n  function renderField''',
-              '''  async function syncOffline() {
-              if (!offlineOwner) return;
-              setError("");
-              setNotice("");
-              try {
-                const result = await flushOfflineQueue(client, offlineOwner);
-                setPending((await getOfflineQueue(offlineOwner)).length);
-                if (result.deadLettered > 0) {
-                  setError(
-                    `${result.deadLettered} operação(ões) excederam o limite de tentativas e foram movidas para a quarentena offline.`,
-                  );
-                } else {
-                  setNotice(`${result.completed} operação(ões) sincronizada(s).`);
-                }
-                await loadRows();
-              } catch (syncError) {
-                setError(
-                  syncError instanceof Error
-                    ? syncError.message
-                    : "Não foi possível sincronizar a fila offline.",
-                );
-              }
+          old_lock = '''function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
+            const result = writeLock.then(operation, operation);
+            writeLock = result.then(
+              () => undefined,
+              () => undefined,
+            );
+            return result;
+          }'''
+          new_lock = '''function withWriteLock<T>(operation: () => Promise<T>): Promise<T> {
+            if (typeof navigator !== "undefined" && "locks" in navigator) {
+              return navigator.locks.request("udk-offline-queue-write", operation);
             }
 
-            function renderField''',
-              re.DOTALL,
-            )
-            sub_once(
-              r'''          <div\s+className="modal-backdrop".*?<section className="crud-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">''',
-              '''          <div
-                    className="modal-backdrop"
-                    onMouseDown={(event) => {
-                      if (event.target === event.currentTarget && !saving) setModalOpen(false);
-                    }}
-                  >
-                    <section
-                      ref={modalRef}
-                      className="crud-modal"
-                      role="dialog"
-                      aria-modal="true"
-                      aria-labelledby="modal-title"
-                      tabIndex={-1}
-                    >''',
-              re.DOTALL,
-            )
-            sub_once(
-              re.escape('''                <button type="button" className="icon-button" onClick={() => setModalOpen(false)} disabled={saving}>
-                          <X size={18} />
-                        </button>'''),
-              '''                <button
-                          type="button"
-                          className="icon-button"
-                          aria-label="Fechar modal"
-                          onClick={() => setModalOpen(false)}
-                          disabled={saving}
-                        >
-                          <X size={18} />
-                        </button>''',
-            )
-            path.write_text(text)
+            const result = writeLock.then(operation, operation);
+            writeLock = result.then(
+              () => undefined,
+              () => undefined,
+            );
+            return result;
+          }'''
+          if 'navigator.locks.request("udk-offline-queue-write"' not in offline:
+              offline = replace_once(offline, old_lock, new_lock, "cross-tab write lock")
 
-          required = [
-            "const modalRef = useRef<HTMLElement>(null);",
-            "result.deadLettered > 0",
-            'aria-label="Fechar modal"',
-            "previousFocusRef.current?.focus();",
+          if "async function readRawDeadLetters" not in offline:
+              quarantine_helpers = '''async function readRawDeadLetters(): Promise<OfflineOperation[]> {
+            if (typeof window === "undefined") return [];
+            if (!indexedDbAvailable()) return memoryDeadLetters;
+
+            try {
+              const envelope = await readValue<EncryptedOfflineQueue>(DEAD_LETTER_KEY);
+              if (!envelope) return [];
+              return await decryptOfflineQueue(envelope, await getEncryptionKey());
+            } catch {
+              return [];
+            }
+          }
+
+          async function saveRawDeadLetters(queue: OfflineOperation[]): Promise<void> {
+            if (typeof window === "undefined") return;
+
+            if (!indexedDbAvailable()) {
+              memoryDeadLetters = queue;
+              return;
+            }
+
+            const encrypted = await encryptOfflineQueue(queue, await getEncryptionKey());
+            await writeValue(DEAD_LETTER_KEY, encrypted);
+          }
+
+          '''
+              marker = "export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {"
+              index = offline.index(marker)
+              offline = offline[:index] + quarantine_helpers + offline[index:]
+
+          if "getOfflineDeadLetters" not in offline:
+              marker = '''export async function getOfflineQueue(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
+            return filterOfflineQueueForOwner(await readRawQueue(), owner);
+          }
+          '''
+              replacement = marker + '''
+          export async function getOfflineDeadLetters(owner: OfflineQueueOwner): Promise<OfflineOperation[]> {
+            return filterOfflineQueueForOwner(await readRawDeadLetters(), owner);
+          }
+          '''
+              offline = replace_once(offline, marker, replacement, "dead-letter reader")
+
+          if "export function recordOfflineFailure" not in offline:
+              failure_handler = '''export type OfflineFailureResult =
+            | { status: "retry"; operation: OfflineOperation }
+            | { status: "dead-letter"; operation: OfflineOperation };
+
+          export function recordOfflineFailure(
+            operation: OfflineOperation,
+            error: unknown,
+            attemptedAt = new Date().toISOString(),
+          ): OfflineFailureResult {
+            const attempts = operation.attempts + 1;
+            const message = error instanceof Error ? error.message : String(error);
+            const failedOperation: OfflineOperation = {
+              ...operation,
+              attempts,
+              lastError: message,
+              lastAttemptAt: attemptedAt,
+            };
+
+            if (attempts >= MAX_OFFLINE_ATTEMPTS) {
+              return {
+                status: "dead-letter",
+                operation: { ...failedOperation, deadLetteredAt: attemptedAt },
+              };
+            }
+
+            return { status: "retry", operation: failedOperation };
+          }
+
+          '''
+              marker = "async function executeOperation(client: SupabaseClient, operation: OfflineOperation): Promise<void> {"
+              index = offline.index(marker)
+              offline = offline[:index] + failure_handler + offline[index:]
+
+          flush_start = offline.index("export async function flushOfflineQueue(")
+          offline = offline[:flush_start] + '''export async function flushOfflineQueue(
+            client: SupabaseClient,
+            owner: OfflineQueueOwner,
+          ): Promise<{ completed: number; remaining: number; deadLettered: number }> {
+            return withWriteLock(async () => {
+              const initialQueue = await readRawQueue();
+              const ownerQueue = filterOfflineQueueForOwner(initialQueue, owner).sort(
+                (left, right) =>
+                  left.createdAt.localeCompare(right.createdAt) ||
+                  left.deviceId.localeCompare(right.deviceId) ||
+                  left.sequence - right.sequence,
+              );
+              const snapshotIds = new Set(ownerQueue.map((operation) => operation.id));
+              const failures: OfflineOperation[] = [];
+              const deadLetters: OfflineOperation[] = [];
+              let completed = 0;
+
+              for (const operation of ownerQueue) {
+                try {
+                  await executeOperation(client, operation);
+                  completed += 1;
+                } catch (operationError) {
+                  const failure = recordOfflineFailure(operation, operationError);
+                  if (failure.status === "dead-letter") deadLetters.push(failure.operation);
+                  else failures.push(failure.operation);
+                }
+              }
+
+              const currentQueue = await readRawQueue();
+              const operationsFromOtherOwners = currentQueue.filter((operation) => !belongsToOwner(operation, owner));
+              const newlyQueuedForOwner = currentQueue.filter(
+                (operation) => belongsToOwner(operation, owner) && !snapshotIds.has(operation.id),
+              );
+              const merged = [...operationsFromOtherOwners, ...failures, ...newlyQueuedForOwner];
+              const unique = Array.from(new Map(merged.map((operation) => [operation.id, operation])).values());
+              await saveRawQueue(unique);
+
+              if (deadLetters.length > 0) {
+                const existingDeadLetters = await readRawDeadLetters();
+                const quarantined = Array.from(
+                  new Map([...existingDeadLetters, ...deadLetters].map((operation) => [operation.id, operation])).values(),
+                );
+                await saveRawDeadLetters(quarantined);
+              }
+
+              return {
+                completed,
+                remaining: failures.length + newlyQueuedForOwner.length,
+                deadLettered: deadLetters.length,
+              };
+            });
+          }
+          '''
+          offline_path.write_text(offline)
+
+          crud_path = Path("apps/plataforma/components/module-crud.tsx")
+          crud = crud_path.read_text()
+
+          if "useMemo, useRef, useState" not in crud:
+              crud = replace_once(
+                  crud,
+                  'import { useCallback, useEffect, useMemo, useState } from "react";',
+                  'import { useCallback, useEffect, useMemo, useRef, useState } from "react";',
+                  "React useRef import",
+              )
+
+          if "const modalRef = useRef<HTMLElement>(null);" not in crud:
+              crud = replace_once(
+                  crud,
+                  "  const [pendingOffline, setPendingOffline] = useState(0);\n",
+                  "  const [pendingOffline, setPendingOffline] = useState(0);\n  const modalRef = useRef<HTMLElement>(null);\n  const previousFocusRef = useRef<HTMLElement | null>(null);\n  const savingRef = useRef(false);\n",
+                  "modal refs",
+              )
+
+          if "previousFocusRef.current?.focus();" not in crud:
+              focus_effect = '''  useEffect(() => {
+            savingRef.current = saving;
+          }, [saving]);
+
+          useEffect(() => {
+            if (!modalOpen) return;
+
+            previousFocusRef.current = document.activeElement instanceof HTMLElement
+              ? document.activeElement
+              : null;
+            const modal = modalRef.current;
+            if (!modal) return;
+
+            const focusableSelector = [
+              'a[href]',
+              'button:not([disabled])',
+              'input:not([disabled])',
+              'select:not([disabled])',
+              'textarea:not([disabled])',
+              '[tabindex]:not([tabindex="-1"])',
+            ].join(',');
+            const focusable = Array.from(
+              modal.querySelectorAll<HTMLElement>(focusableSelector),
+            ).filter((element) => !element.hasAttribute('hidden'));
+            (focusable[0] ?? modal).focus();
+
+            const handleKeyDown = (event: KeyboardEvent) => {
+              if (event.key === 'Escape' && !savingRef.current) {
+                event.preventDefault();
+                setModalOpen(false);
+                return;
+              }
+              if (event.key !== 'Tab') return;
+
+              const activeFocusable = Array.from(
+                modal.querySelectorAll<HTMLElement>(focusableSelector),
+              ).filter((element) => !element.hasAttribute('hidden'));
+              if (activeFocusable.length === 0) {
+                event.preventDefault();
+                modal.focus();
+                return;
+              }
+
+              const first = activeFocusable[0];
+              const last = activeFocusable[activeFocusable.length - 1];
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+              }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+            return () => {
+              document.removeEventListener('keydown', handleKeyDown);
+              previousFocusRef.current?.focus();
+              previousFocusRef.current = null;
+            };
+          }, [modalOpen]);
+
+          '''
+              marker = "  const loadRelations = useCallback(async () => {"
+              index = crud.index(marker)
+              crud = crud[:index] + focus_effect + crud[index:]
+
+          sync_pattern = re.compile(
+              r"  const syncOffline = useCallback\(async \(\) => \{.*?\n  \}, \[client, loadRecords, owner\]\);",
+              re.DOTALL,
+          )
+          sync_replacement = '''  const syncOffline = useCallback(async () => {
+            setError("");
+            setNotice("");
+            try {
+              setPendingOffline((await getOfflineQueue(owner)).length);
+              if (!navigator.onLine) return;
+
+              const result = await flushOfflineQueue(client, owner);
+              setPendingOffline(result.remaining);
+              if (result.deadLettered > 0) {
+                setError(
+                  `${result.deadLettered} operação(ões) excederam o limite de tentativas e foram movidas para a quarentena offline.`,
+                );
+              } else if (result.completed > 0) {
+                setNotice(`${result.completed} operação(ões) sincronizada(s).`);
+              }
+              if (result.completed > 0 || result.deadLettered > 0) await loadRecords();
+            } catch (syncError) {
+              setError(
+                syncError instanceof Error
+                  ? syncError.message
+                  : "Não foi possível sincronizar a fila offline.",
+              );
+            }
+          }, [client, loadRecords, owner]);'''
+          crud, count = sync_pattern.subn(sync_replacement, crud, count=1)
+          if count != 1:
+              raise SystemExit(f"offline sync handler: expected one match, found {count}")
+
+          if "ref={modalRef}" not in crud:
+              crud = replace_once(
+                  crud,
+                  '<div className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" onMouseDown={(event) => event.stopPropagation()}>',
+                  '<div ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="module-modal-title" tabIndex={-1} onMouseDown={(event) => event.stopPropagation()}>',
+                  "modal focus target",
+              )
+
+          crud = crud.replace('aria-label="Fechar formulário"', 'aria-label="Fechar modal"')
+          crud_path.write_text(crud)
+
+          required_offline = [
+              "export const MAX_OFFLINE_ATTEMPTS = 5;",
+              "export function recordOfflineFailure",
+              "deadLettered: deadLetters.length",
+              'navigator.locks.request("udk-offline-queue-write"',
           ]
-          final_text = path.read_text()
-          missing = [marker for marker in required if marker not in final_text]
+          required_crud = [
+              "const modalRef = useRef<HTMLElement>(null);",
+              "previousFocusRef.current?.focus();",
+              'aria-label="Fechar modal"',
+              "catch (syncError)",
+              "result.deadLettered > 0",
+              "quarentena offline",
+          ]
+          missing = [marker for marker in required_offline if marker not in offline_path.read_text()]
+          missing += [marker for marker in required_crud if marker not in crud_path.read_text()]
           if missing:
-            raise SystemExit(f"Missing final UI markers: {missing}")
+              raise SystemExit(f"Missing final review markers: {missing}")
           PY
 
       - name: Verify final application
