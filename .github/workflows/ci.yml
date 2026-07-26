@@ -1,6 +1,8 @@
 name: Apply Task 1 Verified Patch
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [feat/complete-operational-modules]
 
