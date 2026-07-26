@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildIdempotentInsertPayload,
+  createOfflineQueueOwner,
   decryptOfflineQueue,
   encryptOfflineQueue,
   filterOfflineQueueForOwner,
@@ -31,6 +32,15 @@ const operation: OfflineOperation = {
 };
 
 describe("offline queue", () => {
+  it("creates an owner from an explicit Supabase project URL", () => {
+    expect(
+      createOfflineQueueOwner("HTTPS://PROJECT-ONE.SUPABASE.CO/rest/v1/", "user-1"),
+    ).toEqual({
+      userId: "user-1",
+      projectUrl: "https://project-one.supabase.co",
+    });
+  });
+
   it("round-trips valid operations", () => {
     expect(parseOfflineQueue(serializeOfflineQueue([operation]))).toEqual([operation]);
   });
