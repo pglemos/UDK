@@ -29,3 +29,9 @@ Este documento registra os últimos bloqueios corrigidos antes da publicação d
 ## Contratos automatizados
 
 A suíte contém testes para as correções acima e falha caso workflows temporários de reparo permaneçam na branch.
+
+## Estado final da branch
+
+- os executores temporários de reparo foram removidos;
+- lint, TypeScript, testes e build passaram no executor de finalização;
+- os workflows permanentes devem validar somente o código definitivo antes do merge.
