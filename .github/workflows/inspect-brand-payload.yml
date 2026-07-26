@@ -7,7 +7,7 @@ on:
     branches: [fix/official-udk-brand-assets]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   inspect:
@@ -17,40 +17,55 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: fix/official-udk-brand-assets
+          fetch-depth: 0
 
-      - name: Decode and inspect payload
+      - name: Diagnose payload without hiding errors
         run: |
-          set -euo pipefail
-          mkdir -p /tmp/udk-brand-payload
-          echo '=== Encoded payload ==='
-          wc -c .brand-payload/part00.b64
           python3 - <<'PY'
           from pathlib import Path
           import base64
+          import hashlib
+          import io
+          import tarfile
+          import traceback
 
-          encoded = ''.join(Path('.brand-payload/part00.b64').read_text().split())
-          print(f'characters={len(encoded)} modulo4={len(encoded) % 4}')
-          print(f'prefix={encoded[:24]}')
-          print(f'suffix={encoded[-24:]}')
+          source = Path('.brand-payload/part00.b64')
+          report = []
+          report.append(f'file_bytes={source.stat().st_size}')
+          encoded = ''.join(source.read_text().split())
+          report.append(f'characters={len(encoded)}')
+          report.append(f'modulo4={len(encoded) % 4}')
+          report.append(f'prefix={encoded[:32]}')
+          report.append(f'suffix={encoded[-32:]}')
           try:
               decoded = base64.b64decode(encoded, validate=True)
+              report.append(f'decoded_bytes={len(decoded)}')
+              report.append(f'archive_sha256={hashlib.sha256(decoded).hexdigest()}')
+              with tarfile.open(fileobj=io.BytesIO(decoded), mode='r:gz') as archive:
+                  members = archive.getmembers()
+                  report.append(f'members={len(members)}')
+                  for member in members:
+                      report.append(f'{member.size:>10} {member.name}')
+                  archive.extractall('/tmp/udk-brand-payload', filter='data')
+              for path in sorted(Path('/tmp/udk-brand-payload').rglob('*')):
+                  if path.is_file():
+                      report.append(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to("/tmp/udk-brand-payload")}')
           except Exception as error:
-              print(f'base64_error={type(error).__name__}: {error}')
-              raise
-          Path('/tmp/udk-brand-assets.tar.gz').write_bytes(decoded)
-          print(f'decoded_bytes={len(decoded)}')
+              report.append(f'error={type(error).__name__}: {error}')
+              report.append(traceback.format_exc())
+          Path('brand-payload-diagnostic.txt').write_text('\n'.join(report) + '\n')
+          print('\n'.join(report))
           PY
-          echo '=== Archive digest ==='
-          sha256sum /tmp/udk-brand-assets.tar.gz
-          echo '=== Archive contents ==='
-          tar -tzvf /tmp/udk-brand-assets.tar.gz
-          tar -xzf /tmp/udk-brand-assets.tar.gz -C /tmp/udk-brand-payload
-          echo '=== Extracted file hashes ==='
-          find /tmp/udk-brand-payload -type f -print0 | sort -z | xargs -0 sha256sum
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: inspected-exact-udk-brand-payload
-          path: /tmp/udk-brand-payload
-          if-no-files-found: error
-          retention-days: 1
+      - name: Persist diagnosis
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add brand-payload-diagnostic.txt
+          if git diff --cached --quiet; then
+            echo "Diagnosis unchanged."
+          else
+            git commit -m "chore: record official brand payload diagnosis"
+            git pull --rebase origin fix/official-udk-brand-assets
+            git push origin HEAD:fix/official-udk-brand-assets
+          fi
