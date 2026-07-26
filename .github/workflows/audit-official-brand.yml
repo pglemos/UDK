@@ -1,0 +1,64 @@
+name: Audit official UDK brand
+
+on:
+  push:
+    branches: [fix/official-udk-brand-assets]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build repository brand audit
+        run: |
+          set -euo pipefail
+          {
+            echo '# UDK repository brand audit'
+            echo
+            echo '## Repository files'
+            find . -type f \
+              -not -path './.git/*' \
+              -not -path './node_modules/*' \
+              -not -path './.next/*' \
+              | sort
+            echo
+            echo '## Font declarations and imports'
+            rg -n -i 'font-family|fonts.googleapis|Barlow|Inter|Roboto' . \
+              --glob '!pnpm-lock.yaml' \
+              --glob '!node_modules/**' \
+              --glob '!.git/**' || true
+            echo
+            echo '## Logo, icon and image references'
+            rg -n -i 'udk\.svg|logo|favicon|icon|apple-touch|manifest|<img|Image\(' . \
+              --glob '!pnpm-lock.yaml' \
+              --glob '!node_modules/**' \
+              --glob '!.git/**' || true
+            echo
+            echo '## Existing public assets'
+            find apps/plataforma/public -type f -maxdepth 4 -print -exec file {} \; -exec sha256sum {} \; 2>/dev/null | sort || true
+            echo
+            echo '## Brand-like colors and tokens'
+            rg -n -i '#1c191f|#ffffff|#00d9ff|#dafc08|lime|cyan|graphite|theme_color|themeColor' . \
+              --glob '!pnpm-lock.yaml' \
+              --glob '!node_modules/**' \
+              --glob '!.git/**' || true
+            echo
+            echo '## Package scripts and test layout'
+            find . -name package.json -not -path './node_modules/*' -print -exec cat {} \;
+            echo
+            echo '## Git status'
+            git status --short
+          } > brand-audit.txt
+
+          cat brand-audit.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: official-brand-audit
+          path: brand-audit.txt
+          if-no-files-found: error
