@@ -6,6 +6,11 @@ on:
       - feat/twice-grind-redesign
     paths:
       - artifacts/.redesign/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - artifacts/.redesign/**
 
 permissions:
   contents: write
