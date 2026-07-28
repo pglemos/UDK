@@ -1,0 +1,33 @@
+.race-empty {
+  min-height: 420px;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 15px;
+  padding: clamp(28px, 6vw, 84px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.035), transparent),
+    var(--tg-panel);
+}
+
+.race-empty > svg {
+  width: 40px;
+  height: 40px;
+  color: var(--tg-cyan);
+}
+
+.race-empty h2 {
+  max-width: 900px;
+  margin: 0;
+  font: 900 italic clamp(2.8rem, 6vw, 6rem) / 0.8 var(--tg-head);
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.race-empty p {
+  max-width: 680px;
+  margin: 0 0 12px;
+  color: rgba(247, 248, 248, 0.64);
+  line-height: 1.7;
+}

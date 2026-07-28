@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight, Instagram } from "lucide-react";
+import { ArrowUpRight, Instagram, MapPin } from "lucide-react";
+import { PointerHalo, RouteCurtain } from "./editorial-motion";
 import { OfficialLogo } from "./official-logo";
 import { RaceHeader } from "./race-header";
 import { ScrollProgress } from "./motion";
@@ -15,20 +16,27 @@ const footerNavigation = [
 
 export function RaceShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="race-site udk-site">
+    <div className="race-site udk-site tg-site">
       <ScrollProgress />
+      <RouteCurtain />
+      <PointerHalo />
       <RaceHeader />
       {children}
-      <footer className="udk-footer">
+      <footer className="udk-footer tg-footer">
+        <div className="tg-footer-callout">
+          <div className="race-container">
+            <span>Temporada 2026</span>
+            <h2>Seu nome pode ser o próximo no grid.</h2>
+            <Link className="race-button race-button-primary" href="/inscricao">
+              Começar inscrição <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+
         <div className="race-container udk-footer-main">
           <div className="udk-footer-brand">
-            <OfficialLogo variant="negative" width={158} />
-            <p>
-              Campeonato de kart construído sobre evolução, respeito e disputa limpa. Cada etapa conta; cada volta deixa marca.
-            </p>
-            <Link className="race-button race-button-primary" href="/inscricao">
-              Entrar no grid <ArrowUpRight aria-hidden="true" />
-            </Link>
+            <OfficialLogo variant="negative" width={180} />
+            <p>Competição, evolução e respeito. Um campeonato feito por quem vive o kart além do cronômetro.</p>
           </div>
 
           <div className="udk-footer-column">
@@ -48,19 +56,17 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="udk-footer-column udk-footer-contact">
-            <span>Acompanhe</span>
-            <div className="udk-footer-social">
-              <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer" aria-label="Instagram oficial do UDK">
-                <Instagram aria-hidden="true" /> Instagram oficial
-              </a>
-            </div>
-            <p>Kartódromo Internacional de Betim<br />Betim, Minas Gerais</p>
+            <span>Onde a pista chama</span>
+            <p><MapPin aria-hidden="true" /> Kartódromo Internacional de Betim<br />Betim, Minas Gerais</p>
+            <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer">
+              <Instagram aria-hidden="true" /> Instagram oficial
+            </a>
           </div>
         </div>
 
         <div className="race-container udk-footer-bottom">
-          <span>© 2026 Ultras do Kart. Todos os direitos reservados.</span>
-          <span>UDK • Temporada 2026</span>
+          <span>© 2026 Ultras do Kart.</span>
+          <span>UDK • A pista não espera.</span>
         </div>
       </footer>
     </div>

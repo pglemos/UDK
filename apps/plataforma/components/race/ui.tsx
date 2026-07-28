@@ -15,16 +15,18 @@ export function PageHero({
   eyebrow = "Temporada 2026",
   title,
   description,
+  index = "UDK",
 }: {
   eyebrow?: string;
   title: string;
   description: string;
+  index?: string;
   compact?: boolean;
 }) {
   return (
-    <section className="udk-page-hero">
+    <section className="udk-page-hero tg-page-hero">
       <div className="udk-page-hero-media" aria-hidden="true">
-        <img src="/media/udk-race-hero.webp" alt="" />
+        <img src="/media/udk-race-hero.webp" alt="" fetchPriority="high" />
       </div>
       <div className="race-container udk-page-hero-inner">
         <div className="udk-page-hero-copy">
@@ -32,10 +34,8 @@ export function PageHero({
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
-        <div className="udk-page-hero-mark">
-          <TrackGlyph label={`Identidade visual da página ${title}`} />
-          <b>UDK • temporada 2026</b>
-        </div>
+        <div className="tg-page-hero-index" aria-hidden="true">{index}</div>
+        <div className="tg-page-scroll" aria-hidden="true"><i /> Explore</div>
       </div>
     </section>
   );
@@ -53,14 +53,14 @@ export function SectionHeading({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="race-section-heading">
+    <div className="race-section-heading tg-section-heading">
+      <span>{eyebrow}</span>
       <div>
-        <span className="race-kicker">{eyebrow}</span>
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
       {action ? (
-        <Link className="race-text-link" href={action.href}>
+        <Link className="tg-arrow-link" href={action.href}>
           {action.label} <ArrowRight aria-hidden="true" />
         </Link>
       ) : null}
@@ -146,9 +146,9 @@ export function EmptyState({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="race-empty">
+    <div className="race-empty tg-empty-state">
+      <span>{eyebrow}</span>
       <Flag aria-hidden="true" />
-      <span className="race-kicker">{eyebrow}</span>
       <h2>{title}</h2>
       <p>{description}</p>
       {action ? (
@@ -160,11 +160,7 @@ export function EmptyState({
   );
 }
 
-function paginationHref(
-  basePath: string,
-  current: URLSearchParams,
-  page: number,
-): string {
+function paginationHref(basePath: string, current: URLSearchParams, page: number): string {
   const params = new URLSearchParams(current);
   params.set("page", String(page));
   return `${basePath}?${params.toString()}`;
@@ -186,14 +182,7 @@ export function RacePagination({
     if (value && key !== "page") current.set(key, value);
   });
 
-  const pages = new Set<number>([
-    1,
-    meta.totalPages,
-    meta.page - 1,
-    meta.page,
-    meta.page + 1,
-  ]);
-
+  const pages = new Set<number>([1, meta.totalPages, meta.page - 1, meta.page, meta.page + 1]);
   const visible = [...pages]
     .filter((page) => page >= 1 && page <= meta.totalPages)
     .sort((a, b) => a - b);
@@ -211,10 +200,7 @@ export function RacePagination({
         {visible.map((page, index) => (
           <span key={page} className="race-page-slot">
             {index > 0 && page - (visible[index - 1] ?? page) > 1 ? <i aria-hidden="true">…</i> : null}
-            <Link
-              href={paginationHref(basePath, current, page)}
-              aria-current={page === meta.page ? "page" : undefined}
-            >
+            <Link href={paginationHref(basePath, current, page)} aria-current={page === meta.page ? "page" : undefined}>
               {page}
             </Link>
           </span>

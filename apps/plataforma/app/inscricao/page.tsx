@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { RegistrationEntry } from "../../components/registration-entry";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero } from "../../components/race/ui";
-import { RegistrationEntry } from "../../components/registration-entry";
 
 export const metadata: Metadata = {
   title: "Inscrição",
@@ -12,16 +12,22 @@ export const metadata: Metadata = {
 export default function RegistrationPage() {
   return (
     <RaceShell>
-      <main id="conteudo">
+      <main id="conteudo" className="tg-registration-page">
         <PageHero
+          index="07"
           eyebrow="Seu lugar no grid"
           title="Inscrição"
-          description="Uma jornada clara para criar a conta, escolher a categoria, enviar documentos, aceitar os termos e acompanhar a homologação."
+          description="Uma jornada clara da criação da conta à homologação, sem esconder etapas ou transformar cadastro em labirinto."
         />
-        <section className="race-section">
+        <section className="tg-registration-intro">
           <div className="race-container">
-            <RegistrationEntry />
+            <span>01 / Comece por aqui</span>
+            <h2>O primeiro passo precisa ser simples. A preparação pode ser intensa depois.</h2>
+            <p>Escolha sua categoria de interesse e continue dentro da plataforma oficial para completar dados, documentos, termos e pagamento.</p>
           </div>
+        </section>
+        <section className="tg-registration-shell">
+          <div className="race-container"><RegistrationEntry /></div>
         </section>
       </main>
     </RaceShell>

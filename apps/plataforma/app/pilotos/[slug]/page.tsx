@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Flag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Flag, MapPin, Trophy } from "lucide-react";
+import { EditorialEmpty, EditorialHeading } from "../../../components/race/editorial-primitives";
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
-import { DriverVisual, EmptyState } from "../../../components/race/ui";
-import {
-  formatLapTime,
-  getDriverBySlug,
-  getDriverHistory,
-} from "../../../lib/public-data";
+import { formatLapTime, getDriverBySlug, getDriverHistory } from "../../../lib/public-data";
 
 export async function generateMetadata({
   params,
@@ -18,9 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const driver = await getDriverBySlug(slug);
-
   if (!driver) return { title: "Piloto não encontrado" };
-
   return {
     title: driver.name,
     description: `Perfil esportivo de ${driver.name}, #${driver.number}, na temporada UDK 2026.`,
@@ -39,178 +33,88 @@ export default async function DriverProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [driver, history] = await Promise.all([
-    getDriverBySlug(slug),
-    getDriverHistory(slug),
-  ]);
-
+  const [driver, history] = await Promise.all([getDriverBySlug(slug), getDriverHistory(slug)]);
   if (!driver) notFound();
-
-  const pointsScale = Math.min(100, Math.max(8, driver.points));
-  const winsScale = Math.min(100, driver.wins * 18);
-  const podiumScale = Math.min(100, driver.podiums * 13);
-  const polesScale = Math.min(100, driver.poles * 18);
 
   return (
     <RaceShell>
-      <main id="conteudo">
-        <section className="race-profile-hero">
+      <main id="conteudo" className="tg-driver-profile">
+        <section className="tg-driver-profile-hero">
+          <div className="tg-driver-profile-media" aria-hidden="true">
+            <img src={driver.heroImageUrl ?? "/media/udk-race-hero.webp"} alt="" fetchPriority="high" />
+          </div>
+          <div className="race-container tg-driver-profile-hero-inner">
+            <Link className="tg-arrow-link" href="/pilotos"><ArrowLeft aria-hidden="true" /> Voltar ao grid</Link>
+            <div className="tg-driver-profile-copy">
+              <span>{driver.category}</span>
+              <h1>{driver.name}</h1>
+              <p>
+                #{driver.number}
+                {driver.teamName ? ` • ${driver.teamName}` : ""}
+                {driver.city ? ` • ${driver.city}` : ""}
+              </p>
+              <div className="tg-hero-actions">
+                <Link className="race-button race-button-primary" href="/classificacao">Ver classificação <ArrowRight aria-hidden="true" /></Link>
+                <Link className="race-button race-button-ghost" href="/resultados">Resultados</Link>
+              </div>
+            </div>
+            <strong className="tg-driver-profile-number">#{driver.number}</strong>
+          </div>
+        </section>
+
+        <section className="tg-driver-profile-stats">
           <div className="race-container">
-            <Link className="race-text-link" href="/pilotos">
-              <ArrowLeft aria-hidden="true" /> Voltar ao grid
-            </Link>
-            <div className="race-profile-layout">
-              <div className="race-profile-copy">
-                <span className="race-kicker">{driver.category}</span>
-                <h1>{driver.name}</h1>
-                <p>
-                  #{driver.number}
-                  {driver.teamName ? ` • ${driver.teamName}` : ""}
-                  {driver.city ? ` • ${driver.city}` : ""}
-                </p>
-                <div className="race-hero-actions">
-                  <Link className="race-button race-button-primary" href="/classificacao">
-                    Ver classificação <ArrowRight aria-hidden="true" />
-                  </Link>
-                  <Link className="race-button race-button-ghost" href="/resultados">
-                    Últimos resultados
-                  </Link>
-                </div>
-              </div>
+            <article><span>Posição</span><strong>{driver.position ? `P${driver.position}` : "—"}</strong></article>
+            <article><span>Pontos</span><strong>{driver.points}</strong></article>
+            <article><span>Vitórias</span><strong>{driver.wins}</strong></article>
+            <article><span>Pódios</span><strong>{driver.podiums}</strong></article>
+            <article><span>Poles</span><strong>{driver.poles}</strong></article>
+          </div>
+        </section>
+
+        <section className="tg-profile-story">
+          <div className="race-container tg-profile-story-grid">
+            <Reveal className="tg-profile-bio">
+              <span>01 / Perfil</span>
+              <h2>Quem está por trás do número.</h2>
+              <p>{driver.bio ?? `${driver.name} compete com o número ${driver.number} na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}</p>
               <div>
-                <span className="race-profile-number">#{driver.number}</span>
-                <DriverVisual driver={driver} large />
+                <span><Trophy aria-hidden="true" /> {driver.category}</span>
+                <span><MapPin aria-hidden="true" /> {driver.city ?? "Cidade não publicada"}</span>
               </div>
+            </Reveal>
+            <div className="tg-profile-portrait">
+              {driver.avatarUrl ? <img src={driver.avatarUrl} alt={`Retrato de ${driver.name}`} loading="lazy" /> : <div><strong>#{driver.number}</strong><span>Imagem oficial ainda não publicada</span></div>}
             </div>
           </div>
         </section>
 
-        <div className="race-container">
-          <div className="race-profile-stats">
-            <div className="race-profile-stat">
-              <strong>{driver.position ? `P${driver.position}` : "—"}</strong>
-              <span>Posição geral</span>
-            </div>
-            <div className="race-profile-stat">
-              <strong>{driver.points}</strong>
-              <span>Pontos</span>
-            </div>
-            <div className="race-profile-stat">
-              <strong>{driver.wins}</strong>
-              <span>Vitórias</span>
-            </div>
-            <div className="race-profile-stat">
-              <strong>{driver.podiums}</strong>
-              <span>Pódios</span>
-            </div>
-          </div>
-        </div>
-
-        <section className="race-section">
+        <section className="tg-profile-history">
           <div className="race-container">
-            <div className="race-grid">
-              <Reveal>
-                <article className="race-result-overview">
-                  <span className="race-kicker">Perfil esportivo</span>
-                  <h2>Sobre o piloto</h2>
-                  <p>
-                    {driver.bio ??
-                      `${driver.name} compete com o número ${driver.number} na categoria ${driver.category}. O perfil será atualizado com trajetória, equipe e objetivos autorizados pelo piloto.`}
-                  </p>
-                </article>
-              </Reveal>
-
-              <Reveal delay={70}>
-                <article className="race-result-overview">
-                  <span className="race-kicker">Performance</span>
-                  <h2>Indicadores</h2>
-                  <div className="race-performance">
-                    {[
-                      ["Pontos", pointsScale, driver.points],
-                      ["Vitórias", winsScale, driver.wins],
-                      ["Pódios", podiumScale, driver.podiums],
-                      ["Poles", polesScale, driver.poles],
-                    ].map(([label, scale, value]) => (
-                      <div className="race-performance-row" key={String(label)}>
-                        <span>{label}</span>
-                        <div className="race-performance-bar">
-                          <i style={{ width: `${scale}%` }} />
-                        </div>
-                        <b>{value}</b>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              </Reveal>
-
-              <Reveal delay={140}>
-                <article className="race-result-overview">
-                  <span className="race-kicker">Temporada 2026</span>
-                  <h2>Identidade</h2>
-                  <div className="race-summary-list">
-                    <div><span>Número</span><b>#{driver.number}</b></div>
-                    <div><span>Categoria</span><b>{driver.category}</b></div>
-                    <div><span>Equipe</span><b>{driver.teamName ?? "Individual"}</b></div>
-                    <div><span>Cidade</span><b>{driver.city ?? "Não publicada"}</b></div>
-                  </div>
-                </article>
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        <section className="race-section is-panel">
-          <div className="race-container">
-            <div className="race-section-heading">
-              <div>
-                <span className="race-kicker">Histórico</span>
-                <h2>Últimas sessões</h2>
-              </div>
-            </div>
-
+            <EditorialHeading index="02" title="Sessão por sessão, a evolução ganha forma." description="Histórico esportivo publicado pela organização." inverse />
             {history.length ? (
-              <div className="race-timeline">
+              <div className="tg-history-list">
                 {history.map((entry, index) => (
                   <Reveal key={entry.id} delay={index * 45}>
-                    <article className="race-timeline-item">
-                      <strong className="race-timeline-date">P{entry.position}</strong>
-                      <div className="race-timeline-copy">
-                        <h3>{entry.stageTitle || "Sessão oficial"}</h3>
-                        <p>
-                          Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta {formatLapTime(entry.bestLapMs)}
-                        </p>
-                      </div>
-                      <span className="race-points">{entry.points} pts</span>
+                    <article>
+                      <span>P{entry.position}</span>
+                      <div><h3>{entry.stageTitle || "Sessão oficial"}</h3><p>Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta {formatLapTime(entry.bestLapMs)}</p></div>
+                      <strong>{entry.points} pts</strong>
                     </article>
                   </Reveal>
                 ))}
               </div>
             ) : (
-              <EmptyState
-                eyebrow="Histórico esportivo"
-                title="Nenhuma sessão publicada"
-                description="O histórico aparecerá quando resultados individuais forem disponibilizados."
-              />
+              <EditorialEmpty index="02" title="Nenhuma sessão individual publicada." description="O histórico aparecerá quando os resultados oficiais forem disponibilizados." />
             )}
           </div>
         </section>
 
-        <section className="race-section">
+        <section className="tg-inline-cta">
           <div className="race-container">
-            <div className="race-cta">
-              <Flag aria-hidden="true" />
-              <span className="race-kicker">Próxima disputa</span>
-              <h2>A temporada continua.</h2>
-              <p>Veja quando este piloto volta ao grid e acompanhe a evolução da classificação.</p>
-              <div className="race-hero-actions">
-                <Link className="race-button race-button-primary" href="/calendario">
-                  Ver calendário
-                </Link>
-                <Link className="race-button race-button-ghost" href="/pilotos">
-                  Conhecer outros pilotos
-                </Link>
-              </div>
-            </div>
+            <Flag aria-hidden="true" />
+            <div><span>Próxima disputa</span><h2>A temporada continua.</h2></div>
+            <Link href="/calendario" className="race-button race-button-primary">Ver calendário <ArrowRight aria-hidden="true" /></Link>
           </div>
         </section>
       </main>

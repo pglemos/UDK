@@ -1,0 +1,135 @@
+/* UDK Twice + The Grind footer */
+.tg-footer {
+  position: relative;
+  overflow: hidden;
+  color: var(--tg-text);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(0, 217, 255, 0.11), transparent 28rem),
+    linear-gradient(145deg, #050607 0%, #0a0d10 55%, #050607 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tg-footer::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0.18;
+  background:
+    linear-gradient(110deg, transparent 0 54%, rgba(255, 255, 255, 0.03) 54% 54.15%, transparent 54.15%),
+    repeating-linear-gradient(90deg, transparent 0 119px, rgba(255, 255, 255, 0.018) 119px 120px);
+}
+
+.tg-footer-callout {
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tg-footer-callout .race-container {
+  min-height: clamp(320px, 42vw, 610px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  align-items: end;
+  gap: 34px 70px;
+  padding-block: clamp(72px, 9vw, 150px);
+}
+
+.tg-footer-callout span {
+  grid-column: 1 / -1;
+  color: var(--tg-cyan);
+  font: 800 italic 0.76rem/1 var(--tg-head);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.tg-footer-callout h2 {
+  max-width: 1080px;
+  margin: 0;
+  font: 900 italic clamp(4.2rem, 9.5vw, 10rem) / 0.74 var(--tg-head);
+  letter-spacing: -0.065em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.tg-footer-callout .race-button {
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.udk-footer-main {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 1.7fr) repeat(3, minmax(150px, 0.7fr));
+  gap: clamp(38px, 6vw, 100px);
+  padding-block: clamp(58px, 7vw, 110px);
+}
+
+.udk-footer-brand img {
+  width: min(180px, 62%);
+  height: auto;
+}
+
+.udk-footer-brand p {
+  max-width: 430px;
+  margin: 28px 0 0;
+  color: rgba(247, 248, 248, 0.6);
+  line-height: 1.75;
+}
+
+.udk-footer-column > span {
+  display: block;
+  margin-bottom: 24px;
+  color: rgba(247, 248, 248, 0.42);
+  font: 800 italic 0.68rem/1 var(--tg-head);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.udk-footer-column nav {
+  display: grid;
+  gap: 14px;
+}
+
+.udk-footer-column a {
+  width: fit-content;
+  color: rgba(247, 248, 248, 0.82);
+  font: 700 0.84rem/1.35 var(--tg-body);
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.udk-footer-column a:hover {
+  color: var(--tg-cyan);
+  transform: translateX(4px);
+}
+
+.udk-footer-contact p {
+  margin: 0 0 24px;
+  color: rgba(247, 248, 248, 0.62);
+  font-size: 0.8rem;
+  line-height: 1.75;
+}
+
+.udk-footer-contact p svg,
+.udk-footer-contact a svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 7px;
+  vertical-align: -3px;
+}
+
+.udk-footer-bottom {
+  position: relative;
+  z-index: 1;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(247, 248, 248, 0.38);
+  font: 700 0.65rem/1 var(--tg-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
