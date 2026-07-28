@@ -1,26 +1,48 @@
-name: Export redesign source
+name: Apply Twice Grind redesign
 
 on:
   push:
     branches:
       - feat/twice-grind-redesign
+    paths:
+      - artifacts/.redesign/**
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  export:
+  apply:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-      - name: Remove Git metadata
-        run: rm -rf .git
-      - name: Upload source tree
-        uses: actions/upload-artifact@v4
-        with:
-          name: udk-redesign-source
-          path: .
-          include-hidden-files: true
-          retention-days: 1
+          ref: feat/twice-grind-redesign
+          fetch-depth: 0
+
+      - name: Rebuild archive and apply source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/udk-redesign
+          cat artifacts/.redesign/part-00.b64 \
+              artifacts/.redesign/part-01.b64 \
+              artifacts/.redesign/part-02.b64 \
+              artifacts/.redesign/part-03.b64 \
+              artifacts/.redesign/part-04.b64 \
+              artifacts/.redesign/part-05.b64 \
+            | base64 --decode > /tmp/udk-redesign/source.zip
+          echo "e25486a5e5dc39197d81861b5098180e0771a792f9f1deda2140029ea9e505fe  /tmp/udk-redesign/source.zip" | sha256sum --check
+          unzip -oq /tmp/udk-redesign/source.zip -d .
+          rm -rf artifacts/.redesign
+
+      - name: Commit validated redesign
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: rebuild UDK with cinematic community experience"
+          git push origin HEAD:feat/twice-grind-redesign
