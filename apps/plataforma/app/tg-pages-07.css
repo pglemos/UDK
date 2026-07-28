@@ -1,0 +1,163 @@
+.race-auth-visual {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(30px, 5vw, 70px);
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(7, 9, 11, 0.4), rgba(7, 9, 11, 0.9)), url("/media/udk-race-hero.webp") center / cover;
+}
+
+.race-auth-visual::after {
+  position: absolute;
+  right: -5vw;
+  bottom: -4vw;
+  content: "UDK";
+  color: rgba(255, 255, 255, 0.05);
+  font: 900 italic 22vw / 0.65 var(--tg-head);
+  letter-spacing: -0.09em;
+}
+
+.race-auth-visual > * {
+  position: relative;
+  z-index: 2;
+}
+
+.race-auth-copy {
+  max-width: 720px;
+}
+
+.race-auth-copy h1 {
+  margin: 20px 0 26px;
+  font: 900 italic clamp(4.5rem, 8vw, 9rem) / 0.72 var(--tg-head);
+  letter-spacing: -0.07em;
+  text-transform: uppercase;
+}
+
+.race-auth-copy h1 em {
+  display: block;
+  color: var(--tg-cyan);
+  font-style: inherit;
+}
+
+.race-auth-copy p {
+  max-width: 580px;
+  color: rgba(247, 248, 248, 0.72);
+  line-height: 1.8;
+}
+
+.race-auth-panel {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 50px clamp(28px, 5vw, 80px);
+  color: var(--tg-ink);
+  background: var(--tg-paper);
+}
+
+.race-auth-form {
+  width: min(100%, 620px);
+}
+
+.race-auth-form h2 {
+  margin: 18px 0 12px;
+  font: 900 italic clamp(3rem, 6vw, 6rem) / 0.82 var(--tg-head);
+  text-transform: uppercase;
+}
+
+.race-auth-form > p {
+  margin: 0 0 30px;
+  color: #60676d;
+  line-height: 1.7;
+}
+
+.race-form-grid {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.race-form-grid.is-two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.race-field {
+  display: grid;
+  gap: 8px;
+}
+
+.race-field > span {
+  color: #575e64;
+  font: 700 0.72rem var(--tg-body);
+}
+
+.race-field-control {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid rgba(17, 19, 22, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.race-field-control:focus-within {
+  border-color: #0b879e;
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.12);
+}
+
+.race-field-control svg {
+  color: #6c7379;
+}
+
+.race-field-control input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: var(--tg-ink);
+  background: transparent;
+}
+
+.race-password-toggle {
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: #555c62;
+  background: transparent;
+}
+
+.race-auth-submit {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.race-auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  margin-top: 24px;
+}
+
+.race-auth-links button,
+.race-auth-links a {
+  padding: 0;
+  border: 0;
+  color: #3f474d;
+  background: transparent;
+  font: 700 0.75rem var(--tg-body);
+  cursor: pointer;
+}
+
+.race-auth-links button:hover,
+.race-auth-links a:hover {
+  color: #0b879e;
+}
+
+.tg-registration-page {
+  min-height: 100vh;
+  color: var(--tg-text);
+  background:
+    radial-gradient(circle at 88% 14%, rgba(0, 217, 255, 0.09), transparent 30rem),
+    var(--tg-bg);
+}

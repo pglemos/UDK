@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const required = [
@@ -6,6 +6,14 @@ const required = [
   "public/icons/udk-avatar-512.png",
   "public/media/udk-race-hero.webp",
 ];
+
+function readPublicStyles(): string {
+  return readdirSync("app")
+    .filter((file) => /^tg-.*\.css$/.test(file))
+    .sort()
+    .map((file) => readFileSync(`app/${file}`, "utf8"))
+    .join("\n");
+}
 
 describe("official UDK identity", () => {
   it("publishes the approved logo, avatar and race hero", () => {
@@ -24,14 +32,9 @@ describe("official UDK identity", () => {
     files.forEach((path) => expect(readFileSync(path, "utf8")).not.toContain("/udk.svg"));
   });
 
-  it("keeps cyan as interface color instead of recoloring the logo", () => {
+  it("keeps cyan in the interface without recoloring the official logo", () => {
     const logo = readFileSync("components/race/official-logo.tsx", "utf8");
-    const css = [
-      "app/race-premium-core.css",
-      "app/race-premium-pages.css",
-      "app/race-premium-footer.css",
-      "app/race-premium-responsive.css",
-    ].map((path) => readFileSync(path, "utf8")).join("\n");
+    const css = readPublicStyles();
 
     expect(logo).toContain("/brand/udk-logo-negativa.png");
     expect(logo).toContain("/icons/udk-avatar-512.png");
