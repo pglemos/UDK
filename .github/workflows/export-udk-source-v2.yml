@@ -1,11 +1,12 @@
 name: Export UDK source v2
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/udk-cinematic-rebuild-v2
+      - main
     paths:
       - .github/workflows/export-udk-source-v2.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
