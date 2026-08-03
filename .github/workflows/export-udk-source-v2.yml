@@ -1,0 +1,41 @@
+name: Export UDK source v2
+
+on:
+  push:
+    branches:
+      - feat/udk-cinematic-rebuild-v2
+    paths:
+      - .github/workflows/export-udk-source-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Package repository source
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -qr /tmp/udk-source-v2.zip . \
+            -x '.git/*' \
+            -x 'node_modules/*' \
+            -x '.next/*' \
+            -x 'apps/*/.next/*'
+          sha256sum /tmp/udk-source-v2.zip > /tmp/udk-source-v2.sha256
+
+      - name: Upload source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: udk-source-v2-${{ github.sha }}
+          path: |
+            /tmp/udk-source-v2.zip
+            /tmp/udk-source-v2.sha256
+          if-no-files-found: error
+          retention-days: 1
