@@ -17,11 +17,11 @@
     "@supabase/supabase-js": "2.108.2",
     "lucide-react": "0.555.0",
     "next": "16.0.11",
-    "react": "19.2.3",
+    "react": "19.2.8",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
-    "@types/react": "19.2.7",
+    "@types/react": "19.2.18",
     "@types/react-dom": "19.2.3"
   }
 }
