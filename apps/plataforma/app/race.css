@@ -2,36 +2,16 @@
 @import "./cinema-home.css";
 @import "./cinema-pages.css";
 @import "./cinema-responsive.css";
-
-/* Final composition overrides kept here so the public entry stylesheet remains explicit. */
-.race-menu-trigger {
-  display: inline-flex;
-  width: auto;
-  min-width: 94px;
-  height: 48px;
-  padding: 0 15px;
-  gap: 10px;
-  place-items: center;
-  align-items: center;
-  justify-content: center;
-}
-
-.race-menu-trigger span {
-  font-family: var(--cinema-display);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
+@import "./visual-quality.css";
 
 .cinema-menu-caption {
   position: absolute;
   z-index: 3;
-  right: 28px;
-  bottom: 28px;
-  left: 28px;
+  right: clamp(22px, 3vw, 38px);
+  bottom: clamp(22px, 3vw, 38px);
+  left: clamp(22px, 3vw, 38px);
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 42px minmax(0, 1fr);
   gap: 8px 18px;
   align-items: end;
   color: white;
@@ -44,54 +24,26 @@
   font-family: var(--cinema-display);
   font-size: 0.76rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
 }
 
 .cinema-menu-caption strong {
-  font-family: var(--cinema-display);
-  font-size: clamp(2.3rem, 4vw, 5rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.82;
+  font-size: clamp(2.5rem, 4vw, 5.2rem);
+  font-weight: 800;
+  line-height: 0.96;
   text-transform: uppercase;
 }
 
 .cinema-menu-caption small {
-  color: rgba(255, 255, 255, 0.64);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.cinema-stage-project:not(.is-featured) {
-  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
-  min-height: 460px;
-}
-
-.cinema-stage-project.is-featured {
-  grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.65fr);
-  min-height: clamp(580px, 68vw, 860px);
-}
-
-@media (max-width: 1180px) {
-  .race-menu-trigger {
-    min-width: 48px;
-    width: 48px;
-    padding: 0;
-  }
-
-  .race-menu-trigger span {
-    display: none;
-  }
-}
-
-@media (max-width: 900px) {
+@media (max-width: 760px) {
   .cinema-menu-caption {
     display: none;
-  }
-
-  .cinema-stage-project.is-featured,
-  .cinema-stage-project:not(.is-featured) {
-    grid-template-columns: 1fr;
   }
 }
