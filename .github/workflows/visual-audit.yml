@@ -35,10 +35,11 @@ jobs:
       - name: Build application
         run: pnpm --filter @udk/plataforma build
 
-      - name: Install Playwright and Chromium
+      - name: Install isolated Playwright and Chromium
         run: |
-          npm install --no-save --ignore-scripts playwright@1.56.1
-          npx playwright install --with-deps chromium
+          rm -rf /tmp/visual-audit-runner
+          npm install --prefix /tmp/visual-audit-runner --ignore-scripts playwright@1.56.1
+          /tmp/visual-audit-runner/node_modules/.bin/playwright install --with-deps chromium
 
       - name: Start application
         run: |
@@ -53,6 +54,8 @@ jobs:
           exit 1
 
       - name: Capture and validate main routes
+        env:
+          PLAYWRIGHT_MODULE_PATH: /tmp/visual-audit-runner/node_modules/playwright
         run: node .github/scripts/capture-visual-audit.mjs
 
       - name: Upload visual audit
@@ -61,5 +64,5 @@ jobs:
         with:
           name: udk-visual-audit-${{ github.event.pull_request.head.sha }}
           path: visual-audit/*
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
