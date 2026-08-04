@@ -4,7 +4,6 @@ import {
   ArrowDownRight,
   ArrowRight,
   CalendarDays,
-  ChevronRight,
   Flag,
   MapPin,
   Timer,
@@ -36,28 +35,31 @@ export default async function HomePage() {
   const stagePreview = stages.slice(0, 5);
   const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 5);
   const featuredNews = news[0] ?? null;
-  const secondaryNews = news.slice(1, 3);
+  const secondaryNews = news.slice(1, 4);
   const categories = new Set(drivers.map((driver) => driver.category)).size;
+  const totalPodiums = drivers.reduce((sum, driver) => sum + driver.podiums, 0);
+  const registrationOpen = nextStage?.status.includes("registration") ?? false;
 
   return (
     <RaceShell>
-      <main id="conteudo" className="tg-home">
-        <section className="tg-home-hero" data-design="twice-grind-hero">
-          <div className="tg-home-hero-media" aria-hidden="true">
+      <main id="conteudo" className="cinema-home">
+        <section className="cinema-home-hero" data-design="twice-grind-cinematic">
+          <div className="cinema-home-hero-media" aria-hidden="true">
             <img src="/media/udk-race-hero.webp" alt="" fetchPriority="high" />
           </div>
-          <div className="tg-home-hero-shade" aria-hidden="true" />
-          <div className="race-container tg-home-hero-grid">
-            <div className="tg-home-hero-copy">
-              <span className="tg-hero-season">Temporada 2026 • Betim, MG</span>
+
+          <div className="race-container cinema-home-hero-grid">
+            <Reveal className="cinema-home-hero-copy">
+              <span>Temporada 2026 • Betim, Minas Gerais</span>
               <h1>
                 A pista
                 <em>não espera.</em>
               </h1>
               <p>
-                Competição, evolução e respeito em um campeonato feito por quem vive cada volta além do cronômetro.
+                Um campeonato construído por quem entende que velocidade sem evolução é apenas ruído.
+                Disputa intensa, respeito no grid e comunidade além da bandeirada.
               </p>
-              <div className="tg-hero-actions">
+              <div className="cinema-home-actions">
                 <Link href="/inscricao" className="race-button race-button-primary">
                   Entrar no grid <ArrowRight aria-hidden="true" />
                 </Link>
@@ -65,99 +67,119 @@ export default async function HomePage() {
                   Ver temporada <CalendarDays aria-hidden="true" />
                 </Link>
               </div>
-            </div>
+            </Reveal>
 
-            <aside className="tg-next-stage">
-              <div className="tg-next-stage-head">
+            <Reveal className="cinema-next-stage" delay={120}>
+              <div className="cinema-next-stage-head">
                 <span>Próxima etapa</span>
-                <b>{nextStage?.status === "registration" ? "Inscrições abertas" : "Temporada 2026"}</b>
+                <b>{registrationOpen ? "Inscrições abertas" : "Temporada 2026"}</b>
               </div>
               <time>{nextStage?.date ?? "Data a definir"}</time>
               <h2>{nextStage?.title ?? "Calendário oficial"}</h2>
               <p>{nextStage?.track ?? "Traçado oficial"}</p>
-              <div className="tg-next-stage-location">
+              <div className="cinema-next-stage-location">
                 <MapPin aria-hidden="true" />
-                <span>{nextStage?.location ?? "Kartódromo Internacional de Betim"}<b>{nextStage?.city ?? "Betim/MG"}</b></span>
+                <span>
+                  {nextStage?.location ?? "Kartódromo Internacional de Betim"}
+                  <b>{nextStage?.city ?? "Betim/MG"}</b>
+                </span>
               </div>
-              <div className="tg-next-stage-countdown">
+              <div className="cinema-next-stage-countdown">
                 <span>Até a largada</span>
                 {nextStage?.startsAt ? <RaceCountdown target={nextStage.startsAt} /> : <b>Em breve</b>}
               </div>
-              <Link href="/calendario" className="tg-arrow-link">
+              <Link href="/calendario" className="cinema-arrow-link">
                 Detalhes da etapa <ArrowRight aria-hidden="true" />
               </Link>
-            </aside>
+            </Reveal>
           </div>
 
-          <div className="tg-home-hero-foot race-container">
-            <span>Role para sentir o ritmo</span>
+          <div className="race-container cinema-hero-foot">
+            <span>Role para acompanhar a temporada</span>
             <ArrowDownRight aria-hidden="true" />
             <b>UDK / 2026</b>
           </div>
         </section>
 
-        <section className="tg-motion-strip" aria-label="Identidade do campeonato">
+        <section className="cinema-motion-strip" aria-label="Identidade do campeonato">
           <div>
             <span>Ultras do Kart</span><i />
             <span>Performance em pista</span><i />
+            <span>Comunidade além da volta</span><i />
             <span>Temporada 2026</span><i />
             <span>Kartódromo de Betim</span><i />
             <span>Ultras do Kart</span><i />
+            <span>Performance em pista</span><i />
+            <span>Comunidade além da volta</span><i />
+            <span>Temporada 2026</span><i />
+            <span>Kartódromo de Betim</span><i />
           </div>
         </section>
 
-        <section className="tg-manifesto">
-          <div className="race-container tg-manifesto-grid">
-            <Reveal className="tg-manifesto-copy">
-              <span>01 / Manifesto</span>
+        <section className="cinema-manifesto">
+          <div className="race-container cinema-manifesto-grid">
+            <Reveal className="cinema-manifesto-copy">
+              <span>01 / Manifesto Ultras</span>
               <h2>O cronômetro mede a volta. A pista revela o piloto.</h2>
               <p>
-                O UDK nasceu para transformar competição em evolução coletiva. Aqui, desempenho importa, mas respeito, constância e coragem para voltar melhor importam tanto quanto.
+                O UDK transforma competição em evolução coletiva. O resultado importa, mas constância,
+                respeito e coragem para voltar melhor são o que fazem uma temporada permanecer na memória.
               </p>
-              <Link href="/inscricao" className="tg-arrow-link is-dark">
+              <Link href="/inscricao" className="cinema-arrow-link">
                 Conhecer o campeonato <ArrowRight aria-hidden="true" />
               </Link>
             </Reveal>
-            <div className="tg-manifesto-media">
-              <img src="/media/udk-race-hero.webp" alt="Kart em ação durante uma etapa do campeonato" loading="lazy" />
-              <strong>33</strong>
-              <span>Feitos para deixar marca.</span>
-            </div>
+
+            <Reveal className="cinema-manifesto-media" delay={100}>
+              <img src="/media/udk-race-hero.webp" alt="Kart em ação durante o campeonato UDK" loading="lazy" />
+              <strong>{String(drivers.length).padStart(2, "0")}</strong>
+              <span>Pilotos publicados. Uma comunidade em movimento.</span>
+            </Reveal>
           </div>
         </section>
 
-        <section className="tg-season-section">
+        <section className="cinema-season">
           <div className="race-container">
             <EditorialHeading
               index="02"
               title="Uma temporada contada como grandes capítulos."
-              description="Cada etapa tem ritmo, traçado e tensão próprios. O calendário deixa de ser uma lista e passa a mostrar a jornada inteira."
+              description="Cada etapa tem traçado, tensão e contexto próprios. O calendário deixa de ser uma lista e passa a mostrar a jornada inteira."
               action={{ href: "/calendario", label: "Calendário completo" }}
               inverse
             />
 
-            {nextStage ? <StageProject stage={nextStage} index={0} featured /> : null}
+            {nextStage ? (
+              <StageProject stage={nextStage} index={0} featured />
+            ) : (
+              <EditorialEmpty
+                index="02"
+                title="O calendário oficial ainda não foi publicado."
+                description="As etapas aparecerão aqui assim que a organização disponibilizar os dados da temporada."
+              />
+            )}
 
-            <div className="tg-stage-rail" aria-label="Etapas da temporada">
-              {stagePreview.slice(1).map((stage, index) => (
-                <Reveal key={stage.id} delay={index * 55}>
-                  <StageProject stage={stage} index={index + 1} />
-                </Reveal>
-              ))}
-            </div>
+            {stagePreview.length > 1 ? (
+              <div className="cinema-stage-rail" aria-label="Outras etapas da temporada">
+                {stagePreview.slice(1).map((stage, index) => (
+                  <Reveal key={stage.id} delay={index * 55}>
+                    <StageProject stage={stage} index={index + 1} />
+                  </Reveal>
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
 
-        <section className="tg-proof-strip">
+        <section className="cinema-proof" aria-label="Números reais do campeonato">
           <div className="race-container">
             <article><Flag aria-hidden="true" /><strong>{String(stages.length).padStart(2, "0")}</strong><span>etapas oficiais</span></article>
             <article><Users aria-hidden="true" /><strong>{String(drivers.length).padStart(2, "0")}</strong><span>pilotos publicados</span></article>
-            <article><Trophy aria-hidden="true" /><strong>{String(categories).padStart(2, "0")}</strong><span>categorias</span></article>
-            <article><Timer aria-hidden="true" /><strong>2026</strong><span>temporada atual</span></article>
+            <article><Trophy aria-hidden="true" /><strong>{totalPodiums}</strong><span>pódios acumulados</span></article>
+            <article><Timer aria-hidden="true" /><strong>{String(categories).padStart(2, "0")}</strong><span>categorias</span></article>
           </div>
         </section>
 
-        <section className="tg-ranking-section">
+        <section className="cinema-ranking">
           <div className="race-container">
             <EditorialHeading
               index="03"
@@ -166,66 +188,84 @@ export default async function HomePage() {
               action={{ href: "/classificacao", label: "Ver classificação" }}
             />
 
-            <div className="tg-ranking-layout">
-              <div className="tg-ranking-podium" aria-label="Três primeiros colocados">
-                {topDrivers.slice(0, 3).map((driver, index) => (
-                  <Link href={`/pilotos/${driver.slug}`} className={`tg-podium-card place-${index + 1}`} key={driver.slug}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <div className="tg-podium-number">#{driver.number}</div>
-                    <h3>{driver.name}</h3>
-                    <p>{driver.category}</p>
-                    <strong>{driver.points}<small>pts</small></strong>
-                  </Link>
-                ))}
-              </div>
+            {topDrivers.length ? (
+              <div className="cinema-ranking-layout">
+                <div className="cinema-podium" aria-label="Três primeiros colocados">
+                  {topDrivers.slice(0, 3).map((driver, index) => (
+                    <Link href={`/pilotos/${driver.slug}`} className={`cinema-podium-card place-${index + 1}`} key={driver.slug}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <div className="cinema-podium-number">#{driver.number}</div>
+                      <h3>{driver.name}</h3>
+                      <p>{driver.category}</p>
+                      <strong>{driver.points}<small>pts</small></strong>
+                    </Link>
+                  ))}
+                </div>
 
-              <div className="tg-ranking-list">
-                {topDrivers.map((driver, index) => (
-                  <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <b>#{driver.number}</b>
-                    <div><strong>{driver.name}</strong><small>{driver.category}</small></div>
-                    <em>{driver.points} pts</em>
-                    <ChevronRight aria-hidden="true" />
-                  </Link>
-                ))}
+                <div className="cinema-ranking-list">
+                  {topDrivers.map((driver, index) => (
+                    <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <b>#{driver.number}</b>
+                      <div><strong>{driver.name}</strong><small>{driver.category}</small></div>
+                      <em>{driver.points} pts</em>
+                      <ArrowRight aria-hidden="true" />
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <EditorialEmpty
+                index="03"
+                title="A classificação ainda não começou."
+                description="Os pilotos e pontos aparecerão após a publicação oficial da temporada."
+              />
+            )}
           </div>
         </section>
 
-        <section className="tg-drivers-section">
+        <section className="cinema-drivers">
           <div className="race-container">
             <EditorialHeading
               index="04"
               title="Pessoas antes dos números. Pilotos quando a luz apaga."
-              description="Conheça quem constrói o grid, volta após volta."
+              description="Conheça quem constrói o grid e transforma cada encontro em uma história diferente."
               action={{ href: "/pilotos", label: "Todos os pilotos" }}
               inverse
             />
-            <div className="tg-driver-mosaic">
-              {driverPreview.map((driver, index) => <DriverPoster driver={driver} index={index} key={driver.slug} />)}
-            </div>
+
+            {driverPreview.length ? (
+              <div className="cinema-driver-mosaic">
+                {driverPreview.map((driver, index) => <DriverPoster driver={driver} index={index} key={driver.slug} />)}
+              </div>
+            ) : (
+              <EditorialEmpty
+                index="04"
+                title="Os perfis oficiais ainda não foram publicados."
+                description="O grid aparecerá aqui quando os pilotos forem disponibilizados pela organização."
+              />
+            )}
           </div>
         </section>
 
-        <section className="tg-community-section">
-          <div className="tg-community-media" aria-hidden="true">
+        <section className="cinema-community">
+          <div className="cinema-community-media" aria-hidden="true">
             <img src="/media/udk-race-hero.webp" alt="" loading="lazy" />
           </div>
-          <div className="race-container tg-community-copy">
+          <div className="race-container cinema-community-copy">
             <span>05 / Cultura Ultras</span>
             <h2>Competir sozinho é possível. Evoluir junto é outra história.</h2>
             <p>
-              O UDK conecta pilotos que entendem que rivalidade e respeito podem dividir o mesmo grid. A comunidade existe no box, na preparação, no pós-corrida e em cada conselho que reduz décimos.
+              O UDK conecta pilotos que entendem que rivalidade e respeito podem dividir o mesmo grid.
+              A comunidade existe no box, na preparação, no pós-corrida e em cada conselho que reduz décimos.
             </p>
-            <div className="tg-community-values">
+            <div className="cinema-community-values">
               <span>Respeito</span><span>Constância</span><span>Disputa limpa</span><span>Evolução</span>
             </div>
           </div>
         </section>
 
-        <section className="tg-news-section">
+        <section className="cinema-news">
           <div className="race-container">
             <EditorialHeading
               index="06"
@@ -235,8 +275,8 @@ export default async function HomePage() {
             />
 
             {featuredNews ? (
-              <div className="tg-news-layout">
-                <Link href={`/noticias/${featuredNews.slug}`} className="tg-news-feature">
+              <div className="cinema-news-layout">
+                <Link href={`/noticias/${featuredNews.slug}`} className="cinema-news-feature">
                   <img src={featuredNews.coverImageUrl ?? "/media/udk-race-hero.webp"} alt="" loading="lazy" />
                   <div>
                     <span>{featuredNews.category}</span>
@@ -245,7 +285,7 @@ export default async function HomePage() {
                     <time>{new Date(featuredNews.publishedAt).toLocaleDateString("pt-BR")}</time>
                   </div>
                 </Link>
-                <div className="tg-news-secondary">
+                <div className="cinema-news-secondary">
                   {secondaryNews.map((item) => (
                     <Link href={`/noticias/${item.slug}`} key={item.slug}>
                       <span>{item.category}</span>
@@ -267,7 +307,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="tg-sponsors-section">
+        <section className="cinema-sponsors">
           <div className="race-container">
             <span>Marcas que aceleram com o UDK</span>
             {sponsors.length ? (
@@ -278,7 +318,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="tg-home-final-cta">
+        <section className="cinema-final-cta">
           <div className="race-container">
             <span>07 / Próxima largada</span>
             <h2>O grid não precisa continuar sem o seu nome.</h2>
