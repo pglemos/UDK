@@ -42,14 +42,14 @@ export const premiumVisuals = {
   },
 } satisfies Record<string, PremiumVisual>;
 
-export const menuVisuals: PremiumVisual[] = [
+export const menuVisuals = [
   premiumVisuals.hero,
   premiumVisuals.race,
   premiumVisuals.news,
   premiumVisuals.manifesto,
   premiumVisuals.community,
   premiumVisuals.paddock,
-];
+] as const satisfies readonly PremiumVisual[];
 
 const stageVisuals: PremiumVisual[] = [
   premiumVisuals.race,
