@@ -4,6 +4,7 @@
 @import "./cinema-responsive.css";
 @import "./visual-quality.css";
 @import "./visual-media.css";
+@import "./visual-fixes.css";
 
 .cinema-menu-caption {
   position: absolute;
