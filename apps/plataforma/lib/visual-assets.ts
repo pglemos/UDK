@@ -6,9 +6,9 @@ export type PremiumVisual = {
 
 export const premiumVisuals = {
   hero: {
-    src: "https://images.unsplash.com/photo-1774088047169-ad3e4636866e?auto=format&fit=crop&fm=webp&q=82&w=2400",
-    alt: "Piloto de kart acelerando em uma pista durante uma prova",
-    position: "62% center",
+    src: "https://images.unsplash.com/photo-1774088047212-0720fcaceb6b?auto=format&fit=crop&fm=webp&q=82&w=2400",
+    alt: "Piloto e kart preparados para entrar em uma pista de competição",
+    position: "52% center",
   },
   manifesto: {
     src: "https://images.unsplash.com/photo-1772480611852-68ee605fba72?auto=format&fit=crop&fm=webp&q=82&w=2400",
@@ -26,9 +26,9 @@ export const premiumVisuals = {
     position: "56% center",
   },
   paddock: {
-    src: "https://images.unsplash.com/photo-1774088047212-0720fcaceb6b?auto=format&fit=crop&fm=webp&q=82&w=2400",
-    alt: "Kart e piloto preparados para entrar na pista",
-    position: "48% center",
+    src: "https://images.unsplash.com/photo-1774088047169-ad3e4636866e?auto=format&fit=crop&fm=webp&q=82&w=2400",
+    alt: "Piloto de kart acelerando durante uma prova",
+    position: "62% center",
   },
   race: {
     src: "https://images.unsplash.com/photo-1773909722972-1f5e533798b8?auto=format&fit=crop&fm=webp&q=82&w=2400",
