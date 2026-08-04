@@ -41,14 +41,24 @@
   visibility: visible;
 }
 
+.race-auth-copy {
+  padding-top: clamp(92px, 9vw, 126px);
+}
+
 /* The attached UDK wordmark is wider than the legacy stacked logo. */
 .race-brand {
   width: clamp(112px, 10vw, 156px);
 }
 
+.race-brand-official-wordmark,
 .race-brand img {
+  display: block;
   width: 100%;
   height: auto;
+}
+
+.race-menu-brand .race-brand-official-wordmark {
+  width: 116px;
 }
 
 @media (max-width: 1100px) and (min-width: 901px) {
@@ -128,6 +138,10 @@
     top: 18px;
     left: 18px;
     width: 118px;
+  }
+
+  .race-auth-copy {
+    padding-top: 86px;
   }
 
   .tg-news-directory-feature h2 {
