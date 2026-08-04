@@ -1,0 +1,424 @@
+/*
+ * Final browser-audit corrections.
+ * These rules replace unsafe global word breaking and protect the layouts that
+ * failed in the desktop and mobile screenshot review.
+ */
+
+:where(h1, h2, h3, h4, h5, h6, a, button, span, strong, em, time, label, th, td) {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+:where(p, li) {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+:where(.cinema-editorial-heading, .tg-editorial-heading, .cinema-stage-project, .tg-stage-project, .tg-calendar-stage, .tg-standing-podium-card, .cinema-podium-card, .tg-driver-poster, .tg-editorial-empty) > * {
+  min-width: 0;
+}
+
+/* Editorial titles */
+.cinema-editorial-heading h2,
+.tg-editorial-heading h2 {
+  max-width: 16ch;
+  font-size: clamp(3rem, 5.7vw, 6.4rem);
+  line-height: 0.98;
+}
+
+.cinema-manifesto-copy h2,
+.cinema-community-copy h2,
+.cinema-final-cta h2 {
+  max-width: 13ch;
+  font-size: clamp(3.8rem, 6.6vw, 7.4rem);
+  line-height: 0.98;
+}
+
+/* Season cards */
+.cinema-stage-project,
+.tg-stage-project,
+.cinema-stage-project:not(.is-featured),
+.tg-stage-project:not(.is-featured) {
+  overflow: hidden;
+}
+
+.cinema-stage-media,
+.tg-stage-project-media {
+  min-width: 0;
+  min-height: 320px;
+}
+
+.cinema-stage-media img,
+.tg-stage-project-media img,
+.tg-calendar-stage-media img {
+  opacity: 1;
+  visibility: visible;
+}
+
+.cinema-stage-copy h3,
+.tg-stage-project-copy h3 {
+  max-width: 12ch;
+  font-size: clamp(2.7rem, 4.5vw, 5rem);
+  line-height: 0.98;
+}
+
+.cinema-stage-rail .cinema-stage-copy h3,
+.tg-stage-rail .tg-stage-project-copy h3 {
+  max-width: 100%;
+  font-size: clamp(2.2rem, 3vw, 3.6rem);
+}
+
+/* Calendar */
+.tg-calendar-stage-copy h2 {
+  max-width: 12ch;
+  font-size: clamp(2.6rem, 4.3vw, 4.8rem);
+  line-height: 0.98;
+}
+
+.tg-calendar-stage > .tg-arrow-link {
+  display: inline-flex;
+  width: fit-content;
+  min-width: 164px;
+  max-width: calc(100% - 36px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Standings podium */
+.tg-standing-podium-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(180px, 1fr) auto;
+  gap: 20px 16px;
+  align-content: stretch;
+  align-items: end;
+}
+
+.tg-standing-podium-visual {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-height: 180px;
+  margin: 0;
+}
+
+.tg-standing-podium-card > div:not(.tg-standing-podium-visual) {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+}
+
+.tg-standing-podium-card h2 {
+  max-width: 12ch;
+  font-size: clamp(1.45rem, 2.15vw, 2.55rem);
+  line-height: 1;
+}
+
+.tg-standing-podium-card > b {
+  grid-column: 2;
+  grid-row: 2;
+  display: inline-flex;
+  align-items: baseline;
+  align-self: end;
+  justify-self: end;
+  font-size: clamp(1.75rem, 2.3vw, 2.7rem);
+  line-height: 1;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.tg-standing-podium-card > b small {
+  display: inline;
+  margin-left: 5px;
+  white-space: nowrap;
+}
+
+/* Home podium */
+.cinema-podium-card,
+.tg-podium-card {
+  min-width: 0;
+}
+
+.cinema-podium-card h3,
+.tg-podium-card h3 {
+  max-width: 100%;
+  font-size: clamp(1.25rem, 1.8vw, 2.15rem);
+  line-height: 1.02;
+}
+
+.cinema-podium-card strong,
+.tg-podium-card strong {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+/* Drivers */
+.cinema-driver-poster,
+.tg-driver-poster {
+  isolation: isolate;
+  color: var(--cinema-white);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.cinema-driver-poster-media::after,
+.tg-driver-poster-media::after {
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(5, 6, 7, 0.98) 0%, rgba(5, 6, 7, 0.68) 42%, rgba(5, 6, 7, 0.08) 72%);
+}
+
+.cinema-driver-fallback,
+.tg-driver-fallback {
+  color: var(--cinema-white);
+}
+
+.cinema-driver-fallback img,
+.tg-driver-fallback img {
+  opacity: 0.92;
+}
+
+.cinema-driver-poster-copy,
+.tg-driver-poster-copy {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: clamp(22px, 2.6vw, 36px);
+  color: var(--cinema-white);
+}
+
+.cinema-driver-poster-copy h3,
+.tg-driver-poster-copy h3 {
+  max-width: 12ch;
+  font-size: clamp(2rem, 3.3vw, 3.9rem);
+  line-height: 1;
+  color: var(--cinema-white);
+}
+
+.cinema-driver-poster-copy > div,
+.tg-driver-poster-copy > div {
+  padding-right: 34px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cinema-driver-poster-number,
+.tg-driver-poster-number {
+  color: var(--cinema-white);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.65);
+}
+
+/* Empty states */
+.cinema-empty,
+.tg-editorial-empty {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 58px);
+  width: 100%;
+  min-height: 360px;
+}
+
+.cinema-empty > div,
+.tg-editorial-empty > div {
+  max-width: 920px;
+}
+
+.cinema-empty h2,
+.tg-editorial-empty h2 {
+  max-width: 14ch;
+  font-size: clamp(2.8rem, 5.2vw, 5.8rem);
+  line-height: 1;
+}
+
+/* Regulation index */
+.tg-regulation-layout > nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.tg-regulation-layout > nav a b {
+  flex: 0 0 auto;
+}
+
+/* Tables */
+.udk-data-table td,
+.udk-data-table th,
+.udk-driver-cell,
+.udk-points {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+@media (max-width: 1120px) {
+  .cinema-stage-rail,
+  .tg-stage-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .cinema-stage-rail > *,
+  .tg-stage-rail > * {
+    border-right: 0 !important;
+  }
+
+  .cinema-stage-rail .cinema-stage-project,
+  .tg-stage-rail .tg-stage-project {
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .tg-standing-podium-card {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cinema-editorial-heading h2,
+  .tg-editorial-heading h2 {
+    max-width: 100%;
+    font-size: clamp(2.65rem, 11vw, 4.4rem);
+  }
+
+  .cinema-manifesto-copy h2,
+  .cinema-community-copy h2,
+  .cinema-final-cta h2 {
+    max-width: 100%;
+    font-size: clamp(3rem, 13vw, 5rem);
+  }
+
+  .cinema-stage-rail .cinema-stage-project,
+  .tg-stage-rail .tg-stage-project,
+  .cinema-stage-project,
+  .tg-stage-project {
+    grid-template-columns: 1fr;
+  }
+
+  .cinema-stage-copy h3,
+  .tg-stage-project-copy h3,
+  .cinema-stage-rail .cinema-stage-copy h3,
+  .tg-stage-rail .tg-stage-project-copy h3 {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 11vw, 3.8rem);
+  }
+
+  .tg-calendar-stage-copy h2 {
+    max-width: 100%;
+    font-size: clamp(2.25rem, 10.5vw, 3.6rem);
+  }
+
+  .tg-calendar-stage > .tg-arrow-link {
+    grid-column: 2;
+    width: fit-content;
+    min-width: 158px;
+    margin: 4px 18px 24px;
+    padding-bottom: 7px;
+  }
+
+  .tg-standing-podium {
+    gap: 14px;
+  }
+
+  .tg-standing-podium-card,
+  .tg-standing-podium-card.place-1,
+  .tg-standing-podium-card.place-2,
+  .tg-standing-podium-card.place-3 {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(150px, 1fr) auto;
+    min-height: 330px;
+    padding: 22px;
+  }
+
+  .tg-standing-podium-card h2 {
+    max-width: 11ch;
+    font-size: clamp(1.65rem, 7vw, 2.35rem);
+  }
+
+  .tg-standing-podium-card > b {
+    font-size: clamp(1.6rem, 7vw, 2.25rem);
+  }
+
+  .cinema-podium-card h3,
+  .tg-podium-card h3 {
+    font-size: clamp(1.7rem, 7.5vw, 2.5rem);
+  }
+
+  .cinema-driver-poster-copy h3,
+  .tg-driver-poster-copy h3 {
+    max-width: 11ch;
+    font-size: clamp(2.25rem, 10.5vw, 3.6rem);
+  }
+
+  .cinema-empty,
+  .tg-editorial-empty {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    min-height: 300px;
+  }
+
+  .cinema-empty h2,
+  .tg-editorial-empty h2 {
+    max-width: 100%;
+    font-size: clamp(2.55rem, 11vw, 4rem);
+  }
+
+  .tg-regulation-layout > nav {
+    display: flex;
+    gap: 8px;
+    padding: 0 0 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .tg-regulation-layout > nav a {
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: 82vw;
+    padding: 12px 14px;
+    border: 1px solid var(--cinema-line-dark);
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  .tg-regulation-layout > nav a.is-active {
+    background: var(--cinema-ink);
+    color: var(--cinema-white);
+  }
+}
+
+@media (max-width: 460px) {
+  .tg-standing-podium-card,
+  .tg-standing-podium-card.place-1,
+  .tg-standing-podium-card.place-2,
+  .tg-standing-podium-card.place-3 {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 150px auto auto;
+  }
+
+  .tg-standing-podium-card > div:not(.tg-standing-podium-visual) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .tg-standing-podium-card > b {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  .tg-calendar-stage > .tg-arrow-link {
+    min-width: 150px;
+    max-width: calc(100% - 36px);
+  }
+
+  .cinema-driver-poster-copy > div,
+  .tg-driver-poster-copy > div {
+    display: grid;
+    gap: 4px;
+  }
+}
