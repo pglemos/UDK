@@ -3,13 +3,55 @@
 .race-brand {
   position: relative;
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  min-width: 146px;
   min-height: 42px;
 }
 
-.race-brand img {
-  display: block;
+.race-brand-lockup,
+.race-menu-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.race-brand-lockup > img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: contain;
   opacity: 1;
-  filter: brightness(0) invert(1);
+  filter: none;
+}
+
+.race-brand-lockup.is-compact > img {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+}
+
+.race-brand-wordmark {
+  display: grid;
+  gap: 1px;
+  color: white;
+  font-family: var(--cinema-display);
+  line-height: 0.82;
+  text-transform: uppercase;
+}
+
+.race-brand-wordmark strong {
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.race-brand-wordmark small {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 
 .race-reveal {
@@ -73,6 +115,28 @@
 }
 
 @media (max-width: 760px) {
+  .race-brand {
+    min-width: 124px;
+  }
+
+  .race-brand-lockup {
+    gap: 8px;
+  }
+
+  .race-brand-lockup > img {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .race-brand-wordmark strong {
+    font-size: 0.94rem;
+  }
+
+  .race-brand-wordmark small {
+    font-size: 0.54rem;
+  }
+
   .tg-page-hero h1,
   .udk-page-hero h1,
   .race-page-hero h1 {
@@ -97,8 +161,8 @@
   }
 
   .cinema-home-hero-media img {
-    opacity: 0.72;
-    object-position: 62% center !important;
+    opacity: 0.78;
+    object-position: 58% center !important;
   }
 
   .tg-inline-cta h2 {
@@ -108,6 +172,24 @@
 }
 
 @media (max-width: 460px) {
+  .race-brand {
+    min-width: 112px;
+  }
+
+  .race-brand-lockup > img {
+    width: 31px;
+    height: 31px;
+    flex-basis: 31px;
+  }
+
+  .race-brand-wordmark strong {
+    font-size: 0.86rem;
+  }
+
+  .race-brand-wordmark small {
+    font-size: 0.48rem;
+  }
+
   .tg-page-hero h1,
   .udk-page-hero h1,
   .race-page-hero h1 {
