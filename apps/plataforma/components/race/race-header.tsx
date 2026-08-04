@@ -1,18 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { menuVisuals } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 
 const navigation = [
-  { href: "/calendario", label: "Calendário", index: "01", position: "64% center" },
-  { href: "/classificacao", label: "Classificação", index: "02", position: "48% center" },
-  { href: "/resultados", label: "Resultados", index: "03", position: "72% center" },
-  { href: "/pilotos", label: "Pilotos", index: "04", position: "38% center" },
-  { href: "/noticias", label: "Notícias", index: "05", position: "58% center" },
-  { href: "/regulamento", label: "Regulamento", index: "06", position: "78% center" },
+  { href: "/calendario", label: "Calendário", index: "01" },
+  { href: "/classificacao", label: "Classificação", index: "02" },
+  { href: "/resultados", label: "Resultados", index: "03" },
+  { href: "/pilotos", label: "Pilotos", index: "04" },
+  { href: "/noticias", label: "Notícias", index: "05" },
+  { href: "/regulamento", label: "Regulamento", index: "06" },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
@@ -29,6 +31,7 @@ export function RaceHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const home = pathname === "/";
   const previewItem = navigation[preview] ?? navigation[0];
+  const previewVisual = menuVisuals[preview] ?? menuVisuals[0];
 
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 48);
@@ -130,11 +133,14 @@ export function RaceHeader() {
         aria-hidden={!open}
       >
         <div className="cinema-menu-media" aria-hidden="true">
-          <img
-            key={previewItem.href}
-            src="/media/udk-race-hero.webp"
+          <Image
+            key={previewVisual.src}
+            src={previewVisual.src}
             alt=""
-            style={{ objectPosition: previewItem.position }}
+            fill
+            quality={88}
+            sizes="(max-width: 900px) 100vw, 42vw"
+            style={{ objectPosition: previewVisual.position }}
           />
           <div className="cinema-menu-caption">
             <span>{previewItem.index}</span>
