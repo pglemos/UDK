@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const required = [
@@ -8,10 +8,13 @@ const required = [
 ];
 
 function readPublicStyles(): string {
-  return readdirSync("app")
-    .filter((file) => /^tg-.*\.css$/.test(file))
-    .sort()
-    .map((file) => readFileSync(`app/${file}`, "utf8"))
+  return [
+    "app/cinema-core.css",
+    "app/cinema-home.css",
+    "app/cinema-pages.css",
+    "app/cinema-responsive.css",
+  ]
+    .map((file) => readFileSync(file, "utf8"))
     .join("\n");
 }
 
@@ -26,6 +29,8 @@ describe("official UDK identity", () => {
       "app/manifest.ts",
       "components/auth-screen.tsx",
       "components/race/official-logo.tsx",
+      "components/race/race-header.tsx",
+      "components/race/race-shell.tsx",
       "public/offline.html",
       "public/sw.js",
     ];
@@ -34,10 +39,14 @@ describe("official UDK identity", () => {
 
   it("keeps cyan in the interface without recoloring the official logo", () => {
     const logo = readFileSync("components/race/official-logo.tsx", "utf8");
+    const header = readFileSync("components/race/race-header.tsx", "utf8");
+    const shell = readFileSync("components/race/race-shell.tsx", "utf8");
     const css = readPublicStyles();
 
     expect(logo).toContain("/brand/udk-logo-negativa.png");
     expect(logo).toContain("/icons/udk-avatar-512.png");
+    expect(header).toContain("OfficialLogo");
+    expect(shell).toContain("OfficialLogo");
     expect(css).toContain("#00d9ff");
     expect(logo).not.toMatch(/filter:|fill=.*00d9ff|stroke=.*00d9ff/i);
   });
