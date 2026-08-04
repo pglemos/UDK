@@ -40,11 +40,6 @@ export const premiumVisuals = {
     alt: "Kart preparado para uma sessão em circuito",
     position: "50% center",
   },
-  track: {
-    src: "https://images.unsplash.com/photo-1560990816-bb30289c6611?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Circuito de automobilismo visto durante uma sessão de pista",
-    position: "50% center",
-  },
 } satisfies Record<string, PremiumVisual>;
 
 export const menuVisuals = [
@@ -60,7 +55,7 @@ const stageVisuals: PremiumVisual[] = [
   premiumVisuals.race,
   premiumVisuals.paddock,
   premiumVisuals.detail,
-  premiumVisuals.track,
+  premiumVisuals.manifesto,
   premiumVisuals.news,
 ];
 
@@ -68,6 +63,7 @@ const legacyPlaceholders = [
   "/media/udk-race-hero.webp",
   "udk-race-hero.webp",
   "photo-1752348512364-fac974d4d5b0",
+  "photo-1560990816-bb30289c6611",
 ];
 
 export function resolveVisualSource(
