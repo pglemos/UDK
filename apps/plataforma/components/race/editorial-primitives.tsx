@@ -100,19 +100,16 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
             sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
           />
         ) : (
-          <div className="cinema-driver-fallback tg-driver-fallback" aria-hidden="true">
-            <Image
-              className="driver-fallback-photo"
-              src={fallback.src}
-              alt=""
-              fill
-              loading="eager"
-              quality={84}
-              sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
-              style={{ objectPosition: fallback.position }}
-            />
-            <span className="driver-fallback-shade" />
-          </div>
+          <Image
+            className="driver-fallback-photo"
+            src={fallback.src}
+            alt=""
+            fill
+            loading="eager"
+            quality={84}
+            sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
+            style={{ objectPosition: fallback.position }}
+          />
         )}
       </div>
       <div className="cinema-driver-poster-copy tg-driver-poster-copy">
