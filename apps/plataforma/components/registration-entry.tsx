@@ -8,13 +8,11 @@ import { supabase } from "../lib/supabase";
 
 const steps = [
   ["01", "Conta"],
-  ["02", "Dados"],
-  ["03", "Perfil"],
-  ["04", "Categoria"],
-  ["05", "Documentos"],
-  ["06", "Termos"],
-  ["07", "Pagamento"],
-  ["08", "Confirmação"],
+  ["02", "Perfil"],
+  ["03", "Categoria"],
+  ["04", "Documentos"],
+  ["05", "Termos"],
+  ["06", "Confirmação"],
 ] as const;
 
 export function RegistrationEntry() {
@@ -42,9 +40,9 @@ export function RegistrationEntry() {
   }, []);
 
   return (
-    <div className="race-registration">
+    <div className="race-registration cinema-registration">
       <section className="race-registration-main">
-        <div className="race-stepper" aria-label="Etapas da inscrição">
+        <div className="race-stepper" aria-label="Seis etapas da inscrição">
           {steps.map(([number, label], index) => (
             <span className={`race-step${index === 0 ? " is-active" : ""}`} key={number}>
               <b>{number}</b>
@@ -54,12 +52,12 @@ export function RegistrationEntry() {
         </div>
 
         <div className="race-registration-copy">
-          <span className="race-kicker">Primeiro passo</span>
+          <span className="race-kicker">Etapa 01 de 06</span>
           <h2>Prepare sua entrada no grid</h2>
           <p>
-            Escolha a categoria de interesse para visualizar o caminho da inscrição. A confirmação
-            final acontece dentro da plataforma, com documentos, termos e pagamento vinculados ao
-            seu protocolo.
+            Escolha a categoria de interesse e avance para a plataforma oficial. Perfil, documentos,
+            termos e confirmação ficam vinculados ao mesmo protocolo para evitar aquele ritual humano
+            de preencher a mesma informação em oito telas diferentes.
           </p>
         </div>
 
@@ -85,8 +83,8 @@ export function RegistrationEntry() {
         </div>
 
         <div className="race-alert race-alert-warning">
-          A categoria escolhida nesta tela é apenas uma intenção inicial. A homologação segue os
-          critérios esportivos e o regulamento vigente.
+          A categoria escolhida nesta tela é uma intenção inicial. A homologação continua obedecendo
+          aos critérios esportivos e ao regulamento vigente.
         </div>
 
         <div className="race-registration-actions">
@@ -113,13 +111,13 @@ export function RegistrationEntry() {
       </section>
 
       <aside className="race-registration-summary">
-        <span className="race-kicker">Resumo</span>
+        <span className="race-kicker">Resumo em tempo real</span>
         <h2>Temporada 2026</h2>
         <div className="race-summary-list">
           <div><span>Campeonato</span><b>Ultras do Kart</b></div>
           <div><span>Categoria de interesse</span><b>{category === "insanos" ? "Ultras Insanos" : "Ultras Rápidos"}</b></div>
           <div><span>Local</span><b>Kartódromo de Betim</b></div>
-          <div><span>Status</span><b>Início da inscrição</b></div>
+          <div><span>Progresso</span><b>Etapa 01 de 06</b></div>
         </div>
         <div className="race-auth-features">
           <span><CheckCircle2 aria-hidden="true" /> Progresso salvo</span>
