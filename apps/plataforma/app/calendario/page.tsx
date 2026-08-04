@@ -7,7 +7,7 @@ import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, SearchField, StatusBadge } from "../../components/race/ui";
 import { getStages } from "../../lib/public-data";
-import { stageVisual } from "../../lib/visual-assets";
+import { resolveVisualSource, stageVisual } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Calendário",
@@ -67,6 +67,7 @@ export default async function CalendarPage({
               <div className="tg-calendar-timeline" aria-label="Etapas da temporada">
                 {filtered.map((stage, index) => {
                   const visual = stageVisual(index);
+                  const imageSource = resolveVisualSource(stage.heroImageUrl, visual);
                   return (
                     <Reveal key={stage.id} delay={index * 45}>
                       <article className={`tg-calendar-stage${index === 0 ? " is-current" : ""}`}>
@@ -89,9 +90,10 @@ export default async function CalendarPage({
                         </div>
                         <div className="tg-calendar-stage-media">
                           <Image
-                            src={stage.heroImageUrl ?? visual.src}
+                            src={imageSource}
                             alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
                             fill
+                            loading="eager"
                             quality={86}
                             sizes="(max-width: 760px) 100vw, 28vw"
                             style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}

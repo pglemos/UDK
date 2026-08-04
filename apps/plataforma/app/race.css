@@ -5,6 +5,34 @@
 @import "./visual-quality.css";
 @import "./visual-media.css";
 @import "./visual-fixes.css";
+@import "./audit-fixes.css";
+@import "./final-audit-overrides.css";
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+button,
+span,
+strong,
+em,
+time,
+label,
+th,
+td {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+p,
+li {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
 
 .cinema-home-hero-media,
 .cinema-community-media {

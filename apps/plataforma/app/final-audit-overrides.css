@@ -1,0 +1,26 @@
+/* Final fixes identified during the complete 18-screen review. */
+
+.race-registration-summary h2 {
+  max-width: 100%;
+  font-size: clamp(2.45rem, 3.3vw, 3.35rem);
+  line-height: 0.94;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+@media (max-width: 760px) {
+  .race-registration-summary h2 {
+    font-size: clamp(2.35rem, 11vw, 3rem);
+  }
+
+  .race-auth-copy h1 {
+    max-width: 100%;
+    font-size: clamp(3.25rem, 14vw, 4.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+  }
+
+  .race-auth-copy h1 em {
+    max-width: 100%;
+  }
+}
