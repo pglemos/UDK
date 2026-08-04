@@ -3,7 +3,9 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const appRoot = path.resolve(import.meta.dirname, "..");
+const repositoryRoot = path.resolve(appRoot, "../..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
+const readRepositoryFile = (file: string) => fs.readFileSync(path.join(repositoryRoot, file), "utf8");
 
 describe("third visual audit safeguards", () => {
   it("assigns contextual hero artwork instead of repeating one image on every route", () => {
@@ -50,5 +52,21 @@ describe("third visual audit safeguards", () => {
     expect(css).toContain("min-height: 100% !important");
     expect(css).toContain(".tg-standing-podium-fallback img");
     expect(css).toContain(".race-driver-visual.is-fallback img");
+  });
+
+  it("renders a deterministic countdown shell before the client clock starts", () => {
+    const motion = read("components/race/motion.tsx");
+
+    expect(motion).toContain("useState<CountdownValue | null>(null)");
+    expect(motion).toContain("if (!target || value === null)");
+    expect(motion).not.toContain("useState<CountdownValue>(() =>");
+  });
+
+  it("fails browser audits on runtime and optimized image request errors", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+
+    expect(audit).toContain("pageErrors.length || requestFailures.length");
+    expect(audit).toContain("runtimeFailures");
+    expect(audit).toContain("failures: [...mediaFailures, ...runtimeFailures]");
   });
 });
