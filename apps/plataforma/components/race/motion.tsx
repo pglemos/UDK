@@ -136,19 +136,25 @@ function calculateCountdown(target: string): CountdownValue {
 }
 
 export function RaceCountdown({ target }: { target?: string | undefined }) {
-  const [value, setValue] = useState<CountdownValue>(() =>
-    target ? calculateCountdown(target) : { days: 0, hours: 0, minutes: 0, seconds: 0, complete: true },
-  );
+  const [value, setValue] = useState<CountdownValue | null>(null);
 
   useEffect(() => {
-    if (!target) return;
+    if (!target) {
+      setValue(null);
+      return;
+    }
+
     const update = () => setValue(calculateCountdown(target));
     update();
     const timer = window.setInterval(update, 1_000);
     return () => window.clearInterval(timer);
   }, [target]);
 
-  if (!target || value.complete) {
+  if (!target || value === null) {
+    return <span className="race-countdown-complete">Calculando largada</span>;
+  }
+
+  if (value.complete) {
     return <span className="race-countdown-complete">Largada em breve</span>;
   }
 
