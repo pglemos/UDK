@@ -3,6 +3,23 @@
  * Restores meaningful racing imagery wherever a driver portrait is missing.
  */
 
+.cinema-driver-poster-media.is-fallback,
+.tg-driver-poster-media.is-fallback {
+  background-color: var(--cinema-surface);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cinema-driver-poster.is-fallback .cinema-driver-poster-media::after,
+.tg-driver-poster.is-fallback .tg-driver-poster-media::after {
+  background: linear-gradient(
+    0deg,
+    rgba(5, 6, 7, 0.94) 0%,
+    rgba(5, 6, 7, 0.48) 42%,
+    rgba(5, 6, 7, 0.04) 74%
+  );
+}
+
 .cinema-driver-fallback,
 .tg-driver-fallback,
 .tg-standing-podium-fallback,
@@ -20,15 +37,6 @@
 .race-driver-visual.is-fallback {
   display: grid;
   place-items: center;
-}
-
-/* Poster media is absolutely sized, so its fallback must use inset instead of percentage height. */
-.cinema-driver-poster-media > .cinema-driver-fallback,
-.tg-driver-poster-media > .tg-driver-fallback {
-  position: absolute !important;
-  inset: 0 !important;
-  width: auto !important;
-  height: auto !important;
 }
 
 /* Explicit selectors remain as regression anchors for every fallback surface. */
@@ -60,11 +68,6 @@
     linear-gradient(180deg, rgba(5, 6, 7, 0.03) 24%, rgba(5, 6, 7, 0.68) 100%),
     linear-gradient(90deg, rgba(5, 6, 7, 0.38), transparent 70%);
   pointer-events: none;
-}
-
-.cinema-driver-fallback .driver-fallback-shade,
-.tg-driver-fallback .driver-fallback-shade {
-  background: linear-gradient(180deg, rgba(5, 6, 7, 0.01) 30%, rgba(5, 6, 7, 0.36) 100%);
 }
 
 .cinema-driver-fallback img:not(.driver-fallback-photo),
