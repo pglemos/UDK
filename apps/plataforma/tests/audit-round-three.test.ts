@@ -22,8 +22,8 @@ describe("third visual audit safeguards", () => {
 
     expect(assets).toContain("export function driverVisual");
     expect(editorial).toContain("driverVisual(index)");
-    expect(editorial).toMatch(/cinema-driver-fallback[\s\S]*<Image/);
-    expect(editorial).toMatch(/className="driver-fallback-photo"[\s\S]*loading="eager"/);
+    expect(editorial).toMatch(/driver\.avatarUrl[\s\S]*className="driver-fallback-photo"/);
+    expect(editorial).toMatch(/className="driver-fallback-photo"[\s\S]{0,260}loading="eager"/);
     expect(ui).toContain("driverVisual(driver.number || 0)");
   });
 
