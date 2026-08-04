@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "apps/plataforma/**"
+      - ".github/scripts/capture-visual-audit.mjs"
       - ".github/workflows/visual-audit.yml"
 
 permissions:
@@ -34,8 +35,10 @@ jobs:
       - name: Build application
         run: pnpm --filter @udk/plataforma build
 
-      - name: Install Chromium
-        run: npx --yes playwright@1.56.1 install --with-deps chromium
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
 
       - name: Start application
         run: |
@@ -49,32 +52,14 @@ jobs:
           cat /tmp/udk-next.log
           exit 1
 
-      - name: Capture main routes
-        run: |
-          mkdir -p visual-audit
-          routes=("" "calendario" "classificacao" "resultados" "pilotos" "noticias" "regulamento" "inscricao" "login")
-          for route in "${routes[@]}"; do
-            slug="${route:-home}"
-            npx --yes playwright@1.56.1 screenshot \
-              --browser=chromium \
-              --viewport-size="1440,1100" \
-              --wait-for-timeout=3500 \
-              --full-page \
-              "http://127.0.0.1:3000/${route}" \
-              "visual-audit/${slug}-desktop.png"
-            npx --yes playwright@1.56.1 screenshot \
-              --browser=chromium \
-              --viewport-size="390,844" \
-              --wait-for-timeout=3500 \
-              --full-page \
-              "http://127.0.0.1:3000/${route}" \
-              "visual-audit/${slug}-mobile.png"
-          done
+      - name: Capture and validate main routes
+        run: node .github/scripts/capture-visual-audit.mjs
 
       - name: Upload visual audit
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: udk-visual-audit-${{ github.event.pull_request.head.sha }}
-          path: visual-audit/*.png
+          path: visual-audit/*
           if-no-files-found: error
           retention-days: 7
