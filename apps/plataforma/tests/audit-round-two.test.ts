@@ -44,10 +44,19 @@ describe("second full visual audit safeguards", () => {
     expect(logo).not.toContain("/brand/udk-logo-negativa.png");
   });
 
-  it("pins the official logo inside the authentication artwork", () => {
+  it("renders only the official UDK wordmark in the header lockup", () => {
+    const header = read("components/race/race-header.tsx");
+    expect(header).toContain('<OfficialLogo variant="negative"');
+    expect(header).not.toContain("race-brand-wordmark");
+    expect(header).not.toContain("<strong>ULTRAS</strong>");
+  });
+
+  it("pins the official logo and reserves clearance inside the authentication artwork", () => {
     const css = read("app/audit-round-two.css");
     expect(css).toContain(".race-auth-visual > a:first-child");
     expect(css).toContain("position: absolute");
     expect(css).toContain("z-index: 5");
+    expect(css).toContain(".race-auth-copy");
+    expect(css).toContain("padding-top: clamp(92px, 9vw, 126px)");
   });
 });
