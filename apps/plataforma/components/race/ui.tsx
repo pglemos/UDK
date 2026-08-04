@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -9,6 +10,7 @@ import {
   Trophy,
 } from "lucide-react";
 import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data";
+import { premiumVisuals } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 
 export function PageHero({
@@ -26,7 +28,15 @@ export function PageHero({
   return (
     <section className="udk-page-hero tg-page-hero">
       <div className="udk-page-hero-media" aria-hidden="true">
-        <img src="/media/udk-race-hero.webp" alt="" fetchPriority="high" />
+        <Image
+          src={premiumVisuals.race.src}
+          alt=""
+          fill
+          priority
+          quality={90}
+          sizes="100vw"
+          style={{ objectPosition: premiumVisuals.race.position }}
+        />
       </div>
       <div className="race-container udk-page-hero-inner">
         <div className="udk-page-hero-copy">
@@ -101,7 +111,13 @@ export function DriverVisual({
   return (
     <div className={`race-driver-visual${large ? " is-large" : ""}`}>
       {driver.avatarUrl ? (
-        <img src={driver.avatarUrl} alt="" loading="lazy" />
+        <Image
+          src={driver.avatarUrl}
+          alt=""
+          fill
+          quality={86}
+          sizes={large ? "240px" : "120px"}
+        />
       ) : (
         <>
           <OfficialLogo variant="mark-light" width={large ? 76 : 50} />
