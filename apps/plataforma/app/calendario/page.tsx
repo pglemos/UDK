@@ -93,6 +93,7 @@ export default async function CalendarPage({
                             src={imageSource}
                             alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
                             fill
+                            loading="eager"
                             quality={86}
                             sizes="(max-width: 760px) 100vw, 28vw"
                             style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
