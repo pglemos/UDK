@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { RaceShell } from "../../../components/race/race-shell";
 import { getNewsBySlug, getNewsPage } from "../../../lib/public-content";
+import { premiumVisuals } from "../../../lib/visual-assets";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -18,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: item.title,
       description: item.summary,
       publishedTime: item.publishedAt || undefined,
-      images: item.coverImageUrl ? [item.coverImageUrl] : [],
+      images: [item.coverImageUrl ?? premiumVisuals.news.src],
     },
   };
 }
@@ -35,13 +37,14 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
 
   const body = paragraphs(item.content, item.summary);
   const related = relatedPage.items.filter((news) => news.slug !== item.slug).slice(0, 3);
+  const coverSource = item.coverImageUrl ?? premiumVisuals.news.src;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: item.title,
     description: item.summary,
     datePublished: item.publishedAt || undefined,
-    image: item.coverImageUrl || undefined,
+    image: coverSource,
     publisher: { "@type": "SportsOrganization", name: "Ultras do Kart" },
   };
 
@@ -63,7 +66,15 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
           </header>
 
           <div className="tg-article-cover">
-            <img src={item.coverImageUrl ?? "/media/udk-race-hero.webp"} alt="" fetchPriority="high" />
+            <Image
+              src={coverSource}
+              alt=""
+              fill
+              priority
+              quality={90}
+              sizes="100vw"
+              style={{ objectPosition: premiumVisuals.news.position }}
+            />
           </div>
 
           <div className="race-container tg-article-body">
