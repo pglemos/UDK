@@ -1,7 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import { Manrope, Syne } from "next/font/google";
 import { PwaRegister } from "../components/pwa-register";
+import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
 import "./race.css";
+
+const display = Syne({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const body = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udkkart.vercel.app";
 
@@ -26,7 +42,14 @@ export const metadata: Metadata = {
     siteName: "Ultras do Kart",
     title: "UDK • Ultras do Kart",
     description: "Calendário, classificação, resultados, pilotos e inscrições da temporada UDK.",
-    images: [{ url: "/media/udk-race-hero.webp", width: 713, height: 560, alt: "Ultras do Kart" }],
+    images: [
+      {
+        url: premiumVisuals.hero.src,
+        width: 2400,
+        height: 1600,
+        alt: premiumVisuals.hero.alt,
+      },
+    ],
   },
   appleWebApp: {
     capable: true,
@@ -36,14 +59,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08090C",
+  themeColor: "#07090b",
   colorScheme: "dark",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={`${display.variable} ${body.variable}`}>
         <PwaRegister />
         {children}
       </body>
