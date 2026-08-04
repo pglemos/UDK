@@ -6,8 +6,8 @@ export type PremiumVisual = {
 
 export const premiumVisuals = {
   hero: {
-    src: "https://images.unsplash.com/photo-1774088047212-0720fcaceb6b?auto=format&fit=crop&fm=webp&q=82&w=2400",
-    alt: "Piloto e kart preparados para entrar em uma pista de competição",
+    src: "https://images.unsplash.com/photo-1773909722972-1f5e533798b8?auto=format&fit=crop&fm=webp&q=82&w=2400",
+    alt: "Disputa de kart em um circuito ao ar livre",
     position: "52% center",
   },
   manifesto: {
@@ -58,6 +58,22 @@ const stageVisuals: PremiumVisual[] = [
   premiumVisuals.paddock,
   premiumVisuals.news,
 ];
+
+const legacyPlaceholders = [
+  "/media/udk-race-hero.webp",
+  "udk-race-hero.webp",
+];
+
+export function resolveVisualSource(
+  source: string | null | undefined,
+  fallback: PremiumVisual,
+): string {
+  const normalized = source?.trim();
+  if (!normalized || legacyPlaceholders.some((placeholder) => normalized.includes(placeholder))) {
+    return fallback.src;
+  }
+  return normalized;
+}
 
 export function stageVisual(index: number): PremiumVisual {
   return stageVisuals[Math.abs(index) % stageVisuals.length] ?? premiumVisuals.hero;
