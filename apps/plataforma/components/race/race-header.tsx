@@ -7,12 +7,12 @@ import { useEffect, useRef, useState } from "react";
 import { OfficialLogo } from "./official-logo";
 
 const navigation = [
-  ["/calendario", "Calendário"],
-  ["/classificacao", "Classificação"],
-  ["/resultados", "Resultados"],
-  ["/pilotos", "Pilotos"],
-  ["/noticias", "Notícias"],
-  ["/regulamento", "Regulamento"],
+  { href: "/calendario", label: "Calendário", index: "01", position: "64% center" },
+  { href: "/classificacao", label: "Classificação", index: "02", position: "48% center" },
+  { href: "/resultados", label: "Resultados", index: "03", position: "72% center" },
+  { href: "/pilotos", label: "Pilotos", index: "04", position: "38% center" },
+  { href: "/noticias", label: "Notícias", index: "05", position: "58% center" },
+  { href: "/regulamento", label: "Regulamento", index: "06", position: "78% center" },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
@@ -23,9 +23,12 @@ export function RaceHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [preview, setPreview] = useState(0);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const home = pathname === "/";
+  const previewItem = navigation[preview] ?? navigation[0];
 
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 48);
@@ -44,12 +47,33 @@ export function RaceHeader() {
 
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
         triggerRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== "Tab" || !menuRef.current) return;
+      const focusable = Array.from(
+        menuRef.current.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])",
+        ),
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.removeProperty("overflow");
@@ -62,7 +86,7 @@ export function RaceHeader() {
       <a className="race-skip-link" href="#conteudo">Pular para o conteúdo</a>
       <header
         className={[
-          "race-header tg-header",
+          "race-header cinema-header",
           home && !scrolled ? "race-header-overlay" : "",
           scrolled ? "is-compact" : "",
         ].filter(Boolean).join(" ")}
@@ -72,7 +96,7 @@ export function RaceHeader() {
         </Link>
 
         <nav className="race-nav" aria-label="Navegação principal">
-          {navigation.map(([href, label]) => (
+          {navigation.slice(0, 5).map(({ href, label }) => (
             <Link key={href} href={href} aria-current={isActive(pathname, href) ? "page" : undefined}>
               {label}
             </Link>
@@ -90,18 +114,35 @@ export function RaceHeader() {
             type="button"
             aria-label="Abrir menu"
             aria-expanded={open}
-            aria-controls="race-mobile-menu"
+            aria-controls="race-cinematic-menu"
             onClick={() => setOpen(true)}
           >
+            <span>Menu</span>
             <Menu aria-hidden="true" />
           </button>
         </div>
       </header>
 
-      <div id="race-mobile-menu" className={`race-mobile-menu tg-menu${open ? " is-open" : ""}`} aria-hidden={!open}>
-        <div className="tg-menu-media" aria-hidden="true">
-          <img src="/media/udk-race-hero.webp" alt="" />
+      <div
+        ref={menuRef}
+        id="race-cinematic-menu"
+        className={`race-mobile-menu cinema-menu${open ? " is-open" : ""}`}
+        aria-hidden={!open}
+      >
+        <div className="cinema-menu-media" aria-hidden="true">
+          <img
+            key={previewItem.href}
+            src="/media/udk-race-hero.webp"
+            alt=""
+            style={{ objectPosition: previewItem.position }}
+          />
+          <div className="cinema-menu-caption">
+            <span>{previewItem.index}</span>
+            <strong>{previewItem.label}</strong>
+            <small>UDK • Temporada 2026</small>
+          </div>
         </div>
+
         <div className="race-mobile-menu-head">
           <OfficialLogo variant="negative" width={172} />
           <button
@@ -116,23 +157,27 @@ export function RaceHeader() {
             <X aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Navegação móvel">
-          {navigation.map(([href, label], index) => (
+
+        <nav aria-label="Navegação imersiva">
+          {navigation.map(({ href, label, index }, itemIndex) => (
             <Link
               key={href}
               href={href}
-              style={{ "--menu-index": index } as React.CSSProperties}
+              style={{ "--menu-index": itemIndex } as React.CSSProperties}
               aria-current={isActive(pathname, href) ? "page" : undefined}
+              onMouseEnter={() => setPreview(itemIndex)}
+              onFocus={() => setPreview(itemIndex)}
             >
-              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span>{index}</span>
               {label}
               <ArrowUpRight aria-hidden="true" />
             </Link>
           ))}
         </nav>
+
         <div className="race-mobile-menu-actions">
           <Link className="race-button race-button-ghost" href="/login">Entrar</Link>
-          <Link className="race-button race-button-primary" href="/inscricao">Inscrição</Link>
+          <Link className="race-button race-button-primary" href="/inscricao">Entrar no grid</Link>
         </div>
         <p>UDK 2026 • Kartódromo Internacional de Betim</p>
       </div>
