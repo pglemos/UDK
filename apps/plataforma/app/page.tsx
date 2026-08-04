@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowDownRight,
@@ -15,6 +16,7 @@ import { RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
 import { getPublicData } from "../lib/public-data";
+import { newsVisual, premiumVisuals } from "../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Ultras do Kart",
@@ -39,20 +41,29 @@ export default async function HomePage() {
   const categories = new Set(drivers.map((driver) => driver.category)).size;
   const totalPodiums = drivers.reduce((sum, driver) => sum + driver.podiums, 0);
   const registrationOpen = nextStage?.status.includes("registration") ?? false;
+  const featuredNewsVisual = newsVisual(0);
 
   return (
     <RaceShell>
       <main id="conteudo" className="cinema-home">
         <section className="cinema-home-hero" data-design="twice-grind-cinematic">
           <div className="cinema-home-hero-media" aria-hidden="true">
-            <img src="/media/udk-race-hero.webp" alt="" fetchPriority="high" />
+            <Image
+              src={premiumVisuals.hero.src}
+              alt=""
+              fill
+              priority
+              quality={90}
+              sizes="100vw"
+              style={{ objectPosition: premiumVisuals.hero.position }}
+            />
           </div>
 
           <div className="race-container cinema-home-hero-grid">
             <Reveal className="cinema-home-hero-copy">
               <span>Temporada 2026 • Betim, Minas Gerais</span>
               <h1>
-                A pista
+                <span>A pista</span>
                 <em>não espera.</em>
               </h1>
               <p>
@@ -131,7 +142,14 @@ export default async function HomePage() {
             </Reveal>
 
             <Reveal className="cinema-manifesto-media" delay={100}>
-              <img src="/media/udk-race-hero.webp" alt="Kart em ação durante o campeonato UDK" loading="lazy" />
+              <Image
+                src={premiumVisuals.manifesto.src}
+                alt={premiumVisuals.manifesto.alt}
+                fill
+                quality={88}
+                sizes="(max-width: 900px) 100vw, 44vw"
+                style={{ objectPosition: premiumVisuals.manifesto.position }}
+              />
               <strong>{String(drivers.length).padStart(2, "0")}</strong>
               <span>Pilotos publicados. Uma comunidade em movimento.</span>
             </Reveal>
@@ -250,7 +268,14 @@ export default async function HomePage() {
 
         <section className="cinema-community">
           <div className="cinema-community-media" aria-hidden="true">
-            <img src="/media/udk-race-hero.webp" alt="" loading="lazy" />
+            <Image
+              src={premiumVisuals.community.src}
+              alt=""
+              fill
+              quality={88}
+              sizes="100vw"
+              style={{ objectPosition: premiumVisuals.community.position }}
+            />
           </div>
           <div className="race-container cinema-community-copy">
             <span>05 / Cultura Ultras</span>
@@ -277,7 +302,16 @@ export default async function HomePage() {
             {featuredNews ? (
               <div className="cinema-news-layout">
                 <Link href={`/noticias/${featuredNews.slug}`} className="cinema-news-feature">
-                  <img src={featuredNews.coverImageUrl ?? "/media/udk-race-hero.webp"} alt="" loading="lazy" />
+                  <div className="cinema-news-feature-media">
+                    <Image
+                      src={featuredNews.coverImageUrl ?? featuredNewsVisual.src}
+                      alt=""
+                      fill
+                      quality={86}
+                      sizes="(max-width: 900px) 100vw, 62vw"
+                      style={{ objectPosition: featuredNewsVisual.position }}
+                    />
+                  </div>
                   <div>
                     <span>{featuredNews.category}</span>
                     <h3>{featuredNews.title}</h3>

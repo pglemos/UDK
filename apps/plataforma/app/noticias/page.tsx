@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
@@ -6,6 +7,7 @@ import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
 import { getNewsPage } from "../../lib/public-content";
 import { parsePositiveInt } from "../../lib/public-data";
+import { newsVisual } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Notícias",
@@ -28,6 +30,7 @@ export default async function NewsPage({
   const news = await getNewsPage({ page, pageSize: 7, query });
   const featured = news.items[0];
   const list = news.items.slice(1);
+  const featuredVisual = newsVisual(0);
 
   return (
     <RaceShell>
@@ -56,7 +59,17 @@ export default async function NewsPage({
               <>
                 <section className="tg-news-directory-feature">
                   <Link href={`/noticias/${featured.slug}`}>
-                    <div className="tg-news-directory-media"><img src={featured.coverImageUrl ?? "/media/udk-race-hero.webp"} alt="" fetchPriority="high" /></div>
+                    <div className="tg-news-directory-media">
+                      <Image
+                        src={featured.coverImageUrl ?? featuredVisual.src}
+                        alt=""
+                        fill
+                        priority
+                        quality={88}
+                        sizes="(max-width: 760px) 100vw, 58vw"
+                        style={{ objectPosition: featuredVisual.position }}
+                      />
+                    </div>
                     <div>
                       <span>{featured.category}</span>
                       <h2>{featured.title}</h2>
@@ -68,15 +81,27 @@ export default async function NewsPage({
                 </section>
 
                 <section className="tg-news-directory-grid">
-                  {list.map((item, index) => (
-                    <Link href={`/noticias/${item.slug}`} key={item.slug} className={index === 0 ? "is-wide" : ""}>
-                      <div><img src={item.coverImageUrl ?? "/media/udk-race-hero.webp"} alt="" loading="lazy" /></div>
-                      <span>{item.category}</span>
-                      <h3>{item.title}</h3>
-                      <p>{item.summary}</p>
-                      <time>{new Date(item.publishedAt).toLocaleDateString("pt-BR")}</time>
-                    </Link>
-                  ))}
+                  {list.map((item, index) => {
+                    const visual = newsVisual(index + 1);
+                    return (
+                      <Link href={`/noticias/${item.slug}`} key={item.slug} className={index === 0 ? "is-wide" : ""}>
+                        <div>
+                          <Image
+                            src={item.coverImageUrl ?? visual.src}
+                            alt=""
+                            fill
+                            quality={84}
+                            sizes={index === 0 ? "(max-width: 760px) 100vw, 58vw" : "(max-width: 760px) 100vw, 29vw"}
+                            style={{ objectPosition: visual.position }}
+                          />
+                        </div>
+                        <span>{item.category}</span>
+                        <h3>{item.title}</h3>
+                        <p>{item.summary}</p>
+                        <time>{new Date(item.publishedAt).toLocaleDateString("pt-BR")}</time>
+                      </Link>
+                    );
+                  })}
                 </section>
               </>
             ) : (

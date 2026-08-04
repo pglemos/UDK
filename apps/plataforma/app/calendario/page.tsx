@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, Flag, MapPin, Timer } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
@@ -6,6 +7,7 @@ import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, SearchField, StatusBadge } from "../../components/race/ui";
 import { getStages } from "../../lib/public-data";
+import { stageVisual } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Calendário",
@@ -63,35 +65,45 @@ export default async function CalendarPage({
           <div className="race-container">
             {filtered.length ? (
               <div className="tg-calendar-timeline" aria-label="Etapas da temporada">
-                {filtered.map((stage, index) => (
-                  <Reveal key={stage.id} delay={index * 45}>
-                    <article className={`tg-calendar-stage${index === 0 ? " is-current" : ""}`}>
-                      <div className="tg-calendar-stage-index">
-                        <span>{String(index + 1).padStart(2, "0")}</span>
-                        <i />
-                      </div>
-                      <div className="tg-calendar-stage-date">
-                        <time>{stage.date || "Data a definir"}</time>
-                        <StatusBadge status={stage.status} />
-                      </div>
-                      <div className="tg-calendar-stage-copy">
-                        <h2>{stage.title}</h2>
-                        <p>{stage.shortDescription ?? stage.track}</p>
-                        <div>
-                          <span><Flag aria-hidden="true" /> {stage.track}</span>
-                          <span><MapPin aria-hidden="true" /> {stage.location} • {stage.city}</span>
-                          <span><Timer aria-hidden="true" /> {stage.time || "Horário a definir"}</span>
+                {filtered.map((stage, index) => {
+                  const visual = stageVisual(index);
+                  return (
+                    <Reveal key={stage.id} delay={index * 45}>
+                      <article className={`tg-calendar-stage${index === 0 ? " is-current" : ""}`}>
+                        <div className="tg-calendar-stage-index">
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <i />
                         </div>
-                      </div>
-                      <div className="tg-calendar-stage-media">
-                        <img src={stage.heroImageUrl ?? "/media/udk-race-hero.webp"} alt="" loading="lazy" />
-                      </div>
-                      <Link href="/inscricao" className="tg-arrow-link">
-                        Entrar no grid <ArrowRight aria-hidden="true" />
-                      </Link>
-                    </article>
-                  </Reveal>
-                ))}
+                        <div className="tg-calendar-stage-date">
+                          <time>{stage.date || "Data a definir"}</time>
+                          <StatusBadge status={stage.status} />
+                        </div>
+                        <div className="tg-calendar-stage-copy">
+                          <h2>{stage.title}</h2>
+                          <p>{stage.shortDescription ?? stage.track}</p>
+                          <div>
+                            <span><Flag aria-hidden="true" /> {stage.track}</span>
+                            <span><MapPin aria-hidden="true" /> {stage.location} • {stage.city}</span>
+                            <span><Timer aria-hidden="true" /> {stage.time || "Horário a definir"}</span>
+                          </div>
+                        </div>
+                        <div className="tg-calendar-stage-media">
+                          <Image
+                            src={stage.heroImageUrl ?? visual.src}
+                            alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
+                            fill
+                            quality={86}
+                            sizes="(max-width: 760px) 100vw, 28vw"
+                            style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
+                          />
+                        </div>
+                        <Link href="/inscricao" className="tg-arrow-link">
+                          Entrar no grid <ArrowRight aria-hidden="true" />
+                        </Link>
+                      </article>
+                    </Reveal>
+                  );
+                })}
               </div>
             ) : (
               <EditorialEmpty
