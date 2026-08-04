@@ -81,7 +81,7 @@ async function collectDiagnostics(page, route, viewportName, mediaFailures) {
     }),
   );
 
-  const broken = media.filter((item) => !item.complete || item.naturalWidth < 2 || item.width < 2 || item.height < 2);
+  const broken = media.filter((item) => !item.complete || item.naturalWidth < 2 || item.naturalHeight < 2 || item.width < 2 || item.height < 2);
   if (broken.length) {
     mediaFailures.push({ type: "media", route, viewport: viewportName, broken });
   }
@@ -96,6 +96,15 @@ const browser = await chromium.launch({ headless: true });
 const diagnostics = [];
 const mediaFailures = [];
 const runtimeFailures = [];
+const captureFailures = [];
+
+function writeDiagnostics() {
+  return fs.writeFile(
+    path.join(outputDirectory, "diagnostics.json"),
+    `${JSON.stringify({ diagnostics, failures: [...mediaFailures, ...runtimeFailures, ...captureFailures] }, null, 2)}\n`,
+    "utf8",
+  );
+}
 
 try {
   for (const [viewportName, viewport] of viewports) {
@@ -104,9 +113,15 @@ try {
     for (const [route, slug] of routes) {
       const page = await context.newPage();
       const pageErrors = [];
+      const consoleErrors = [];
       const requestFailures = [];
 
       page.on("pageerror", (error) => pageErrors.push(error.message));
+      page.on("console", (message) => {
+        if (message.type() === "error") {
+          consoleErrors.push(message.text());
+        }
+      });
       page.on("requestfailed", (request) => {
         const url = request.url();
         if (url.includes("/_next/image") || url.includes("images.unsplash.com")) {
@@ -120,23 +135,29 @@ try {
 
       const routeName = route || "home";
       const routeDiagnostics = await collectDiagnostics(page, routeName, viewportName, mediaFailures);
-      diagnostics.push({ ...routeDiagnostics, pageErrors, requestFailures });
+      diagnostics.push({ ...routeDiagnostics, pageErrors, consoleErrors, requestFailures });
 
-      if (pageErrors.length || requestFailures.length) {
+      if (pageErrors.length || consoleErrors.length || requestFailures.length) {
         runtimeFailures.push({
           type: "runtime",
           route: routeName,
           viewport: viewportName,
           pageErrors,
+          consoleErrors,
           requestFailures,
         });
       }
 
-      await page.screenshot({
-        path: path.join(outputDirectory, `${slug}-${viewportName}.png`),
-        fullPage: true,
-      });
-      await page.close();
+      try {
+        await page.screenshot({
+          path: path.join(outputDirectory, `${slug}-${viewportName}.png`),
+          fullPage: true,
+        });
+      } catch (error) {
+        captureFailures.push({ type: "capture", route: routeName, viewport: viewportName, error: error.message });
+      } finally {
+        await page.close();
+      }
     }
 
     await context.close();
@@ -145,13 +166,9 @@ try {
   await browser.close();
 }
 
-const failures = [...mediaFailures, ...runtimeFailures];
+const failures = [...mediaFailures, ...runtimeFailures, ...captureFailures];
 
-await fs.writeFile(
-  path.join(outputDirectory, "diagnostics.json"),
-  `${JSON.stringify({ diagnostics, failures: [...mediaFailures, ...runtimeFailures] }, null, 2)}\n`,
-  "utf8",
-);
+await writeDiagnostics();
 
 if (failures.length) {
   console.error(JSON.stringify(failures, null, 2));
