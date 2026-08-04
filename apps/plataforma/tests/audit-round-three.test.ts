@@ -23,7 +23,7 @@ describe("third visual audit safeguards", () => {
     expect(assets).toContain("export function driverVisual");
     expect(editorial).toContain("driverVisual(index)");
     expect(editorial).toMatch(/cinema-driver-fallback[\s\S]*<Image/);
-    expect(ui).toContain("driverVisual(Number.parseInt(driver.number, 10) || 0)");
+    expect(ui).toContain("driverVisual(driver.number || 0)");
   });
 
   it("uses the same visual fallback in the standings podium", () => {
