@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, Flag, MapPin, Timer } from "lucide-react";
 import type { PublicDriver, PublicStage } from "../../lib/public-data";
 import { driverVisual, resolveVisualSource, stageVisual } from "../../lib/visual-assets";
-import { OfficialLogo } from "./official-logo";
 import { StatusBadge } from "./ui";
 
 export function EditorialHeading({
@@ -112,8 +111,6 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
               style={{ objectPosition: fallback.position }}
             />
             <span className="driver-fallback-shade" />
-            <OfficialLogo variant="mark-light" width={74} />
-            <strong>#{driver.number}</strong>
           </div>
         )}
       </div>
