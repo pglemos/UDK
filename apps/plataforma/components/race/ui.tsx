@@ -110,7 +110,7 @@ export function DriverVisual({
   driver: PublicDriver;
   large?: boolean;
 }) {
-  const fallback = driverVisual(Number.parseInt(driver.number, 10) || 0);
+  const fallback = driverVisual(driver.number || 0);
 
   return (
     <div className={`race-driver-visual${large ? " is-large" : ""}${driver.avatarUrl ? "" : " is-fallback"}`}>
