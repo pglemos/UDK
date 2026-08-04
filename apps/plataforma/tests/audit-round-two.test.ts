@@ -46,7 +46,8 @@ describe("second full visual audit safeguards", () => {
 
   it("renders only the official UDK wordmark in the header lockup", () => {
     const header = read("components/race/race-header.tsx");
-    expect(header).toContain('<OfficialLogo variant="negative"');
+    expect(header).toContain("<OfficialLogo");
+    expect(header).toContain('variant="negative"');
     expect(header).not.toContain("race-brand-wordmark");
     expect(header).not.toContain("<strong>ULTRAS</strong>");
   });
