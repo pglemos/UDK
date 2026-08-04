@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Flag, MapPin, Timer } from "lucide-react";
 import type { PublicDriver, PublicStage } from "../../lib/public-data";
+import { stageVisual } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 import { StatusBadge } from "./ui";
 
@@ -42,13 +44,20 @@ export function StageProject({
   index: number;
   featured?: boolean;
 }) {
+  const visual = stageVisual(index);
+  const imageSource = stage.heroImageUrl ?? visual.src;
+
   return (
     <article className={`cinema-stage-project${featured ? " cinema-stage-feature is-featured" : ""}`}>
       <div className="cinema-stage-media">
-        <img
-          src={stage.heroImageUrl ?? "/media/udk-race-hero.webp"}
-          alt=""
-          loading={featured ? "eager" : "lazy"}
+        <Image
+          src={imageSource}
+          alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
+          fill
+          priority={featured}
+          quality={featured ? 90 : 86}
+          sizes={featured ? "(max-width: 900px) 100vw, 62vw" : "(max-width: 900px) 100vw, 38vw"}
+          style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
         />
         <span>{String(index + 1).padStart(2, "0")}</span>
       </div>
@@ -81,7 +90,13 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
     >
       <div className="cinema-driver-poster-media tg-driver-poster-media">
         {driver.avatarUrl ? (
-          <img src={driver.avatarUrl} alt="" loading="lazy" />
+          <Image
+            src={driver.avatarUrl}
+            alt={`Retrato de ${driver.name}`}
+            fill
+            quality={86}
+            sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
+          />
         ) : (
           <div className="cinema-driver-fallback tg-driver-fallback" aria-hidden="true">
             <OfficialLogo variant="mark-light" width={74} />
