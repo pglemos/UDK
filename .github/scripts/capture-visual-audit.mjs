@@ -1,6 +1,10 @@
 import fs from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
-import { chromium } from "playwright";
+
+const require = createRequire(import.meta.url);
+const playwrightModule = process.env.PLAYWRIGHT_MODULE_PATH ?? "playwright";
+const { chromium } = require(playwrightModule);
 
 const baseUrl = process.env.VISUAL_AUDIT_BASE_URL ?? "http://127.0.0.1:3000";
 const outputDirectory = path.resolve("visual-audit");
