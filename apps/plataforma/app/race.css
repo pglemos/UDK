@@ -5,6 +5,7 @@
 @import "./visual-quality.css";
 @import "./visual-media.css";
 @import "./visual-fixes.css";
+@import "./audit-fixes.css";
 
 .cinema-home-hero-media,
 .cinema-community-media {
