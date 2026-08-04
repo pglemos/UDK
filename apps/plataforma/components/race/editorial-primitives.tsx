@@ -106,6 +106,7 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
               src={fallback.src}
               alt=""
               fill
+              loading="eager"
               quality={84}
               sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
               style={{ objectPosition: fallback.position }}
