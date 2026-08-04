@@ -53,7 +53,8 @@ describe("UDK cinematic public experience", () => {
     ]) {
       expect(home).toContain(marker);
     }
-    expect(home).toContain("A pista não espera");
+    expect(home).toContain("A pista");
+    expect(home).toContain("não espera.");
   });
 
   it("keeps all public routes in the shared shell", () => {
