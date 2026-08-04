@@ -6,6 +6,12 @@
 @import "./visual-media.css";
 @import "./visual-fixes.css";
 
+.cinema-home-hero-media,
+.cinema-community-media {
+  position: absolute !important;
+  inset: 0;
+}
+
 .cinema-menu-caption {
   position: absolute;
   z-index: 3;
