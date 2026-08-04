@@ -1,0 +1,239 @@
+/* Internal-route media and reading refinements loaded after the base redesign. */
+
+.race-auth-visual {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image:
+    linear-gradient(180deg, rgba(5, 6, 7, 0.22), rgba(5, 6, 7, 0.9)),
+    url("https://images.unsplash.com/photo-1774088047212-0720fcaceb6b?auto=format&fit=crop&fm=webp&q=82&w=2400");
+  background-position: 50% center;
+  background-size: cover;
+}
+
+.race-auth-visual::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(0, 217, 255, 0.14), transparent 48%);
+  pointer-events: none;
+}
+
+.tg-calendar-stage-media,
+.tg-news-directory-media,
+.tg-news-directory-grid a > div:first-child,
+.tg-driver-profile-media,
+.tg-profile-portrait,
+.tg-article-cover {
+  position: relative;
+  overflow: hidden;
+}
+
+.tg-calendar-stage-media img,
+.tg-news-directory-media img,
+.tg-news-directory-grid a > div:first-child img,
+.tg-driver-profile-media img,
+.tg-profile-portrait img,
+.tg-article-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: none;
+}
+
+.tg-page-hero h1,
+.udk-page-hero h1,
+.race-page-hero h1 {
+  max-width: 100%;
+  font-family: var(--cinema-display);
+  font-size: clamp(4.6rem, 10vw, 10.4rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  white-space: normal;
+}
+
+.tg-page-hero p,
+.udk-page-hero p,
+.race-page-hero p {
+  max-width: 720px;
+  font-family: var(--cinema-body);
+  font-size: clamp(1rem, 1.12vw, 1.2rem);
+  line-height: 1.72;
+}
+
+.tg-calendar-stage {
+  grid-template-columns: 64px minmax(120px, 0.28fr) minmax(280px, 1fr) minmax(260px, 0.72fr) auto;
+  gap: clamp(20px, 2.5vw, 42px);
+}
+
+.tg-calendar-stage-copy h2,
+.tg-driver-profile-copy h1,
+.tg-article-header h1,
+.tg-related-news h2 {
+  max-width: 100%;
+  font-family: var(--cinema-display);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  white-space: normal;
+}
+
+.tg-driver-profile-copy h1,
+.tg-article-header h1 {
+  font-size: clamp(4.4rem, 9vw, 9.6rem);
+}
+
+.tg-driver-profile-number {
+  max-width: 46vw;
+  overflow: hidden;
+}
+
+.tg-driver-profile-stats .race-container {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.tg-driver-profile-stats article {
+  min-width: 0;
+}
+
+.tg-history-list article {
+  grid-template-columns: 82px minmax(0, 1fr) auto;
+  gap: clamp(16px, 3vw, 44px);
+}
+
+.tg-article-header .race-container,
+.tg-article-body,
+.tg-related-news .race-container {
+  min-width: 0;
+}
+
+.tg-article-body {
+  grid-template-columns: minmax(170px, 0.32fr) minmax(0, 1fr);
+  gap: clamp(36px, 7vw, 110px);
+}
+
+.tg-article-body > div {
+  max-width: 800px;
+}
+
+.tg-article-body p {
+  font-size: clamp(1.05rem, 1.18vw, 1.24rem);
+  line-height: 1.82;
+}
+
+.tg-news-directory-feature > a {
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+}
+
+.tg-news-directory-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tg-news-directory-grid a,
+.tg-news-directory-feature a {
+  min-width: 0;
+}
+
+.tg-news-directory-media,
+.tg-news-directory-grid a > div:first-child {
+  min-height: clamp(300px, 38vw, 620px);
+}
+
+@media (max-width: 1120px) {
+  .tg-calendar-stage {
+    grid-template-columns: 54px minmax(120px, 0.28fr) minmax(0, 1fr) minmax(220px, 0.62fr);
+  }
+
+  .tg-calendar-stage > .tg-arrow-link {
+    grid-column: 3 / -1;
+    justify-self: start;
+  }
+
+  .tg-news-directory-feature > a {
+    grid-template-columns: minmax(0, 1fr) minmax(290px, 0.76fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .tg-page-hero h1,
+  .udk-page-hero h1,
+  .race-page-hero h1 {
+    font-size: clamp(3.7rem, 17vw, 6.8rem);
+  }
+
+  .tg-calendar-stage,
+  .tg-news-directory-feature > a,
+  .tg-news-directory-grid,
+  .tg-article-body {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-calendar-stage-index {
+    display: none;
+  }
+
+  .tg-calendar-stage > .tg-arrow-link {
+    grid-column: 1;
+  }
+
+  .tg-calendar-stage-media {
+    min-height: min(500px, 76vw);
+  }
+
+  .tg-driver-profile-stats .race-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tg-driver-profile-copy h1,
+  .tg-article-header h1 {
+    font-size: clamp(3.5rem, 15vw, 6.4rem);
+  }
+
+  .tg-driver-profile-number {
+    max-width: 100%;
+  }
+
+  .tg-history-list article {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .tg-history-list article > strong {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .tg-article-cover {
+    min-height: min(620px, 82vw);
+  }
+
+  .tg-article-body > aside {
+    position: static;
+  }
+}
+
+@media (max-width: 460px) {
+  .race-auth-visual,
+  .race-auth-panel {
+    padding-inline: 18px;
+  }
+
+  .tg-driver-profile-stats .race-container {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-calendar-stage-date,
+  .tg-calendar-stage-copy,
+  .tg-calendar-stage > .tg-arrow-link {
+    padding-inline: 0;
+  }
+
+  .tg-history-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-history-list article > strong {
+    grid-column: 1;
+  }
+}
