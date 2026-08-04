@@ -37,12 +37,17 @@ describe("third visual audit safeguards", () => {
     expect(standings).toContain("tg-standing-podium-fallback");
   });
 
-  it("loads final fallback styling after every earlier visual override", () => {
+  it("locks poster media dimensions after every earlier visual override", () => {
     const race = read("app/race.css");
     const css = read("app/audit-round-three.css");
 
     expect(race).toContain('@import "./audit-round-three.css";');
     expect(race.indexOf("audit-round-three.css")).toBeGreaterThan(race.indexOf("audit-round-two.css"));
+    expect(css).toContain(".cinema-driver-poster-media,");
+    expect(css).toContain("position: absolute !important");
+    expect(css).toContain("inset: 0 !important");
+    expect(css).toContain("height: 100% !important");
+    expect(css).toContain("min-height: 100% !important");
     expect(css).toContain(".tg-standing-podium-fallback img");
     expect(css).toContain(".race-driver-visual.is-fallback img");
   });
