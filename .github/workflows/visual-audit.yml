@@ -58,12 +58,14 @@ jobs:
             npx --yes playwright@1.56.1 screenshot \
               --browser=chromium \
               --viewport-size="1440,1100" \
+              --wait-for-timeout=3500 \
               --full-page \
               "http://127.0.0.1:3000/${route}" \
               "visual-audit/${slug}-desktop.png"
             npx --yes playwright@1.56.1 screenshot \
               --browser=chromium \
               --viewport-size="390,844" \
+              --wait-for-timeout=3500 \
               --full-page \
               "http://127.0.0.1:3000/${route}" \
               "visual-audit/${slug}-mobile.png"
