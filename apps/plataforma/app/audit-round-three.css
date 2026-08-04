@@ -3,6 +3,33 @@
  * Restores meaningful racing imagery wherever a driver portrait is missing.
  */
 
+/*
+ * Next/Image fill needs a positioned box with real dimensions. An earlier
+ * quality layer changed this media surface to position: relative, leaving it
+ * with only an absolutely positioned child and therefore a computed height of
+ * zero. Keep this override last in the cascade.
+ */
+.cinema-driver-poster-media,
+.tg-driver-poster-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: hidden;
+}
+
+.cinema-driver-poster-media > img,
+.tg-driver-poster-media > img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  object-fit: cover !important;
+}
+
 .cinema-driver-poster-media.is-fallback,
 .tg-driver-poster-media.is-fallback {
   background-color: var(--cinema-surface);
