@@ -21,6 +21,18 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function BrandLockup({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className={`race-brand-lockup${compact ? " is-compact" : ""}`}>
+      <OfficialLogo variant="mark-light" width={compact ? 38 : 44} priority={!compact} />
+      <span className="race-brand-wordmark" aria-hidden="true">
+        <strong>ULTRAS</strong>
+        <small>DO KART</small>
+      </span>
+    </span>
+  );
+}
+
 export function RaceHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -95,7 +107,7 @@ export function RaceHeader() {
         ].filter(Boolean).join(" ")}
       >
         <Link className="race-brand" href="/" aria-label="Ultras do Kart, página inicial">
-          <OfficialLogo variant="negative" width={176} priority />
+          <BrandLockup />
         </Link>
 
         <nav className="race-nav" aria-label="Navegação principal">
@@ -150,7 +162,9 @@ export function RaceHeader() {
         </div>
 
         <div className="race-mobile-menu-head">
-          <OfficialLogo variant="negative" width={172} />
+          <span className="race-menu-brand" aria-label="Ultras do Kart">
+            <BrandLockup compact />
+          </span>
           <button
             ref={closeRef}
             type="button"
