@@ -59,6 +59,24 @@ const stageVisuals: PremiumVisual[] = [
   premiumVisuals.news,
 ];
 
+const driverVisuals: PremiumVisual[] = [
+  premiumVisuals.paddock,
+  premiumVisuals.detail,
+  premiumVisuals.manifesto,
+  premiumVisuals.news,
+  premiumVisuals.community,
+];
+
+const pageHeroVisuals: Record<string, PremiumVisual> = {
+  "01": premiumVisuals.paddock,
+  "02": premiumVisuals.manifesto,
+  "03": premiumVisuals.detail,
+  "04": premiumVisuals.community,
+  "05": premiumVisuals.news,
+  "06": premiumVisuals.race,
+  "07": premiumVisuals.hero,
+};
+
 const legacyPlaceholders = [
   "/media/udk-race-hero.webp",
   "udk-race-hero.webp",
@@ -75,6 +93,14 @@ export function resolveVisualSource(
     return fallback.src;
   }
   return normalized;
+}
+
+export function pageHeroVisual(index: string): PremiumVisual {
+  return pageHeroVisuals[index] ?? premiumVisuals.race;
+}
+
+export function driverVisual(seed = 0): PremiumVisual {
+  return driverVisuals[Math.abs(seed) % driverVisuals.length] ?? premiumVisuals.paddock;
 }
 
 export function stageVisual(index: number): PremiumVisual {
