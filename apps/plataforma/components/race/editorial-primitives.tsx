@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Flag, MapPin, Timer } from "lucide-react";
 import type { PublicDriver, PublicStage } from "../../lib/public-data";
-import { stageVisual } from "../../lib/visual-assets";
+import { resolveVisualSource, stageVisual } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 import { StatusBadge } from "./ui";
 
@@ -45,7 +45,7 @@ export function StageProject({
   featured?: boolean;
 }) {
   const visual = stageVisual(index);
-  const imageSource = stage.heroImageUrl ?? visual.src;
+  const imageSource = resolveVisualSource(stage.heroImageUrl, visual);
 
   return (
     <article className={`cinema-stage-project${featured ? " cinema-stage-feature is-featured" : ""}`}>
