@@ -1,11 +1,13 @@
+import { officialBrandAssets } from "../../lib/official-brand-assets";
+
 type LogoVariant = "principal" | "negative" | "dark" | "mark-light" | "mark-dark";
 
 const logoSources: Record<LogoVariant, string> = {
-  principal: "/brand/udk-logo-negativa.png",
-  negative: "/brand/udk-logo-negativa.png",
-  dark: "/brand/udk-logo-negativa.png",
-  "mark-light": "/icons/udk-avatar-512.png",
-  "mark-dark": "/icons/udk-avatar-512.png",
+  principal: officialBrandAssets.wordmarkWhite,
+  negative: officialBrandAssets.wordmarkWhite,
+  dark: officialBrandAssets.wordmarkDark,
+  "mark-light": officialBrandAssets.avatar,
+  "mark-dark": officialBrandAssets.avatar,
 };
 
 export function OfficialLogo({
@@ -24,10 +26,10 @@ export function OfficialLogo({
   return (
     <img
       src={logoSources[variant]}
-      alt="Ultras do Kart"
+      alt="UDK"
       className={className}
       width={width}
-      height={compact ? width : Math.round(width * 0.245)}
+      height={compact ? width : Math.round(width * 0.201)}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
     />
