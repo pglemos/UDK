@@ -18,14 +18,14 @@ export function EditorialHeading({
   inverse?: boolean;
 }) {
   return (
-    <header className={`tg-editorial-heading${inverse ? " is-inverse" : ""}`}>
+    <header className={`cinema-editorial-heading tg-editorial-heading${inverse ? " is-inverse" : ""}`}>
       <span>{index}</span>
       <div>
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
       {action ? (
-        <Link href={action.href} className="tg-arrow-link">
+        <Link href={action.href} className="cinema-arrow-link tg-arrow-link">
           {action.label} <ArrowRight aria-hidden="true" />
         </Link>
       ) : null}
@@ -43,8 +43,8 @@ export function StageProject({
   featured?: boolean;
 }) {
   return (
-    <article className={`tg-stage-project${featured ? " is-featured" : ""}`}>
-      <div className="tg-stage-project-media">
+    <article className={`cinema-stage-project${featured ? " cinema-stage-feature is-featured" : ""}`}>
+      <div className="cinema-stage-media">
         <img
           src={stage.heroImageUrl ?? "/media/udk-race-hero.webp"}
           alt=""
@@ -52,19 +52,19 @@ export function StageProject({
         />
         <span>{String(index + 1).padStart(2, "0")}</span>
       </div>
-      <div className="tg-stage-project-copy">
-        <div className="tg-stage-project-topline">
+      <div className="cinema-stage-copy">
+        <div className="cinema-stage-topline">
           <time>{stage.date || "Data a definir"}</time>
           <StatusBadge status={stage.status} />
         </div>
         <h3>{stage.title}</h3>
         <p>{stage.shortDescription ?? stage.track}</p>
-        <div className="tg-stage-project-meta">
+        <div className="cinema-stage-meta">
           <span><MapPin aria-hidden="true" /> {stage.city}</span>
           <span><Flag aria-hidden="true" /> {stage.track}</span>
           <span><Timer aria-hidden="true" /> {stage.time || "Horário a definir"}</span>
         </div>
-        <Link href="/calendario" className="tg-arrow-link">
+        <Link href="/calendario" className="cinema-arrow-link">
           Ver etapa <ChevronRight aria-hidden="true" />
         </Link>
       </div>
@@ -76,20 +76,20 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
   return (
     <Link
       href={`/pilotos/${driver.slug}`}
-      className="tg-driver-poster"
+      className="cinema-driver-poster tg-driver-poster"
       style={{ "--poster-index": index } as React.CSSProperties}
     >
-      <div className="tg-driver-poster-media">
+      <div className="cinema-driver-poster-media tg-driver-poster-media">
         {driver.avatarUrl ? (
           <img src={driver.avatarUrl} alt="" loading="lazy" />
         ) : (
-          <div className="tg-driver-fallback" aria-hidden="true">
+          <div className="cinema-driver-fallback tg-driver-fallback" aria-hidden="true">
             <OfficialLogo variant="mark-light" width={74} />
             <strong>#{driver.number}</strong>
           </div>
         )}
       </div>
-      <div className="tg-driver-poster-copy">
+      <div className="cinema-driver-poster-copy tg-driver-poster-copy">
         <span>{driver.category}</span>
         <h3>{driver.name}</h3>
         <div>
@@ -97,7 +97,7 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           <em>{driver.wins} vitórias</em>
         </div>
       </div>
-      <span className="tg-driver-poster-number">#{driver.number}</span>
+      <span className="cinema-driver-poster-number tg-driver-poster-number">#{driver.number}</span>
       <ChevronRight aria-hidden="true" />
     </Link>
   );
@@ -115,14 +115,14 @@ export function EditorialEmpty({
   action?: { href: string; label: string };
 }) {
   return (
-    <section className="tg-editorial-empty">
+    <section className="cinema-empty tg-editorial-empty">
       <span>{index}</span>
       <div>
         <Flag aria-hidden="true" />
         <h2>{title}</h2>
         <p>{description}</p>
         {action ? (
-          <Link href={action.href} className="tg-arrow-link">
+          <Link href={action.href} className="cinema-arrow-link tg-arrow-link">
             {action.label} <ArrowRight aria-hidden="true" />
           </Link>
         ) : null}
