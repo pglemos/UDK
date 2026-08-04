@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Trophy } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
 import { getCategories, getStandingsPage, parsePositiveInt } from "../../lib/public-data";
+import { driverVisual } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Classificação",
@@ -71,16 +73,41 @@ export default async function StandingsPage({
             {standings.items.length ? (
               <>
                 <section className="tg-standing-podium" aria-label="Pódio da classificação">
-                  {standings.items.slice(0, 3).map((driver, index) => (
-                    <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div className="tg-standing-podium-visual">
-                        {driver.avatarUrl ? <img src={driver.avatarUrl} alt="" /> : <strong>#{driver.number}</strong>}
-                      </div>
-                      <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
-                      <b>{driver.points}<small>pts</small></b>
-                    </Link>
-                  ))}
+                  {standings.items.slice(0, 3).map((driver, index) => {
+                    const fallback = driverVisual(index);
+                    return (
+                      <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <div className={`tg-standing-podium-visual${driver.avatarUrl ? "" : " tg-standing-podium-fallback"}`}>
+                          {driver.avatarUrl ? (
+                            <Image
+                              src={driver.avatarUrl}
+                              alt=""
+                              fill
+                              quality={86}
+                              sizes="(max-width: 760px) 100vw, 33vw"
+                            />
+                          ) : (
+                            <>
+                              <Image
+                                className="driver-fallback-photo"
+                                src={fallback.src}
+                                alt=""
+                                fill
+                                quality={84}
+                                sizes="(max-width: 760px) 100vw, 33vw"
+                                style={{ objectPosition: fallback.position }}
+                              />
+                              <span className="driver-fallback-shade" aria-hidden="true" />
+                              <strong>#{driver.number}</strong>
+                            </>
+                          )}
+                        </div>
+                        <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
+                        <b>{driver.points}<small>pts</small></b>
+                      </Link>
+                    );
+                  })}
                 </section>
 
                 <div className="tg-standing-table-wrap">
