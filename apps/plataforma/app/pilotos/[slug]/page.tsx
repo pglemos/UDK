@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Flag, MapPin, Trophy } from "lucide-react";
@@ -6,6 +7,7 @@ import { EditorialEmpty, EditorialHeading } from "../../../components/race/edito
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
 import { formatLapTime, getDriverBySlug, getDriverHistory } from "../../../lib/public-data";
+import { premiumVisuals } from "../../../lib/visual-assets";
 
 export async function generateMetadata({
   params,
@@ -22,7 +24,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${driver.name} • UDK`,
       description: `${driver.points} pontos, ${driver.wins} vitórias e ${driver.podiums} pódios na temporada.`,
-      images: driver.heroImageUrl || driver.avatarUrl ? [driver.heroImageUrl ?? driver.avatarUrl ?? ""] : [],
+      images: [driver.heroImageUrl ?? driver.avatarUrl ?? premiumVisuals.hero.src],
     },
   };
 }
@@ -41,7 +43,15 @@ export default async function DriverProfilePage({
       <main id="conteudo" className="tg-driver-profile">
         <section className="tg-driver-profile-hero">
           <div className="tg-driver-profile-media" aria-hidden="true">
-            <img src={driver.heroImageUrl ?? "/media/udk-race-hero.webp"} alt="" fetchPriority="high" />
+            <Image
+              src={driver.heroImageUrl ?? premiumVisuals.hero.src}
+              alt=""
+              fill
+              priority
+              quality={90}
+              sizes="100vw"
+              style={{ objectPosition: driver.heroImageUrl ? "50% center" : premiumVisuals.hero.position }}
+            />
           </div>
           <div className="race-container tg-driver-profile-hero-inner">
             <Link className="tg-arrow-link" href="/pilotos"><ArrowLeft aria-hidden="true" /> Voltar ao grid</Link>
@@ -84,7 +94,17 @@ export default async function DriverProfilePage({
               </div>
             </Reveal>
             <div className="tg-profile-portrait">
-              {driver.avatarUrl ? <img src={driver.avatarUrl} alt={`Retrato de ${driver.name}`} loading="lazy" /> : <div><strong>#{driver.number}</strong><span>Imagem oficial ainda não publicada</span></div>}
+              {driver.avatarUrl ? (
+                <Image
+                  src={driver.avatarUrl}
+                  alt={`Retrato de ${driver.name}`}
+                  fill
+                  quality={88}
+                  sizes="(max-width: 760px) 100vw, 42vw"
+                />
+              ) : (
+                <div><strong>#{driver.number}</strong><span>Imagem oficial ainda não publicada</span></div>
+              )}
             </div>
           </div>
         </section>
