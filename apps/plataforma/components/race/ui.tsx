@@ -10,7 +10,7 @@ import {
   Trophy,
 } from "lucide-react";
 import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data";
-import { premiumVisuals } from "../../lib/visual-assets";
+import { driverVisual, pageHeroVisual } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 
 export function PageHero({
@@ -25,17 +25,19 @@ export function PageHero({
   index?: string;
   compact?: boolean;
 }) {
+  const visual = pageHeroVisual(index);
+
   return (
     <section className="udk-page-hero tg-page-hero">
       <div className="udk-page-hero-media" aria-hidden="true">
         <Image
-          src={premiumVisuals.race.src}
+          src={visual.src}
           alt=""
           fill
           priority
           quality={90}
           sizes="100vw"
-          style={{ objectPosition: premiumVisuals.race.position }}
+          style={{ objectPosition: visual.position }}
         />
       </div>
       <div className="race-container udk-page-hero-inner">
@@ -108,8 +110,10 @@ export function DriverVisual({
   driver: PublicDriver;
   large?: boolean;
 }) {
+  const fallback = driverVisual(Number.parseInt(driver.number, 10) || 0);
+
   return (
-    <div className={`race-driver-visual${large ? " is-large" : ""}`}>
+    <div className={`race-driver-visual${large ? " is-large" : ""}${driver.avatarUrl ? "" : " is-fallback"}`}>
       {driver.avatarUrl ? (
         <Image
           src={driver.avatarUrl}
@@ -120,6 +124,16 @@ export function DriverVisual({
         />
       ) : (
         <>
+          <Image
+            className="driver-fallback-photo"
+            src={fallback.src}
+            alt=""
+            fill
+            quality={82}
+            sizes={large ? "240px" : "120px"}
+            style={{ objectPosition: fallback.position }}
+          />
+          <span className="driver-fallback-shade" aria-hidden="true" />
           <OfficialLogo variant="mark-light" width={large ? 76 : 50} />
           <strong>#{driver.number}</strong>
         </>
