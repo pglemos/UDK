@@ -5,31 +5,31 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
-describe("UDK Twice + The Grind redesign contracts", () => {
+describe("UDK Twice + The Grind direction contracts", () => {
   it("keeps the immersive global shell and official brand", () => {
     const header = read("components/race/race-header.tsx");
     const shell = read("components/race/race-shell.tsx");
 
-    expect(header).toContain("tg-menu-media");
+    expect(header).toContain("cinema-menu-media");
     expect(header).toContain("aria-label=\"Abrir menu\"");
     expect(header).toContain("Entrar no grid");
-    expect(shell).toContain("RouteCurtain");
-    expect(shell).toContain("PointerHalo");
+    expect(shell).toContain("CinematicRouteCurtain");
+    expect(shell).toContain("CinematicPointer");
     expect(shell).toContain("OfficialLogo");
   });
 
   it("builds the complete cinematic home narrative", () => {
     const home = read("app/page.tsx");
     for (const marker of [
-      "tg-home-hero",
-      "tg-manifesto",
-      "tg-season-section",
-      "tg-ranking-section",
-      "tg-drivers-section",
-      "tg-community-section",
-      "tg-news-section",
-      "tg-sponsors-section",
-      "tg-home-final-cta",
+      "cinema-home-hero",
+      "cinema-manifesto",
+      "cinema-season",
+      "cinema-ranking",
+      "cinema-drivers",
+      "cinema-community",
+      "cinema-news",
+      "cinema-sponsors",
+      "cinema-final-cta",
     ]) {
       expect(home).toContain(marker);
     }
@@ -68,10 +68,10 @@ describe("UDK Twice + The Grind redesign contracts", () => {
   });
 
   it("ships responsive and reduced-motion coverage", () => {
-    const responsive = ["app/tg-responsive-01.css", "app/tg-responsive-02.css", "app/tg-responsive-03.css"].map(read).join("\n");
-    expect(responsive).toContain("@media (max-width: 1199px)");
-    expect(responsive).toContain("@media (max-width: 899px)");
-    expect(responsive).toContain("@media (max-width: 639px)");
+    const responsive = read("app/cinema-responsive.css");
+    expect(responsive).toContain("@media (max-width: 1180px)");
+    expect(responsive).toContain("@media (max-width: 900px)");
+    expect(responsive).toContain("@media (max-width: 640px)");
     expect(responsive).toContain("prefers-reduced-motion: reduce");
   });
 });
