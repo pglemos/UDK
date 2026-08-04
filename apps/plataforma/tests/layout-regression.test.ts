@@ -30,7 +30,8 @@ describe("responsive layout safeguards", () => {
 
     expect(assets).toContain("photo-1505570554449-69ce7d4fa36b");
     expect(assets).toContain("photo-1560990816-bb30289c6611");
-    expect(assets).not.toContain("photo-1752348512364-fac974d4d5b0");
+    expect(assets).not.toContain('src: "https://images.unsplash.com/photo-1752348512364-fac974d4d5b0');
+    expect(assets).toContain('"photo-1752348512364-fac974d4d5b0"');
     expect(calendar).toContain("resolveVisualSource");
     expect(primitives).toContain("resolveVisualSource");
   });
