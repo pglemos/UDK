@@ -9,7 +9,7 @@ describe("second full visual audit safeguards", () => {
   it("loads the second audit stylesheet after every previous visual layer", () => {
     const race = read("app/race.css");
     expect(race).toContain('@import "./audit-round-two.css";');
-    expect(race.indexOf('audit-round-two.css')).toBeGreaterThan(race.indexOf('final-audit-overrides.css'));
+    expect(race.indexOf("audit-round-two.css")).toBeGreaterThan(race.indexOf("final-audit-overrides.css"));
   });
 
   it("prevents the featured news title from overflowing its desktop column", () => {
@@ -33,8 +33,14 @@ describe("second full visual audit safeguards", () => {
   it("uses the attached official UDK wordmarks instead of the legacy repository logo", () => {
     const logo = read("components/race/official-logo.tsx");
     const assets = read("lib/official-brand-assets.ts");
+    const white = read("public/brand/udk-wordmark-white.svg");
+    const dark = read("public/brand/udk-wordmark-dark.svg");
+
     expect(logo).toContain("officialBrandAssets");
-    expect(assets).toContain("data:image/png;base64,");
+    expect(assets).toContain("/brand/udk-wordmark-white.svg");
+    expect(assets).toContain("/brand/udk-wordmark-dark.svg");
+    expect(white).toContain("viewBox=\"0 0 2000 402\"");
+    expect(dark).toContain("viewBox=\"0 0 2000 402\"");
     expect(logo).not.toContain("/brand/udk-logo-negativa.png");
   });
 
