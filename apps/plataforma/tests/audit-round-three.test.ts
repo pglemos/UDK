@@ -62,11 +62,31 @@ describe("third visual audit safeguards", () => {
     expect(motion).not.toContain("useState<CountdownValue>(() =>");
   });
 
-  it("fails browser audits on runtime and optimized image request errors", () => {
+  it("rejects invalid natural image dimensions", () => {
     const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
 
-    expect(audit).toContain("pageErrors.length || requestFailures.length");
+    expect(audit).toContain("item.naturalWidth < 2");
+    expect(audit).toContain("item.naturalHeight < 2");
+  });
+
+  it("fails browser audits on page, console and image request errors", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+
+    expect(audit).toContain('page.on("console"');
+    expect(audit).toContain('message.type() === "error"');
+    expect(audit).toContain("consoleErrors");
+    expect(audit).toContain("pageErrors.length || consoleErrors.length || requestFailures.length");
     expect(audit).toContain("runtimeFailures");
-    expect(audit).toContain("failures: [...mediaFailures, ...runtimeFailures]");
+  });
+
+  it("persists capture diagnostics even when an individual route throws", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+
+    expect(audit).toContain("captureFailures");
+    expect(audit).toContain('type: "capture"');
+    expect(audit).toContain("finally");
+    expect(audit).toContain("await page.close()");
+    expect(audit).toContain("writeDiagnostics");
+    expect(audit).toContain("failures: [...mediaFailures, ...runtimeFailures, ...captureFailures]");
   });
 });
