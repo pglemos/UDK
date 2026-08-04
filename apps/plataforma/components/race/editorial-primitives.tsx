@@ -83,12 +83,8 @@ export function StageProject({
 
 export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; index?: number }) {
   const fallback = driverVisual(index);
-  const fallbackStyle = driver.avatarUrl
-    ? undefined
-    : {
-        backgroundImage: `url("${fallback.src}")`,
-        backgroundPosition: fallback.position,
-      };
+  const source = driver.avatarUrl ?? fallback.src;
+  const alt = driver.avatarUrl ? `Retrato de ${driver.name}` : fallback.alt;
 
   return (
     <Link
@@ -96,19 +92,17 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
       className={`cinema-driver-poster tg-driver-poster${driver.avatarUrl ? "" : " is-fallback"}`}
       style={{ "--poster-index": index } as React.CSSProperties}
     >
-      <div
-        className={`cinema-driver-poster-media tg-driver-poster-media${driver.avatarUrl ? "" : " is-fallback"}`}
-        style={fallbackStyle}
-      >
-        {driver.avatarUrl ? (
-          <Image
-            src={driver.avatarUrl}
-            alt={`Retrato de ${driver.name}`}
-            fill
-            quality={86}
-            sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
-          />
-        ) : null}
+      <div className="cinema-driver-poster-media tg-driver-poster-media">
+        <Image
+          src={source}
+          alt={alt}
+          fill
+          priority={index < 3}
+          loading={index < 3 ? undefined : "eager"}
+          quality={86}
+          sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
+          style={{ objectPosition: driver.avatarUrl ? "50% center" : fallback.position }}
+        />
       </div>
       <div className="cinema-driver-poster-copy tg-driver-poster-copy">
         <span>{driver.category}</span>
