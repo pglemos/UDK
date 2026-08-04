@@ -61,7 +61,7 @@ async function scrollAndHydrate(page) {
   });
 }
 
-async function collectDiagnostics(page, route, viewportName, failures) {
+async function collectDiagnostics(page, route, viewportName, mediaFailures) {
   const media = await page.locator(".tg-driver-poster-media img, .tg-standing-podium-visual img").evaluateAll(
     (images) => images.map((image) => {
       const style = window.getComputedStyle(image);
@@ -83,7 +83,7 @@ async function collectDiagnostics(page, route, viewportName, failures) {
 
   const broken = media.filter((item) => !item.complete || item.naturalWidth < 2 || item.width < 2 || item.height < 2);
   if (broken.length) {
-    failures.push({ route, viewport: viewportName, broken });
+    mediaFailures.push({ type: "media", route, viewport: viewportName, broken });
   }
 
   return { route, viewport: viewportName, media };
@@ -94,7 +94,8 @@ await fs.mkdir(outputDirectory, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 const diagnostics = [];
-const failures = [];
+const mediaFailures = [];
+const runtimeFailures = [];
 
 try {
   for (const [viewportName, viewport] of viewports) {
@@ -117,8 +118,19 @@ try {
       await scrollAndHydrate(page);
       await sleep(800);
 
-      const routeDiagnostics = await collectDiagnostics(page, route || "home", viewportName, failures);
+      const routeName = route || "home";
+      const routeDiagnostics = await collectDiagnostics(page, routeName, viewportName, mediaFailures);
       diagnostics.push({ ...routeDiagnostics, pageErrors, requestFailures });
+
+      if (pageErrors.length || requestFailures.length) {
+        runtimeFailures.push({
+          type: "runtime",
+          route: routeName,
+          viewport: viewportName,
+          pageErrors,
+          requestFailures,
+        });
+      }
 
       await page.screenshot({
         path: path.join(outputDirectory, `${slug}-${viewportName}.png`),
@@ -133,9 +145,11 @@ try {
   await browser.close();
 }
 
+const failures = [...mediaFailures, ...runtimeFailures];
+
 await fs.writeFile(
   path.join(outputDirectory, "diagnostics.json"),
-  `${JSON.stringify({ diagnostics, failures }, null, 2)}\n`,
+  `${JSON.stringify({ diagnostics, failures: [...mediaFailures, ...runtimeFailures] }, null, 2)}\n`,
   "utf8",
 );
 
