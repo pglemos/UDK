@@ -23,13 +23,12 @@ function isActive(pathname: string, href: string): boolean {
 
 function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <span className={`race-brand-lockup${compact ? " is-compact" : ""}`}>
-      <OfficialLogo variant="mark-light" width={compact ? 38 : 44} priority={!compact} />
-      <span className="race-brand-wordmark" aria-hidden="true">
-        <strong>ULTRAS</strong>
-        <small>DO KART</small>
-      </span>
-    </span>
+    <OfficialLogo
+      variant="negative"
+      width={compact ? 116 : 148}
+      priority={!compact}
+      className="race-brand-official-wordmark"
+    />
   );
 }
 
@@ -106,7 +105,7 @@ export function RaceHeader() {
           scrolled ? "is-compact" : "",
         ].filter(Boolean).join(" ")}
       >
-        <Link className="race-brand" href="/" aria-label="Ultras do Kart, página inicial">
+        <Link className="race-brand" href="/" aria-label="UDK, página inicial">
           <BrandLockup />
         </Link>
 
@@ -162,7 +161,7 @@ export function RaceHeader() {
         </div>
 
         <div className="race-mobile-menu-head">
-          <span className="race-menu-brand" aria-label="Ultras do Kart">
+          <span className="race-menu-brand" aria-label="UDK">
             <BrandLockup compact />
           </span>
           <button
