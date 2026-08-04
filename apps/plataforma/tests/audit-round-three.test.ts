@@ -22,8 +22,10 @@ describe("third visual audit safeguards", () => {
 
     expect(assets).toContain("export function driverVisual");
     expect(editorial).toContain("driverVisual(index)");
-    expect(editorial).toMatch(/driver\.avatarUrl[\s\S]*className="driver-fallback-photo"/);
-    expect(editorial).toMatch(/className="driver-fallback-photo"[\s\S]{0,260}loading="eager"/);
+    expect(editorial).toContain("backgroundImage: `url");
+    expect(editorial).toContain("backgroundPosition: fallback.position");
+    expect(editorial).toContain('driver.avatarUrl ? "" : " is-fallback"');
+    expect(editorial).not.toContain('className="driver-fallback-photo"');
     expect(ui).toContain("driverVisual(driver.number || 0)");
   });
 
@@ -41,7 +43,8 @@ describe("third visual audit safeguards", () => {
 
     expect(race).toContain('@import "./audit-round-three.css";');
     expect(race.indexOf("audit-round-three.css")).toBeGreaterThan(race.indexOf("audit-round-two.css"));
-    expect(css).toContain(".cinema-driver-fallback img");
+    expect(css).toContain(".cinema-driver-poster-media.is-fallback");
+    expect(css).toContain("background-size: cover");
     expect(css).toContain(".tg-standing-podium-fallback img");
     expect(css).toContain(".race-driver-visual.is-fallback img");
   });
