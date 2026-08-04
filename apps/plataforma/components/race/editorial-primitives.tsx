@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Flag, MapPin, Timer } from "lucide-react";
 import type { PublicDriver, PublicStage } from "../../lib/public-data";
-import { resolveVisualSource, stageVisual } from "../../lib/visual-assets";
+import { driverVisual, resolveVisualSource, stageVisual } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 import { StatusBadge } from "./ui";
 
@@ -83,6 +83,8 @@ export function StageProject({
 }
 
 export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; index?: number }) {
+  const fallback = driverVisual(index);
+
   return (
     <Link
       href={`/pilotos/${driver.slug}`}
@@ -100,6 +102,16 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           />
         ) : (
           <div className="cinema-driver-fallback tg-driver-fallback" aria-hidden="true">
+            <Image
+              className="driver-fallback-photo"
+              src={fallback.src}
+              alt=""
+              fill
+              quality={84}
+              sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
+              style={{ objectPosition: fallback.position }}
+            />
+            <span className="driver-fallback-shade" />
             <OfficialLogo variant="mark-light" width={74} />
             <strong>#{driver.number}</strong>
           </div>
