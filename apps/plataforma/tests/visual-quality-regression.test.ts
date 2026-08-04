@@ -8,15 +8,16 @@ const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8")
 describe("UDK visual quality regressions", () => {
   it("loads the editorial type system through next/font", () => {
     const layout = read("app/layout.tsx");
-    const core = read("app/cinema-core.css");
+    const entry = read("app/race.css");
+    const refinement = read("app/visual-quality.css");
 
     expect(layout).toContain('from "next/font/google"');
     expect(layout).toContain("Syne");
     expect(layout).toContain("Manrope");
     expect(layout).toContain("className={`${display.variable} ${body.variable}`}");
-    expect(core).not.toContain("fonts.googleapis.com");
-    expect(core).toContain("var(--font-display)");
-    expect(core).toContain("var(--font-body)");
+    expect(entry).toContain('@import "./visual-quality.css";');
+    expect(refinement).toContain("var(--font-display)");
+    expect(refinement).toContain("var(--font-body)");
   });
 
   it("uses multiple high-resolution visual sources instead of the 713px fallback", () => {
