@@ -5,6 +5,14 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
+type MediaManifest = {
+  assets: Array<{
+    path: string;
+    width: number;
+    height: number;
+  }>;
+};
+
 describe("UDK visual quality regressions", () => {
   it("loads the editorial type system through next/font", () => {
     const layout = read("app/layout.tsx");
@@ -20,14 +28,23 @@ describe("UDK visual quality regressions", () => {
     expect(refinement).toContain("var(--font-body)");
   });
 
-  it("uses multiple high-resolution visual sources instead of the 713px fallback", () => {
+  it("uses multiple optimized official visual sources instead of a repeated fallback", () => {
     const assets = read("lib/visual-assets.ts");
+    const manifest = JSON.parse(
+      read("public/media/official/source-manifest.json"),
+    ) as MediaManifest;
     const home = read("app/page.tsx");
     const header = read("components/race/race-header.tsx");
     const primitives = read("components/race/editorial-primitives.tsx");
 
-    expect(assets.match(/images\.unsplash\.com/g)?.length ?? 0).toBeGreaterThanOrEqual(5);
-    expect(assets).toContain("w=2400");
+    expect(assets.match(/\/media\/official\//g)?.length ?? 0).toBeGreaterThanOrEqual(20);
+    expect(assets).toContain("/media/official/home/hero-desktop.webp");
+    expect(assets).toContain("/media/official/drivers/fallback-01.webp");
+    expect(assets).toContain("/media/official/stages/stage-05.webp");
+    expect(assets).toContain("/media/official/news/news-03.webp");
+    expect(manifest.assets).toHaveLength(24);
+    expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(24);
+    expect(manifest.assets.every((asset) => asset.width >= 800 && asset.height >= 600)).toBe(true);
     expect(home).toContain("premiumVisuals");
     expect(header).toContain("menuVisuals");
     expect(primitives).toContain("stageVisual");
@@ -48,7 +65,8 @@ describe("UDK visual quality regressions", () => {
     }
 
     const config = read("next.config.ts");
-    expect(config).toContain('hostname: "images.unsplash.com"');
+    expect(config).toContain('formats: ["image/avif", "image/webp"]');
+    expect(config).toContain("1920");
   });
 
   it("prevents headline and component clipping across viewports", () => {
