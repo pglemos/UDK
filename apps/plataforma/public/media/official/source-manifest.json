@@ -1,0 +1,229 @@
+{
+  "generatedAt": "2026-08-06",
+  "policy": {
+    "productionSources": "Local files only; Google Drive sources are provenance only",
+    "pilotIdentity": "No facial recognition or inferred identity used",
+    "imageFormat": "WebP",
+    "videoFormat": "H.264 MP4 without audio"
+  },
+  "assets": [
+    {
+      "path": "/media/official/home/hero-desktop.webp",
+      "source": "IMG_4290.MOV @ 1.45s",
+      "purpose": "Home desktop poster",
+      "width": 1920,
+      "height": 1080,
+      "crop": "1920x1080 center crop",
+      "transform": "WebP quality 86, contrast +6%, color +4%"
+    },
+    {
+      "path": "/media/official/home/hero-mobile.webp",
+      "source": "275A.mp4 @ 1.80s",
+      "purpose": "Home mobile and reduced-motion poster",
+      "width": 720,
+      "height": 1200,
+      "crop": "vertical crop",
+      "transform": "WebP quality 86, contrast +5%, color +3%"
+    },
+    {
+      "path": "/media/official/heroes/calendario.webp",
+      "source": "IMG_4290.MOV @ 3.18s",
+      "purpose": "Calendário page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "1920x1080 center crop",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/classificacao.webp",
+      "source": "IMG_4293.MOV @ 1.20s",
+      "purpose": "Classificação page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "1920x1080 center crop",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/resultados.webp",
+      "source": "DSC00414-1.jpg",
+      "purpose": "Resultados page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "1920x1080 crop focused on timing board",
+      "transform": "WebP quality 87, contrast +8%, color +5%"
+    },
+    {
+      "path": "/media/official/heroes/pilotos.webp",
+      "source": "ULT-DPTO-Cover.jpg + ULT-FLAVIO-Cover.jpg",
+      "purpose": "Pilotos page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "two-portrait collage with left text-safe area",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/noticias.webp",
+      "source": "233A.mp4 @ 8.40s + 275A.mp4 @ 7.00s",
+      "purpose": "Notícias page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "two-action-frame collage with left text-safe area",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/regulamento.webp",
+      "source": "209A.mp4 @ 3.80s + 8.00s",
+      "purpose": "Regulamento page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "briefing collage with left text-safe area",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/inscricao.webp",
+      "source": "215A.mp4 @ 5.20s + IMG_4319.MOV @ 1.20s",
+      "purpose": "Inscrição page hero",
+      "width": 1920,
+      "height": 1080,
+      "crop": "preparation collage with left text-safe area",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/heroes/login.webp",
+      "source": "201A.mp4 @ 5.00s + 1.00s",
+      "purpose": "Login background",
+      "width": 1920,
+      "height": 1080,
+      "crop": "kart detail collage with left text-safe area",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/drivers/dpto.webp",
+      "source": "ULT-DPTO-Cover.jpg",
+      "purpose": "Dpto pilot portrait",
+      "width": 900,
+      "height": 1200,
+      "crop": "vertical portrait crop",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/drivers/flavio.webp",
+      "source": "ULT-FLAVIO-Cover.jpg",
+      "purpose": "Flavio pilot portrait",
+      "width": 900,
+      "height": 1200,
+      "crop": "vertical portrait crop",
+      "transform": "WebP quality 86"
+    },
+    {
+      "path": "/media/official/drivers/fallback-01.webp",
+      "source": "275A.mp4 @ 1.80s",
+      "purpose": "Driver fallback 01",
+      "width": 720,
+      "height": 1200,
+      "crop": "vertical action crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/drivers/fallback-02.webp",
+      "source": "280A.mp4 @ 1.20s",
+      "purpose": "Driver fallback 02",
+      "width": 720,
+      "height": 1200,
+      "crop": "vertical action crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/drivers/fallback-03.webp",
+      "source": "233A.mp4 @ 14.00s",
+      "purpose": "Driver fallback 03",
+      "width": 720,
+      "height": 1200,
+      "crop": "vertical action crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/stages/stage-01.webp",
+      "source": "IMG_4290.MOV @ 1.45s",
+      "purpose": "Stage fallback 01",
+      "width": 1200,
+      "height": 800,
+      "crop": "3:2 action crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/stages/stage-02.webp",
+      "source": "IMG_4293.MOV @ 2.18s",
+      "purpose": "Stage fallback 02",
+      "width": 1200,
+      "height": 800,
+      "crop": "3:2 kart crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/stages/stage-03.webp",
+      "source": "263A.mp4 @ 2.50s",
+      "purpose": "Stage fallback 03",
+      "width": 720,
+      "height": 960,
+      "crop": "vertical track-sign crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/stages/stage-04.webp",
+      "source": "255A.mp4 @ 1.40s",
+      "purpose": "Stage fallback 04",
+      "width": 720,
+      "height": 960,
+      "crop": "vertical track crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/stages/stage-05.webp",
+      "source": "275A.mp4 @ 7.00s",
+      "purpose": "Stage fallback 05",
+      "width": 720,
+      "height": 960,
+      "crop": "vertical pack crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/news/news-01.webp",
+      "source": "233A.mp4 @ 8.40s + 14.00s",
+      "purpose": "News fallback 01",
+      "width": 1200,
+      "height": 800,
+      "crop": "night-race collage",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/news/news-02.webp",
+      "source": "209A.mp4 @ 3.80s + 8.00s",
+      "purpose": "News fallback 02",
+      "width": 1200,
+      "height": 800,
+      "crop": "briefing collage",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/news/news-03.webp",
+      "source": "DSC00414-1.jpg",
+      "purpose": "News fallback 03",
+      "width": 1200,
+      "height": 800,
+      "crop": "timing-board crop",
+      "transform": "WebP quality 84"
+    },
+    {
+      "path": "/media/official/home/hero-loop.mp4",
+      "source": "IMG_4290.MOV + IMG_4293.MOV",
+      "purpose": "Home decorative desktop loop",
+      "width": 1280,
+      "height": 720,
+      "durationSeconds": 6.75,
+      "sizeBytes": 1385022,
+      "crop": "1920x1080 center crop",
+      "transform": "H.264 High profile, 24 fps, CRF 28, audio removed, faststart"
+    }
+  ]
+}
