@@ -81,6 +81,18 @@ describe("third visual audit safeguards", () => {
     expect(audit).toContain("media%2Fofficial");
   });
 
+  it("uses bundled Chromium by default and an explicit workflow channel override", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+    const workflow = readRepositoryFile(".github/workflows/visual-audit.yml");
+
+    expect(audit).toContain(
+      "const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL;",
+    );
+    expect(audit).not.toContain('?? "chrome"');
+    expect(audit).toContain("...(browserChannel ? { channel: browserChannel } : {})");
+    expect(workflow).toContain("VISUAL_AUDIT_BROWSER_CHANNEL: chrome");
+  });
+
   it("fails browser audits on page, console and official media request errors", () => {
     const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
 
