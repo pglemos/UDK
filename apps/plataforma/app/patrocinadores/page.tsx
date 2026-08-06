@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/patrocinadores" },
 };
 
+function instagramHandle(url: string): string {
+  try {
+    const [handle] = new URL(url).pathname.split("/").filter(Boolean);
+    return handle ? `@${handle}` : "Instagram";
+  } catch {
+    return "Instagram";
+  }
+}
+
 export default async function SponsorsPage() {
   const sponsors = await getSponsors();
 
@@ -46,8 +55,9 @@ export default async function SponsorsPage() {
                           <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>
                         )}
                       </div>
-                      <span>{sponsor.tier || "Parceiro oficial"}</span>
+                      <span>{sponsor.tier || "Patrocinador oficial"}</span>
                       <h2>{sponsor.name}</h2>
+                      {sponsor.websiteUrl ? <small>{instagramHandle(sponsor.websiteUrl)}</small> : null}
                     </>
                   );
 
@@ -59,6 +69,7 @@ export default async function SponsorsPage() {
                           href={sponsor.websiteUrl}
                           target="_blank"
                           rel="noreferrer"
+                          aria-label={`Abrir Instagram de ${sponsor.name}`}
                         >
                           {content}
                         </a>
