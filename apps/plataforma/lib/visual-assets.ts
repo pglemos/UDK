@@ -1,3 +1,5 @@
+import { isGenericMediaSource } from "./media-policy";
+
 export type PremiumVisual = {
   src: string;
   alt: string;
@@ -170,20 +172,12 @@ const pageHeroVisuals: Record<string, PremiumVisual> = {
   },
 };
 
-const legacyPlaceholders = [
-  "/media/udk-race-hero.webp",
-  "udk-race-hero.webp",
-  "images.unsplash.com",
-  "photo-1752348512364-fac974d4d5b0",
-  "photo-1560990816-bb30289c6611",
-];
-
 export function resolveVisualSource(
   source: string | null | undefined,
   fallback: PremiumVisual,
 ): string {
   const normalized = source?.trim();
-  if (!normalized || legacyPlaceholders.some((placeholder) => normalized.includes(placeholder))) {
+  if (!normalized || isGenericMediaSource(normalized)) {
     return fallback.src;
   }
   return normalized;
