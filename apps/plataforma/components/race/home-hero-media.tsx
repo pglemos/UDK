@@ -43,7 +43,6 @@ export function HomeHeroMediaLayer() {
       <picture>
         <source media="(max-width: 767px)" srcSet={homeHeroMedia.mobile} type="image/webp" />
         {/* The responsive picture prevents both priority posters from downloading. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="official-home-hero-poster"
           src={homeHeroMedia.poster}
