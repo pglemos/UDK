@@ -19,13 +19,13 @@ with championship as (
 ),
 roster(name, slug, logo_url, website_url, tier, status) as (
   values
-    ('Grupo Emtel', 'grupo-emtel', '/sponsors/grupo-emtel.webp', 'https://www.instagram.com/grupoemtel/', 'Patrocinador oficial', 'active'),
-    ('Firepit Brasil', 'firepit-brasil', '/sponsors/firepit-brasil.webp', 'https://www.instagram.com/firepitbrasil/', 'Patrocinador oficial', 'active'),
-    ('Guicosmos TV', 'guicosmos-tv', '/sponsors/guicosmos-tv.webp', 'https://www.instagram.com/guicosmos_tv/', 'Patrocinador oficial', 'active'),
-    ('AKAMIG', 'akamig', '/sponsors/akamig.webp', 'https://www.instagram.com/akamigkart/', 'Patrocinador oficial', 'active'),
-    ('TransferMix', 'transfermix', '/sponsors/transfermix.webp', 'https://www.instagram.com/transfermixbrindes/', 'Patrocinador oficial', 'active'),
-    ('Veste Custom Wear', 'veste-custom-wear', '/sponsors/veste-custom-wear.webp', 'https://www.instagram.com/vestecw/', 'Patrocinador oficial', 'active'),
-    ('Vintage São Francisco', 'vintage-sao-francisco', '/sponsors/vintage-sao-francisco.webp', 'https://www.instagram.com/vinagreorganico/', 'Patrocinador oficial', 'active')
+    ('Grupo Emtel', 'grupo-emtel', '/sponsors/grupo-emtel.svg', 'https://www.instagram.com/grupoemtel/', 'Patrocinador oficial', 'active'),
+    ('Firepit Brasil', 'firepit-brasil', '/sponsors/firepit-brasil.svg', 'https://www.instagram.com/firepitbrasil/', 'Patrocinador oficial', 'active'),
+    ('Guicosmos TV', 'guicosmos-tv', '/sponsors/guicosmos-tv.svg', 'https://www.instagram.com/guicosmos_tv/', 'Patrocinador oficial', 'active'),
+    ('AKAMIG', 'akamig', '/sponsors/akamig.svg', 'https://www.instagram.com/akamigkart/', 'Patrocinador oficial', 'active'),
+    ('TransferMix', 'transfermix', '/sponsors/transfermix.svg', 'https://www.instagram.com/transfermixbrindes/', 'Patrocinador oficial', 'active'),
+    ('Veste Custom Wear', 'veste-custom-wear', '/sponsors/veste-custom-wear.svg', 'https://www.instagram.com/vestecw/', 'Patrocinador oficial', 'active'),
+    ('Vintage São Francisco', 'vintage-sao-francisco', '/sponsors/vintage-sao-francisco.svg', 'https://www.instagram.com/vinagreorganico/', 'Patrocinador oficial', 'active')
 )
 insert into public.sponsors (
   championship_id,
