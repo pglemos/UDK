@@ -7,6 +7,7 @@ const playwrightModule = process.env.PLAYWRIGHT_MODULE_PATH ?? "playwright";
 const { chromium } = require(playwrightModule);
 
 const baseUrl = process.env.VISUAL_AUDIT_BASE_URL ?? "http://127.0.0.1:3000";
+const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL ?? "chrome";
 const outputDirectory = path.resolve("visual-audit");
 const routes = [
   ["", "home"],
@@ -32,6 +33,14 @@ function isAuditedMediaUrl(url) {
     url.includes("/media/official/") ||
     url.includes("media%2Fofficial") ||
     url.includes("images.unsplash.com")
+  );
+}
+
+function isExpectedVideoMetadataAbort(url, errorText) {
+  return (
+    url.includes("/media/official/") &&
+    url.includes(".mp4") &&
+    errorText.includes("ERR_ABORTED")
   );
 }
 
@@ -242,7 +251,7 @@ function writeDiagnostics() {
 }
 
 try {
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true, channel: browserChannel });
 
   for (const [viewportName, viewport] of viewports) {
     const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
@@ -264,11 +273,9 @@ try {
         });
         page.on("requestfailed", (request) => {
           const url = request.url();
-          if (isAuditedMediaUrl(url)) {
-            requestFailures.push({
-              url,
-              error: request.failure()?.errorText ?? "unknown",
-            });
+          const errorText = request.failure()?.errorText ?? "unknown";
+          if (isAuditedMediaUrl(url) && !isExpectedVideoMetadataAbort(url, errorText)) {
+            requestFailures.push({ url, error: errorText });
           }
         });
         page.on("response", (response) => {
@@ -353,10 +360,13 @@ try {
     error: error instanceof Error ? error.message : String(error),
   });
 } finally {
-  if (browser) {
-    await browser.close();
+  try {
+    if (browser) {
+      await browser.close();
+    }
+  } finally {
+    await writeDiagnostics();
   }
-  await writeDiagnostics();
 }
 
 const failures = [
