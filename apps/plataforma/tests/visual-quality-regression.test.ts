@@ -44,7 +44,13 @@ describe("UDK visual quality regressions", () => {
     expect(assets).toContain("/media/official/news/news-03.webp");
     expect(manifest.assets).toHaveLength(24);
     expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(24);
-    expect(manifest.assets.every((asset) => asset.width >= 800 && asset.height >= 600)).toBe(true);
+    expect(
+      manifest.assets.every(
+        (asset) =>
+          Math.max(asset.width, asset.height) >= 960 &&
+          Math.min(asset.width, asset.height) >= 720,
+      ),
+    ).toBe(true);
     expect(home).toContain("premiumVisuals");
     expect(header).toContain("menuVisuals");
     expect(primitives).toContain("stageVisual");
