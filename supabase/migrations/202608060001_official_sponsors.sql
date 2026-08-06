@@ -8,7 +8,9 @@ with championship as (
 delete from public.sponsors sponsor
 using championship
 where sponsor.championship_id = championship.id
-  and sponsor.slug = 'pvf-transportes';
+  and sponsor.slug = 'pvf-transportes'
+  and sponsor.status = 'active'
+  and sponsor.deleted_at is null;
 
 with championship as (
   select id
@@ -55,6 +57,8 @@ set
   website_url = excluded.website_url,
   tier = excluded.tier,
   status = excluded.status,
+  -- `deleted_at` was added to sponsors by migration 202607180008.
+  -- Clearing it restores an approved sponsor that had been soft-deleted.
   deleted_at = null,
   updated_at = now();
 
@@ -68,6 +72,8 @@ with championship as (
 delete from public.sponsors sponsor
 using championship
 where sponsor.championship_id = championship.id
+  and sponsor.status = 'active'
+  and sponsor.deleted_at is null
   and sponsor.slug not in (
     'grupo-emtel',
     'firepit-brasil',
