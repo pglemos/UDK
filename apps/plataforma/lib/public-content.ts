@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { sanitizePublicMediaSource } from "./media-policy";
 import { buildPageMeta, getPageRange, type PageMeta } from "./public-data";
 import { fallbackNews, fallbackRegulations, fallbackSponsors } from "./public-content-fallbacks";
 
@@ -77,7 +78,7 @@ export function normalizePublicContent(row: UnknownRow): PublicContent {
     summary,
     content: body,
     category: text(row.category, "Notícias"),
-    coverImageUrl: nullableText(row.cover_image_url),
+    coverImageUrl: sanitizePublicMediaSource(nullableText(row.cover_image_url)),
     publishedAt: text(row.published_at),
     readingMinutes: Math.max(1, Math.ceil(words / 220)),
   };
