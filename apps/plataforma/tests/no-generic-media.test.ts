@@ -7,7 +7,7 @@ function source(path: string): string {
   return readFileSync(`${root}/${path}`, "utf8");
 }
 
-// Keep stock-photo hosts blocked at fallback, database, and rendering boundaries.
+// Keep stock-photo hosts blocked at fallback, database, rendering, and metadata boundaries.
 const genericHosts = [
   "images.unsplash.com",
   "source.unsplash.com",
