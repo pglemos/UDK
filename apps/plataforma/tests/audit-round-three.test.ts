@@ -17,25 +17,29 @@ describe("third visual audit safeguards", () => {
     expect(ui).not.toContain("src={premiumVisuals.race.src}");
   });
 
-  it("renders a real racing visual when a driver has no uploaded portrait", () => {
+  it("renders an official racing visual when a driver has no valid published portrait", () => {
     const assets = read("lib/visual-assets.ts");
     const editorial = read("components/race/editorial-primitives.tsx");
     const ui = read("components/race/ui.tsx");
 
     expect(assets).toContain("export function driverVisual");
+    expect(assets).toContain("isGenericMediaSource");
     expect(editorial).toContain("driverVisual(index)");
-    expect(editorial).toContain("const source = driver.avatarUrl ?? fallback.src");
+    expect(editorial).toContain("resolveVisualSource(driver.avatarUrl, fallback)");
+    expect(editorial).toContain("hasPublishedPortrait");
     expect(editorial).toContain("src={source}");
-    expect(editorial).toContain("objectPosition: driver.avatarUrl ?");
+    expect(editorial).toContain("objectPosition: hasPublishedPortrait ?");
     expect(editorial).not.toContain('className="driver-fallback-photo"');
     expect(ui).toContain("driverVisual(driver.number || 0)");
   });
 
-  it("uses the same visual fallback in the standings podium", () => {
+  it("uses the same sanitized official fallback in the standings podium", () => {
     const standings = read("app/classificacao/page.tsx");
 
     expect(standings).toContain('import Image from "next/image"');
     expect(standings).toContain("driverVisual(index)");
+    expect(standings).toContain("resolveVisualSource(driver.avatarUrl, fallback)");
+    expect(standings).toContain("hasPublishedPortrait");
     expect(standings).toContain("tg-standing-podium-fallback");
   });
 

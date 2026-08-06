@@ -6,7 +6,7 @@ import { EditorialEmpty, EditorialHeading } from "../../components/race/editoria
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
 import { getCategories, getStandingsPage, parsePositiveInt } from "../../lib/public-data";
-import { driverVisual } from "../../lib/visual-assets";
+import { driverVisual, resolveVisualSource } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Classificação",
@@ -75,13 +75,15 @@ export default async function StandingsPage({
                 <section className="tg-standing-podium" aria-label="Pódio da classificação">
                   {standings.items.slice(0, 3).map((driver, index) => {
                     const fallback = driverVisual(index);
+                    const source = resolveVisualSource(driver.avatarUrl, fallback);
+                    const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
                     return (
                       <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
                         <span>{String(index + 1).padStart(2, "0")}</span>
-                        <div className={`tg-standing-podium-visual${driver.avatarUrl ? "" : " tg-standing-podium-fallback"}`}>
-                          {driver.avatarUrl ? (
+                        <div className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}>
+                          {hasPublishedPortrait ? (
                             <Image
-                              src={driver.avatarUrl}
+                              src={source}
                               alt=""
                               fill
                               quality={86}

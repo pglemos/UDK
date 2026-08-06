@@ -7,7 +7,7 @@ import { EditorialEmpty, EditorialHeading } from "../../../components/race/edito
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
 import { formatLapTime, getDriverBySlug, getDriverHistory } from "../../../lib/public-data";
-import { premiumVisuals } from "../../../lib/visual-assets";
+import { driverVisual, premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";
 
 export async function generateMetadata({
   params,
@@ -17,6 +17,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const driver = await getDriverBySlug(slug);
   if (!driver) return { title: "Piloto não encontrado" };
+  const coverSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);
   return {
     title: driver.name,
     description: `Perfil esportivo de ${driver.name}, #${driver.number}, na temporada UDK 2026.`,
@@ -24,7 +25,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${driver.name} • UDK`,
       description: `${driver.points} pontos, ${driver.wins} vitórias e ${driver.podiums} pódios na temporada.`,
-      images: [driver.heroImageUrl ?? driver.avatarUrl ?? premiumVisuals.hero.src],
+      images: [coverSource],
     },
   };
 }
@@ -38,19 +39,25 @@ export default async function DriverProfilePage({
   const [driver, history] = await Promise.all([getDriverBySlug(slug), getDriverHistory(slug)]);
   if (!driver) notFound();
 
+  const portraitFallback = driverVisual(driver.number);
+  const heroSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);
+  const portraitSource = resolveVisualSource(driver.avatarUrl, portraitFallback);
+  const hasPublishedHero = Boolean(driver.heroImageUrl || driver.avatarUrl) && heroSource !== premiumVisuals.manifesto.src;
+  const hasPublishedPortrait = Boolean(driver.avatarUrl) && portraitSource !== portraitFallback.src;
+
   return (
     <RaceShell>
       <main id="conteudo" className="tg-driver-profile">
         <section className="tg-driver-profile-hero">
           <div className="tg-driver-profile-media" aria-hidden="true">
             <Image
-              src={driver.heroImageUrl ?? premiumVisuals.hero.src}
+              src={heroSource}
               alt=""
               fill
               priority
               quality={90}
               sizes="100vw"
-              style={{ objectPosition: driver.heroImageUrl ? "50% center" : premiumVisuals.hero.position }}
+              style={{ objectPosition: hasPublishedHero ? "50% center" : premiumVisuals.manifesto.position }}
             />
           </div>
           <div className="race-container tg-driver-profile-hero-inner">
@@ -93,18 +100,15 @@ export default async function DriverProfilePage({
                 <span><MapPin aria-hidden="true" /> {driver.city ?? "Cidade não publicada"}</span>
               </div>
             </Reveal>
-            <div className="tg-profile-portrait">
-              {driver.avatarUrl ? (
-                <Image
-                  src={driver.avatarUrl}
-                  alt={`Retrato de ${driver.name}`}
-                  fill
-                  quality={88}
-                  sizes="(max-width: 760px) 100vw, 42vw"
-                />
-              ) : (
-                <div><strong>#{driver.number}</strong><span>Imagem oficial ainda não publicada</span></div>
-              )}
+            <div className={`tg-profile-portrait${hasPublishedPortrait ? "" : " is-fallback"}`}>
+              <Image
+                src={portraitSource}
+                alt={hasPublishedPortrait ? `Retrato de ${driver.name}` : portraitFallback.alt}
+                fill
+                quality={88}
+                sizes="(max-width: 760px) 100vw, 42vw"
+                style={{ objectPosition: hasPublishedPortrait ? "50% center" : portraitFallback.position }}
+              />
             </div>
           </div>
         </section>
