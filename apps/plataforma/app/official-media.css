@@ -2,22 +2,27 @@
   background: #050607;
 }
 
+.official-home-hero-media picture,
 .official-home-hero-poster,
 .official-home-hero-video {
   position: absolute !important;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.official-home-hero-media picture {
+  z-index: 0;
+  display: block;
+}
+
+.official-home-hero-poster,
+.official-home-hero-video {
   object-fit: cover;
 }
 
 .official-home-hero-poster {
-  z-index: 0;
-}
-
-.official-home-hero-poster-mobile {
-  visibility: hidden;
-  opacity: 0;
+  display: block;
 }
 
 .official-home-hero-video {
@@ -45,16 +50,6 @@
 }
 
 @media (max-width: 767px) {
-  .official-home-hero-poster-desktop {
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  .official-home-hero-poster-mobile {
-    visibility: visible;
-    opacity: 1;
-  }
-
   .official-home-hero-video {
     display: none;
   }
