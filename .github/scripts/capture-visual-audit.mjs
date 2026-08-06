@@ -7,7 +7,7 @@ const playwrightModule = process.env.PLAYWRIGHT_MODULE_PATH ?? "playwright";
 const { chromium } = require(playwrightModule);
 
 const baseUrl = process.env.VISUAL_AUDIT_BASE_URL ?? "http://127.0.0.1:3000";
-const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL ?? "chrome";
+const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL;
 const outputDirectory = path.resolve("visual-audit");
 const routes = [
   ["", "home"],
@@ -251,7 +251,10 @@ function writeDiagnostics() {
 }
 
 try {
-  browser = await chromium.launch({ headless: true, channel: browserChannel });
+  browser = await chromium.launch({
+    headless: true,
+    ...(browserChannel ? { channel: browserChannel } : {}),
+  });
 
   for (const [viewportName, viewport] of viewports) {
     const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
