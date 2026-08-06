@@ -7,6 +7,8 @@ on:
       - "apps/plataforma/**"
       - ".github/scripts/capture-visual-audit.mjs"
       - ".github/workflows/visual-audit.yml"
+  push:
+    branches: [fix/remove-generic-photos-20260806]
 
 permissions:
   contents: read
@@ -63,7 +65,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: udk-visual-audit-${{ github.event.pull_request.head.sha }}
+          name: udk-visual-audit-${{ github.sha }}
           path: visual-audit/*
           if-no-files-found: warn
           retention-days: 7
