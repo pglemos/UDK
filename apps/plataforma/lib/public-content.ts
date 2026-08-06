@@ -94,6 +94,15 @@ export function normalizePublicSponsor(row: UnknownRow): PublicSponsor {
   };
 }
 
+export function mergeOfficialSponsors(rows: PublicSponsor[]): PublicSponsor[] {
+  const bySlug = new Map(rows.map((row) => [row.slug, row]));
+
+  return fallbackSponsors.map((official) => ({
+    ...(bySlug.get(official.slug) ?? {}),
+    ...official,
+  }));
+}
+
 export function normalizePublicTerm(row: UnknownRow): PublicTerm {
   return {
     id: text(row.id),
@@ -175,7 +184,7 @@ export async function getNewsBySlug(slug: string): Promise<PublicContent | null>
 
 export async function getSponsors(): Promise<PublicSponsor[]> {
   const client = publicClient();
-  if (!client) return fallbackSponsors;
+  if (!client) return mergeOfficialSponsors([]);
 
   const { data, error } = await client
     .from("public_portal_sponsors")
@@ -183,9 +192,9 @@ export async function getSponsors(): Promise<PublicSponsor[]> {
     .order("tier")
     .order("name");
 
-  if (error) return fallbackSponsors;
+  if (error) return mergeOfficialSponsors([]);
   const normalized = ((data ?? []) as UnknownRow[]).map(normalizePublicSponsor);
-  return normalized.length ? normalized : fallbackSponsors;
+  return mergeOfficialSponsors(normalized);
 }
 
 export async function getRegulations(): Promise<PublicTerm[]> {

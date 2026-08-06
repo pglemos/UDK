@@ -44,12 +44,55 @@ export const fallbackNews: PublicContent[] = [
 ];
 
 export const fallbackSponsors: PublicSponsor[] = [
-  { name: "TS Sports", slug: "ts-sports", logoUrl: "", websiteUrl: "", tier: "oficial" },
-  { name: "RS Design", slug: "rs-design", logoUrl: "", websiteUrl: "", tier: "oficial" },
-  { name: "Firepit", slug: "firepit", logoUrl: "", websiteUrl: "", tier: "oficial" },
-  { name: "LapTime", slug: "laptime", logoUrl: "", websiteUrl: "", tier: "oficial" },
-  { name: "Vlad Imagens", slug: "vlad-imagens", logoUrl: "", websiteUrl: "", tier: "oficial" },
-  { name: "Clique na Curva", slug: "clique-na-curva", logoUrl: "", websiteUrl: "", tier: "oficial" },
+  {
+    name: "Grupo Emtel",
+    slug: "grupo-emtel",
+    logoUrl: "/sponsors/grupo-emtel.svg",
+    websiteUrl: "https://www.instagram.com/grupoemtel/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "Firepit Brasil",
+    slug: "firepit-brasil",
+    logoUrl: "/sponsors/firepit-brasil.svg",
+    websiteUrl: "https://www.instagram.com/firepitbrasil/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "Guicosmos TV",
+    slug: "guicosmos-tv",
+    logoUrl: "/sponsors/guicosmos-tv.svg",
+    websiteUrl: "https://www.instagram.com/guicosmos_tv/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "AKAMIG",
+    slug: "akamig",
+    logoUrl: "/sponsors/akamig.svg",
+    websiteUrl: "https://www.instagram.com/akamigkart/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "TransferMix",
+    slug: "transfermix",
+    logoUrl: "/sponsors/transfermix.svg",
+    websiteUrl: "https://www.instagram.com/transfermixbrindes/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "Veste Custom Wear",
+    slug: "veste-custom-wear",
+    logoUrl: "/sponsors/veste-custom-wear.svg",
+    websiteUrl: "https://www.instagram.com/vestecw/",
+    tier: "Patrocinador oficial",
+  },
+  {
+    name: "Vintage São Francisco",
+    slug: "vintage-sao-francisco",
+    logoUrl: "/sponsors/vintage-sao-francisco.svg",
+    websiteUrl: "https://www.instagram.com/vinagreorganico/",
+    tier: "Patrocinador oficial",
+  },
 ];
 
 export const fallbackRegulations: PublicTerm[] = [

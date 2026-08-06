@@ -34,16 +34,17 @@ describe("responsive layout safeguards", () => {
     expect(css).toContain("@media (max-width: 760px)");
   });
 
-  it("uses verified official stage visuals and resolves legacy placeholders", () => {
+  it("uses verified official visuals and resolves legacy placeholders", () => {
     const assets = read("lib/visual-assets.ts");
     const calendar = read("app/calendario/page.tsx");
     const primitives = read("components/race/editorial-primitives.tsx");
 
     expect(assets).toContain("/media/official/stages/stage-01.webp");
     expect(assets).toContain("/media/official/stages/stage-05.webp");
-    expect(assets).not.toContain('src: "https://images.unsplash.com/');
-    expect(assets).toContain('"photo-1752348512364-fac974d4d5b0"');
-    expect(assets).toContain('"photo-1560990816-bb30289c6611"');
+    expect(assets).toContain("/media/official/heroes/calendario.webp");
+    expect(assets).toContain("/media/official/drivers/fallback-01.webp");
+    expect(assets).toContain("/media/official/news/news-01.webp");
+    expect(assets).not.toContain("images.unsplash.com");
     expect(calendar).toContain("resolveVisualSource");
     expect(calendar).toContain('loading="eager"');
     expect(primitives).toContain("resolveVisualSource");
