@@ -27,11 +27,11 @@ describe("official sponsor roster", () => {
     expect(fallbackSponsors.every((sponsor) => sponsor.tier === "Patrocinador oficial")).toBe(true);
   });
 
-  it("uses local WebP logos and Instagram destinations", () => {
+  it("uses local SVG logos and Instagram destinations", () => {
     for (const sponsor of fallbackSponsors) {
-      expect(sponsor.logoUrl).toBe(`/sponsors/${sponsor.slug}.webp`);
+      expect(sponsor.logoUrl).toBe(`/sponsors/${sponsor.slug}.svg`);
       expect(sponsor.websiteUrl).toMatch(/^https:\/\/www\.instagram\.com\/[A-Za-z0-9_.]+\/$/);
-      expect(existsSync(publicFile(`${sponsor.slug}.webp`))).toBe(true);
+      expect(existsSync(publicFile(`${sponsor.slug}.svg`))).toBe(true);
     }
   });
 
@@ -68,7 +68,7 @@ describe("official sponsor roster", () => {
   });
 
   it("ships an idempotent migration for the same roster", () => {
-    const migration = sourceFile("../../supabase/migrations/202608060001_official_sponsors.sql");
+    const migration = sourceFile("../../../supabase/migrations/202608060001_official_sponsors.sql");
 
     expect(migration).toContain("pvf-transportes");
     expect(migration).toContain("on conflict (championship_id, slug) do update");
