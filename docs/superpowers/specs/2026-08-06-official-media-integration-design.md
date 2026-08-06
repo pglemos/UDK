@@ -136,7 +136,6 @@ apps/plataforma/public/media/official/
   home/
     hero-desktop.webp
     hero-mobile.webp
-    hero-poster.webp
     hero-loop.mp4
   heroes/
     calendario.webp
