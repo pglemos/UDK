@@ -22,7 +22,7 @@ PVF Transportes deve ser removida e não pode aparecer no fallback, na migraçã
 
 - `tier`: `Patrocinador oficial`
 - `status`: `active`
-- `logo_url`: arquivo WebP local em `/sponsors/<slug>.webp`
+- `logo_url`: arquivo SVG local em `/sponsors/<slug>.svg`
 - `website_url`: perfil oficial no Instagram, usado como destino externo do card
 
 Não será criado um novo campo de banco apenas para Instagram. O schema atual já possui `website_url`, suficiente para o único destino público necessário nesta entrega. Isso evita uma expansão de schema sem ganho funcional.
@@ -47,7 +47,7 @@ Uma migração idempotente deve:
 
 ## Ativos
 
-Todos os arquivos serão convertidos para WebP com canvas transparente de 1200 x 600 px, conteúdo centralizado e proporção original preservada. Nenhum card deve depender de imagem remota.
+Todos os arquivos são SVG locais, dimensionados por `viewBox`, com fundo transparente e proporção preservada. Nenhum card depende de imagem remota.
 
 ## Testes
 
