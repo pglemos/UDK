@@ -36,23 +36,18 @@ jobs:
                   raise SystemExit("Home media import anchor not found")
               source = source.replace(import_anchor, import_anchor + media_import, 1)
 
-          old_block = '''          <div className="cinema-home-hero-media" aria-hidden="true">
-            <Image
-              src={premiumVisuals.hero.src}
-              alt=""
-              fill
-              priority
-              quality={90}
-              sizes="100vw"
-              style={{ objectPosition: premiumVisuals.hero.position }}
-            />
-          </div>
-'''
-          new_block = '          <HomeHeroMediaLayer />\n'
-          if new_block not in source:
-              if old_block not in source:
-                  raise SystemExit("Static Home hero block not found")
-              source = source.replace(old_block, new_block, 1)
+          replacement = '          <HomeHeroMediaLayer />\n'
+          if replacement not in source:
+              start_marker = '          <div className="cinema-home-hero-media" aria-hidden="true">\n'
+              end_marker = '          </div>\n'
+              start = source.find(start_marker)
+              if start < 0:
+                  raise SystemExit("Static Home hero start marker not found")
+              end = source.find(end_marker, start)
+              if end < 0:
+                  raise SystemExit("Static Home hero end marker not found")
+              end += len(end_marker)
+              source = source[:start] + replacement + source[end:]
 
           path.write_text(source, encoding="utf-8")
           PY
