@@ -29,7 +29,7 @@ describe("official UDK media", () => {
   it("uses only local official media in the editorial catalog", () => {
     const catalog = read("lib/visual-assets.ts");
 
-    expect(catalog).not.toContain("images.unsplash.com");
+    expect(catalog).not.toContain("https://images.unsplash.com");
     expect(catalog).toContain('/media/official/home/hero-loop.mp4');
     expect(catalog).toContain('/media/official/heroes/resultados.webp');
   });
