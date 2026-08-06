@@ -42,4 +42,25 @@ describe("official UDK media", () => {
 
     expect(new Set(matches).size).toBeGreaterThanOrEqual(8);
   });
+
+  it("renders a poster-backed motion-aware Home hero and official login artwork", () => {
+    const component = read("components/race/home-hero-media.tsx");
+    const home = read("app/page.tsx");
+    const entry = read("app/race.css");
+    const styles = read("app/official-media.css");
+
+    expect(component).toContain('"use client"');
+    expect(component).toContain("prefers-reduced-motion: reduce");
+    expect(component).toContain("max-width: 767px");
+    expect(component).toContain("poster={homeHeroMedia.poster}");
+    expect(component).toContain("muted");
+    expect(component).toContain("playsInline");
+    expect(component).toContain("onError");
+    expect(home).toContain("<HomeHeroMediaLayer />");
+    expect(entry).toContain('@import "./official-media.css";');
+    expect(entry.indexOf("official-media.css")).toBeGreaterThan(
+      entry.indexOf("audit-round-three.css"),
+    );
+    expect(styles).toContain('/media/official/heroes/login.webp');
+  });
 });
