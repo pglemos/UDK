@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm build"
+  "buildCommand": "pnpm -w verify && pnpm -w lint && pnpm -w typecheck && pnpm -w test && pnpm build"
 }
