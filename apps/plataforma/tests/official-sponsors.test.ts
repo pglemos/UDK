@@ -67,12 +67,20 @@ describe("official sponsor roster", () => {
     expect(page).toContain('rel="noreferrer"');
   });
 
-  it("ships an idempotent migration for the same roster", () => {
+  it("ships migration and pgTAP coverage for two executions", () => {
     const migration = sourceFile("../../../supabase/migrations/202608060001_official_sponsors.sql");
+    const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
     expect(migration).toContain("pvf-transportes");
     expect(migration).toContain("on conflict (championship_id, slug) do update");
     expect(migration).toContain("Patrocinador oficial");
-    for (const slug of officialSlugs) expect(migration).toContain(slug);
+    expect(migration).toContain("sponsor.status = 'active'");
+    expect(databaseTest.match(/\\ir \.\.\/migrations\/202608060001_official_sponsors\.sql/g)).toHaveLength(2);
+    expect(databaseTest).toContain("inactive historical sponsor records are preserved");
+    expect(databaseTest).toContain("an approved soft-deleted sponsor is restored");
+    for (const slug of officialSlugs) {
+      expect(migration).toContain(slug);
+      expect(databaseTest).toContain(slug);
+    }
   });
 });
