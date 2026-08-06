@@ -4,40 +4,52 @@ export type PremiumVisual = {
   position: string;
 };
 
+export type HomeHeroMedia = {
+  poster: string;
+  mobile: string;
+  video: string;
+};
+
+export const homeHeroMedia: HomeHeroMedia = {
+  poster: "/media/official/home/hero-desktop.webp",
+  mobile: "/media/official/home/hero-mobile.webp",
+  video: "/media/official/home/hero-loop.mp4",
+};
+
 export const premiumVisuals = {
   hero: {
-    src: "https://images.unsplash.com/photo-1773909722972-1f5e533798b8?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Disputa de kart em um circuito ao ar livre",
-    position: "52% center",
+    src: homeHeroMedia.poster,
+    alt: "Karts do UDK cruzando a linha de chegada no Kartódromo de Betim",
+    position: "50% center",
   },
   manifesto: {
-    src: "https://images.unsplash.com/photo-1772480611852-68ee605fba72?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Pilotos e karts reunidos antes de uma sessão na pista",
+    src: "/media/official/heroes/pilotos.webp",
+    alt: "Pilotos do UDK reunidos durante a temporada",
     position: "50% center",
   },
   community: {
-    src: "https://images.unsplash.com/photo-1649095381023-48ee8e4a8aba?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Competidores de kart compartilhando o ambiente de pista",
-    position: "50% 48%",
+    src: "/media/official/heroes/regulamento.webp",
+    alt: "Pilotos reunidos no briefing oficial do UDK",
+    position: "50% center",
   },
   news: {
-    src: "https://images.unsplash.com/photo-1774071900500-2cf042f345e4?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Kart contornando uma curva em alta velocidade",
-    position: "56% center",
+    src: "/media/official/news/news-01.webp",
+    alt: "Karts do UDK em disputa durante uma prova noturna",
+    position: "50% center",
   },
   paddock: {
-    src: "https://images.unsplash.com/photo-1774088047169-ad3e4636866e?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Piloto de kart acelerando durante uma prova",
-    position: "62% center",
+    src: "/media/official/heroes/inscricao.webp",
+    alt: "Pilotos se preparando para entrar na pista",
+    position: "50% center",
   },
   race: {
-    src: "https://images.unsplash.com/photo-1773909722972-1f5e533798b8?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Disputa de kart em um circuito ao ar livre",
-    position: "52% center",
+    src: "/media/official/heroes/classificacao.webp",
+    alt: "Disputa de posição entre karts do UDK",
+    position: "50% center",
   },
   detail: {
-    src: "https://images.unsplash.com/photo-1505570554449-69ce7d4fa36b?auto=format&fit=crop&fm=webp&q=84&w=2400",
-    alt: "Kart preparado para uma sessão em circuito",
+    src: "/media/official/heroes/login.webp",
+    alt: "Detalhes de um kart preparado para a etapa",
     position: "50% center",
   },
 } satisfies Record<string, PremiumVisual>;
@@ -51,35 +63,117 @@ export const menuVisuals = [
   premiumVisuals.paddock,
 ] as const satisfies readonly PremiumVisual[];
 
-const stageVisuals: PremiumVisual[] = [
-  premiumVisuals.race,
-  premiumVisuals.paddock,
-  premiumVisuals.detail,
-  premiumVisuals.manifesto,
-  premiumVisuals.news,
-];
+const stageVisuals = [
+  {
+    src: "/media/official/stages/stage-01.webp",
+    alt: "Karts do UDK cruzando a linha de chegada",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/stages/stage-02.webp",
+    alt: "Kart do UDK acelerando durante uma etapa",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/stages/stage-03.webp",
+    alt: "Ambiente de pista em uma etapa do UDK",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/stages/stage-04.webp",
+    alt: "Disputa de kart em uma etapa do UDK",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/stages/stage-05.webp",
+    alt: "Pelotão de karts do UDK em pista",
+    position: "50% center",
+  },
+] as const satisfies readonly PremiumVisual[];
 
-const driverVisuals: PremiumVisual[] = [
-  premiumVisuals.paddock,
-  premiumVisuals.detail,
-  premiumVisuals.manifesto,
-  premiumVisuals.news,
-  premiumVisuals.community,
-];
+const driverVisuals = [
+  {
+    src: "/media/official/drivers/fallback-01.webp",
+    alt: "Piloto do UDK em ação na pista",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/drivers/fallback-02.webp",
+    alt: "Piloto do UDK durante uma etapa",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/drivers/fallback-03.webp",
+    alt: "Piloto do UDK em uma corrida noturna",
+    position: "50% center",
+  },
+] as const satisfies readonly PremiumVisual[];
+
+const newsVisuals = [
+  {
+    src: "/media/official/news/news-01.webp",
+    alt: "Disputa noturna entre karts do UDK",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/news/news-02.webp",
+    alt: "Briefing oficial com pilotos do UDK",
+    position: "50% center",
+  },
+  {
+    src: "/media/official/news/news-03.webp",
+    alt: "Painel de cronometragem do UDK",
+    position: "50% center",
+  },
+] as const satisfies readonly PremiumVisual[];
 
 const pageHeroVisuals: Record<string, PremiumVisual> = {
-  "01": premiumVisuals.paddock,
-  "02": premiumVisuals.manifesto,
-  "03": premiumVisuals.detail,
-  "04": premiumVisuals.community,
-  "05": premiumVisuals.news,
-  "06": premiumVisuals.race,
-  "07": premiumVisuals.hero,
+  "01": {
+    src: "/media/official/heroes/calendario.webp",
+    alt: "Grid do UDK antes de uma etapa",
+    position: "50% center",
+  },
+  "02": {
+    src: "/media/official/heroes/classificacao.webp",
+    alt: "Disputa de posição durante uma prova do UDK",
+    position: "50% center",
+  },
+  "03": {
+    src: "/media/official/heroes/resultados.webp",
+    alt: "Painel de cronometragem e resultados do UDK",
+    position: "50% center",
+  },
+  "04": {
+    src: "/media/official/heroes/pilotos.webp",
+    alt: "Pilotos do UDK no paddock",
+    position: "50% center",
+  },
+  "05": {
+    src: "/media/official/heroes/noticias.webp",
+    alt: "Bastidores de uma etapa do UDK",
+    position: "50% center",
+  },
+  "06": {
+    src: "/media/official/heroes/regulamento.webp",
+    alt: "Briefing oficial antes da corrida",
+    position: "50% center",
+  },
+  "07": {
+    src: "/media/official/heroes/inscricao.webp",
+    alt: "Preparação de piloto para entrar na pista",
+    position: "50% center",
+  },
+  login: {
+    src: "/media/official/heroes/login.webp",
+    alt: "Detalhes de um kart preparado para a etapa",
+    position: "50% center",
+  },
 };
 
 const legacyPlaceholders = [
   "/media/udk-race-hero.webp",
   "udk-race-hero.webp",
+  "images.unsplash.com",
   "photo-1752348512364-fac974d4d5b0",
   "photo-1560990816-bb30289c6611",
 ];
@@ -108,6 +202,5 @@ export function stageVisual(index: number): PremiumVisual {
 }
 
 export function newsVisual(index = 0): PremiumVisual {
-  const visuals = [premiumVisuals.news, premiumVisuals.race, premiumVisuals.paddock];
-  return visuals[Math.abs(index) % visuals.length] ?? premiumVisuals.news;
+  return newsVisuals[Math.abs(index) % newsVisuals.length] ?? premiumVisuals.news;
 }
