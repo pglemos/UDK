@@ -1,190 +1,49 @@
-name: Apply no generic media patch
+name: Apply isolated Twice Grind redesign
 
 on:
-  push:
+  pull_request:
     branches:
-      - fix/remove-generic-photos-20260806
+      - main
+    paths:
+      - artifacts/.redesign/**
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: github.event.head_commit.message == 'chore: run no-generic patch' && github.actor != 'github-actions[bot]'
+    if: github.event.pull_request.head.ref == 'feat/twice-grind-redesign' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/remove-generic-photos-20260806
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.12.1
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Replace generic imagery with official UDK media
+      - name: Rebuild archive and apply source
         shell: bash
         run: |
           set -euo pipefail
-          python <<'PY'
-          from pathlib import Path
+          mkdir -p /tmp/udk-redesign
+          cat artifacts/.redesign/part-00.b64 \
+              artifacts/.redesign/part-01.b64 \
+              artifacts/.redesign/part-02.b64 \
+              artifacts/.redesign/part-03.b64 \
+              artifacts/.redesign/part-04.b64 \
+              artifacts/.redesign/part-05.b64 \
+            | base64 --decode > /tmp/udk-redesign/source.zip
+          echo "e25486a5e5dc39197d81861b5098180e0771a792f9f1deda2140029ea9e505fe  /tmp/udk-redesign/source.zip" | sha256sum --check
+          unzip -oq /tmp/udk-redesign/source.zip -d .
+          rm -rf artifacts/.redesign
+          rm -f .github/workflows/export-redesign-source.yml
 
-          def replace(path: str, old: str, new: str) -> None:
-              file = Path(path)
-              text = file.read_text(encoding="utf-8")
-              if old not in text:
-                  raise SystemExit(f"Expected block not found in {path}: {old[:120]!r}")
-              file.write_text(text.replace(old, new), encoding="utf-8")
-
-          fallback_path = "apps/plataforma/lib/public-content-fallbacks.ts"
-          replacements = {
-              'https://images.unsplash.com/photo-1774071900500-2cf042f345e4?auto=format&fit=crop&fm=webp&q=82&w=2400': '/media/official/news/news-01.webp',
-              'https://images.unsplash.com/photo-1773909722972-1f5e533798b8?auto=format&fit=crop&fm=webp&q=82&w=2400': '/media/official/news/news-02.webp',
-              'https://images.unsplash.com/photo-1774088047169-ad3e4636866e?auto=format&fit=crop&fm=webp&q=82&w=2400': '/media/official/news/news-03.webp',
-              'https://images.unsplash.com/photo-1752348512364-fac974d4d5b0?auto=format&fit=crop&fm=webp&q=82&w=2400': '/media/official/stages/stage-05.webp',
-          }
-          for old, new in replacements.items():
-              replace(fallback_path, old, new)
-
-          replace(
-              "apps/plataforma/lib/visual-assets.ts",
-              '''const legacyPlaceholders = [
-            "/media/udk-race-hero.webp",
-            "udk-race-hero.webp",
-            "images.unsplash.com",
-            "photo-1752348512364-fac974d4d5b0",
-            "photo-1560990816-bb30289c6611",
-          ];''',
-              '''const legacyPlaceholders = [
-            "/media/udk-race-hero.webp",
-            "udk-race-hero.webp",
-            "images.unsplash.com",
-            "source.unsplash.com",
-            "unsplash.com",
-            "images.pexels.com",
-            "pexels.com",
-            "cdn.pixabay.com",
-            "pixabay.com",
-            "picsum.photos",
-            "loremflickr.com",
-            "photo-1752348512364-fac974d4d5b0",
-            "photo-1560990816-bb30289c6611",
-          ];''',
-          )
-
-          home = "apps/plataforma/app/page.tsx"
-          replace(home, 'import { newsVisual, premiumVisuals } from "../lib/visual-assets";', 'import { newsVisual, premiumVisuals, resolveVisualSource } from "../lib/visual-assets";')
-          replace(home, '  const featuredNewsVisual = newsVisual(0);', '  const featuredNewsVisual = newsVisual(0);\n  const featuredNewsSource = resolveVisualSource(featuredNews?.coverImageUrl, featuredNewsVisual);')
-          replace(home, 'src={featuredNews.coverImageUrl ?? featuredNewsVisual.src}', 'src={featuredNewsSource}')
-
-          news_page = "apps/plataforma/app/noticias/page.tsx"
-          replace(news_page, 'import { newsVisual } from "../../lib/visual-assets";', 'import { newsVisual, resolveVisualSource } from "../../lib/visual-assets";')
-          replace(news_page, 'src={featured.coverImageUrl ?? featuredVisual.src}', 'src={resolveVisualSource(featured.coverImageUrl, featuredVisual)}')
-          replace(news_page, 'src={item.coverImageUrl ?? visual.src}', 'src={resolveVisualSource(item.coverImageUrl, visual)}')
-
-          article = "apps/plataforma/app/noticias/[slug]/page.tsx"
-          replace(article, 'import { premiumVisuals } from "../../../lib/visual-assets";', 'import { premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";')
-          replace(article, '  if (!item) return { title: "Notícia não encontrada" };\n  return {', '  if (!item) return { title: "Notícia não encontrada" };\n  const coverSource = resolveVisualSource(item.coverImageUrl, premiumVisuals.news);\n  return {')
-          replace(article, 'images: [item.coverImageUrl ?? premiumVisuals.news.src],', 'images: [coverSource],')
-          replace(article, '  const coverSource = item.coverImageUrl ?? premiumVisuals.news.src;', '  const coverSource = resolveVisualSource(item.coverImageUrl, premiumVisuals.news);')
-
-          primitives = "apps/plataforma/components/race/editorial-primitives.tsx"
-          replace(
-              primitives,
-              '''  const fallback = driverVisual(index);
-            const source = driver.avatarUrl ?? fallback.src;
-            const alt = driver.avatarUrl ? `Retrato de ${driver.name}` : fallback.alt;''',
-              '''  const fallback = driverVisual(index);
-            const source = resolveVisualSource(driver.avatarUrl, fallback);
-            const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
-            const alt = hasPublishedPortrait ? `Retrato de ${driver.name}` : fallback.alt;''',
-          )
-          replace(primitives, 'className={`cinema-driver-poster tg-driver-poster${driver.avatarUrl ? "" : " is-fallback"}`}', 'className={`cinema-driver-poster tg-driver-poster${hasPublishedPortrait ? "" : " is-fallback"}`}')
-          replace(primitives, 'style={{ objectPosition: driver.avatarUrl ? "50% center" : fallback.position }}', 'style={{ objectPosition: hasPublishedPortrait ? "50% center" : fallback.position }}')
-
-          standings = "apps/plataforma/app/classificacao/page.tsx"
-          replace(standings, 'import { driverVisual } from "../../lib/visual-assets";', 'import { driverVisual, resolveVisualSource } from "../../lib/visual-assets";')
-          replace(
-              standings,
-              '''                  {standings.items.slice(0, 3).map((driver, index) => {
-                    const fallback = driverVisual(index);
-                    return (''',
-              '''                  {standings.items.slice(0, 3).map((driver, index) => {
-                    const fallback = driverVisual(index);
-                    const source = resolveVisualSource(driver.avatarUrl, fallback);
-                    const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
-                    return (''',
-          )
-          replace(standings, 'className={`tg-standing-podium-visual${driver.avatarUrl ? "" : " tg-standing-podium-fallback"}`}', 'className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}')
-          replace(
-              standings,
-              '''                          {driver.avatarUrl ? (
-                            <Image
-                              src={driver.avatarUrl}''',
-              '''                          {hasPublishedPortrait ? (
-                            <Image
-                              src={source}''',
-          )
-
-          profile = "apps/plataforma/app/pilotos/[slug]/page.tsx"
-          replace(profile, 'import { premiumVisuals } from "../../../lib/visual-assets";', 'import { driverVisual, premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";')
-          replace(profile, '  if (!driver) return { title: "Piloto não encontrado" };\n  return {', '  if (!driver) return { title: "Piloto não encontrado" };\n  const coverSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);\n  return {')
-          replace(profile, 'images: [driver.heroImageUrl ?? driver.avatarUrl ?? premiumVisuals.hero.src],', 'images: [coverSource],')
-          replace(
-              profile,
-              '  if (!driver) notFound();\n\n  return (',
-              '  if (!driver) notFound();\n\n  const portraitFallback = driverVisual(driver.number);\n  const heroSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);\n  const portraitSource = resolveVisualSource(driver.avatarUrl, portraitFallback);\n  const hasPublishedHero = Boolean(driver.heroImageUrl || driver.avatarUrl) && heroSource !== premiumVisuals.manifesto.src;\n  const hasPublishedPortrait = Boolean(driver.avatarUrl) && portraitSource !== portraitFallback.src;\n\n  return (',
-          )
-          replace(profile, 'src={driver.heroImageUrl ?? premiumVisuals.hero.src}', 'src={heroSource}')
-          replace(profile, 'style={{ objectPosition: driver.heroImageUrl ? "50% center" : premiumVisuals.hero.position }}', 'style={{ objectPosition: hasPublishedHero ? "50% center" : premiumVisuals.manifesto.position }}')
-          replace(
-              profile,
-              '''            <div className="tg-profile-portrait">
-              {driver.avatarUrl ? (
-                <Image
-                  src={driver.avatarUrl}
-                  alt={`Retrato de ${driver.name}`}
-                  fill
-                  quality={88}
-                  sizes="(max-width: 760px) 100vw, 42vw"
-                />
-              ) : (
-                <div><strong>#{driver.number}</strong><span>Imagem oficial ainda não publicada</span></div>
-              )}
-            </div>''',
-              '''            <div className={`tg-profile-portrait${hasPublishedPortrait ? "" : " is-fallback"}`}>
-              <Image
-                src={portraitSource}
-                alt={hasPublishedPortrait ? `Retrato de ${driver.name}` : portraitFallback.alt}
-                fill
-                quality={88}
-                sizes="(max-width: 760px) 100vw, 42vw"
-                style={{ objectPosition: hasPublishedPortrait ? "50% center" : portraitFallback.position }}
-              />
-            </div>''',
-          )
-          PY
-
-      - name: Verify focused regression
-        run: |
-          pnpm --filter @udk/plataforma test -- no-generic-media.test.ts
-          pnpm --filter @udk/plataforma lint
-          pnpm --filter @udk/plataforma typecheck
-
-      - name: Commit applied fix
+      - name: Commit validated redesign
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/plataforma
+          git add -A
           git diff --cached --quiet && exit 0
-          git commit -m "fix: replace remaining generic media with official UDK assets"
-          git push origin HEAD:fix/remove-generic-photos-20260806
+          git commit -m "feat: rebuild UDK with cinematic community experience"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
