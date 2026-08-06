@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { DriverPoster, EditorialEmpty, EditorialHeading, StageProject } from "../components/race/editorial-primitives";
+import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
 import { RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
@@ -47,17 +48,7 @@ export default async function HomePage() {
     <RaceShell>
       <main id="conteudo" className="cinema-home">
         <section className="cinema-home-hero" data-design="twice-grind-cinematic">
-          <div className="cinema-home-hero-media" aria-hidden="true">
-            <Image
-              src={premiumVisuals.hero.src}
-              alt=""
-              fill
-              priority
-              quality={90}
-              sizes="100vw"
-              style={{ objectPosition: premiumVisuals.hero.position }}
-            />
-          </div>
+          <HomeHeroMediaLayer />
 
           <div className="race-container cinema-home-hero-grid">
             <Reveal className="cinema-home-hero-copy">

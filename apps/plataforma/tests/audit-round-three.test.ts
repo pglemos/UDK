@@ -69,7 +69,31 @@ describe("third visual audit safeguards", () => {
     expect(audit).toContain("item.naturalHeight < 2");
   });
 
-  it("fails browser audits on page, console and image request errors", () => {
+  it("audits official imagery and the poster-backed Home video", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+
+    expect(audit).toContain('document.querySelectorAll("video")');
+    expect(audit).toContain("readyState");
+    expect(audit).toContain("networkState");
+    expect(audit).toContain("videoFailures");
+    expect(audit).toContain("poster");
+    expect(audit).toContain('url.includes("/media/official/")');
+    expect(audit).toContain("media%2Fofficial");
+  });
+
+  it("uses bundled Chromium by default and an explicit workflow channel override", () => {
+    const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
+    const workflow = readRepositoryFile(".github/workflows/visual-audit.yml");
+
+    expect(audit).toContain(
+      "const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL;",
+    );
+    expect(audit).not.toContain('?? "chrome"');
+    expect(audit).toContain("...(browserChannel ? { channel: browserChannel } : {})");
+    expect(workflow).toContain("VISUAL_AUDIT_BROWSER_CHANNEL: chrome");
+  });
+
+  it("fails browser audits on page, console and official media request errors", () => {
     const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
 
     expect(audit).toContain('page.on("console"');
@@ -87,6 +111,8 @@ describe("third visual audit safeguards", () => {
     expect(audit).toContain("finally");
     expect(audit).toContain("await page.close()");
     expect(audit).toContain("writeDiagnostics");
-    expect(audit).toContain("failures: [...mediaFailures, ...runtimeFailures, ...captureFailures]");
+    expect(audit).toContain(
+      "failures: [...mediaFailures, ...videoFailures, ...runtimeFailures, ...captureFailures]",
+    );
   });
 });

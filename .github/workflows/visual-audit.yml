@@ -56,6 +56,7 @@ jobs:
       - name: Capture and validate main routes
         env:
           PLAYWRIGHT_MODULE_PATH: /tmp/visual-audit-runner/node_modules/playwright
+          VISUAL_AUDIT_BROWSER_CHANNEL: chrome
         run: node .github/scripts/capture-visual-audit.mjs
 
       - name: Upload visual audit
