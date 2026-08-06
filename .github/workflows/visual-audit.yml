@@ -8,7 +8,7 @@ on:
       - ".github/scripts/capture-visual-audit.mjs"
       - ".github/workflows/visual-audit.yml"
   push:
-    branches: [fix/remove-generic-photos-20260806]
+    branches: [main]
 
 permissions:
   contents: read
