@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, feat/complete-operational-modules, fix/remove-generic-photos-20260806]
+    branches: [main, feat/complete-operational-modules]
 
 permissions:
   contents: read
