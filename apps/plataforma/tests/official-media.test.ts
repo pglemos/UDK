@@ -3,7 +3,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const appRoot = path.resolve(import.meta.dirname, "..");
+const repositoryRoot = path.resolve(appRoot, "../..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
+const readRepositoryFile = (file: string) =>
+  fs.readFileSync(path.join(repositoryRoot, file), "utf8");
 
 const requiredAssets = [
   "public/media/official/home/hero-desktop.webp",
@@ -43,7 +46,7 @@ describe("official UDK media", () => {
     expect(new Set(matches).size).toBeGreaterThanOrEqual(8);
   });
 
-  it("renders a poster-backed motion-aware Home hero and official login artwork", () => {
+  it("loads one responsive poster for the motion-aware Home hero", () => {
     const component = read("components/race/home-hero-media.tsx");
     const home = read("app/page.tsx");
     const entry = read("app/race.css");
@@ -52,6 +55,12 @@ describe("official UDK media", () => {
     expect(component).toContain('"use client"');
     expect(component).toContain("prefers-reduced-motion: reduce");
     expect(component).toContain("max-width: 767px");
+    expect(component).toContain("<picture>");
+    expect(component).toContain('<source media="(max-width: 767px)"');
+    expect(component).toContain("srcSet={homeHeroMedia.mobile}");
+    expect(component.match(/<img/g)?.length ?? 0).toBe(1);
+    expect(component).not.toContain('from "next/image"');
+    expect(component).toContain('fetchPriority="high"');
     expect(component).toContain("poster={homeHeroMedia.poster}");
     expect(component).toContain("muted");
     expect(component).toContain("playsInline");
@@ -62,5 +71,16 @@ describe("official UDK media", () => {
       entry.indexOf("audit-round-three.css"),
     );
     expect(styles).toContain('/media/official/heroes/login.webp');
+  });
+
+  it("documents the implemented 24-asset Home contract", () => {
+    const design = readRepositoryFile(
+      "docs/superpowers/specs/2026-08-06-official-media-integration-design.md",
+    );
+
+    expect(design).toContain("hero-desktop.webp");
+    expect(design).toContain("hero-mobile.webp");
+    expect(design).toContain("hero-loop.mp4");
+    expect(design).not.toContain("hero-poster.webp");
   });
 });
