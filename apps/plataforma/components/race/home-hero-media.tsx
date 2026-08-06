@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { homeHeroMedia } from "../../lib/visual-assets";
 
@@ -41,24 +40,20 @@ export function HomeHeroMediaLayer() {
       aria-hidden="true"
       data-video-state={videoState}
     >
-      <Image
-        className="official-home-hero-poster official-home-hero-poster-desktop"
-        src={homeHeroMedia.poster}
-        alt=""
-        fill
-        priority
-        quality={88}
-        sizes="100vw"
-      />
-      <Image
-        className="official-home-hero-poster official-home-hero-poster-mobile"
-        src={homeHeroMedia.mobile}
-        alt=""
-        fill
-        priority
-        quality={88}
-        sizes="100vw"
-      />
+      <picture>
+        <source media="(max-width: 767px)" srcSet={homeHeroMedia.mobile} type="image/webp" />
+        {/* The responsive picture prevents both priority posters from downloading. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="official-home-hero-poster"
+          src={homeHeroMedia.poster}
+          alt=""
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
       {allowVideo && !videoFailed ? (
         <video
           className={`official-home-hero-video${videoReady ? " is-ready" : ""}`}
