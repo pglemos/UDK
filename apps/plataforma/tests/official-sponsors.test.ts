@@ -75,7 +75,7 @@ describe("official sponsor roster", () => {
     expect(migration).toContain("on conflict (championship_id, slug) do update");
     expect(migration).toContain("Patrocinador oficial");
     expect(migration).toContain("sponsor.status = 'active'");
-    expect(databaseTest.match(/\\ir \.\.\/migrations\/202608060001_official_sponsors\.sql/g)).toHaveLength(2);
+    expect(databaseTest.match(/\ir \.\.\/migrations\/202608060001_official_sponsors\.sql/g)).toHaveLength(2);
     expect(databaseTest).toContain("inactive historical sponsor records are preserved");
     expect(databaseTest).toContain("an approved soft-deleted sponsor is restored");
     for (const slug of officialSlugs) {
