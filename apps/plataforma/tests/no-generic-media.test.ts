@@ -10,6 +10,7 @@ function source(path: string): string {
 const genericHosts = [
   "images.unsplash.com",
   "source.unsplash.com",
+  "unsplash.com",
   "images.pexels.com",
   "pexels.com",
   "cdn.pixabay.com",
@@ -29,23 +30,33 @@ describe("official media only", () => {
     expect(fallbackContent).toContain('/media/official/news/news-01.webp');
     expect(fallbackContent).toContain('/media/official/news/news-02.webp');
     expect(fallbackContent).toContain('/media/official/news/news-03.webp');
+    expect(fallbackContent).toContain('/media/official/stages/stage-05.webp');
   });
 
-  it("filters generic media before rendering news and driver imagery", () => {
+  it("sanitizes generic media before content reaches public pages", () => {
+    const mediaPolicy = source("lib/media-policy.ts");
+    const publicContent = source("lib/public-content.ts");
     const visualAssets = source("lib/visual-assets.ts");
-    const home = source("app/page.tsx");
-    const news = source("app/noticias/page.tsx");
-    const article = source("app/noticias/[slug]/page.tsx");
+
+    for (const host of genericHosts) {
+      expect(mediaPolicy).toContain(host);
+    }
+
+    expect(publicContent).toContain("sanitizePublicMediaSource");
+    expect(publicContent).toContain("coverImageUrl: sanitizePublicMediaSource");
+    expect(visualAssets).toContain("isGenericMediaSource");
+  });
+
+  it("uses official fallbacks for driver cards, podiums, and profiles", () => {
     const standings = source("app/classificacao/page.tsx");
     const driverProfile = source("app/pilotos/[slug]/page.tsx");
     const primitives = source("components/race/editorial-primitives.tsx");
 
-    for (const host of genericHosts) {
-      expect(visualAssets).toContain(host);
-    }
-
-    for (const file of [home, news, article, standings, driverProfile, primitives]) {
+    for (const file of [standings, driverProfile, primitives]) {
       expect(file).toContain("resolveVisualSource");
     }
+
+    expect(driverProfile).toContain("portraitFallback");
+    expect(driverProfile).toContain("premiumVisuals.manifesto");
   });
 });
