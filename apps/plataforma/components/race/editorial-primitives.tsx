@@ -83,13 +83,14 @@ export function StageProject({
 
 export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; index?: number }) {
   const fallback = driverVisual(index);
-  const source = driver.avatarUrl ?? fallback.src;
-  const alt = driver.avatarUrl ? `Retrato de ${driver.name}` : fallback.alt;
+  const source = resolveVisualSource(driver.avatarUrl, fallback);
+  const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
+  const alt = hasPublishedPortrait ? `Retrato de ${driver.name}` : fallback.alt;
 
   return (
     <Link
       href={`/pilotos/${driver.slug}`}
-      className={`cinema-driver-poster tg-driver-poster${driver.avatarUrl ? "" : " is-fallback"}`}
+      className={`cinema-driver-poster tg-driver-poster${hasPublishedPortrait ? "" : " is-fallback"}`}
       style={{ "--poster-index": index } as React.CSSProperties}
     >
       <div className="cinema-driver-poster-media tg-driver-poster-media">
@@ -101,7 +102,7 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           loading={index < 3 ? undefined : "eager"}
           quality={86}
           sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
-          style={{ objectPosition: driver.avatarUrl ? "50% center" : fallback.position }}
+          style={{ objectPosition: hasPublishedPortrait ? "50% center" : fallback.position }}
         />
       </div>
       <div className="cinema-driver-poster-copy tg-driver-poster-copy">
