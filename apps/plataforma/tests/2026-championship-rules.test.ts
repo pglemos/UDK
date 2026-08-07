@@ -9,7 +9,12 @@ const readRepo = (file: string) => fs.readFileSync(path.join(repositoryRoot, fil
 
 describe("UDK 2026 official championship rules", () => {
   it("versions the official scoring rules and best-six-of-eight discard calculation in PostgreSQL", () => {
-    const migration = readRepo("supabase/migrations/202608070001_2026_scoring_and_regulation.sql");
+    const migration = [
+      "supabase/migrations/202608070001_2026_scoring_rules.sql",
+      "supabase/migrations/202608070002_2026_standings_discards.sql",
+      "supabase/migrations/202608070003_2026_public_standings_fields.sql",
+      "supabase/migrations/202608070004_2026_public_regulation.sql",
+    ].map(readRepo).join("\n");
 
     expect(migration).toContain("50");
     expect(migration).toContain("150");
@@ -44,14 +49,15 @@ describe("UDK 2026 official championship rules", () => {
     expect(standingsPage).toContain("Melhores 6 de 8 resultados");
   });
 
-  it("imports the suit-inspired racing texture as a secondary identity layer", () => {
-    const race = readApp("app/race.css");
+  it("loads the suit-inspired racing texture as a secondary identity layer", () => {
+    const layout = readApp("app/layout.tsx");
     const texture = readApp("app/brand-racing-texture.css");
 
-    expect(race).toContain('@import "./brand-racing-texture.css";');
+    expect(layout).toContain('import "./brand-racing-texture.css";');
     expect(texture).toContain("--udk-suit-teal");
     expect(texture).toContain("repeating-linear-gradient");
     expect(texture).toContain("mask-image");
     expect(texture).toContain(".tg-page-hero::after");
+    expect(texture).toContain(".dashboard-grid::before");
   });
 });
