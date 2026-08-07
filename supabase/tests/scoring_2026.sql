@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(12);
+select plan(15);
 
 select is(
   (
@@ -152,6 +152,24 @@ select ok(
   and position('least(2' in pg_get_functiondef('public.recalculate_standings(uuid,uuid)'::regprocedure)) > 0
   and position('coalesce(entry.points, 0)' in lower(pg_get_functiondef('public.recalculate_standings(uuid,uuid)'::regprocedure))) > 0,
   'standings function applies progressive best-six-of-eight discards including zero-point absences'
+);
+
+select has_trigger(
+  'public',
+  'result_entries',
+  'result_entries_auto_points',
+  'result entries automatically recalculate points when sporting inputs change'
+);
+
+select ok(
+  position('position_points' in pg_get_functiondef('public.apply_result_entry_points()'::regprocedure)) > 0
+  and position('fastest_lap_points' in pg_get_functiondef('public.apply_result_entry_points()'::regprocedure)) > 0,
+  'automatic entry scoring reads the active points rule including fastest-lap bonus'
+);
+
+select ok(
+  position('can_judge_season' in pg_get_functiondef('public.recalculate_result_points(uuid)'::regprocedure)) > 0,
+  'manual result recalculation is available to the authorized judging team'
 );
 
 select * from finish();
