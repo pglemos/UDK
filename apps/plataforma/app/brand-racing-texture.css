@@ -49,16 +49,17 @@
   inset: 0 0 0 auto;
   width: min(48vw, 760px);
   opacity: 0.52;
+  z-index: 1;
   mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 100%);
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 100%);
 }
 
-.tg-page-hero > *,
+.tg-page-hero > .race-container,
 .tg-inline-cta > *,
 .udk-scoring-rule > *,
 .dashboard-grid > * {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .tg-inline-cta::before {
