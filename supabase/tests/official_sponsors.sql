@@ -16,25 +16,16 @@ select is(
   'the official roster has exactly seven active sponsors'
 );
 
-select set_eq(
-  array(
-    select sponsor.slug
+select is(
+  (
+    select string_agg(sponsor.slug, ',' order by sponsor.slug)
     from public.sponsors sponsor
     join public.championships championship on championship.id = sponsor.championship_id
     where championship.slug = 'udk'
       and sponsor.status = 'active'
       and sponsor.deleted_at is null
-    order by sponsor.slug
   ),
-  array[
-    'akamig',
-    'firepit-brasil',
-    'grupo-emtel',
-    'guicosmos-tv',
-    'transfermix',
-    'veste-custom-wear',
-    'vintage-sao-francisco'
-  ]::text[],
+  'akamig,firepit-brasil,grupo-emtel,guicosmos-tv,transfermix,veste-custom-wear,vintage-sao-francisco',
   'the final active roster matches the approved sponsor slugs'
 );
 
