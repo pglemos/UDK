@@ -30,6 +30,8 @@ describe("UDK 2026 official championship rules", () => {
     expect(migration).toContain("result_entries_auto_points");
     expect(migration).toContain("apply_result_entry_points");
     expect(migration).toContain("can_judge_season");
+    expect(migration).toContain("create unique index concurrently if not exists");
+    expect(migration).toContain("standing.category_id is not distinct from driver.category_id");
   });
 
   it("publishes the corrected eight-result regulation without the old eight-regular-races wording", () => {
@@ -39,6 +41,7 @@ describe("UDK 2026 official championship rules", () => {
     expect(fallback).toContain("06 corridas regulares");
     expect(fallback).toContain("02 Endurances");
     expect(fallback).toContain("02 piores resultados");
+    expect(fallback).toContain("cada corrida é um resultado pontuável independente");
     expect(fallback).not.toContain("08 corridas regulares");
   });
 
@@ -51,6 +54,8 @@ describe("UDK 2026 official championship rules", () => {
     expect(standingsPage).toContain("grossPoints");
     expect(standingsPage).toContain("discardedPoints");
     expect(standingsPage).toContain("Melhores 6 de 8 resultados");
+    expect(standingsPage).toContain("formatPoints");
+    expect(standingsPage).toContain('driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"');
   });
 
   it("loads the suit-inspired racing texture as a secondary identity layer without collapsing hero media", () => {
@@ -64,6 +69,7 @@ describe("UDK 2026 official championship rules", () => {
     expect(texture).toContain(".tg-page-hero::after");
     expect(texture).toContain(".dashboard-grid::before");
     expect(texture).toContain(".tg-page-hero > .race-container");
+    expect(texture).toContain("color: #59656a");
     expect(texture).not.toContain(".tg-page-hero > *,");
   });
 });
