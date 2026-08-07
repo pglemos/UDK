@@ -30,7 +30,8 @@ describe("UDK 2026 official championship rules", () => {
     expect(migration).toContain("result_entries_auto_points");
     expect(migration).toContain("apply_result_entry_points");
     expect(migration).toContain("can_judge_season");
-    expect(migration).toContain("create unique index concurrently if not exists");
+    expect(migration).toContain("create unique index if not exists");
+    expect(migration).not.toContain("create unique index concurrently");
     expect(migration).toContain("standing.category_id is not distinct from driver.category_id");
   });
 
