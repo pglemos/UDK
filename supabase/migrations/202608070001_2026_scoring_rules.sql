@@ -3,7 +3,11 @@
 alter table public.results
   drop constraint if exists results_stage_id_category_id_version_key;
 
-create unique index concurrently if not exists results_scoring_event_version_unique_idx
+-- The current Supabase CLI applies migrations in pipeline mode and rejects
+-- CREATE INDEX CONCURRENTLY with SQLSTATE 25001. Keep this index transactional
+-- so db reset/db push can apply the schema deterministically. `public.results`
+-- is small enough in the current championship workload for this migration path.
+create unique index if not exists results_scoring_event_version_unique_idx
   on public.results (
     stage_id,
     coalesce(category_id, '00000000-0000-0000-0000-000000000000'::uuid),
