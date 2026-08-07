@@ -49,7 +49,7 @@ describe("UDK 2026 official championship rules", () => {
     expect(standingsPage).toContain("Melhores 6 de 8 resultados");
   });
 
-  it("loads the suit-inspired racing texture as a secondary identity layer", () => {
+  it("loads the suit-inspired racing texture as a secondary identity layer without collapsing hero media", () => {
     const layout = readApp("app/layout.tsx");
     const texture = readApp("app/brand-racing-texture.css");
 
@@ -59,5 +59,7 @@ describe("UDK 2026 official championship rules", () => {
     expect(texture).toContain("mask-image");
     expect(texture).toContain(".tg-page-hero::after");
     expect(texture).toContain(".dashboard-grid::before");
+    expect(texture).toContain(".tg-page-hero > .race-container");
+    expect(texture).not.toContain(".tg-page-hero > *,");
   });
 });
