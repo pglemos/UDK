@@ -18,6 +18,11 @@ function param(value: string | string[] | undefined, fallback = ""): string {
   return Array.isArray(value) ? value[0] ?? fallback : value ?? fallback;
 }
 
+function formatPoints(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  return rounded.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+}
+
 export default async function StandingsPage({
   searchParams,
 }: {
@@ -112,7 +117,7 @@ export default async function StandingsPage({
                           )}
                         </div>
                         <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
-                        <b>{driver.points}<small>pts válidos</small></b>
+                        <b>{formatPoints(driver.points)}<small>pts válidos</small></b>
                       </Link>
                     );
                   })}
@@ -125,20 +130,23 @@ export default async function StandingsPage({
                       <tr><th>Pos.</th><th>Piloto</th><th>Categoria</th><th>Vitórias</th><th>Pódios</th><th>Dif.</th><th>Brutos</th><th>Descartes</th><th>Pontos válidos</th><th /></tr>
                     </thead>
                     <tbody>
-                      {standings.items.map((driver, index) => (
-                        <tr key={driver.slug}>
-                          <td data-label="Posição"><span className={`udk-rank rank-${index + 1}`}>{(standings.meta.page - 1) * standings.meta.pageSize + index + 1}</span></td>
-                          <td data-label="Piloto"><Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}><span className="udk-driver-avatar">#{driver.number}</span><strong>{driver.name}</strong></Link></td>
-                          <td data-label="Categoria">{driver.category}</td>
-                          <td data-label="Vitórias">{driver.wins}</td>
-                          <td data-label="Pódios">{driver.podiums}</td>
-                          <td data-label="Diferença">{index === 0 ? "Líder" : `-${leaderPoints - driver.points}`}</td>
-                          <td data-label="Pontos brutos">{driver.grossPoints}</td>
-                          <td data-label="Pontos descartados"><span className="udk-discarded-points">-{driver.discardedPoints}</span></td>
-                          <td data-label="Pontos válidos"><strong className="udk-points">{driver.points}</strong></td>
-                          <td><Link href={`/pilotos/${driver.slug}`} aria-label={`Abrir ${driver.name}`}><ChevronRight aria-hidden="true" /></Link></td>
-                        </tr>
-                      ))}
+                      {standings.items.map((driver, index) => {
+                        const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
+                        return (
+                          <tr key={driver.slug}>
+                            <td data-label="Posição"><span className={`udk-rank rank-${index + 1}`}>{(standings.meta.page - 1) * standings.meta.pageSize + index + 1}</span></td>
+                            <td data-label="Piloto"><Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}><span className="udk-driver-avatar">#{driver.number}</span><strong>{driver.name}</strong></Link></td>
+                            <td data-label="Categoria">{driver.category}</td>
+                            <td data-label="Vitórias">{driver.wins}</td>
+                            <td data-label="Pódios">{driver.podiums}</td>
+                            <td data-label="Diferença">{index === 0 ? "Líder" : `-${formatPoints(gap)}`}</td>
+                            <td data-label="Pontos brutos">{formatPoints(driver.grossPoints)}</td>
+                            <td data-label="Pontos descartados"><span className="udk-discarded-points">{driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"}</span></td>
+                            <td data-label="Pontos válidos"><strong className="udk-points">{formatPoints(driver.points)}</strong></td>
+                            <td><Link href={`/pilotos/${driver.slug}`} aria-label={`Abrir ${driver.name}`}><ChevronRight aria-hidden="true" /></Link></td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
