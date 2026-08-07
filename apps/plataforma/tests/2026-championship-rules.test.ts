@@ -14,6 +14,7 @@ describe("UDK 2026 official championship rules", () => {
       "supabase/migrations/202608070002_2026_standings_discards.sql",
       "supabase/migrations/202608070003_2026_public_standings_fields.sql",
       "supabase/migrations/202608070004_2026_public_regulation.sql",
+      "supabase/migrations/202608070005_2026_automatic_result_points.sql",
     ].map(readRepo).join("\n");
 
     expect(migration).toContain("50");
@@ -26,6 +27,9 @@ describe("UDK 2026 official championship rules", () => {
     expect(migration).toContain("Corrida 1 - Horário");
     expect(migration).toContain("Corrida 2 - Anti-horário");
     expect(migration).toContain("Endurance 1h");
+    expect(migration).toContain("result_entries_auto_points");
+    expect(migration).toContain("apply_result_entry_points");
+    expect(migration).toContain("can_judge_season");
   });
 
   it("publishes the corrected eight-result regulation without the old eight-regular-races wording", () => {
