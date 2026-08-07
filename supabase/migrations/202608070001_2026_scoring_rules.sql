@@ -3,7 +3,7 @@
 alter table public.results
   drop constraint if exists results_stage_id_category_id_version_key;
 
-create unique index if not exists results_scoring_event_version_unique_idx
+create unique index concurrently if not exists results_scoring_event_version_unique_idx
   on public.results (
     stage_id,
     coalesce(category_id, '00000000-0000-0000-0000-000000000000'::uuid),
