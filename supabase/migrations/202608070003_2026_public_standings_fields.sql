@@ -108,7 +108,7 @@ left join public.categories category
 left join latest_standing standing
   on standing.driver_id = driver.id
  and standing.season_id = driver.season_id
- and (driver.category_id is null or standing.category_id = driver.category_id)
+ and standing.category_id is not distinct from driver.category_id
 where driver.deleted_at is null
   and driver.public_profile
   and driver.status = 'approved';
