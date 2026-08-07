@@ -1,0 +1,166 @@
+:root {
+  --udk-suit-teal: #0b747d;
+  --udk-suit-teal-bright: #0aa6b4;
+  --udk-suit-teal-soft: rgb(10 166 180 / 16%);
+  --udk-suit-grid: 26px;
+}
+
+/*
+ * Digital adaptation of the official racing-suit texture.
+ * It intentionally stays secondary to the established black/white/cyan identity.
+ */
+.tg-page-hero,
+.tg-inline-cta,
+.udk-scoring-rule,
+.dashboard-grid,
+.metrics article {
+  position: relative;
+  isolation: isolate;
+}
+
+.tg-page-hero::after,
+.tg-inline-cta::before,
+.udk-scoring-rule::before,
+.dashboard-grid::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  background-color: transparent;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 8px,
+      rgb(11 116 125 / 22%) 8px 10px,
+      transparent 10px 18px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 8px,
+      rgb(10 166 180 / 14%) 8px 10px,
+      transparent 10px 18px
+    );
+  background-size: var(--udk-suit-grid) var(--udk-suit-grid);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+
+.tg-page-hero::after {
+  inset: 0 0 0 auto;
+  width: min(48vw, 760px);
+  opacity: 0.52;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 100%);
+}
+
+.tg-page-hero > *,
+.tg-inline-cta > *,
+.udk-scoring-rule > *,
+.dashboard-grid > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tg-inline-cta::before {
+  inset: 0;
+  opacity: 0.36;
+  background-size: 32px 32px;
+}
+
+.udk-scoring-rule {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) minmax(260px, 0.8fr) minmax(320px, 1.4fr);
+  align-items: center;
+  gap: clamp(16px, 3vw, 44px);
+  margin: clamp(28px, 5vw, 64px) 0 26px;
+  padding: clamp(20px, 3vw, 34px);
+  overflow: hidden;
+  border: 1px solid rgb(11 116 125 / 38%);
+  background: linear-gradient(110deg, #090c0e 0%, #0b1114 58%, #0a1719 100%);
+  color: #fff;
+}
+
+.udk-scoring-rule::before {
+  inset: 0 0 0 auto;
+  width: min(46%, 540px);
+  opacity: 0.74;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%);
+}
+
+.udk-scoring-rule > span {
+  color: var(--udk-suit-teal-bright);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.udk-scoring-rule > strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.35rem, 2.2vw, 2.35rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.udk-scoring-rule > p {
+  margin: 0;
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.udk-discarded-points {
+  color: #6d777c;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-grid::before {
+  inset: -18px -20px auto auto;
+  width: min(44vw, 560px);
+  height: 280px;
+  opacity: 0.28;
+  mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
+}
+
+.metrics article::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--udk-suit-teal), var(--udk-suit-teal-bright), transparent 72%);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --udk-suit-grid: 30px;
+  }
+
+  .udk-scoring-rule {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .udk-scoring-rule::before {
+    width: 78%;
+    opacity: 0.52;
+  }
+
+  .tg-page-hero::after {
+    width: 72vw;
+    opacity: 0.38;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-page-hero::after,
+  .tg-inline-cta::before,
+  .udk-scoring-rule::before,
+  .dashboard-grid::before {
+    animation: none !important;
+  }
+}
