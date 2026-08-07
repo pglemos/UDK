@@ -47,7 +47,7 @@ A classificação final considera os 06 melhores resultados de cada piloto. Os 0
 
 04. PONTUAÇÃO DAS CORRIDAS REGULARES
 P1 50; P2 45; P3 42; P4 40; P5 38; P6 37; P7 36; P8 35; P9 34; P10 33; P11 32; P12 31; P13 30; P14 29; P15 28; P16 27; P17 26; P18 25; P19 24; P20 23; P21 22; P22 21; P23 20; P24 19; P25 18; P26 17; P27 16; P28 15; P29 14; P30 13; P31 12; P32 11; P33 10; P34 9; P35 8; P36 7; P37 6; P38 5; P39 4; P40 3; P41 2; P42 1.
-O resultado da etapa regular é a soma dos pontos obtidos na 1ª e na 2ª corridas.
+O total informativo da etapa regular é a soma dos pontos obtidos na 1ª e na 2ª corridas. Para efeito de classificação e descarte, cada corrida é um resultado pontuável independente.
 
 05. PONTUAÇÃO ENDURANCE
 P1 150; P2 145; P3 142; P4 140; P5 138. A partir do P6, a pontuação cai 01 ponto por posição: P6 137, P7 136 e assim sucessivamente até zero.
