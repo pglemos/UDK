@@ -31,6 +31,8 @@ export type PublicDriver = {
   categorySlug: string;
   categoryColor: string;
   points: number;
+  grossPoints: number;
+  discardedPoints: number;
   wins: number;
   podiums: number;
   poles: number;
@@ -159,6 +161,8 @@ export function buildPageMeta(
 export function normalizePublicDriver(row: UnknownRow): PublicDriver {
   const name = stringValue(row.name) || stringValue(row.sport_name) || stringValue(row.full_name);
   const category = stringValue(row.category) || stringValue(row.category_name, "Geral");
+  const points = numberValue(row.points);
+  const grossPoints = numberValue(row.gross_points, points);
 
   return {
     id: stringValue(row.id),
@@ -169,7 +173,9 @@ export function normalizePublicDriver(row: UnknownRow): PublicDriver {
     category,
     categorySlug: stringValue(row.category_slug),
     categoryColor: stringValue(row.category_color, "#00D9FF"),
-    points: numberValue(row.points),
+    points,
+    grossPoints,
+    discardedPoints: numberValue(row.discarded_points, Math.max(0, grossPoints - points)),
     wins: numberValue(row.wins),
     podiums: numberValue(row.podiums),
     poles: numberValue(row.poles),

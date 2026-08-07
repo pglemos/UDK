@@ -4,6 +4,7 @@ import { PwaRegister } from "../components/pwa-register";
 import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
 import "./race.css";
+import "./brand-racing-texture.css";
 
 const display = Syne({
   subsets: ["latin"],
