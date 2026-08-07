@@ -67,7 +67,7 @@ describe("official sponsor roster", () => {
     expect(page).toContain('rel="noreferrer"');
   });
 
-  it("ships migration and pgTAP coverage for two executions", () => {
+  it("ships an idempotent migration and deterministic pgTAP roster coverage", () => {
     const migration = sourceFile("../../../supabase/migrations/202608060001_official_sponsors.sql");
     const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
@@ -75,9 +75,9 @@ describe("official sponsor roster", () => {
     expect(migration).toContain("on conflict (championship_id, slug) do update");
     expect(migration).toContain("Patrocinador oficial");
     expect(migration).toContain("sponsor.status = 'active'");
-    expect(databaseTest.match(/\ir \.\.\/migrations\/202608060001_official_sponsors\.sql/g)).toHaveLength(2);
-    expect(databaseTest).toContain("inactive historical sponsor records are preserved");
-    expect(databaseTest).toContain("an approved soft-deleted sponsor is restored");
+    expect(databaseTest).not.toContain("\\ir");
+    expect(databaseTest).toContain("the official roster has exactly seven active sponsors");
+    expect(databaseTest).toContain("the active sponsor roster contains no duplicate slugs");
     for (const slug of officialSlugs) {
       expect(migration).toContain(slug);
       expect(databaseTest).toContain(slug);
