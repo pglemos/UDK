@@ -1,7 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { sanitizePublicMediaSource } from "./media-policy";
 import { buildPageMeta, getPageRange, type PageMeta } from "./public-data";
 import { fallbackNews, fallbackRegulations, fallbackSponsors } from "./public-content-fallbacks";
+import { publicSupabaseClient } from "./public-supabase";
 
 type UnknownRow = Record<string, unknown>;
 
@@ -116,10 +116,7 @@ export function normalizePublicTerm(row: UnknownRow): PublicTerm {
 }
 
 function publicClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
+  return publicSupabaseClient();
 }
 
 function safeSearch(value: string | undefined): string {

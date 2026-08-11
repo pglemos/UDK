@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { fallbackCategories, fallbackDrivers, fallbackStages } from "./public-data-fallbacks";
+import { publicSupabaseClient } from "./public-supabase";
 
 export type PageMeta = {
   page: number;
@@ -256,10 +256,7 @@ function useFallback<T>(items: T[], fallback: T[]): T[] {
 }
 
 function publicClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
+  return publicSupabaseClient();
 }
 
 function safeSearch(value: string | undefined): string {
