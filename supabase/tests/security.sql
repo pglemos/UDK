@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(34);
+select plan(35);
 
 select ok(to_regprocedure('public.can_participate_as_driver(uuid)') is not null, 'participant scope helper exists');
 select ok(to_regprocedure('public.can_view_profile(uuid)') is not null, 'profile scope helper exists');
@@ -196,6 +196,16 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.recalculate_standings(uuid,uuid)', 'EXECUTE'),
   'signed-in users may call the guarded standings recalculation function'
+);
+select is(
+  (select count(*)::bigint
+   from pg_policies
+   where schemaname in ('public', 'storage')
+     and roles @> array['public']::name[]
+     and (coalesce(qual, '') || ' ' || coalesce(with_check, ''))
+       ~* '(^|[^[:alnum:]_])((public[.])?is_admin)[[:space:]]*[(]'),
+  0::bigint,
+  'policies calling is_admin are restricted to authenticated users'
 );
 
 select * from finish();
