@@ -32,9 +32,7 @@ export const metadata: Metadata = {
   applicationName: "UDK",
   alternates: { canonical: "/" },
   icons: {
-    icon: [
-      { url: "/icons/udk-avatar-512.png", sizes: "512x512", type: "image/png" },
-    ],
+    icon: [{ url: "/icons/udk-avatar-512.png", sizes: "512x512", type: "image/png" }],
     apple: [{ url: "/icons/udk-avatar-512.png", sizes: "512x512", type: "image/png" }],
   },
   openGraph: {
@@ -66,7 +64,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-scroll-behavior="smooth">
       <body className={`${display.variable} ${body.variable}`}>
         <PwaRegister />
         {children}

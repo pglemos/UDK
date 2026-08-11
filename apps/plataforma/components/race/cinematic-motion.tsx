@@ -6,11 +6,17 @@ import { OfficialLogo } from "./official-logo";
 
 export function CinematicRouteCurtain() {
   const pathname = usePathname();
+  const firstRender = useRef(true);
   const [active, setActive] = useState(false);
 
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
     setActive(true);
-    const timer = window.setTimeout(() => setActive(false), 720);
+    const timer = window.setTimeout(() => setActive(false), 360);
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
@@ -66,23 +72,32 @@ export function CinematicPointer() {
 }
 
 export function CinematicIntro() {
-  const [hidden, setHidden] = useState(false);
+  const pathname = usePathname();
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (pathname !== "/") {
+      setVisible(false);
+      return;
+    }
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const seen = window.sessionStorage.getItem("udk-cinematic-intro") === "seen";
     if (reducedMotion || seen) {
-      setHidden(true);
+      setVisible(false);
       return;
     }
 
     window.sessionStorage.setItem("udk-cinematic-intro", "seen");
-    const timer = window.setTimeout(() => setHidden(true), 1850);
+    setVisible(true);
+    const timer = window.setTimeout(() => setVisible(false), 680);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [pathname]);
+
+  if (pathname !== "/" || !visible) return null;
 
   return (
-    <div className={`cinema-intro${hidden ? " is-hidden" : ""}`} aria-hidden="true">
+    <div className="cinema-intro" aria-hidden="true">
       <OfficialLogo variant="negative" width={300} priority />
     </div>
   );

@@ -75,6 +75,7 @@ h3,
 p,
 li,
 .race-article-body {
+  overflow-wrap: break-word;
   text-wrap: pretty;
 }
 

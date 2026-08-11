@@ -22,6 +22,7 @@ describe("UDK visual quality regressions", () => {
     expect(layout).toContain('from "next/font/google"');
     expect(layout).toContain("Syne");
     expect(layout).toContain("Manrope");
+    expect(layout).toContain('data-scroll-behavior="smooth"');
     expect(layout).toContain("className={`${display.variable} ${body.variable}`}");
     expect(entry).toContain('@import "./visual-quality.css";');
     expect(refinement).toContain("var(--font-display)");
@@ -47,8 +48,7 @@ describe("UDK visual quality regressions", () => {
     expect(
       manifest.assets.every(
         (asset) =>
-          Math.max(asset.width, asset.height) >= 960 &&
-          Math.min(asset.width, asset.height) >= 720,
+          Math.max(asset.width, asset.height) >= 960 && Math.min(asset.width, asset.height) >= 720,
       ),
     ).toBe(true);
     expect(home).toContain("premiumVisuals");
@@ -73,12 +73,16 @@ describe("UDK visual quality regressions", () => {
     const config = read("next.config.ts");
     expect(config).toContain('formats: ["image/avif", "image/webp"]');
     expect(config).toContain("1920");
+    expect(config).toContain('hostname: "images.unsplash.com"');
+    expect(config).toContain("qualities: [82, 84, 86, 88, 90]");
+    expect(config).toContain("turbopack:");
   });
 
   it("prevents headline and component clipping across viewports", () => {
     const refinement = read("app/visual-quality.css");
 
     expect(refinement).toContain("overflow-wrap: anywhere");
+    expect(refinement).toContain("overflow-wrap: break-word");
     expect(refinement).toContain("text-wrap: balance");
     expect(refinement).toContain("min-width: 0");
     expect(refinement).toContain("@media (max-width: 1120px)");

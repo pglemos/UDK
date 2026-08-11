@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const repositoryRoot = path.resolve(appRoot, "../..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
-const readRepositoryFile = (file: string) => fs.readFileSync(path.join(repositoryRoot, file), "utf8");
+const readRepositoryFile = (file: string) =>
+  fs.readFileSync(path.join(repositoryRoot, file), "utf8");
 
 describe("third visual audit safeguards", () => {
   it("assigns contextual hero artwork instead of repeating one image on every route", () => {
@@ -48,7 +49,9 @@ describe("third visual audit safeguards", () => {
     const css = read("app/audit-round-three.css");
 
     expect(race).toContain('@import "./audit-round-three.css";');
-    expect(race.indexOf("audit-round-three.css")).toBeGreaterThan(race.indexOf("audit-round-two.css"));
+    expect(race.indexOf("audit-round-three.css")).toBeGreaterThan(
+      race.indexOf("audit-round-two.css"),
+    );
     expect(css).toContain(".cinema-driver-poster-media,");
     expect(css).toContain("position: absolute !important");
     expect(css).toContain("inset: 0 !important");
@@ -56,6 +59,54 @@ describe("third visual audit safeguards", () => {
     expect(css).toContain("min-height: 100% !important");
     expect(css).toContain(".tg-standing-podium-fallback img");
     expect(css).toContain(".race-driver-visual.is-fallback img");
+  });
+
+  it("locks the profile hero fill surface and shared touch targets", () => {
+    const css = read("app/audit-round-three.css");
+    expect(css).toContain(".tg-driver-profile-media");
+    expect(css).toContain("position: absolute !important");
+    expect(css).toContain(".tg-driver-profile-media > img");
+    expect(css).toContain("min-height: 44px");
+    expect(css).toContain(".race-password-toggle");
+    expect(css).toContain("width: 44px");
+    expect(css).toContain("min-height: 52px");
+    expect(css).toContain(".udk-data-table td:last-child > a");
+    expect(css).toContain("min-width: 44px");
+  });
+
+  it("gives the cinematic news cover a deterministic fill containing block", () => {
+    const css = read("app/audit-round-three.css");
+
+    expect(css).toContain(".tg-article-cover");
+    expect(css).toContain("position: relative !important");
+    expect(css).toContain("height: min(760px, 72vw) !important");
+    expect(css).toContain("min-height: 320px !important");
+    expect(css).toContain("height: min(520px, 78vw) !important");
+  });
+
+  it("keeps the mobile menu out of the accessibility tree while closed", () => {
+    const header = read("components/race/race-header.tsx");
+    expect(header).toContain('role="dialog"');
+    expect(header).toContain('aria-modal="true"');
+    expect(header).toContain("inert={!open}");
+    expect(header).toContain('document.querySelectorAll<HTMLElement>(".race-site > *")');
+    expect(header).toContain('element.setAttribute("inert", "")');
+    expect(header).toContain('element.removeAttribute("inert")');
+    expect(header).toContain("onPointerDown={(event) => event.preventDefault()}");
+    expect(header).toContain("autoFocus={open}");
+    expect(header).toContain("element.focus({ preventScroll: true })");
+    expect(header).toContain("requestAnimationFrame");
+    expect(header).toContain("setTimeout(focusClose, 120)");
+    expect(header).toContain("const focusTrigger = useCallback");
+  });
+
+  it("does not block the initial route with a long cinematic curtain", () => {
+    const motion = read("components/race/cinematic-motion.tsx");
+    const css = read("app/cinema-core.css");
+    expect(motion).toContain("firstRender");
+    expect(motion).toContain('pathname !== "/"');
+    expect(motion).toContain("680");
+    expect(css).toContain("cinema-intro-wipe 680ms");
   });
 
   it("renders a deterministic countdown shell before the client clock starts", () => {
@@ -89,9 +140,7 @@ describe("third visual audit safeguards", () => {
     const audit = readRepositoryFile(".github/scripts/capture-visual-audit.mjs");
     const workflow = readRepositoryFile(".github/workflows/visual-audit.yml");
 
-    expect(audit).toContain(
-      "const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL;",
-    );
+    expect(audit).toContain("const browserChannel = process.env.VISUAL_AUDIT_BROWSER_CHANNEL;");
     expect(audit).not.toContain('?? "chrome"');
     expect(audit).toContain("...(browserChannel ? { channel: browserChannel } : {})");
     expect(workflow).toContain("VISUAL_AUDIT_BROWSER_CHANNEL: chrome");

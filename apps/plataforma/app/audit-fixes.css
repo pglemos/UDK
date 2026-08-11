@@ -13,10 +13,21 @@
 :where(p, li) {
   overflow-wrap: break-word;
   word-break: normal;
-  hyphens: auto;
+  hyphens: none;
 }
 
-:where(.cinema-editorial-heading, .tg-editorial-heading, .cinema-stage-project, .tg-stage-project, .tg-calendar-stage, .tg-standing-podium-card, .cinema-podium-card, .tg-driver-poster, .tg-editorial-empty) > * {
+:where(
+    .cinema-editorial-heading,
+    .tg-editorial-heading,
+    .cinema-stage-project,
+    .tg-stage-project,
+    .tg-calendar-stage,
+    .tg-standing-podium-card,
+    .cinema-podium-card,
+    .tg-driver-poster,
+    .tg-editorial-empty
+  )
+  > * {
   min-width: 0;
 }
 
@@ -170,7 +181,12 @@
 .cinema-driver-poster-media::after,
 .tg-driver-poster-media::after {
   z-index: 1;
-  background: linear-gradient(0deg, rgba(5, 6, 7, 0.98) 0%, rgba(5, 6, 7, 0.68) 42%, rgba(5, 6, 7, 0.08) 72%);
+  background: linear-gradient(
+    0deg,
+    rgba(5, 6, 7, 0.98) 0%,
+    rgba(5, 6, 7, 0.68) 42%,
+    rgba(5, 6, 7, 0.08) 72%
+  );
 }
 
 .cinema-driver-fallback,

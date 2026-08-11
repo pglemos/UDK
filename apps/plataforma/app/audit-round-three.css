@@ -19,6 +19,45 @@
   overflow: hidden;
 }
 
+/* The profile hero is also a fill surface, but its media layer is overridden
+ * by visual-media.css for normal-flow image rules. Restore the containing box
+ * after the complete cascade so the hero image always has real dimensions. */
+.tg-driver-profile-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: hidden;
+}
+
+.tg-driver-profile-media > img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover !important;
+}
+
+/* News articles are rendered by the cinematic shell, which does not import
+ * the legacy article-page stylesheet. Keep this fill surface self-contained
+ * so its containing block has a deterministic height on the first paint. */
+.tg-article-cover {
+  position: relative !important;
+  width: 100% !important;
+  height: min(760px, 72vw) !important;
+  min-height: 320px !important;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .tg-article-cover {
+    height: min(520px, 78vw) !important;
+    min-height: 260px !important;
+  }
+}
+
 .cinema-driver-poster-media > img,
 .tg-driver-poster-media > img {
   position: absolute !important;
@@ -140,5 +179,88 @@
 @media (max-width: 640px) {
   .tg-standing-podium-fallback > strong {
     font-size: clamp(3rem, 17vw, 5rem) !important;
+  }
+}
+
+/* Shared interaction contract: every actionable text control is comfortable
+ * to tap, while keeping the editorial underline treatment intact. */
+:where(.cinema-arrow-link, .tg-arrow-link, .race-text-link, .udk-small-link) {
+  min-height: 44px;
+  padding-block: 10px 9px;
+}
+
+.race-nav a,
+.race-header-login,
+.race-brand {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.race-header-login {
+  padding-inline: 4px;
+}
+
+.race-auth-visual > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  align-self: flex-start;
+}
+
+.udk-footer-column a,
+.udk-footer-contact > a,
+.race-auth-links a,
+.race-auth-links button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.race-auth-links a,
+.race-auth-links button {
+  padding-block: 8px;
+}
+
+.race-field-control input {
+  min-height: 52px;
+}
+
+.race-password-toggle {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+}
+
+.race-search-field input {
+  min-height: 48px;
+}
+
+.race-pagination > a,
+.race-pagination > div a {
+  min-height: 44px;
+}
+
+.race-pagination > div a {
+  min-width: 44px;
+}
+
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.udk-data-table td:last-child > a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinema-intro {
+    display: none !important;
   }
 }

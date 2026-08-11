@@ -56,8 +56,8 @@ export function RegistrationEntry() {
           <h2>Prepare sua entrada no grid</h2>
           <p>
             Escolha a categoria de interesse e avance para a plataforma oficial. Perfil, documentos,
-            termos e confirmação ficam vinculados ao mesmo protocolo para evitar aquele ritual humano
-            de preencher a mesma informação em oito telas diferentes.
+            termos e confirmação ficam vinculados ao mesmo protocolo para evitar aquele ritual
+            humano de preencher a mesma informação em oito telas diferentes.
           </p>
         </div>
 
@@ -69,7 +69,9 @@ export function RegistrationEntry() {
             onClick={() => setCategory("insanos")}
           >
             <strong>Ultras Insanos</strong>
-            <span>Categoria para quem está entrando no campeonato e quer evoluir em um grid equilibrado.</span>
+            <span>
+              Categoria para quem está entrando no campeonato e quer evoluir em um grid equilibrado.
+            </span>
           </button>
           <button
             className={category === "rapidos" ? "is-selected" : ""}
@@ -78,7 +80,9 @@ export function RegistrationEntry() {
             onClick={() => setCategory("rapidos")}
           >
             <strong>Ultras Rápidos</strong>
-            <span>Categoria de maior ritmo, voltada a pilotos com experiência e desempenho consolidado.</span>
+            <span>
+              Categoria de maior ritmo, voltada a pilotos com experiência e desempenho consolidado.
+            </span>
           </button>
         </div>
 
@@ -94,7 +98,8 @@ export function RegistrationEntry() {
           <Link
             className="race-button race-button-primary"
             href={`${destination}${destination.includes("?") ? "&" : "?"}categoria=${category}`}
-            aria-disabled={checking}
+            aria-disabled={checking || undefined}
+            tabIndex={checking ? -1 : undefined}
           >
             {checking ? (
               <>
@@ -114,15 +119,33 @@ export function RegistrationEntry() {
         <span className="race-kicker">Resumo em tempo real</span>
         <h2>Temporada 2026</h2>
         <div className="race-summary-list">
-          <div><span>Campeonato</span><b>Ultras do Kart</b></div>
-          <div><span>Categoria de interesse</span><b>{category === "insanos" ? "Ultras Insanos" : "Ultras Rápidos"}</b></div>
-          <div><span>Local</span><b>Kartódromo de Betim</b></div>
-          <div><span>Progresso</span><b>Etapa 01 de 06</b></div>
+          <div>
+            <span>Campeonato</span>
+            <b>Ultras do Kart</b>
+          </div>
+          <div>
+            <span>Categoria de interesse</span>
+            <b>{category === "insanos" ? "Ultras Insanos" : "Ultras Rápidos"}</b>
+          </div>
+          <div>
+            <span>Local</span>
+            <b>Kartódromo de Betim</b>
+          </div>
+          <div>
+            <span>Progresso</span>
+            <b>Etapa 01 de 06</b>
+          </div>
         </div>
         <div className="race-auth-features">
-          <span><CheckCircle2 aria-hidden="true" /> Progresso salvo</span>
-          <span><CheckCircle2 aria-hidden="true" /> Protocolo individual</span>
-          <span><CheckCircle2 aria-hidden="true" /> Acompanhamento online</span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Progresso salvo
+          </span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Protocolo individual
+          </span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Acompanhamento online
+          </span>
         </div>
       </aside>
     </div>
