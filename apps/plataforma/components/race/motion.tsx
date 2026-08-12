@@ -53,13 +53,17 @@ export function CountUp({
   value,
   suffix = "",
   minimumFractionDigits = 0,
+  minimumIntegerDigits = 1,
 }: {
   value: number;
   suffix?: string;
   minimumFractionDigits?: number;
+  minimumIntegerDigits?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(0);
+  // Começa no valor final: assim o número existe no HTML do servidor e
+  // continua legível sem JavaScript. A animação zera e conta na hidratação.
+  const [display, setDisplay] = useState(value);
 
   useEffect(() => {
     const node = ref.current;
@@ -73,6 +77,7 @@ export function CountUp({
       return;
     }
 
+    setDisplay(0);
     let frame = 0;
     let started = false;
     let start = 0;
@@ -106,6 +111,8 @@ export function CountUp({
       {display.toLocaleString("pt-BR", {
         minimumFractionDigits,
         maximumFractionDigits: minimumFractionDigits,
+        minimumIntegerDigits,
+        useGrouping: false,
       })}
       {suffix}
     </span>
@@ -120,8 +127,8 @@ type CountdownValue = {
   complete: boolean;
 };
 
-function calculateCountdown(target: string): CountdownValue {
-  const distance = new Date(target).getTime() - Date.now();
+function calculateCountdown(target: string, skewMs: number): CountdownValue {
+  const distance = new Date(target).getTime() - (Date.now() + skewMs);
   if (!Number.isFinite(distance) || distance <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, complete: true };
   }
@@ -135,8 +142,58 @@ function calculateCountdown(target: string): CountdownValue {
   };
 }
 
+const SKEW_REFRESH_MS = 60_000;
+
 export function RaceCountdown({ target }: { target?: string | undefined }) {
   const [value, setValue] = useState<CountdownValue | null>(null);
+  const [live, setLive] = useState(false);
+  // Diferença entre o relógio do servidor e o do dispositivo, em ms.
+  const skewRef = useRef(0);
+
+  // A5 — recalibra pelo horário do servidor a cada 60s, para que a contagem
+  // não dependa do relógio local do visitante.
+  useEffect(() => {
+    if (!target) return;
+
+    let active = true;
+    const controller = new AbortController();
+
+    const calibrate = async () => {
+      try {
+        const requestedAt = Date.now();
+        const response = await fetch("/api/health", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`health ${response.status}`);
+        const payload: unknown = await response.json();
+        const now =
+          typeof payload === "object" && payload !== null && "now" in payload
+            ? (payload as { now?: unknown }).now
+            : undefined;
+        if (typeof now !== "string") throw new Error("health sem now");
+
+        const serverMs = new Date(now).getTime();
+        if (!Number.isFinite(serverMs)) throw new Error("now inválido");
+
+        if (!active) return;
+        // Meio round-trip aproxima o instante em que o servidor respondeu.
+        const latency = (Date.now() - requestedAt) / 2;
+        skewRef.current = serverMs + latency - Date.now();
+        setLive(true);
+      } catch {
+        if (active) setLive(false);
+      }
+    };
+
+    void calibrate();
+    const timer = window.setInterval(() => void calibrate(), SKEW_REFRESH_MS);
+    return () => {
+      active = false;
+      controller.abort();
+      window.clearInterval(timer);
+    };
+  }, [target]);
 
   useEffect(() => {
     if (!target) {
@@ -144,7 +201,7 @@ export function RaceCountdown({ target }: { target?: string | undefined }) {
       return;
     }
 
-    const update = () => setValue(calculateCountdown(target));
+    const update = () => setValue(calculateCountdown(target, skewRef.current));
     update();
     const timer = window.setInterval(update, 1_000);
     return () => window.clearInterval(timer);
@@ -173,6 +230,11 @@ export function RaceCountdown({ target }: { target?: string | undefined }) {
           <span>{label}</span>
         </div>
       ))}
+      {live ? (
+        <b className="udk-countdown-live" data-status="live">
+          Ao vivo
+        </b>
+      ) : null}
     </div>
   );
 }

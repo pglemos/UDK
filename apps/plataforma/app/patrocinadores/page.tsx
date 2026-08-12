@@ -57,7 +57,7 @@ export default async function SponsorsPage() {
                             width={360}
                             height={190}
                             sizes="(max-width: 640px) 80vw, (max-width: 900px) 38vw, 28vw"
-                            loading="eager"
+                            loading="lazy"
                           />
                         ) : (
                           <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>

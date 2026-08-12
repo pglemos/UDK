@@ -187,6 +187,31 @@ button[aria-busy="true"] svg:first-child {
   background: var(--cinema-muted-dark);
 }
 
+/* ---------- 4b. Selo "ao vivo" do countdown (A5) ----------------------- */
+.udk-countdown-live {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  color: var(--udk-ok);
+  font-family: var(--cinema-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.udk-countdown-live::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: udkDotPulse 2s ease-in-out infinite;
+}
+
 /* ---------- 5. Contraste do hero no mobile (A4) ------------------------ */
 @media (max-width: 900px) {
   .cinema-home-hero::after,
@@ -222,6 +247,16 @@ button[aria-busy="true"] svg:first-child {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
+  }
+  .race-menu-trigger svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Login e "Entrar no grid" saem do header: não cabem em 375px e empurravam
+     o header para três linhas. O menu e a barra fixa dão os dois caminhos. */
+  .race-header-actions > a {
+    display: none;
   }
 
   /* C1 — CTA de inscrição sempre alcançável: barra fixa no rodapé. */

@@ -18,7 +18,7 @@ import {
   StageProject,
 } from "../components/race/editorial-primitives";
 import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
-import { RaceCountdown, Reveal } from "../components/race/motion";
+import { CountUp, RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
 import { getPublicData } from "../lib/public-data";
@@ -203,22 +203,25 @@ export default async function HomePage() {
           <div className="race-container">
             <article>
               <Flag aria-hidden="true" />
-              <strong>{String(stages.length).padStart(2, "0")}</strong>
+              <strong><CountUp value={stages.length} minimumIntegerDigits={2} /></strong>
               <span>etapas oficiais</span>
             </article>
             <article>
               <Users aria-hidden="true" />
-              <strong>{String(drivers.length).padStart(2, "0")}</strong>
+              <strong><CountUp value={drivers.length} minimumIntegerDigits={2} /></strong>
               <span>pilotos publicados</span>
             </article>
             <article>
               <Trophy aria-hidden="true" />
-              <strong>{totalPodiums}</strong>
-              <span>pódios acumulados</span>
+              <strong><CountUp value={totalPodiums} /></strong>
+              <span>
+                pódios entre {drivers.length}{" "}
+                {drivers.length === 1 ? "piloto" : "pilotos"}
+              </span>
             </article>
             <article>
               <Timer aria-hidden="true" />
-              <strong>{String(categories).padStart(2, "0")}</strong>
+              <strong><CountUp value={categories} minimumIntegerDigits={2} /></strong>
               <span>categorias</span>
             </article>
           </div>

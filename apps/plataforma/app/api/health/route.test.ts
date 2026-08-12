@@ -18,4 +18,17 @@ describe("health endpoint", () => {
     expect(serialized).not.toContain("password");
     expect(serialized).not.toContain("token");
   });
+
+  it("exposes the server clock so the countdown can calibrate (A5)", async () => {
+    const before = Date.now();
+    const body = (await (await GET()).json()) as Record<string, unknown>;
+    const after = Date.now();
+
+    expect(typeof body.now).toBe("string");
+    const now = new Date(body.now as string).getTime();
+    expect(Number.isFinite(now)).toBe(true);
+    expect(now).toBeGreaterThanOrEqual(before - 1_000);
+    expect(now).toBeLessThanOrEqual(after + 1_000);
+    expect(body.now).toBe(body.timestamp);
+  });
 });
