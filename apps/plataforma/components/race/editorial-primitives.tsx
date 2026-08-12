@@ -54,7 +54,7 @@ export function StageProject({
           alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
           fill
           priority={featured}
-          loading={featured ? undefined : "eager"}
+          loading={featured ? undefined : "lazy"}
           quality={featured ? 90 : 86}
           sizes={featured ? "(max-width: 900px) 100vw, 62vw" : "(max-width: 900px) 100vw, 38vw"}
           style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
@@ -98,8 +98,8 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           src={source}
           alt={alt}
           fill
-          priority={index < 3}
-          loading={index < 3 ? undefined : "eager"}
+          priority={index === 0}
+          loading={index === 0 ? undefined : "lazy"}
           quality={86}
           sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
           style={{ objectPosition: hasPublishedPortrait ? "50% center" : fallback.position }}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plataforma",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@udk/plataforma", "dev"],
+      "port": 3001
+    }
+  ]
+}

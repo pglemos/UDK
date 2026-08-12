@@ -46,8 +46,11 @@ describe("responsive layout safeguards", () => {
     expect(assets).toContain("/media/official/news/news-01.webp");
     expect(assets).not.toContain("images.unsplash.com");
     expect(calendar).toContain("resolveVisualSource");
-    expect(calendar).toContain('loading="eager"');
+    // A10 — só o hero da rota carrega com prioridade; o resto é lazy.
+    expect(calendar).toContain('loading="lazy"');
+    expect(calendar).not.toContain('loading="eager"');
     expect(primitives).toContain("resolveVisualSource");
-    expect(primitives).toContain('loading={featured ? undefined : "eager"}');
+    expect(primitives).toContain('loading={featured ? undefined : "lazy"}');
+    expect(primitives).toContain("priority={index === 0}");
   });
 });

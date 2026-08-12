@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ChevronRight,
   Flag,
-  Search,
   Timer,
   Trophy,
 } from "lucide-react";
@@ -247,20 +246,4 @@ export function RacePagination({
   );
 }
 
-export function SearchField({
-  name = "q",
-  defaultValue = "",
-  placeholder = "Buscar",
-}: {
-  name?: string;
-  defaultValue?: string;
-  placeholder?: string;
-}) {
-  return (
-    <label className="race-search-field">
-      <Search aria-hidden="true" />
-      <span className="sr-only">{placeholder}</span>
-      <input name={name} defaultValue={defaultValue} placeholder={placeholder} />
-    </label>
-  );
-}
+export { SearchField } from "./search-field";

@@ -189,8 +189,8 @@ export function RaceHeader() {
             onPointerDown={(event) => event.preventDefault()}
             onClick={() => setOpen(true)}
           >
-            <span>Menu</span>
-            <Menu aria-hidden="true" />
+            <span className="sr-only">Menu</span>
+            <Menu aria-hidden="true" size={24} />
           </button>
         </div>
       </header>

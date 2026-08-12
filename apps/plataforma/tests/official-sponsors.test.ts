@@ -69,7 +69,8 @@ describe("official sponsor roster", () => {
     expect(page).toContain("instagramHandle");
     expect(page).toContain("sponsor.logoUrl");
     expect(page).toContain("sponsor.websiteUrl");
-    expect(page).toContain('loading="eager"');
+    // A10 — a grade de patrocinadores fica abaixo da dobra, carrega lazy.
+    expect(page).toContain('loading="lazy"');
     expect(page).toContain('target="_blank"');
     expect(page).toContain('rel="noreferrer"');
     expect(home).toContain("cinema-sponsor-list");
