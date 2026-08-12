@@ -75,6 +75,13 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
           <span>UDK • A pista não espera.</span>
         </div>
       </footer>
+
+      <div className="udk-mobile-cta">
+        <Link href="/inscricao">
+          Entrar no grid <ArrowUpRight aria-hidden="true" size={16} />
+        </Link>
+        <Link href="/login">Entrar</Link>
+      </div>
     </div>
   );
 }

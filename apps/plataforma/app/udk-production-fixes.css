@@ -1,0 +1,523 @@
+/* ==========================================================================
+   UDK — CORREÇÕES DE PRODUÇÃO
+   Aplicar como ÚLTIMO import do app/layout.tsx.
+   Cobre os itens C1–C6, A4, A6–A13, A15, D1–D15 da auditoria, usando apenas
+   as classes que já existem nos componentes.
+   ========================================================================== */
+
+/* ---------- 0. Tokens de status que faltavam (A6, A9) ------------------- */
+:root {
+  --udk-ok: var(--cinema-success, #42d487);
+  --udk-warn: var(--cinema-warning, #ffca58);
+  --udk-bad: var(--cinema-danger, #ff6464);
+  --udk-p1: var(--cinema-gold, #ffc64b);
+  --udk-p2: var(--cinema-silver, #c4ccd2);
+  --udk-p3: var(--cinema-bronze, #ca8651);
+  --udk-tap: 44px;
+  --udk-tap-lg: 56px;
+}
+
+/* ---------- 1. Animações base (D1–D14) --------------------------------- */
+@keyframes udkFadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes udkDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .35; transform: scale(.7); }
+}
+@keyframes udkCtaGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 217, 255, .45); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 217, 255, 0); }
+}
+@keyframes udkScrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+@keyframes udkMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes udkSpin { to { transform: rotate(360deg); } }
+
+/* D1 — transição de entrada de página */
+main#conteudo,
+.operations-main .content {
+  animation: udkFadeSlideUp 400ms var(--cinema-ease, ease-out) both;
+}
+
+/* D12 — garante o movimento do marquee de identidade */
+.cinema-motion-strip > div {
+  display: flex;
+  align-items: center;
+  gap: 54px;
+  width: max-content;
+  animation: udkMarquee 24s linear infinite;
+}
+
+/* D7 — header sticky com transição suave e vidro fosco */
+.race-header.cinema-header {
+  transition:
+    background-color 300ms ease,
+    backdrop-filter 300ms ease,
+    border-color 300ms ease;
+}
+.race-header.cinema-header.is-compact {
+  background: rgba(5, 6, 7, .72);
+  backdrop-filter: blur(12px);
+}
+
+/* D5 — pulso apenas no CTA do hero da home, nunca no header */
+.cinema-home-hero .race-button-primary {
+  animation: udkCtaGlow 2.4s ease-in-out infinite;
+}
+
+/* A15 — indicador de scroll com seta animada */
+.cinema-hero-foot svg {
+  animation: udkScrollBounce 1.8s ease-in-out infinite;
+}
+
+/* A8 — feedback de carregamento em qualquer botão ocupado */
+button[aria-busy="true"],
+button:disabled {
+  opacity: .72;
+  cursor: progress;
+}
+.spin,
+button[aria-busy="true"] svg:first-child {
+  animation: udkSpin .8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ---------- 2. Hover states que faltavam (A7, A13, D6, D11) ------------ */
+.tg-calendar-stage,
+.tg-standing-podium-card,
+.tg-driver-directory-grid > * > a,
+.tg-news-directory-grid > a,
+.race-sponsor-card,
+.metrics article {
+  transition:
+    transform 200ms var(--cinema-ease, ease),
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.tg-calendar-stage:hover,
+.tg-standing-podium-card:hover,
+.tg-news-directory-grid > a:hover,
+.race-sponsor-card:hover,
+.metrics article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+  border-color: var(--cinema-cyan);
+}
+.tg-calendar-stage-media img,
+.tg-news-directory-grid img {
+  transition: transform 600ms var(--cinema-ease, ease);
+}
+.tg-calendar-stage:hover .tg-calendar-stage-media img,
+.tg-news-directory-grid > a:hover img {
+  transform: scale(1.05);
+}
+/* D11 — overlay de leitura no card de notícia */
+.tg-news-directory-grid > a > div:first-child::after,
+.tg-news-directory-feature .tg-news-directory-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgba(0, 0, 0, .72) 100%);
+  pointer-events: none;
+}
+/* A13 — patrocinadores clicáveis com transição real */
+.race-sponsor-card {
+  cursor: pointer;
+}
+.race-sponsor-card img {
+  transition: filter 300ms ease, opacity 300ms ease;
+}
+
+/* Linhas de tabela clicáveis (A7) */
+.udk-data-table tbody tr {
+  transition: background-color 180ms ease;
+}
+.udk-data-table tbody tr:hover {
+  background: rgba(255, 255, 255, .04);
+}
+
+/* ---------- 3. Hierarquia de pódio (A6) -------------------------------- */
+.udk-data-table tbody tr:nth-child(1) { background: rgba(255, 198, 75, .08); box-shadow: inset 3px 0 0 var(--udk-p1); }
+.udk-data-table tbody tr:nth-child(2) { background: rgba(196, 204, 210, .06); box-shadow: inset 3px 0 0 var(--udk-p2); }
+.udk-data-table tbody tr:nth-child(3) { background: rgba(202, 134, 81, .06); box-shadow: inset 3px 0 0 var(--udk-p3); }
+.udk-rank.rank-1 { color: var(--udk-p1); }
+.udk-rank.rank-2 { color: var(--udk-p2); }
+.udk-rank.rank-3 { color: var(--udk-p3); }
+/* “Líder” deixa de parecer um número qualquer */
+.udk-data-table tbody tr:nth-child(1) td[data-label="Dif."] {
+  color: var(--udk-p1);
+  font-family: var(--cinema-display);
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ---------- 4. Badges de status com indicador (A9) --------------------- */
+.udk-status-badge::before,
+[class*="status-badge"]::before,
+.cinema-next-stage-head b::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: udkDotPulse 2s ease-in-out infinite;
+  vertical-align: middle;
+}
+/* Estados encerrados não pulsam */
+[class*="status-badge"][data-status="closed"]::before,
+[class*="status-badge"][data-status="cancelled"]::before {
+  animation: none;
+  background: var(--cinema-muted-dark);
+}
+
+/* ---------- 5. Contraste do hero no mobile (A4) ------------------------ */
+@media (max-width: 900px) {
+  .cinema-home-hero::after,
+  .race-page-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(5, 6, 7, .7) 0%, rgba(5, 6, 7, .88) 100%);
+  }
+  .cinema-home-hero > .race-container,
+  .race-page-hero > .race-container {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+/* ---------- 6. Header e menu mobile (C1, C3, A11) --------------------- */
+@media (max-width: 1180px) {
+  /* C3 — hambúrguer só ícone, alvo de 44px */
+  .race-menu-trigger {
+    width: var(--udk-tap);
+    height: var(--udk-tap);
+    display: grid;
+    place-items: center;
+    padding: 0;
+  }
+  .race-menu-trigger > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  /* C1 — CTA de inscrição sempre alcançável: barra fixa no rodapé. */
+  .udk-mobile-cta {
+    position: fixed;
+    z-index: 130;
+    inset: auto 0 0 0;
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(5, 6, 7, 0) 0%, rgba(5, 6, 7, .96) 40%);
+    border-top: 1px solid var(--cinema-line);
+  }
+  .udk-mobile-cta > a {
+    height: var(--udk-tap-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--cinema-display);
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .udk-mobile-cta > a:first-child {
+    flex: 2;
+    background: var(--cinema-cyan);
+    color: var(--cinema-black);
+  }
+  .udk-mobile-cta > a:last-child {
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, .28);
+    color: var(--cinema-white);
+  }
+  /* espaço para a barra não cobrir o fim do conteúdo */
+  main#conteudo {
+    padding-bottom: calc(var(--udk-tap-lg) + 28px);
+  }
+
+  /* A11 — página ativa visível no menu mobile */
+  .race-mobile-menu nav a[aria-current="page"] {
+    background: rgba(0, 217, 255, .1);
+    box-shadow: inset 3px 0 0 var(--cinema-cyan);
+  }
+  .race-mobile-menu nav a,
+  .race-mobile-menu-actions > a {
+    min-height: var(--udk-tap-lg);
+  }
+}
+@media (min-width: 1181px) {
+  .udk-mobile-cta { display: none; }
+}
+
+/* ---------- 7. Login acima da dobra no mobile (C2) --------------------- */
+@media (max-width: 900px) {
+  .race-auth {
+    display: flex;
+    flex-direction: column;
+  }
+  .race-auth-panel { order: -1; }
+  .race-auth-visual {
+    order: 1;
+    min-height: 232px;
+    max-height: 40vh;
+  }
+  .race-auth-features { display: none; }
+  .race-auth-form { padding-block: 24px; }
+  .race-auth-form input { min-height: 52px; }
+  .race-password-toggle {
+    width: var(--udk-tap);
+    height: var(--udk-tap);
+  }
+  .race-auth-submit { min-height: var(--udk-tap-lg); }
+}
+
+/* Alertas com faixa semântica, não só texto (#11) */
+.race-alert, .alert {
+  display: flex;
+  gap: 11px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.race-alert-success, .alert-success { background: rgba(66, 212, 135, .1); box-shadow: inset 3px 0 0 var(--udk-ok); }
+.race-alert-warning, .alert-warning { background: rgba(255, 202, 88, .1); box-shadow: inset 3px 0 0 var(--udk-warn); }
+.race-alert-error, .alert-error { background: rgba(255, 100, 100, .1); box-shadow: inset 3px 0 0 var(--udk-bad); }
+
+/* ---------- 8. Inscrição: stepper no lugar da sidebar (C4) ------------- */
+@media (max-width: 900px) {
+  .registration-sidebar,
+  .udk-registration-aside,
+  [class*="registration"] aside {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-height: 48px;
+    padding: 0 16px;
+    overflow: hidden;
+    background: var(--cinema-black-soft);
+    border-bottom: 1px solid var(--cinema-line);
+    white-space: nowrap;
+  }
+  [class*="registration"] aside > *:not(:first-child):not(:nth-child(2)) {
+    display: none;
+  }
+}
+
+/* ---------- 9. Tabelas viram cards no mobile (C5) --------------------- */
+@media (max-width: 768px) {
+  .udk-data-table thead { display: none; }
+  .udk-data-table,
+  .udk-data-table tbody,
+  .udk-data-table tr,
+  .udk-data-table td {
+    display: block;
+    width: 100%;
+  }
+  .udk-data-table tr {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 4px 12px;
+    margin-bottom: 10px;
+    padding: 14px;
+    border: 1px solid var(--cinema-line);
+  }
+  .udk-data-table td {
+    padding: 0;
+    border: 0;
+    font-size: 12px;
+    color: var(--cinema-muted);
+  }
+  /* posição, nome e pontos ganham as três células principais */
+  .udk-data-table td:nth-child(1) { grid-row: 1 / span 2; }
+  .udk-data-table td:nth-child(2) {
+    grid-column: 2;
+    font-family: var(--cinema-display);
+    font-size: 19px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--cinema-white);
+  }
+  .udk-data-table td:last-child,
+  .udk-data-table td:nth-last-child(2) {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    font-variant-numeric: tabular-nums;
+    font-size: 20px;
+    color: var(--cinema-white);
+  }
+  /* o resto vira uma linha de metadados legível */
+  .udk-data-table td:nth-child(n + 3):not(:last-child):not(:nth-last-child(2)) {
+    grid-column: 2;
+    display: inline;
+  }
+  .udk-data-table td[data-label]:nth-child(n + 3)::before {
+    content: attr(data-label) ": ";
+    color: var(--cinema-muted-dark);
+  }
+  .tg-standing-table-wrap { overflow: visible; }
+}
+
+/* ---------- 10. Busca instantânea, filtros como chips (C6) ------------ */
+.udk-toolbar button[type="submit"] {
+  display: none; /* a busca passa a ser debounced no SearchField */
+}
+.udk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.udk-toolbar input[type="search"],
+.udk-toolbar input[type="text"] {
+  flex: 1 1 260px;
+  min-height: var(--udk-tap-lg);
+}
+.udk-toolbar select { min-height: 48px; }
+.udk-category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.udk-category-tabs a { min-height: var(--udk-tap); display: inline-flex; align-items: center; }
+@media (max-width: 768px) {
+  .udk-toolbar input[type="search"] { flex: 1 1 100%; }
+  .udk-category-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .udk-category-tabs::-webkit-scrollbar { display: none; }
+}
+
+/* ---------- 11. Footer com peso real (A12, D15) ----------------------- */
+.race-footer {
+  border-top: 1px solid var(--cinema-line);
+  background: linear-gradient(180deg, var(--cinema-black) 0%, #07090b 100%);
+}
+.race-footer a[href="/inscricao"] {
+  min-height: var(--udk-tap-lg);
+  padding-inline: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cinema-cyan);
+  color: var(--cinema-black);
+  font-family: var(--cinema-display);
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ---------- 12. Painel autenticado no mobile -------------------------- */
+@media (max-width: 900px) {
+  .shell .sidebar {
+    position: fixed;
+    z-index: 60;
+    inset: 0 auto 0 0;
+    width: min(86vw, 320px);
+    transform: translateX(-100%);
+    transition: transform 280ms var(--cinema-ease, ease);
+  }
+  .shell .sidebar.sidebar-open { transform: none; }
+  .mobile-overlay {
+    position: fixed;
+    z-index: 55;
+    inset: 0;
+    background: rgba(5, 6, 7, .72);
+    border: 0;
+  }
+  .mobile-menu, .mobile-close {
+    width: var(--udk-tap);
+    height: var(--udk-tap);
+    display: grid;
+    place-items: center;
+  }
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .dashboard-columns { grid-template-columns: 1fr; }
+  .pending-list li { min-height: 48px; }
+}
+.metrics article { border-top: 3px solid transparent; }
+.metrics a[href*="financeiro"] article { border-top-color: var(--udk-bad); }
+.metrics a[href*="resultados"] article { border-top-color: var(--udk-warn); }
+.metrics a[href*="inscricoes"] article { border-top-color: var(--cinema-cyan); }
+.connection-offline { color: var(--udk-bad); }
+.connection-online { color: var(--udk-ok); }
+.queue-count {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 202, 88, .4);
+  background: rgba(255, 202, 88, .1);
+  color: var(--udk-warn);
+  font-family: var(--cinema-display);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ---------- 13. Loading com semáforo de largada (D10) ----------------- */
+.loading-screen .loading-line,
+.loading-screen svg {
+  display: none;
+}
+.loading-screen::after {
+  content: "";
+  display: flex;
+  gap: 12px;
+  width: 178px;
+  height: 26px;
+  background:
+    radial-gradient(circle 13px at 13px 13px, var(--udk-bad) 96%, transparent) 0 0 / 38px 26px no-repeat,
+    radial-gradient(circle 13px at 13px 13px, var(--udk-bad) 96%, transparent) 38px 0 / 38px 26px no-repeat,
+    radial-gradient(circle 13px at 13px 13px, var(--udk-bad) 96%, transparent) 76px 0 / 38px 26px no-repeat,
+    radial-gradient(circle 13px at 13px 13px, rgba(255, 100, 100, .18) 96%, transparent) 114px 0 / 38px 26px no-repeat,
+    radial-gradient(circle 13px at 13px 13px, rgba(255, 100, 100, .18) 96%, transparent) 152px 0 / 38px 26px no-repeat;
+}
+
+/* ---------- 14. Acessibilidade e alvos de toque (#17, #25) ------------ */
+@media (max-width: 900px) {
+  .race-button,
+  .race-header-login,
+  .tg-arrow-link,
+  .cinema-arrow-link {
+    min-height: var(--udk-tap-lg);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+:focus-visible {
+  outline: 2px solid var(--cinema-cyan);
+  outline-offset: 3px;
+}

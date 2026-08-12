@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Syne } from "next/font/google";
+import { Barlow_Condensed, Inter, Manrope, Syne } from "next/font/google";
 import { PwaRegister } from "../components/pwa-register";
 import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
 import "./race.css";
 import "./brand-racing-texture.css";
+import "./udk-production-fixes.css";
 
 const display = Syne({
   subsets: ["latin"],
@@ -17,6 +18,21 @@ const body = Manrope({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
+  display: "swap",
+});
+
+const barlow = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-barlow",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -64,7 +80,11 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" data-scroll-behavior="smooth">
+    <html
+      lang="pt-BR"
+      data-scroll-behavior="smooth"
+      className={`${barlow.variable} ${inter.variable}`}
+    >
       <body className={`${display.variable} ${body.variable}`}>
         <PwaRegister />
         {children}
