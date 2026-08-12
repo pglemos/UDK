@@ -150,21 +150,16 @@ button[aria-busy="true"] svg:first-child {
   background: rgba(255, 255, 255, .04);
 }
 
-/* ---------- 3. Hierarquia de pódio (A6) -------------------------------- */
-.udk-data-table tbody tr:nth-child(1) { background: rgba(255, 198, 75, .08); box-shadow: inset 3px 0 0 var(--udk-p1); }
-.udk-data-table tbody tr:nth-child(2) { background: rgba(196, 204, 210, .06); box-shadow: inset 3px 0 0 var(--udk-p2); }
-.udk-data-table tbody tr:nth-child(3) { background: rgba(202, 134, 81, .06); box-shadow: inset 3px 0 0 var(--udk-p3); }
+/* ---------- 3. Hierarquia de pódio (A6) --------------------------------
+   Só a faixa lateral: a tabela de classificação ainda herda o tema claro do
+   globals.css (dívida A1), então nada aqui pode fixar cor de texto ou de
+   fundo — ficaria ilegível em um dos dois temas. */
+.udk-data-table tbody tr:nth-child(1) { box-shadow: inset 3px 0 0 var(--udk-p1); }
+.udk-data-table tbody tr:nth-child(2) { box-shadow: inset 3px 0 0 var(--udk-p2); }
+.udk-data-table tbody tr:nth-child(3) { box-shadow: inset 3px 0 0 var(--udk-p3); }
 .udk-rank.rank-1 { color: var(--udk-p1); }
 .udk-rank.rank-2 { color: var(--udk-p2); }
 .udk-rank.rank-3 { color: var(--udk-p3); }
-/* “Líder” deixa de parecer um número qualquer */
-.udk-data-table tbody tr:nth-child(1) td[data-label="Dif."] {
-  color: var(--udk-p1);
-  font-family: var(--cinema-display);
-  font-weight: 900;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
 
 /* ---------- 4. Badges de status com indicador (A9) --------------------- */
 .udk-status-badge::before,
@@ -368,60 +363,12 @@ button[aria-busy="true"] svg:first-child {
   }
 }
 
-/* ---------- 9. Tabelas viram cards no mobile (C5) --------------------- */
-@media (max-width: 768px) {
-  .udk-data-table thead { display: none; }
-  .udk-data-table,
-  .udk-data-table tbody,
-  .udk-data-table tr,
-  .udk-data-table td {
-    display: block;
-    width: 100%;
-  }
-  .udk-data-table tr {
-    display: grid;
-    grid-template-columns: 34px 1fr auto;
-    align-items: center;
-    gap: 4px 12px;
-    margin-bottom: 10px;
-    padding: 14px;
-    border: 1px solid var(--cinema-line);
-  }
-  .udk-data-table td {
-    padding: 0;
-    border: 0;
-    font-size: 12px;
-    color: var(--cinema-muted);
-  }
-  /* posição, nome e pontos ganham as três células principais */
-  .udk-data-table td:nth-child(1) { grid-row: 1 / span 2; }
-  .udk-data-table td:nth-child(2) {
-    grid-column: 2;
-    font-family: var(--cinema-display);
-    font-size: 19px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--cinema-white);
-  }
-  .udk-data-table td:last-child,
-  .udk-data-table td:nth-last-child(2) {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-    font-variant-numeric: tabular-nums;
-    font-size: 20px;
-    color: var(--cinema-white);
-  }
-  /* o resto vira uma linha de metadados legível */
-  .udk-data-table td:nth-child(n + 3):not(:last-child):not(:nth-last-child(2)) {
-    grid-column: 2;
-    display: inline;
-  }
-  .udk-data-table td[data-label]:nth-child(n + 3)::before {
-    content: attr(data-label) ": ";
-    color: var(--cinema-muted-dark);
-  }
-  .tg-standing-table-wrap { overflow: visible; }
-}
+/* ---------- 9. Tabelas no mobile (C5) — nada a fazer aqui --------------
+   O cinema-responsive.css já converte .udk-data-table em cards rótulo/valor
+   abaixo de 640px, com thead oculto e `content: attr(data-label)`. A versão
+   deste patch competia com aquelas regras e quebrava o layout: sobrepunha as
+   células e pintava o texto de branco sobre o fundo claro que a tabela herda
+   do globals.css. O tratamento original é o correto e fica intacto. */
 
 /* ---------- 10. Busca instantânea, filtros como chips (C6) ------------ */
 .udk-toolbar button[type="submit"] {

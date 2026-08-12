@@ -79,6 +79,23 @@ describe("design audit corrections", () => {
     expect(read("components/race/motion.tsx")).toContain("IntersectionObserver");
   });
 
+  it("leaves the existing responsive table treatment alone (C5)", () => {
+    const fixes = read("app/udk-production-fixes.css");
+    const responsive = read("app/cinema-responsive.css");
+
+    // O tratamento de cards rótulo/valor é do cinema-responsive.css. Competir
+    // com ele sobrepunha as células e deixava texto branco sobre fundo claro.
+    expect(responsive).toContain("content: attr(data-label)");
+    expect(fixes).not.toContain(".udk-data-table thead");
+    expect(fixes).not.toContain("grid-template-columns: 34px 1fr auto");
+    expect(fixes).not.toContain(".udk-data-table td:nth-child(2)");
+
+    // A faixa de pódio sobrevive, mas sem fixar cor de texto ou de fundo:
+    // a tabela ainda herda o tema claro do globals.css.
+    expect(fixes).toContain("box-shadow: inset 3px 0 0 var(--udk-p1)");
+    expect(fixes).not.toContain("background: rgba(255, 198, 75, .08)");
+  });
+
   it("drops the stylesheets no route imports (A2, first step)", () => {
     const dead = [
       "app/race-core.css",
