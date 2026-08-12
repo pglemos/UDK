@@ -1155,20 +1155,56 @@
   text-transform: uppercase;
 }
 
-.cinema-sponsors .race-container > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 22px 42px;
+.cinema-sponsors .race-container > div.cinema-sponsor-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px;
 }
 
-.cinema-sponsors strong {
+.cinema-sponsor-item {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 10px;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+.cinema-sponsor-mark {
+  display: grid;
+  width: 100%;
+  min-height: 74px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.94);
+  transition: border-color var(--cinema-fast) ease, transform var(--cinema-fast) ease;
+}
+
+.cinema-sponsor-mark img {
+  width: 100%;
+  height: 56px;
+  object-fit: contain;
+}
+
+.cinema-sponsor-item strong {
+  max-width: 100%;
   color: rgba(255, 255, 255, 0.72);
   font-family: var(--cinema-display);
-  font-size: clamp(1.35rem, 2.2vw, 2.6rem);
+  font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
   text-transform: uppercase;
+}
+
+.cinema-sponsor-item:hover .cinema-sponsor-mark,
+.cinema-sponsor-item:focus-visible .cinema-sponsor-mark {
+  border-color: var(--cinema-cyan);
+  transform: translateY(-3px);
 }
 
 .cinema-sponsors p {

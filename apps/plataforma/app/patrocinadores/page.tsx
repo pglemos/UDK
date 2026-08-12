@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
 import { EmptyState, SectionHeading } from "../../components/race/ui";
@@ -50,14 +51,23 @@ export default async function SponsorsPage() {
                     <>
                       <div className="race-sponsor-logo">
                         {sponsor.logoUrl ? (
-                          <img src={sponsor.logoUrl} alt={`Logo ${sponsor.name}`} loading="lazy" />
+                          <Image
+                            src={sponsor.logoUrl}
+                            alt={`Logo ${sponsor.name}`}
+                            width={360}
+                            height={190}
+                            sizes="(max-width: 640px) 80vw, (max-width: 900px) 38vw, 28vw"
+                            loading="eager"
+                          />
                         ) : (
                           <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>
                         )}
                       </div>
                       <span>{sponsor.tier || "Patrocinador oficial"}</span>
                       <h2>{sponsor.name}</h2>
-                      {sponsor.websiteUrl ? <small>{instagramHandle(sponsor.websiteUrl)}</small> : null}
+                      {sponsor.websiteUrl ? (
+                        <small>{instagramHandle(sponsor.websiteUrl)}</small>
+                      ) : null}
                     </>
                   );
 

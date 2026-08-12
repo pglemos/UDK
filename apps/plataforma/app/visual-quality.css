@@ -567,6 +567,11 @@ img {
   gap: 18px 34px;
 }
 
+.cinema-sponsors .race-container > div.cinema-sponsor-list {
+  display: grid;
+  gap: 18px;
+}
+
 .cinema-sponsors strong {
   white-space: normal;
 }

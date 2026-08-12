@@ -10,6 +10,7 @@ const officialSlugs = [
   "grupo-emtel",
   "guicosmos-tv",
   "transfermix",
+  "velho-oeste",
   "veste-custom-wear",
   "vintage-sao-francisco",
 ];
@@ -27,11 +28,15 @@ describe("official sponsor roster", () => {
     expect(fallbackSponsors.every((sponsor) => sponsor.tier === "Patrocinador oficial")).toBe(true);
   });
 
-  it("uses local SVG logos and Instagram destinations", () => {
+  it("uses local logo assets and only approved Instagram destinations", () => {
     for (const sponsor of fallbackSponsors) {
-      expect(sponsor.logoUrl).toBe(`/sponsors/${sponsor.slug}.svg`);
-      expect(sponsor.websiteUrl).toMatch(/^https:\/\/www\.instagram\.com\/[A-Za-z0-9_.]+\/$/);
-      expect(existsSync(publicFile(`${sponsor.slug}.svg`))).toBe(true);
+      const assetName = sponsor.logoUrl.replace("/sponsors/", "");
+      expect(assetName).toMatch(new RegExp(`^${sponsor.slug}\\.(svg|webp)$`));
+      expect(
+        sponsor.websiteUrl === "" ||
+          /^https:\/\/www\.instagram\.com\/[A-Za-z0-9_.]+\/$/.test(sponsor.websiteUrl),
+      ).toBe(true);
+      expect(existsSync(publicFile(assetName))).toBe(true);
     }
   });
 
@@ -59,16 +64,23 @@ describe("official sponsor roster", () => {
 
   it("renders logos, Instagram handles and safe external links", () => {
     const page = sourceFile("../app/patrocinadores/page.tsx");
+    const home = sourceFile("../app/page.tsx");
 
     expect(page).toContain("instagramHandle");
     expect(page).toContain("sponsor.logoUrl");
     expect(page).toContain("sponsor.websiteUrl");
+    expect(page).toContain('loading="eager"');
     expect(page).toContain('target="_blank"');
     expect(page).toContain('rel="noreferrer"');
+    expect(home).toContain("cinema-sponsor-list");
+    expect(home).toContain("sponsor.logoUrl");
   });
 
   it("ships an idempotent migration and deterministic pgTAP roster coverage", () => {
     const migration = sourceFile("../../../supabase/migrations/202608060001_official_sponsors.sql");
+    const followupMigration = sourceFile(
+      "../../../supabase/migrations/20260811220000_official_sponsor_assets.sql",
+    );
     const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
     expect(migration).toContain("pvf-transportes");
@@ -76,10 +88,12 @@ describe("official sponsor roster", () => {
     expect(migration).toContain("Patrocinador oficial");
     expect(migration).toContain("sponsor.status = 'active'");
     expect(databaseTest).not.toContain("\\ir");
-    expect(databaseTest).toContain("the official roster has exactly seven active sponsors");
+    expect(followupMigration).toContain("velho-oeste");
+    expect(followupMigration).toContain("/sponsors/velho-oeste.svg");
+    expect(databaseTest).toContain("the official roster has exactly eight active sponsors");
     expect(databaseTest).toContain("the active sponsor roster contains no duplicate slugs");
     for (const slug of officialSlugs) {
-      expect(migration).toContain(slug);
+      expect(followupMigration).toContain(slug);
       expect(databaseTest).toContain(slug);
     }
   });

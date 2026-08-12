@@ -11,7 +11,12 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { DriverPoster, EditorialEmpty, EditorialHeading, StageProject } from "../components/race/editorial-primitives";
+import {
+  DriverPoster,
+  EditorialEmpty,
+  EditorialHeading,
+  StageProject,
+} from "../components/race/editorial-primitives";
 import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
 import { RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
@@ -58,8 +63,8 @@ export default async function HomePage() {
                 <em>não espera.</em>
               </h1>
               <p>
-                Um campeonato construído por quem entende que velocidade sem evolução é apenas ruído.
-                Disputa intensa, respeito no grid e comunidade além da bandeirada.
+                Um campeonato construído por quem entende que velocidade sem evolução é apenas
+                ruído. Disputa intensa, respeito no grid e comunidade além da bandeirada.
               </p>
               <div className="cinema-home-actions">
                 <Link href="/inscricao" className="race-button race-button-primary">
@@ -88,7 +93,11 @@ export default async function HomePage() {
               </div>
               <div className="cinema-next-stage-countdown">
                 <span>Até a largada</span>
-                {nextStage?.startsAt ? <RaceCountdown target={nextStage.startsAt} /> : <b>Em breve</b>}
+                {nextStage?.startsAt ? (
+                  <RaceCountdown target={nextStage.startsAt} />
+                ) : (
+                  <b>Em breve</b>
+                )}
               </div>
               <Link href="/calendario" className="cinema-arrow-link">
                 Detalhes da etapa <ArrowRight aria-hidden="true" />
@@ -105,16 +114,26 @@ export default async function HomePage() {
 
         <section className="cinema-motion-strip" aria-label="Identidade do campeonato">
           <div>
-            <span>Ultras do Kart</span><i />
-            <span>Performance em pista</span><i />
-            <span>Comunidade além da volta</span><i />
-            <span>Temporada 2026</span><i />
-            <span>Kartódromo de Betim</span><i />
-            <span>Ultras do Kart</span><i />
-            <span>Performance em pista</span><i />
-            <span>Comunidade além da volta</span><i />
-            <span>Temporada 2026</span><i />
-            <span>Kartódromo de Betim</span><i />
+            <span>Ultras do Kart</span>
+            <i />
+            <span>Performance em pista</span>
+            <i />
+            <span>Comunidade além da volta</span>
+            <i />
+            <span>Temporada 2026</span>
+            <i />
+            <span>Kartódromo de Betim</span>
+            <i />
+            <span>Ultras do Kart</span>
+            <i />
+            <span>Performance em pista</span>
+            <i />
+            <span>Comunidade além da volta</span>
+            <i />
+            <span>Temporada 2026</span>
+            <i />
+            <span>Kartódromo de Betim</span>
+            <i />
           </div>
         </section>
 
@@ -124,8 +143,9 @@ export default async function HomePage() {
               <span>01 / Manifesto Ultras</span>
               <h2>O cronômetro mede a volta. A pista revela o piloto.</h2>
               <p>
-                O UDK transforma competição em evolução coletiva. O resultado importa, mas constância,
-                respeito e coragem para voltar melhor são o que fazem uma temporada permanecer na memória.
+                O UDK transforma competição em evolução coletiva. O resultado importa, mas
+                constância, respeito e coragem para voltar melhor são o que fazem uma temporada
+                permanecer na memória.
               </p>
               <Link href="/inscricao" className="cinema-arrow-link">
                 Conhecer o campeonato <ArrowRight aria-hidden="true" />
@@ -181,10 +201,26 @@ export default async function HomePage() {
 
         <section className="cinema-proof" aria-label="Números reais do campeonato">
           <div className="race-container">
-            <article><Flag aria-hidden="true" /><strong>{String(stages.length).padStart(2, "0")}</strong><span>etapas oficiais</span></article>
-            <article><Users aria-hidden="true" /><strong>{String(drivers.length).padStart(2, "0")}</strong><span>pilotos publicados</span></article>
-            <article><Trophy aria-hidden="true" /><strong>{totalPodiums}</strong><span>pódios acumulados</span></article>
-            <article><Timer aria-hidden="true" /><strong>{String(categories).padStart(2, "0")}</strong><span>categorias</span></article>
+            <article>
+              <Flag aria-hidden="true" />
+              <strong>{String(stages.length).padStart(2, "0")}</strong>
+              <span>etapas oficiais</span>
+            </article>
+            <article>
+              <Users aria-hidden="true" />
+              <strong>{String(drivers.length).padStart(2, "0")}</strong>
+              <span>pilotos publicados</span>
+            </article>
+            <article>
+              <Trophy aria-hidden="true" />
+              <strong>{totalPodiums}</strong>
+              <span>pódios acumulados</span>
+            </article>
+            <article>
+              <Timer aria-hidden="true" />
+              <strong>{String(categories).padStart(2, "0")}</strong>
+              <span>categorias</span>
+            </article>
           </div>
         </section>
 
@@ -201,12 +237,19 @@ export default async function HomePage() {
               <div className="cinema-ranking-layout">
                 <div className="cinema-podium" aria-label="Três primeiros colocados">
                   {topDrivers.slice(0, 3).map((driver, index) => (
-                    <Link href={`/pilotos/${driver.slug}`} className={`cinema-podium-card place-${index + 1}`} key={driver.slug}>
+                    <Link
+                      href={`/pilotos/${driver.slug}`}
+                      className={`cinema-podium-card place-${index + 1}`}
+                      key={driver.slug}
+                    >
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <div className="cinema-podium-number">#{driver.number}</div>
                       <h3>{driver.name}</h3>
                       <p>{driver.category}</p>
-                      <strong>{driver.points}<small>pts</small></strong>
+                      <strong>
+                        {driver.points}
+                        <small>pts</small>
+                      </strong>
                     </Link>
                   ))}
                 </div>
@@ -216,7 +259,10 @@ export default async function HomePage() {
                     <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <b>#{driver.number}</b>
-                      <div><strong>{driver.name}</strong><small>{driver.category}</small></div>
+                      <div>
+                        <strong>{driver.name}</strong>
+                        <small>{driver.category}</small>
+                      </div>
                       <em>{driver.points} pts</em>
                       <ArrowRight aria-hidden="true" />
                     </Link>
@@ -245,7 +291,9 @@ export default async function HomePage() {
 
             {driverPreview.length ? (
               <div className="cinema-driver-mosaic">
-                {driverPreview.map((driver, index) => <DriverPoster driver={driver} index={index} key={driver.slug} />)}
+                {driverPreview.map((driver, index) => (
+                  <DriverPoster driver={driver} index={index} key={driver.slug} />
+                ))}
               </div>
             ) : (
               <EditorialEmpty
@@ -272,11 +320,15 @@ export default async function HomePage() {
             <span>05 / Cultura Ultras</span>
             <h2>Competir sozinho é possível. Evoluir junto é outra história.</h2>
             <p>
-              O UDK conecta pilotos que entendem que rivalidade e respeito podem dividir o mesmo grid.
-              A comunidade existe no box, na preparação, no pós-corrida e em cada conselho que reduz décimos.
+              O UDK conecta pilotos que entendem que rivalidade e respeito podem dividir o mesmo
+              grid. A comunidade existe no box, na preparação, no pós-corrida e em cada conselho que
+              reduz décimos.
             </p>
             <div className="cinema-community-values">
-              <span>Respeito</span><span>Constância</span><span>Disputa limpa</span><span>Evolução</span>
+              <span>Respeito</span>
+              <span>Constância</span>
+              <span>Disputa limpa</span>
+              <span>Evolução</span>
             </div>
           </div>
         </section>
@@ -336,9 +388,45 @@ export default async function HomePage() {
           <div className="race-container">
             <span>Marcas que aceleram com o UDK</span>
             {sponsors.length ? (
-              <div>{sponsors.map((sponsor) => <strong key={sponsor.slug}>{sponsor.name}</strong>)}</div>
+              <div className="cinema-sponsor-list">
+                {sponsors.map((sponsor) => {
+                  const content = (
+                    <>
+                      <span className="cinema-sponsor-mark">
+                        <Image
+                          src={sponsor.logoUrl}
+                          alt={`Logo ${sponsor.name}`}
+                          width={220}
+                          height={100}
+                          sizes="(max-width: 720px) 140px, 180px"
+                        />
+                      </span>
+                      <strong>{sponsor.name}</strong>
+                    </>
+                  );
+
+                  return sponsor.websiteUrl ? (
+                    <a
+                      key={sponsor.slug}
+                      className="cinema-sponsor-item"
+                      href={sponsor.websiteUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Abrir Instagram de ${sponsor.name}`}
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div key={sponsor.slug} className="cinema-sponsor-item">
+                      {content}
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <p>As parcerias oficiais serão exibidas assim que forem publicadas pela organização.</p>
+              <p>
+                As parcerias oficiais serão exibidas assim que forem publicadas pela organização.
+              </p>
             )}
           </div>
         </section>
@@ -347,7 +435,9 @@ export default async function HomePage() {
           <div className="race-container">
             <span>07 / Próxima largada</span>
             <h2>O grid não precisa continuar sem o seu nome.</h2>
-            <p>Crie sua conta, escolha a categoria e acompanhe cada etapa pela plataforma oficial.</p>
+            <p>
+              Crie sua conta, escolha a categoria e acompanhe cada etapa pela plataforma oficial.
+            </p>
             <Link href="/inscricao" className="race-button race-button-primary">
               Começar inscrição <ArrowRight aria-hidden="true" />
             </Link>
