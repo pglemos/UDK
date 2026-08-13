@@ -10,7 +10,8 @@ import { premiumVisuals } from "../../../lib/visual-assets";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const item = await getNewsBySlug(slug);
-  if (!item) return { title: "Notícia não encontrada" };
+  // Ver comentário equivalente em pilotos/[slug]: sem isto a resposta sai 200.
+  if (!item) notFound();
   return {
     title: item.title,
     description: item.summary,

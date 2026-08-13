@@ -16,7 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const driver = await getDriverBySlug(slug);
-  if (!driver) return { title: "Piloto não encontrado" };
+  // O notFound() precisa acontecer aqui: com loading.tsx na raiz a resposta já
+  // começa a ser transmitida antes do corpo da página, e o 200 sairia junto.
+  if (!driver) notFound();
   const coverSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);
   return {
     title: driver.name,
