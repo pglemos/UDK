@@ -164,6 +164,19 @@ function descreverErro(error: unknown, config: ModuleConfig): string {
   }
 }
 
+// As funções do banco levantam exceções em inglês e com o UUID do registro.
+// Quem opera o campeonato não tem o que fazer com isso.
+function traduzirRpc(mensagem: string): string {
+  const m = mensagem.toLowerCase();
+  if (m.includes("active points rule not found")) {
+    return "Nenhuma regra de pontuação ativa atende esta etapa. Verifique em Regras de pontuação se existe uma regra ativa para a temporada, o formato da etapa e a categoria.";
+  }
+  if (m.includes("permission denied")) return "Seu papel não permite executar esta ação.";
+  if (m.includes("result not found")) return "Resultado não encontrado — ele pode ter sido arquivado.";
+  if (m.includes("not homologated")) return "A sessão precisa estar homologada antes desta ação.";
+  return mensagem;
+}
+
 function isNetworkError(error: unknown): boolean {
   const message = String((error as { message?: string } | undefined)?.message ?? error).toLowerCase();
   return !navigator.onLine || message.includes("fetch") || message.includes("network") || message.includes("timeout");
@@ -467,6 +480,16 @@ useEffect(() => {
     let keepUploads = false;
 
     try {
+      // Pares mutuamente exclusivos: avisar antes de gastar um round-trip e
+      // receber de volta a violação de CHECK do banco.
+      for (const field of config.fields) {
+        if (!field.exclusiveWith?.length || !values[field.key]) continue;
+        const conflito = field.exclusiveWith.find((outro) => values[outro]);
+        if (!conflito) continue;
+        const rotulo = config.fields.find((f) => f.key === conflito)?.label ?? conflito;
+        throw new Error(`Preencha ${field.label} ou ${rotulo}, não os dois.`);
+      }
+
       const payload = buildPayload(config, values);
       if (config.table === "term_acceptances") payload.user_id = owner.userId;
       uploaded = await uploadFiles(payload);
@@ -543,7 +566,7 @@ useEffect(() => {
     setError("");
     const parameters = Object.fromEntries(Object.entries(action.parameterMap).map(([parameter, recordKey]) => [parameter, record[recordKey]]));
     const { error: actionError } = await client.rpc(action.rpc, parameters);
-    if (actionError) setError(actionError.message);
+    if (actionError) setError(traduzirRpc(actionError.message));
     else {
       setNotice(`${action.label} concluído.`);
       await loadRecords();

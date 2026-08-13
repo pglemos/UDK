@@ -40,6 +40,12 @@ export type ModuleField = {
   relation?: RelationConfig;
   storageBucket?: string;
   accept?: string;
+  /**
+   * Campos que não podem ser preenchidos junto com este. O banco cobra alguns
+   * desses pares com CHECK — um kart é de um piloto ou de uma equipe, nunca
+   * dos dois — e sem aviso o formulário só devolve a recusa depois de salvar.
+   */
+  exclusiveWith?: string[];
 };
 
 export type ModuleAction = {
@@ -754,8 +760,8 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       sessionOfStage(),
-      relation("driver_id", "Piloto", "drivers", "sport_name", false),
-      relation("team_id", "Equipe", "endurance_teams", "name", false),
+      { ...relation("driver_id", "Piloto", "drivers", "sport_name", false), exclusiveWith: ["team_id"] },
+      { ...relation("team_id", "Equipe", "endurance_teams", "name", false), exclusiveWith: ["driver_id"] },
       { key: "kart_number", label: "Número do kart", kind: "number", required: true },
       { key: "status", label: "Situação", kind: "select", required: true, options: statusOptions("assigned", "confirmed", "changed", "returned", "cancelled") },
       { key: "notes", label: "Observações", kind: "textarea" },
