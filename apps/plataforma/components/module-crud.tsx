@@ -57,8 +57,29 @@ function formatValue(
   }
   if (field.kind === "datetime") return new Date(String(value)).toLocaleString("pt-BR");
   if (field.kind === "date") return new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString("pt-BR");
-  if (typeof value === "object") return JSON.stringify(value);
-  return String(value);
+  if (typeof value === "object") return resumirObjeto(value);
+  return encurtar(String(value));
+}
+
+// Campos de texto longo (o conteúdo de um regulamento inteiro, por exemplo)
+// esticavam a célula em milhares de pixels. O texto completo segue no title da
+// célula e no formulário de edição.
+function encurtar(texto: string, limite = 90): string {
+  const limpo = texto.replace(/\s+/g, " ").trim();
+  return limpo.length > limite ? `${limpo.slice(0, limite - 1)}…` : limpo;
+}
+
+// Na listagem, um objeto cru vira ruído: a tabela de pontuação chegava a
+// mostrar `{"1":50,"2":45,…}` em 6 mil pixels de largura. A célula passa a
+// dizer o tamanho do conteúdo; o valor completo continua no formulário e no
+// title da célula.
+function resumirObjeto(value: object): string {
+  if (Array.isArray(value)) {
+    return value.length === 0 ? "—" : `${value.length} ${value.length === 1 ? "item" : "itens"}`;
+  }
+  const chaves = Object.keys(value as Record<string, unknown>);
+  if (chaves.length === 0) return "—";
+  return `${chaves.length} ${chaves.length === 1 ? "campo" : "campos"}`;
 }
 
 function initialValues(config: ModuleConfig): Record<string, unknown> {
@@ -515,7 +536,7 @@ useEffect(() => {
         <div className="data-card-head"><div><strong>{filteredRecords.length}</strong><span>registro(s)</span></div><small>Dados protegidos pelas políticas RLS do Supabase</small></div>
         {loading ? <div className="empty-state"><LoaderCircle className="spin" /><p>Carregando {config.label.toLowerCase()}...</p></div> : filteredRecords.length === 0 ? <div className="empty-state"><Check /><h3>Nenhum registro encontrado</h3><p>Altere a busca ou crie o primeiro registro deste módulo.</p></div> : (
           <div className="table-scroll"><table className="admin-table"><thead><tr>{visibleFields.map((field) => <th key={field.key}>{field.label}</th>)}<th>Atualizado</th><th className="actions-column">Ações</th></tr></thead><tbody>{filteredRecords.map((record) => (
-            <tr key={record.id}>{visibleFields.map((field) => { const formatted = formatValue(record[field.key], field, relationOptions); return <td key={field.key} title={formatted}>{field.key === "status" ? <span className={statusClass(record[field.key])}>{formatted}</span> : formatted}</td>; })}<td>{record.updated_at ? new Date(String(record.updated_at)).toLocaleString("pt-BR") : "—"}</td><td className="row-actions">
+            <tr key={record.id}>{visibleFields.map((field) => { const formatted = formatValue(record[field.key], field, relationOptions); const completo = record[field.key] == null ? "" : String(typeof record[field.key] === "object" ? JSON.stringify(record[field.key]) : record[field.key]); return <td key={field.key} title={completo || formatted}>{field.key === "status" ? <span className={statusClass(record[field.key])}>{formatted}</span> : formatted}</td>; })}<td>{record.updated_at ? new Date(String(record.updated_at)).toLocaleString("pt-BR") : "—"}</td><td className="row-actions">
               {!config.readOnly ? config.actions?.map((action) => <button type="button" className="icon-button action-button" title={action.label} aria-label={action.label} onClick={() => void runAction(record, action)} key={action.key} disabled={saving}><RefreshCw size={16} /></button>) : null}
               {!config.readOnly && !config.createOnly ? <><button type="button" className="icon-button" title="Editar" aria-label="Editar registro" onClick={() => openEdit(record)}><Pencil size={16} /></button><button type="button" className="icon-button danger" title="Arquivar" aria-label="Arquivar registro" onClick={() => void deleteRecord(record)}><Trash2 size={16} /></button></> : null}
             </td></tr>
