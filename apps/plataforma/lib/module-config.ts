@@ -21,6 +21,12 @@ export type RelationConfig = {
   labelColumn: string;
   valueColumn?: string;
   filters?: Record<string, string | number | boolean>;
+  /**
+   * Restringe as opções ao que pertence ao valor escolhido em outro campo do
+   * formulário. Sessão só faz sentido dentro da etapa selecionada, e o banco
+   * cobra isso com uma chave estrangeira composta.
+   */
+  dependsOn?: { field: string; column: string };
 };
 
 export type ModuleField = {
@@ -77,6 +83,21 @@ const relation = (
   kind: "relation",
   required,
   relation: { table, labelColumn },
+});
+
+// Sessão pertence a uma etapa: results e kart_assignments têm chave estrangeira
+// composta (stage_id, session_id) -> sessions(stage_id, id). Sem o filtro, o
+// formulário deixa escolher uma sessão de outra etapa e o insert falha com 409.
+const sessionOfStage = (required = false): ModuleField => ({
+  key: "session_id",
+  label: "Sessão",
+  kind: "relation",
+  required,
+  relation: {
+    table: "sessions",
+    labelColumn: "name",
+    dependsOn: { field: "stage_id", column: "stage_id" },
+  },
 });
 
 export const moduleConfigs: ModuleConfig[] = [
@@ -314,7 +335,7 @@ export const moduleConfigs: ModuleConfig[] = [
     ascending: false,
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
-      relation("session_id", "Sessão", "sessions", "name", false),
+      sessionOfStage(),
       relation("category_id", "Categoria", "categories", "name", false),
       { key: "title", label: "Título", kind: "text", required: true },
       {
@@ -732,7 +753,7 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "kart_number",
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
-      relation("session_id", "Sessão", "sessions", "name", false),
+      sessionOfStage(),
       relation("driver_id", "Piloto", "drivers", "sport_name", false),
       relation("team_id", "Equipe", "endurance_teams", "name", false),
       { key: "kart_number", label: "Número do kart", kind: "number", required: true },
@@ -882,7 +903,7 @@ export const moduleConfigs: ModuleConfig[] = [
       relation("user_role_id", "Papel", "user_roles", "role"),
       relation("category_id", "Categoria", "categories", "name", false),
       relation("stage_id", "Etapa", "stages", "title", false),
-      relation("session_id", "Sessão", "sessions", "name", false),
+      sessionOfStage(),
       { key: "module", label: "Módulo", kind: "text", required: true },
       { key: "action", label: "Ação", kind: "select", required: true, options: statusOptions("read", "create", "update", "delete", "approve", "publish", "homologate", "export", "manage") },
       { key: "allowed", label: "Permitida", kind: "checkbox" },

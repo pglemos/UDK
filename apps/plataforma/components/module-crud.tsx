@@ -23,7 +23,7 @@ import {
 import { dateTimeLocalToIso, isoToDateTimeLocal } from "../lib/datetime";
 
 type RecordRow = Record<string, unknown> & { id: string };
-type RelationOption = { value: string; label: string };
+type RelationOption = { value: string; label: string; pai?: string };
 type UploadedObject = { bucket: string; path: string; fieldKey: string };
 type StorageScope = { kind: "season" | "championship"; id: string };
 
@@ -136,6 +136,34 @@ function statusClass(value: unknown): string {
   return "status-badge";
 }
 
+// O Postgres devolve o motivo real da recusa em `code`; sem tradução o painel
+// mostrava sempre "Não foi possível salvar o registro." e o operador não tinha
+// como saber se faltou um campo, se o vínculo estava errado ou se já existia
+// um registro igual.
+function descreverErro(error: unknown, config: ModuleConfig): string {
+  const e = error as { code?: string; message?: string; details?: string } | undefined;
+  const detalhe = String(e?.details ?? e?.message ?? "");
+  const campoCitado = config.fields.find((f) => detalhe.includes(f.key))?.label;
+  const sufixo = campoCitado ? ` Campo: ${campoCitado}.` : "";
+
+  switch (e?.code) {
+    case "23505":
+      return `Já existe um ${config.singular} com esses dados. Altere o que precisa ser único (slug, número ou versão) e salve de novo.${sufixo}`;
+    case "23503":
+      return `Vínculo inválido: a combinação selecionada não existe. Confira os campos de seleção — sessão precisa pertencer à etapa escolhida.${sufixo}`;
+    case "23502":
+      return `Falta preencher um campo obrigatório.${sufixo}`;
+    case "23514":
+      return `Valor fora das opções aceitas para este ${config.singular}.${sufixo}`;
+    case "22P02":
+      return `Formato inválido em um dos campos (número, data ou JSON).${sufixo}`;
+    case "42501":
+      return "Seu papel não permite esta operação neste módulo.";
+    default:
+      return e?.message ? `Não foi possível salvar: ${e.message}` : "Não foi possível salvar o registro.";
+  }
+}
+
 function isNetworkError(error: unknown): boolean {
   const message = String((error as { message?: string } | undefined)?.message ?? error).toLowerCase();
   return !navigator.onLine || message.includes("fetch") || message.includes("network") || message.includes("timeout");
@@ -230,7 +258,11 @@ useEffect(() => {
         const valueColumn = relation.valueColumn ?? "id";
         let query = client
           .from(relation.table)
-          .select(`${valueColumn},${relation.labelColumn}`)
+          .select(
+            [valueColumn, relation.labelColumn, relation.dependsOn?.column]
+              .filter(Boolean)
+              .join(","),
+          )
           .is("deleted_at", null)
           .limit(1000);
         for (const [key, value] of Object.entries(relation.filters ?? {})) query = query.eq(key, value);
@@ -239,6 +271,7 @@ useEffect(() => {
         const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
           value: String(row[valueColumn]),
           label: String(row[relation.labelColumn] ?? row[valueColumn]),
+          ...(relation.dependsOn ? { pai: String(row[relation.dependsOn.column] ?? "") } : {}),
         }));
         return [field.key, options] as const;
       }),
@@ -475,7 +508,7 @@ useEffect(() => {
       await loadRecords();
     } catch (saveError) {
       if (!keepUploads) await cleanupUploads(uploaded);
-      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o registro.");
+      setError(descreverErro(saveError, config));
     } finally {
       setSaving(false);
     }
@@ -518,7 +551,16 @@ useEffect(() => {
     setSaving(false);
   }
 
-  const updateValue = (field: ModuleField, value: unknown) => setValues((current) => ({ ...current, [field.key]: value }));
+  const updateValue = (field: ModuleField, value: unknown) =>
+    setValues((current) => {
+      const proximo = { ...current, [field.key]: value };
+      // Trocar a etapa invalida a sessão escolhida: ela pertencia à etapa
+      // anterior e o banco recusaria a combinação.
+      for (const outro of config.fields) {
+        if (outro.relation?.dependsOn?.field === field.key) proximo[outro.key] = "";
+      }
+      return proximo;
+    });
 
   return (
     <section className="module-workspace">
@@ -551,7 +593,16 @@ useEffect(() => {
           return <label key={field.key} className={field.kind === "textarea" || field.kind === "json" ? "form-wide" : ""}><span>{field.label}{field.required ? <b> *</b> : null}</span>
             {field.kind === "textarea" || field.kind === "json" ? <textarea {...common} rows={field.kind === "json" ? 9 : 4} placeholder={field.placeholder} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)} /> : null}
             {field.kind === "select" ? <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}><option value="">Selecione</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : null}
-            {field.kind === "relation" ? <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}><option value="">Selecione</option>{relationOptions[field.key]?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : null}
+            {field.kind === "relation" ? (() => {
+              const dep = field.relation?.dependsOn;
+              const pai = dep ? String(values[dep.field] ?? "") : "";
+              const opcoes = (relationOptions[field.key] ?? []).filter((option) => !dep || (pai ? option.pai === pai : false));
+              const aguardandoPai = Boolean(dep && !pai);
+              return <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}>
+                <option value="">{aguardandoPai ? `Selecione ${dep?.field === "stage_id" ? "a etapa" : "o campo anterior"} primeiro` : "Selecione"}</option>
+                {opcoes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>;
+            })() : null}
             {field.kind === "checkbox" ? <span className="checkbox-field"><input {...common} type="checkbox" checked={Boolean(value)} onChange={(event) => updateValue(field, event.target.checked)} />Ativo</span> : null}
             {field.kind === "file" ? <input {...common} type="file" accept={field.accept} onChange={(event) => setFileValues((current) => ({ ...current, [field.key]: event.target.files?.[0] }))} /> : null}
             {["text", "number", "currency", "datetime", "date"].includes(field.kind) ? <input {...common} type={field.kind === "number" || field.kind === "currency" ? "number" : field.kind === "datetime" ? "datetime-local" : field.kind} step={field.kind === "currency" ? "1" : undefined} placeholder={field.placeholder} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)} /> : null}
