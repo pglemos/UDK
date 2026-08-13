@@ -499,8 +499,12 @@ p {
 .mobile-close,
 .mobile-menu {
   display: none;
-  border: 0;
-  background: transparent;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--graphite);
 }
 
 .context {
@@ -765,12 +769,13 @@ p {
 
 .role-chips span {
   border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.45rem 0.68rem;
-  background: rgba(255, 255, 255, 0.6);
+  padding: 6px 11px;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-muted);
-  font-size: 0.66rem;
+  font-family: var(--cinema-display, "Barlow Condensed", sans-serif);
+  font-size: 11px;
   font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -978,13 +983,25 @@ p {
   gap: 0.5rem;
 }
 
+.stage-actions a:hover {
+  border-color: var(--cyan);
+  background: rgba(0, 217, 255, 0.12);
+}
+
 .stage-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
   border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 0.55rem 0.7rem;
-  background: white;
-  font-size: 0.7rem;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--graphite);
+  font-family: var(--cinema-display, "Barlow Condensed", sans-serif);
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .pending-list {
@@ -1456,7 +1473,7 @@ p {
 
   .mobile-menu {
     border: 1px solid var(--line);
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
     color: var(--graphite);
   }
 
