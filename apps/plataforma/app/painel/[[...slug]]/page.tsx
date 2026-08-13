@@ -207,6 +207,15 @@ const writableModulesByRole: Record<Role, string[]> = {
   guardian: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
 };
 
+type ModuleCount = { total: number; tom: "quiet" | "normal" | "warning" | "danger" };
+
+const countClass: Record<ModuleCount["tom"], string> = {
+  quiet: "count count-quiet",
+  normal: "count",
+  warning: "count count-warning",
+  danger: "count count-danger",
+};
+
 const roleLabels: Record<Role, string> = {
   admin: "Administrador",
   organization: "Organização",
@@ -247,6 +256,7 @@ export default function OperationsPage({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [online, setOnline] = useState(true);
   const [offlineCount, setOfflineCount] = useState(0);
+  const [moduleCounts, setModuleCounts] = useState<Record<string, ModuleCount>>({});
   const [authError, setAuthError] = useState("");
 
   useEffect(() => {
@@ -386,6 +396,47 @@ export default function OperationsPage({
     };
   }, [offlineOwner]);
 
+  // Contadores por módulo na navegação (telas 3a/3b do projeto de design).
+  // A cor comunica a natureza do número: âmbar e vermelho para o que exige
+  // ação, ciano para volume normal.
+  useEffect(() => {
+    if (!client || !user) return;
+    let active = true;
+
+    const carregar = async () => {
+      const contar = async (tabela: string, coluna?: string, valores?: string[]): Promise<number> => {
+        let consulta = client.from(tabela).select("id", { count: "exact", head: true }).is("deleted_at", null);
+        if (coluna && valores) consulta = consulta.in(coluna, valores);
+        const { count } = await consulta;
+        return count ?? 0;
+      };
+
+      const [pilotos, inscricoes, documentos, pagamentos, resultados, recursos] = await Promise.all([
+        contar("drivers"),
+        contar("registrations", "status", ["submitted", "under_review"]),
+        contar("documents", "status", ["pending"]),
+        contar("payments", "status", ["pending", "under_review"]),
+        contar("results", "status", ["provisional"]),
+        contar("appeals", "status", ["open"]),
+      ]);
+
+      if (!active) return;
+      setModuleCounts({
+        pilotos: { total: pilotos, tom: "quiet" },
+        inscricoes: { total: inscricoes, tom: "normal" },
+        documentos: { total: documentos, tom: "warning" },
+        financeiro: { total: pagamentos, tom: "warning" },
+        resultados: { total: resultados, tom: "danger" },
+        recursos: { total: recursos, tom: "danger" },
+      });
+    };
+
+    void carregar().catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [client, user]);
+
   const visibleGroups = useMemo(
     () =>
       navigationGroups
@@ -462,7 +513,11 @@ export default function OperationsPage({
                   >
                     <Icon size={18} />
                     {item.label}
-                    <ChevronRight size={15} />
+                    {(() => {
+                      const contagem = moduleCounts[item.key];
+                      if (!contagem || contagem.total === 0) return <ChevronRight size={15} />;
+                      return <span className={countClass[contagem.tom]}>{contagem.total}</span>;
+                    })()}
                   </Link>
                 );
               })}
