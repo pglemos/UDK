@@ -504,10 +504,9 @@ button[aria-busy="true"] svg:first-child {
   outline-offset: 3px;
 }
 
-/* O header é fixo e tem 92px. Sem esta margem, "Pular para o conteúdo" leva o
-   início do conteúdo para debaixo dele — justamente quem usa teclado ou leitor
-   de tela perde o começo da página. Vale para qualquer alvo de âncora. */
-main#conteudo,
+/* Âncoras internas param sob o header fixo de 92px sem esta margem. Não afeta
+   "Pular para o conteúdo": main#conteudo começa em y=0 e o header sobrepõe o
+   hero de propósito, então ali não há para onde recuar. */
 :target {
   scroll-margin-top: calc(var(--cinema-header, 92px) + 16px);
 }
