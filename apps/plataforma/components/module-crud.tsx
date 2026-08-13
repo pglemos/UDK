@@ -621,10 +621,16 @@ useEffect(() => {
               const pai = dep ? String(values[dep.field] ?? "") : "";
               const opcoes = (relationOptions[field.key] ?? []).filter((option) => !dep || (pai ? option.pai === pai : false));
               const aguardandoPai = Boolean(dep && !pai);
-              return <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}>
-                <option value="">{aguardandoPai ? `Selecione ${dep?.field === "stage_id" ? "a etapa" : "o campo anterior"} primeiro` : "Selecione"}</option>
-                {opcoes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-              </select>;
+              // Sem nenhuma opção, um campo obrigatório trava o envio sem dizer
+              // por quê: o navegador só recusa o submit em silêncio.
+              const vazio = !aguardandoPai && opcoes.length === 0;
+              return <>
+                <select {...common} value={String(value ?? "")} onChange={(event) => updateValue(field, event.target.value)}>
+                  <option value="">{aguardandoPai ? `Selecione ${dep?.field === "stage_id" ? "a etapa" : "o campo anterior"} primeiro` : vazio ? "Nenhum registro disponível" : "Selecione"}</option>
+                  {opcoes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
+                {vazio ? <small className="field-hint">Cadastre ao menos um registro em {field.relation?.table === "endurance_teams" ? "Equipes Endurance" : field.label} antes de continuar.</small> : null}
+              </>;
             })() : null}
             {field.kind === "checkbox" ? <span className="checkbox-field"><input {...common} type="checkbox" checked={Boolean(value)} onChange={(event) => updateValue(field, event.target.checked)} />Ativo</span> : null}
             {field.kind === "file" ? <input {...common} type="file" accept={field.accept} onChange={(event) => setFileValues((current) => ({ ...current, [field.key]: event.target.files?.[0] }))} /> : null}

@@ -767,6 +767,13 @@ p {
   gap: 0.45rem;
 }
 
+.field-hint {
+  margin-top: 6px;
+  color: var(--warning);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .role-chips span {
   border: 1px solid var(--line);
   padding: 6px 11px;
