@@ -7,7 +7,7 @@ on:
     branches: [main, feat/complete-operational-modules]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: application-ci-${{ github.ref }}
@@ -22,8 +22,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -34,19 +32,7 @@ jobs:
         run: corepack enable
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Commit generated lockfile
-        if: github.head_ref == 'fix/react-dom-alignment-20260818'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pnpm-lock.yaml
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git commit -m "chore: refresh lockfile for ReactDOM alignment"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+        run: pnpm install --frozen-lockfile
 
       - name: Verify workspace
         id: verify
