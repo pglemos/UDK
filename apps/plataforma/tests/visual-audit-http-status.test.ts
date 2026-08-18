@@ -12,4 +12,10 @@ describe("visual audit navigation", () => {
     expect(visualAuditSource).toContain("!navigationResponse.ok()");
     expect(visualAuditSource).toContain("navigationResponse.status()");
   });
+
+  it("covers every public and authentication surface required by the deployment checklist", () => {
+    expect(visualAuditSource).toContain('["patrocinadores", "patrocinadores"]');
+    expect(visualAuditSource).toContain('["recuperar-senha", "recuperar-senha"]');
+    expect(visualAuditSource).toContain('["nova-senha", "nova-senha"]');
+  });
 });
