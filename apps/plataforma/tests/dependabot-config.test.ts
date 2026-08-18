@@ -8,6 +8,6 @@ const dependabotConfig = readFileSync(
 
 describe("Dependabot configuration", () => {
   it("does not require repository labels that are not provisioned", () => {
-    expect(dependabotConfig).not.toMatch(/labels:\s*\n\s*-\s*dependencies/);
+    expect(dependabotConfig).not.toContain("- dependencies");
   });
 });
