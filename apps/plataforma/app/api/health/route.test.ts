@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET } from "./route";
 
 const originalVercelCommitSha = process.env.VERCEL_GIT_COMMIT_SHA;
 const originalVercelDeploymentId = process.env.VERCEL_DEPLOYMENT_ID;
+const originalSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const originalSupabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 afterEach(() => {
   if (originalVercelCommitSha === undefined) delete process.env.VERCEL_GIT_COMMIT_SHA;
@@ -10,10 +12,21 @@ afterEach(() => {
 
   if (originalVercelDeploymentId === undefined) delete process.env.VERCEL_DEPLOYMENT_ID;
   else process.env.VERCEL_DEPLOYMENT_ID = originalVercelDeploymentId;
+
+  if (originalSupabaseUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+  else process.env.NEXT_PUBLIC_SUPABASE_URL = originalSupabaseUrl;
+
+  if (originalSupabaseAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = originalSupabaseAnonKey;
+
+  vi.unstubAllGlobals();
 });
 
 describe("health endpoint", () => {
   it("reports unified application status without exposing credentials", async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
     const response = await GET();
     const body = await response.json() as Record<string, unknown>;
     const serialized = JSON.stringify(body).toLowerCase();
@@ -31,6 +44,8 @@ describe("health endpoint", () => {
   });
 
   it("reports the Git commit that actually produced the Vercel deployment", async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     process.env.VERCEL_GIT_COMMIT_SHA = "0123456789abcdef0123456789abcdef01234567";
     process.env.VERCEL_DEPLOYMENT_ID = "dpl_example";
 
@@ -41,6 +56,8 @@ describe("health endpoint", () => {
   });
 
   it("uses an explicit local marker when Vercel deployment metadata is unavailable", async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     delete process.env.VERCEL_GIT_COMMIT_SHA;
     delete process.env.VERCEL_DEPLOYMENT_ID;
 
@@ -51,6 +68,8 @@ describe("health endpoint", () => {
   });
 
   it("exposes the server clock so the countdown can calibrate (A5)", async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const before = Date.now();
     const body = (await (await GET()).json()) as Record<string, unknown>;
     const after = Date.now();
@@ -61,5 +80,33 @@ describe("health endpoint", () => {
     expect(now).toBeGreaterThanOrEqual(before - 1_000);
     expect(now).toBeLessThanOrEqual(after + 1_000);
     expect(body.now).toBe(body.timestamp);
+  });
+
+  it("marks production health as degraded when configured Supabase is unreachable", async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "public-test-key";
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+
+    const response = await GET();
+    const body = await response.json() as Record<string, unknown>;
+
+    expect(response.status).toBe(503);
+    expect(body.status).toBe("degraded");
+    expect(body.supabaseConfigured).toBe(true);
+    expect(body.supabaseReachable).toBe(false);
+  });
+
+  it("confirms configured Supabase only after a real public data probe succeeds", async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "public-test-key";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("[]", { status: 200 })));
+
+    const response = await GET();
+    const body = await response.json() as Record<string, unknown>;
+
+    expect(response.status).toBe(200);
+    expect(body.status).toBe("ok");
+    expect(body.supabaseConfigured).toBe(true);
+    expect(body.supabaseReachable).toBe(true);
   });
 });
