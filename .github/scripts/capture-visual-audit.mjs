@@ -289,10 +289,18 @@ try {
         });
 
         try {
-          await page.goto(`${baseUrl}/${route}`, {
+          const navigationResponse = await page.goto(`${baseUrl}/${route}`, {
             waitUntil: "networkidle",
             timeout: 45_000,
           });
+          if (!navigationResponse) {
+            throw new Error(`Route ${routeName} returned no navigation response.`);
+          }
+          if (!navigationResponse.ok()) {
+            throw new Error(
+              `Route ${routeName} returned HTTP ${navigationResponse.status()} ${navigationResponse.statusText()}.`,
+            );
+          }
           await scrollAndHydrate(page);
           await sleep(800);
 
