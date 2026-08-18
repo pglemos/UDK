@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Instagram, MapPin } from "lucide-react";
+import { ArrowUpRight, Camera, MapPin } from "lucide-react";
 import { CinematicIntro, CinematicPointer, CinematicRouteCurtain } from "./cinematic-motion";
 import { OfficialLogo } from "./official-logo";
 import { RaceHeader } from "./race-header";
@@ -65,7 +65,7 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
             <span>Onde a pista chama</span>
             <p><MapPin aria-hidden="true" /> Kartódromo Internacional de Betim<br />Betim, Minas Gerais</p>
             <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer">
-              <Instagram aria-hidden="true" /> Instagram oficial
+              <Camera aria-hidden="true" /> Instagram oficial
             </a>
           </div>
         </div>
