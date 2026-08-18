@@ -56,6 +56,9 @@ describe("design audit corrections", () => {
     expect(field).toContain("router.replace");
     expect(field).toContain("debounceMs = 300");
     expect(field).toContain('params.delete("page")');
+    expect(field).toContain('const searchParamValue = searchParams.get(name) ?? "";');
+    expect(field).toContain("setValue(searchParamValue);");
+    expect(field).toContain("value.trim() === searchParamValue.trim()");
     expect(ui).toContain('export { SearchField } from "./search-field";');
   });
 

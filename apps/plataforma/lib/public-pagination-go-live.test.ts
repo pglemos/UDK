@@ -19,15 +19,20 @@ function createQuery(response: QueryResponse) {
   for (const method of ["select", "order", "range", "eq", "ilike"]) {
     query[method] = vi.fn(() => query);
   }
-  query.then = (resolve: (value: QueryResponse) => unknown, reject?: (reason: unknown) => unknown) =>
-    Promise.resolve(response).then(resolve, reject);
+  query.then = (
+    resolve: (value: QueryResponse) => unknown,
+    reject?: (reason: unknown) => unknown,
+  ) => Promise.resolve(response).then(resolve, reject);
   return query as {
     select: ReturnType<typeof vi.fn>;
     order: ReturnType<typeof vi.fn>;
     range: ReturnType<typeof vi.fn>;
     eq: ReturnType<typeof vi.fn>;
     ilike: ReturnType<typeof vi.fn>;
-    then: (resolve: (value: QueryResponse) => unknown, reject?: (reason: unknown) => unknown) => Promise<unknown>;
+    then: (
+      resolve: (value: QueryResponse) => unknown,
+      reject?: (reason: unknown) => unknown,
+    ) => Promise<unknown>;
   };
 }
 
@@ -91,13 +96,21 @@ describe("go-live public pagination", () => {
   });
 
   it("never replaces a configured Supabase failure with believable fallback championship data", async () => {
-    const standingsQuery = createQuery({ data: null, count: null, error: new Error("database unavailable") });
+    const standingsQuery = createQuery({
+      data: null,
+      count: null,
+      error: new Error("database unavailable"),
+    });
     mockedPublicSupabaseClient.mockReturnValue({ from: vi.fn(() => standingsQuery) } as never);
 
     const standings = await getStandingsPage({ page: 1, pageSize: 10 });
     expect(standings.items).toEqual([]);
 
-    const driversQuery = createQuery({ data: null, count: null, error: new Error("database unavailable") });
+    const driversQuery = createQuery({
+      data: null,
+      count: null,
+      error: new Error("database unavailable"),
+    });
     mockedPublicSupabaseClient.mockReturnValue({ from: vi.fn(() => driversQuery) } as never);
 
     const drivers = await getDriversPage({ page: 1, pageSize: 10 });
@@ -105,20 +118,28 @@ describe("go-live public pagination", () => {
   });
 
   it("keeps the classification podium and point gap anchored to the real category leaders on every page", () => {
-    const pageSource = readFileSync(new URL("../app/classificacao/page.tsx", import.meta.url), "utf8");
+    const pageSource = readFileSync(
+      new URL("../app/classificacao/page.tsx", import.meta.url),
+      "utf8",
+    );
 
     expect(pageSource).toContain("const [standings, leaders, categories] = await Promise.all");
-    expect(pageSource).toContain('getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })');
+    expect(pageSource).toContain(
+      'getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })',
+    );
     expect(pageSource).toContain("const leaderPoints = leaders.items[0]?.points ?? 0");
-    expect(pageSource).toContain("leaders.items.slice(0, 3).map");
+    expect(pageSource).toMatch(/leaders\.items\.slice\(0, 3\)\.map/);
   });
 
   it("renders the official standing position so shared ranks survive pagination", () => {
-    const pageSource = readFileSync(new URL("../app/classificacao/page.tsx", import.meta.url), "utf8");
+    const pageSource = readFileSync(
+      new URL("../app/classificacao/page.tsx", import.meta.url),
+      "utf8",
+    );
 
     expect(pageSource).toContain("const officialPosition = driver.position ?? absolutePosition");
     expect(pageSource).toContain("rank-${officialPosition}");
-    expect(pageSource).toContain("{officialPosition}</span>");
+    expect(pageSource).toMatch(/\{officialPosition\}\s*<\/span>/);
     expect(pageSource).toContain("driver.position ?? index + 1");
   });
 });

@@ -141,11 +141,7 @@ export function getPageRange(page: number, pageSize: number): { from: number; to
   return { from, to: from + pageSize - 1 };
 }
 
-export function buildPageMeta(
-  page: number,
-  pageSize: number,
-  totalItems: number,
-): PageMeta {
+export function buildPageMeta(page: number, pageSize: number, totalItems: number): PageMeta {
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const safePage = Math.min(Math.max(1, page), totalPages);
   return {
@@ -267,12 +263,18 @@ function filterAndSortDrivers(
 ): PublicDriver[] {
   return drivers
     .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
-    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
-    .sort((a, b) => sort === "name"
-      ? a.name.localeCompare(b.name, "pt-BR")
-      : sort === "points"
-        ? b.points - a.points
-        : (a.position ?? 999) - (b.position ?? 999) || b.points - a.points);
+    .filter(
+      (driver) =>
+        !cleanQuery ||
+        driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")),
+    )
+    .sort((a, b) =>
+      sort === "name"
+        ? a.name.localeCompare(b.name, "pt-BR")
+        : sort === "points"
+          ? b.points - a.points
+          : (a.position ?? 999) - (b.position ?? 999) || b.points - a.points,
+    );
 }
 
 function paginateDrivers(
@@ -320,7 +322,11 @@ export async function getStandingsPage({
   const client = publicClient();
   const cleanQuery = safeSearch(query);
   if (!client) {
-    return paginateDrivers(filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort), page, pageSize);
+    return paginateDrivers(
+      filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort),
+      page,
+      pageSize,
+    );
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -360,7 +366,11 @@ export async function getDriversPage({
   const client = publicClient();
   const cleanQuery = safeSearch(query);
   if (!client) {
-    return paginateDrivers(filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort), page, pageSize);
+    return paginateDrivers(
+      filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort),
+      page,
+      pageSize,
+    );
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -418,7 +428,8 @@ export async function getStages({
 
   const { data, error } = await request;
   if (error) return [];
-  return ((data ?? []) as UnknownRow[]).map(normalizePublicStage)
+  return ((data ?? []) as UnknownRow[])
+    .map(normalizePublicStage)
     .filter((stage) => !status || status === "todos" || stage.status === status)
     .filter((stage) => !format || format === "todos" || stage.format === format);
 }

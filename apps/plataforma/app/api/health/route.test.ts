@@ -28,7 +28,7 @@ describe("health endpoint", () => {
     delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     const response = await GET();
-    const body = await response.json() as Record<string, unknown>;
+    const body = (await response.json()) as Record<string, unknown>;
     const serialized = JSON.stringify(body).toLowerCase();
 
     expect(response.status).toBe(200);
@@ -88,7 +88,7 @@ describe("health endpoint", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
 
     const response = await GET();
-    const body = await response.json() as Record<string, unknown>;
+    const body = (await response.json()) as Record<string, unknown>;
 
     expect(response.status).toBe(503);
     expect(body.status).toBe("degraded");
@@ -102,7 +102,7 @@ describe("health endpoint", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("[]", { status: 200 })));
 
     const response = await GET();
-    const body = await response.json() as Record<string, unknown>;
+    const body = (await response.json()) as Record<string, unknown>;
 
     expect(response.status).toBe(200);
     expect(body.status).toBe("ok");

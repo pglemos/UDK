@@ -18,14 +18,21 @@ export function SearchField({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState(defaultValue);
+  const searchParamValue = searchParams.get(name) ?? "";
+  const [value, setValue] = useState(searchParamValue || defaultValue);
   const firstRun = useRef(true);
+
+  useEffect(() => {
+    setValue(searchParamValue);
+  }, [searchParamValue]);
 
   useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
       return;
     }
+
+    if (value.trim() === searchParamValue.trim()) return;
 
     const timer = window.setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
@@ -38,7 +45,7 @@ export function SearchField({
     }, debounceMs);
 
     return () => window.clearTimeout(timer);
-  }, [debounceMs, name, pathname, router, searchParams, value]);
+  }, [debounceMs, name, pathname, router, searchParamValue, searchParams, value]);
 
   return (
     <label className="race-search-field">

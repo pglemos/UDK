@@ -15,7 +15,9 @@ describe("UDK 2026 official championship rules", () => {
       "supabase/migrations/202608070003_2026_public_standings_fields.sql",
       "supabase/migrations/202608070004_2026_public_regulation.sql",
       "supabase/migrations/202608070005_2026_automatic_result_points.sql",
-    ].map(readRepo).join("\n");
+    ]
+      .map(readRepo)
+      .join("\n");
 
     expect(migration).toContain("50");
     expect(migration).toContain("150");
@@ -49,6 +51,7 @@ describe("UDK 2026 official championship rules", () => {
   it("exposes gross and discarded points to the public classification experience", () => {
     const publicData = readApp("lib/public-data.ts");
     const standingsPage = readApp("app/classificacao/page.tsx");
+    const compactStandingsPage = standingsPage.replace(/\s+/g, " ");
 
     expect(publicData).toContain("grossPoints");
     expect(publicData).toContain("discardedPoints");
@@ -56,7 +59,9 @@ describe("UDK 2026 official championship rules", () => {
     expect(standingsPage).toContain("discardedPoints");
     expect(standingsPage).toContain("Melhores 6 de 8 resultados");
     expect(standingsPage).toContain("formatPoints");
-    expect(standingsPage).toContain('driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"');
+    expect(compactStandingsPage).toContain(
+      'driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"',
+    );
   });
 
   it("loads the suit-inspired racing texture as a secondary identity layer without collapsing hero media", () => {

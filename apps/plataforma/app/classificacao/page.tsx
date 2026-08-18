@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 function param(value: string | string[] | undefined, fallback = ""): string {
-  return Array.isArray(value) ? value[0] ?? fallback : value ?? fallback;
+  return Array.isArray(value) ? (value[0] ?? fallback) : (value ?? fallback);
 }
 
 function formatPoints(value: number): string {
@@ -60,11 +60,23 @@ export default async function StandingsPage({
             <aside className="udk-scoring-rule" aria-label="Regra de descartes da temporada">
               <span>Regra 2026</span>
               <strong>Melhores 6 de 8 resultados</strong>
-              <p>São 06 corridas regulares e 02 Endurances. Ao final, os 02 piores resultados são descartados automaticamente.</p>
+              <p>
+                São 06 corridas regulares e 02 Endurances. Ao final, os 02 piores resultados são
+                descartados automaticamente.
+              </p>
             </aside>
 
-            <div className="udk-category-tabs tg-category-tabs" role="navigation" aria-label="Categorias">
-              <Link className={category === "geral" ? "is-active" : ""} href="/classificacao?categoria=geral">Geral</Link>
+            <div
+              className="udk-category-tabs tg-category-tabs"
+              role="navigation"
+              aria-label="Categorias"
+            >
+              <Link
+                className={category === "geral" ? "is-active" : ""}
+                href="/classificacao?categoria=geral"
+              >
+                Geral
+              </Link>
               {categories.map((item) => (
                 <Link
                   className={category === item.slug ? "is-active" : ""}
@@ -79,7 +91,9 @@ export default async function StandingsPage({
             <form className="udk-toolbar tg-toolbar is-compact" action="/classificacao">
               <SearchField defaultValue={query} placeholder="Buscar piloto" />
               <input type="hidden" name="categoria" value={category} />
-              <button type="submit" className="race-button race-button-primary">Buscar</button>
+              <button type="submit" className="race-button race-button-primary">
+                Buscar
+              </button>
             </form>
 
             {standings.items.length ? (
@@ -89,12 +103,19 @@ export default async function StandingsPage({
                     {leaders.items.slice(0, 3).map((driver, index) => {
                       const fallback = driverVisual(index);
                       const source = resolveVisualSource(driver.avatarUrl, fallback);
-                      const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
+                      const hasPublishedPortrait =
+                        Boolean(driver.avatarUrl) && source !== fallback.src;
                       const podiumPosition = driver.position ?? index + 1;
                       return (
-                        <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${podiumPosition}`} key={driver.slug}>
+                        <Link
+                          href={`/pilotos/${driver.slug}`}
+                          className={`tg-standing-podium-card place-${podiumPosition}`}
+                          key={driver.slug}
+                        >
                           <span>{String(podiumPosition).padStart(2, "0")}</span>
-                          <div className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}>
+                          <div
+                            className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}
+                          >
                             {hasPublishedPortrait ? (
                               <Image
                                 src={source}
@@ -119,8 +140,14 @@ export default async function StandingsPage({
                               </>
                             )}
                           </div>
-                          <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
-                          <b>{formatPoints(driver.points)}<small>pts válidos</small></b>
+                          <div>
+                            <h2>{driver.name}</h2>
+                            <p>{driver.category}</p>
+                          </div>
+                          <b>
+                            {formatPoints(driver.points)}
+                            <small>pts válidos</small>
+                          </b>
                         </Link>
                       );
                     })}
@@ -129,27 +156,68 @@ export default async function StandingsPage({
 
                 <div className="tg-standing-table-wrap">
                   <table className="udk-data-table tg-standing-table">
-                    <caption className="sr-only">Classificação UDK 2026 com pontuação bruta, descartes e pontos válidos</caption>
+                    <caption className="sr-only">
+                      Classificação UDK 2026 com pontuação bruta, descartes e pontos válidos
+                    </caption>
                     <thead>
-                      <tr><th>Pos.</th><th>Piloto</th><th>Categoria</th><th>Vitórias</th><th>Pódios</th><th>Dif.</th><th>Brutos</th><th>Descartes</th><th>Pontos válidos</th><th /></tr>
+                      <tr>
+                        <th>Pos.</th>
+                        <th>Piloto</th>
+                        <th>Categoria</th>
+                        <th>Vitórias</th>
+                        <th>Pódios</th>
+                        <th>Dif.</th>
+                        <th>Brutos</th>
+                        <th>Descartes</th>
+                        <th>Pontos válidos</th>
+                        <th />
+                      </tr>
                     </thead>
                     <tbody>
                       {standings.items.map((driver, index) => {
-                        const absolutePosition = (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
+                        const absolutePosition =
+                          (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
                         const officialPosition = driver.position ?? absolutePosition;
-                        const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
+                        const gap =
+                          Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                         return (
                           <tr key={driver.slug}>
-                            <td data-label="Posição"><span className={`udk-rank rank-${officialPosition}`}>{officialPosition}</span></td>
-                            <td data-label="Piloto"><Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}><span className="udk-driver-avatar">#{driver.number}</span><strong>{driver.name}</strong></Link></td>
+                            <td data-label="Posição">
+                              <span className={`udk-rank rank-${officialPosition}`}>
+                                {officialPosition}
+                              </span>
+                            </td>
+                            <td data-label="Piloto">
+                              <Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}>
+                                <span className="udk-driver-avatar">#{driver.number}</span>
+                                <strong>{driver.name}</strong>
+                              </Link>
+                            </td>
                             <td data-label="Categoria">{driver.category}</td>
                             <td data-label="Vitórias">{driver.wins}</td>
                             <td data-label="Pódios">{driver.podiums}</td>
-                            <td data-label="Diferença">{gap === 0 ? "Líder" : `-${formatPoints(gap)}`}</td>
+                            <td data-label="Diferença">
+                              {gap === 0 ? "Líder" : `-${formatPoints(gap)}`}
+                            </td>
                             <td data-label="Pontos brutos">{formatPoints(driver.grossPoints)}</td>
-                            <td data-label="Pontos descartados"><span className="udk-discarded-points">{driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"}</span></td>
-                            <td data-label="Pontos válidos"><strong className="udk-points">{formatPoints(driver.points)}</strong></td>
-                            <td><Link href={`/pilotos/${driver.slug}`} aria-label={`Abrir ${driver.name}`}><ChevronRight aria-hidden="true" /></Link></td>
+                            <td data-label="Pontos descartados">
+                              <span className="udk-discarded-points">
+                                {driver.discardedPoints > 0
+                                  ? `-${formatPoints(driver.discardedPoints)}`
+                                  : "—"}
+                              </span>
+                            </td>
+                            <td data-label="Pontos válidos">
+                              <strong className="udk-points">{formatPoints(driver.points)}</strong>
+                            </td>
+                            <td>
+                              <Link
+                                href={`/pilotos/${driver.slug}`}
+                                aria-label={`Abrir ${driver.name}`}
+                              >
+                                <ChevronRight aria-hidden="true" />
+                              </Link>
+                            </td>
                           </tr>
                         );
                       })}
@@ -166,15 +234,24 @@ export default async function StandingsPage({
               />
             )}
 
-            <RacePagination meta={standings.meta} basePath="/classificacao" params={{ categoria: category, q: query || undefined, page: String(page) }} />
+            <RacePagination
+              meta={standings.meta}
+              basePath="/classificacao"
+              params={{ categoria: category, q: query || undefined, page: String(page) }}
+            />
           </div>
         </section>
 
         <section className="tg-inline-cta is-dark">
           <div className="race-container">
             <Trophy aria-hidden="true" />
-            <div><span>Seu nome no ranking</span><h2>Entre no grid e construa a próxima posição.</h2></div>
-            <Link href="/inscricao" className="race-button race-button-primary">Iniciar inscrição <ArrowRight aria-hidden="true" /></Link>
+            <div>
+              <span>Seu nome no ranking</span>
+              <h2>Entre no grid e construa a próxima posição.</h2>
+            </div>
+            <Link href="/inscricao" className="race-button race-button-primary">
+              Iniciar inscrição <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

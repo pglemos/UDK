@@ -28,14 +28,17 @@ export async function GET() {
     : null;
   const healthy = !supabaseConfigured || supabaseReachable === true;
 
-  return Response.json({
-    status: healthy ? "ok" : "degraded",
-    now: now.toISOString(),
-    app: "udk",
-    release: process.env.VERCEL_GIT_COMMIT_SHA ?? "local",
-    deploymentId: process.env.VERCEL_DEPLOYMENT_ID ?? null,
-    supabaseConfigured,
-    supabaseReachable,
-    timestamp: now.toISOString(),
-  }, { status: healthy ? 200 : 503 });
+  return Response.json(
+    {
+      status: healthy ? "ok" : "degraded",
+      now: now.toISOString(),
+      app: "udk",
+      release: process.env.VERCEL_GIT_COMMIT_SHA ?? "local",
+      deploymentId: process.env.VERCEL_DEPLOYMENT_ID ?? null,
+      supabaseConfigured,
+      supabaseReachable,
+      timestamp: now.toISOString(),
+    },
+    { status: healthy ? 200 : 503 },
+  );
 }
