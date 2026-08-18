@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./public-supabase", () => ({
@@ -99,5 +100,14 @@ describe("go-live public pagination", () => {
 
     const drivers = await getDriversPage({ page: 1, pageSize: 10 });
     expect(drivers.items).toEqual([]);
+  });
+
+  it("keeps the classification podium and point gap anchored to the real category leaders on every page", () => {
+    const pageSource = readFileSync(new URL("../app/classificacao/page.tsx", import.meta.url), "utf8");
+
+    expect(pageSource).toContain("const [standings, leaders, categories] = await Promise.all");
+    expect(pageSource).toContain('getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })');
+    expect(pageSource).toContain("const leaderPoints = leaders.items[0]?.points ?? 0");
+    expect(pageSource).toContain("leaders.items.slice(0, 3).map");
   });
 });
