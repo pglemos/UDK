@@ -203,25 +203,32 @@ export default async function HomePage() {
           <div className="race-container">
             <article>
               <Flag aria-hidden="true" />
-              <strong><CountUp value={stages.length} minimumIntegerDigits={2} /></strong>
+              <strong>
+                <CountUp value={stages.length} minimumIntegerDigits={2} />
+              </strong>
               <span>etapas oficiais</span>
             </article>
             <article>
               <Users aria-hidden="true" />
-              <strong><CountUp value={drivers.length} minimumIntegerDigits={2} /></strong>
+              <strong>
+                <CountUp value={drivers.length} minimumIntegerDigits={2} />
+              </strong>
               <span>pilotos publicados</span>
             </article>
             <article>
               <Trophy aria-hidden="true" />
-              <strong><CountUp value={totalPodiums} /></strong>
+              <strong>
+                <CountUp value={totalPodiums} />
+              </strong>
               <span>
-                pódios entre {drivers.length}{" "}
-                {drivers.length === 1 ? "piloto" : "pilotos"}
+                pódios entre {drivers.length} {drivers.length === 1 ? "piloto" : "pilotos"}
               </span>
             </article>
             <article>
               <Timer aria-hidden="true" />
-              <strong><CountUp value={categories} minimumIntegerDigits={2} /></strong>
+              <strong>
+                <CountUp value={categories} minimumIntegerDigits={2} />
+              </strong>
               <span>categorias</span>
             </article>
           </div>
@@ -246,7 +253,9 @@ export default async function HomePage() {
                       key={driver.slug}
                     >
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div className="cinema-podium-number">#{driver.number}</div>
+                      {driver.number !== null ? (
+                        <div className="cinema-podium-number">#{driver.number}</div>
+                      ) : null}
                       <h3>{driver.name}</h3>
                       <p>{driver.category}</p>
                       <strong>
@@ -261,7 +270,7 @@ export default async function HomePage() {
                   {topDrivers.map((driver, index) => (
                     <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <b>#{driver.number}</b>
+                      {driver.number !== null ? <b>#{driver.number}</b> : null}
                       <div>
                         <strong>{driver.name}</strong>
                         <small>{driver.category}</small>

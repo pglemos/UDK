@@ -31,7 +31,7 @@ describe("third visual audit safeguards", () => {
     expect(editorial).toContain("src={source}");
     expect(editorial).toContain("objectPosition: hasPublishedPortrait ?");
     expect(editorial).not.toContain('className="driver-fallback-photo"');
-    expect(ui).toContain("driverVisual(driver.number || 0)");
+    expect(ui).toContain("driverVisual(driver.number ?? 0)");
   });
 
   it("uses the same sanitized official fallback in the standings podium", () => {

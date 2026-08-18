@@ -19,7 +19,9 @@ export function EditorialHeading({
   inverse?: boolean;
 }) {
   return (
-    <header className={`cinema-editorial-heading tg-editorial-heading${inverse ? " is-inverse" : ""}`}>
+    <header
+      className={`cinema-editorial-heading tg-editorial-heading${inverse ? " is-inverse" : ""}`}
+    >
       <span>{index}</span>
       <div>
         <h2>{title}</h2>
@@ -47,7 +49,9 @@ export function StageProject({
   const imageSource = resolveVisualSource(stage.heroImageUrl, visual);
 
   return (
-    <article className={`cinema-stage-project${featured ? " cinema-stage-feature is-featured" : ""}`}>
+    <article
+      className={`cinema-stage-project${featured ? " cinema-stage-feature is-featured" : ""}`}
+    >
       <div className="cinema-stage-media">
         <Image
           src={imageSource}
@@ -69,9 +73,15 @@ export function StageProject({
         <h3>{stage.title}</h3>
         <p>{stage.shortDescription ?? stage.track}</p>
         <div className="cinema-stage-meta">
-          <span><MapPin aria-hidden="true" /> {stage.city}</span>
-          <span><Flag aria-hidden="true" /> {stage.track}</span>
-          <span><Timer aria-hidden="true" /> {stage.time || "Horário a definir"}</span>
+          <span>
+            <MapPin aria-hidden="true" /> {stage.city}
+          </span>
+          <span>
+            <Flag aria-hidden="true" /> {stage.track}
+          </span>
+          <span>
+            <Timer aria-hidden="true" /> {stage.time || "Horário a definir"}
+          </span>
         </div>
         <Link href="/calendario" className="cinema-arrow-link">
           Ver etapa <ChevronRight aria-hidden="true" />
@@ -113,7 +123,11 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           <em>{driver.wins} vitórias</em>
         </div>
       </div>
-      <span className="cinema-driver-poster-number tg-driver-poster-number">#{driver.number}</span>
+      {driver.number !== null ? (
+        <span className="cinema-driver-poster-number tg-driver-poster-number">
+          #{driver.number}
+        </span>
+      ) : null}
       <ChevronRight aria-hidden="true" />
     </Link>
   );

@@ -136,7 +136,7 @@ export default async function StandingsPage({
                                   style={{ objectPosition: fallback.position }}
                                 />
                                 <span className="driver-fallback-shade" aria-hidden="true" />
-                                <strong>#{driver.number}</strong>
+                                {driver.number !== null ? <strong>#{driver.number}</strong> : null}
                               </>
                             )}
                           </div>
@@ -189,7 +189,9 @@ export default async function StandingsPage({
                             </td>
                             <td data-label="Piloto">
                               <Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}>
-                                <span className="udk-driver-avatar">#{driver.number}</span>
+                                {driver.number !== null ? (
+                                  <span className="udk-driver-avatar">#{driver.number}</span>
+                                ) : null}
                                 <strong>{driver.name}</strong>
                               </Link>
                             </td>

@@ -36,8 +36,14 @@ import type { User } from "@supabase/supabase-js";
 import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";
 import { getModuleConfig } from "../../../lib/module-config";
 import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";
-import { computeAllowedModules, computeWritableModules, type RoleGrant, type RolePermission } from "../../../lib/access-control";
+import {
+  computeAllowedModules,
+  computeWritableModules,
+  type RoleGrant,
+  type RolePermission,
+} from "../../../lib/access-control";
 import { ModuleCrud } from "../../../components/module-crud";
+import { PilotCrud } from "../../../components/pilot-crud";
 import { Dashboard } from "../../../components/dashboard";
 import { ReportsPanel } from "../../../components/reports-panel";
 
@@ -148,9 +154,30 @@ const roleAccess: Record<Role, string[]> = {
     "relatorios",
     "notificacoes",
   ],
-  marshal: ["dashboard", "calendario", "sessoes", "pilotos", "checkin", "karts", "endurance", "membros-endurance", "stints", "ocorrencias", "evidencias", "notificacoes"],
+  marshal: [
+    "dashboard",
+    "calendario",
+    "sessoes",
+    "pilotos",
+    "checkin",
+    "karts",
+    "endurance",
+    "membros-endurance",
+    "stints",
+    "ocorrencias",
+    "evidencias",
+    "notificacoes",
+  ],
   finance: ["dashboard", "inscricoes", "financeiro", "creditos", "relatorios", "notificacoes"],
-  editor: ["dashboard", "conteudo", "versoes-conteudo", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],
+  editor: [
+    "dashboard",
+    "conteudo",
+    "versoes-conteudo",
+    "patrocinadores",
+    "usuarios-patrocinador",
+    "campanhas",
+    "notificacoes",
+  ],
   sponsor: ["dashboard", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],
   driver: [
     "dashboard",
@@ -202,10 +229,37 @@ const roleAccess: Record<Role, string[]> = {
 const writableModulesByRole: Record<Role, string[]> = {
   admin: allModuleKeys,
   organization: allModuleKeys,
-  judge: ["resultados", "entradas-resultado", "classificacao", "pontuacao", "importacoes", "voltas", "ocorrencias", "evidencias", "julgamentos", "recursos"],
-  marshal: ["sessoes", "checkin", "karts", "endurance", "membros-endurance", "stints", "ocorrencias", "evidencias"],
+  judge: [
+    "resultados",
+    "entradas-resultado",
+    "classificacao",
+    "pontuacao",
+    "importacoes",
+    "voltas",
+    "ocorrencias",
+    "evidencias",
+    "julgamentos",
+    "recursos",
+  ],
+  marshal: [
+    "sessoes",
+    "checkin",
+    "karts",
+    "endurance",
+    "membros-endurance",
+    "stints",
+    "ocorrencias",
+    "evidencias",
+  ],
   finance: ["financeiro", "creditos"],
-  editor: ["conteudo", "versoes-conteudo", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],
+  editor: [
+    "conteudo",
+    "versoes-conteudo",
+    "patrocinadores",
+    "usuarios-patrocinador",
+    "campanhas",
+    "notificacoes",
+  ],
   sponsor: [],
   driver: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
   guardian: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
@@ -241,11 +295,7 @@ function initials(value: string): string {
     .join("");
 }
 
-export default function OperationsPage({
-  params,
-}: {
-  params: Promise<{ slug?: string[] }>;
-}) {
+export default function OperationsPage({ params }: { params: Promise<{ slug?: string[] }> }) {
   const resolvedParams = use(params);
   const activeKey = resolvedParams.slug?.[0] ?? "dashboard";
   const router = useRouter();
@@ -277,7 +327,9 @@ export default function OperationsPage({
 
   useEffect(() => {
     if (!client) {
-      setAuthError("Supabase ainda não conectado. Cadastre as variáveis do projeto antes de acessar o painel.");
+      setAuthError(
+        "Supabase ainda não conectado. Cadastre as variáveis do projeto antes de acessar o painel.",
+      );
       setReady(true);
       return;
     }
@@ -298,7 +350,11 @@ export default function OperationsPage({
       setUser(authenticatedUser);
 
       const [profileResult, rolesResult] = await Promise.all([
-        activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),
+        activeClient
+          .from("profiles")
+          .select("full_name,sport_name")
+          .eq("id", authenticatedUser.id)
+          .maybeSingle(),
         activeClient
           .from("user_roles")
           .select("id,role,expires_at")
@@ -318,7 +374,9 @@ export default function OperationsPage({
       }
 
       const profile = profileResult.data;
-      setDisplayName(profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK");
+      setDisplayName(
+        profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK",
+      );
       const now = Date.now();
       const loadedGrants = (rolesResult.data ?? [])
         .filter((item) => !item.expires_at || new Date(item.expires_at).getTime() > now)
@@ -329,7 +387,9 @@ export default function OperationsPage({
         setRoles([]);
         setRoleGrants([]);
         setPermissions([]);
-        setAuthError("Esta conta não possui papel ativo. Solicite a vinculação à organização do campeonato.");
+        setAuthError(
+          "Esta conta não possui papel ativo. Solicite a vinculação à organização do campeonato.",
+        );
         setReady(true);
         return;
       }
@@ -337,14 +397,21 @@ export default function OperationsPage({
       const { data: permissionRows, error: permissionError } = await activeClient
         .from("role_permissions")
         .select("user_role_id,module,action,allowed,expires_at")
-        .in("user_role_id", loadedGrants.map((grant) => grant.id))
+        .in(
+          "user_role_id",
+          loadedGrants.map((grant) => grant.id),
+        )
         .is("deleted_at", null);
 
       if (!active || permissionError) {
         setRoles([]);
         setRoleGrants([]);
         setPermissions([]);
-        setAuthError(permissionError ? `Não foi possível validar permissões granulares: ${permissionError.message}` : "Sessão encerrada.");
+        setAuthError(
+          permissionError
+            ? `Não foi possível validar permissões granulares: ${permissionError.message}`
+            : "Sessão encerrada.",
+        );
         setReady(true);
         return;
       }
@@ -375,10 +442,7 @@ export default function OperationsPage({
     [permissions, roleGrants],
   );
   const offlineOwner = useMemo(
-    () =>
-      client && user && projectUrl
-        ? createOfflineQueueOwner(projectUrl, user.id)
-        : undefined,
+    () => (client && user && projectUrl ? createOfflineQueueOwner(projectUrl, user.id) : undefined),
     [client, projectUrl, user],
   );
 
@@ -408,21 +472,30 @@ export default function OperationsPage({
     let active = true;
 
     const carregar = async () => {
-      const contar = async (tabela: string, coluna?: string, valores?: string[]): Promise<number> => {
-        let consulta = client.from(tabela).select("id", { count: "exact", head: true }).is("deleted_at", null);
+      const contar = async (
+        tabela: string,
+        coluna?: string,
+        valores?: string[],
+      ): Promise<number> => {
+        let consulta = client
+          .from(tabela)
+          .select("id", { count: "exact", head: true })
+          .is("deleted_at", null);
         if (coluna && valores) consulta = consulta.in(coluna, valores);
         const { count } = await consulta;
         return count ?? 0;
       };
 
-      const [pilotos, inscricoes, documentos, pagamentos, resultados, recursos] = await Promise.all([
-        contar("drivers"),
-        contar("registrations", "status", ["submitted", "under_review"]),
-        contar("documents", "status", ["pending"]),
-        contar("payments", "status", ["pending", "under_review"]),
-        contar("results", "status", ["provisional"]),
-        contar("appeals", "status", ["open"]),
-      ]);
+      const [pilotos, inscricoes, documentos, pagamentos, resultados, recursos] = await Promise.all(
+        [
+          contar("drivers"),
+          contar("registrations", "status", ["submitted", "under_review"]),
+          contar("documents", "status", ["pending"]),
+          contar("payments", "status", ["pending", "under_review"]),
+          contar("results", "status", ["provisional"]),
+          contar("appeals", "status", ["open"]),
+        ],
+      );
 
       if (!active) return;
       setModuleCounts({
@@ -444,7 +517,10 @@ export default function OperationsPage({
   const visibleGroups = useMemo(
     () =>
       navigationGroups
-        .map((group) => ({ ...group, items: group.items.filter((item) => allowedKeys.has(item.key)) }))
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => allowedKeys.has(item.key)),
+        }))
         .filter((group) => group.items.length > 0),
     [allowedKeys],
   );
@@ -455,7 +531,9 @@ export default function OperationsPage({
   const config = getModuleConfig(activeKey);
   const authorized = allowedKeys.has(activeKey);
   const canMutate = writableKeys.has(activeKey);
-  const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;
+  const effectiveConfig = config
+    ? { ...config, readOnly: config.readOnly || !canMutate }
+    : undefined;
 
   async function signOut() {
     if (client) await client.auth.signOut();
@@ -466,7 +544,9 @@ export default function OperationsPage({
     return (
       <main className="loading-screen">
         <img src="/udk.svg" alt="UDK" />
-        <div className="loading-line"><span /></div>
+        <div className="loading-line">
+          <span />
+        </div>
         <p>Validando conta e permissões...</p>
       </main>
     );
@@ -486,7 +566,13 @@ export default function OperationsPage({
 
   return (
     <div className="shell">
-      {sidebarOpen ? <button className="mobile-overlay" aria-label="Fechar menu" onClick={() => setSidebarOpen(false)} /> : null}
+      {sidebarOpen ? (
+        <button
+          className="mobile-overlay"
+          aria-label="Fechar menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      ) : null}
       <aside className={sidebarOpen ? "sidebar sidebar-open" : "sidebar"}>
         <div className="sidebar-brand">
           <img src="/udk.svg" alt="UDK" />
@@ -555,7 +641,9 @@ export default function OperationsPage({
               {online ? <Cloud size={17} /> : <CloudOff size={17} />}
               {online ? "Online" : "Offline"}
             </span>
-            {offlineCount > 0 ? <span className="queue-count">{offlineCount} pendente(s)</span> : null}
+            {offlineCount > 0 ? (
+              <span className="queue-count">{offlineCount} pendente(s)</span>
+            ) : null}
             <span className="avatar header-avatar">{initials(displayName) || "UD"}</span>
           </div>
         </header>
@@ -570,15 +658,21 @@ export default function OperationsPage({
                   ? "Visão consolidada do campeonato, prazos e pendências críticas."
                   : activeKey === "relatorios"
                     ? "Exportações respeitam o escopo e as permissões do usuário autenticado."
-                    : config?.description ?? "Módulo operacional do campeonato UDK."}
+                    : (config?.description ?? "Módulo operacional do campeonato UDK.")}
               </p>
             </div>
             <div className="role-chips">
-              {roles.map((role) => <span key={role}>{roleLabels[role]}</span>)}
+              {roles.map((role) => (
+                <span key={role}>{roleLabels[role]}</span>
+              ))}
             </div>
           </div>
 
-          {authError ? <div className="alert alert-warning" role="alert">{authError}</div> : null}
+          {authError ? (
+            <div className="alert alert-warning" role="alert">
+              {authError}
+            </div>
+          ) : null}
 
           {!authorized ? (
             <div className="access-denied">
@@ -591,6 +685,8 @@ export default function OperationsPage({
             <Dashboard client={client} allowedKeys={allowedKeys} />
           ) : activeKey === "relatorios" ? (
             <ReportsPanel client={client} />
+          ) : activeKey === "pilotos" ? (
+            <PilotCrud client={client} readOnly={!canMutate} />
           ) : config && offlineOwner ? (
             <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
           ) : (

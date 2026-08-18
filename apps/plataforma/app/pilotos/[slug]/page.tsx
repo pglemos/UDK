@@ -19,10 +19,13 @@ export async function generateMetadata({
   // O notFound() precisa acontecer aqui: com loading.tsx na raiz a resposta já
   // começa a ser transmitida antes do corpo da página, e o 200 sairia junto.
   if (!driver) notFound();
-  const coverSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);
+  const coverSource = resolveVisualSource(
+    driver.heroImageUrl ?? driver.avatarUrl,
+    premiumVisuals.manifesto,
+  );
   return {
     title: driver.name,
-    description: `Perfil esportivo de ${driver.name}, #${driver.number}, na temporada UDK 2026.`,
+    description: `Perfil esportivo de ${driver.name} na temporada UDK 2026.`,
     alternates: { canonical: `/pilotos/${driver.slug}` },
     openGraph: {
       title: `${driver.name} • UDK`,
@@ -32,19 +35,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function DriverProfilePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function DriverProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [driver, history] = await Promise.all([getDriverBySlug(slug), getDriverHistory(slug)]);
   if (!driver) notFound();
 
-  const portraitFallback = driverVisual(driver.number);
-  const heroSource = resolveVisualSource(driver.heroImageUrl ?? driver.avatarUrl, premiumVisuals.manifesto);
+  const portraitFallback = driverVisual(driver.number ?? 0);
+  const heroSource = resolveVisualSource(
+    driver.heroImageUrl ?? driver.avatarUrl,
+    premiumVisuals.manifesto,
+  );
   const portraitSource = resolveVisualSource(driver.avatarUrl, portraitFallback);
-  const hasPublishedHero = Boolean(driver.heroImageUrl || driver.avatarUrl) && heroSource !== premiumVisuals.manifesto.src;
+  const hasPublishedHero =
+    Boolean(driver.heroImageUrl || driver.avatarUrl) && heroSource !== premiumVisuals.manifesto.src;
   const hasPublishedPortrait = Boolean(driver.avatarUrl) && portraitSource !== portraitFallback.src;
 
   return (
@@ -59,35 +62,56 @@ export default async function DriverProfilePage({
               priority
               quality={90}
               sizes="100vw"
-              style={{ objectPosition: hasPublishedHero ? "50% center" : premiumVisuals.manifesto.position }}
+              style={{
+                objectPosition: hasPublishedHero ? "50% center" : premiumVisuals.manifesto.position,
+              }}
             />
           </div>
           <div className="race-container tg-driver-profile-hero-inner">
-            <Link className="tg-arrow-link" href="/pilotos"><ArrowLeft aria-hidden="true" /> Voltar ao grid</Link>
+            <Link className="tg-arrow-link" href="/pilotos">
+              <ArrowLeft aria-hidden="true" /> Voltar ao grid
+            </Link>
             <div className="tg-driver-profile-copy">
               <span>{driver.category}</span>
               <h1>{driver.name}</h1>
-              <p>
-                #{driver.number}
-                {driver.teamName ? ` • ${driver.teamName}` : ""}
-                {driver.city ? ` • ${driver.city}` : ""}
-              </p>
+              <p>{[driver.teamName, driver.city].filter(Boolean).join(" • ")}</p>
               <div className="tg-hero-actions">
-                <Link className="race-button race-button-primary" href="/classificacao">Ver classificação <ArrowRight aria-hidden="true" /></Link>
-                <Link className="race-button race-button-ghost" href="/resultados">Resultados</Link>
+                <Link className="race-button race-button-primary" href="/classificacao">
+                  Ver classificação <ArrowRight aria-hidden="true" />
+                </Link>
+                <Link className="race-button race-button-ghost" href="/resultados">
+                  Resultados
+                </Link>
               </div>
             </div>
-            <strong className="tg-driver-profile-number">#{driver.number}</strong>
+            {driver.number !== null ? (
+              <strong className="tg-driver-profile-number">#{driver.number}</strong>
+            ) : null}
           </div>
         </section>
 
         <section className="tg-driver-profile-stats">
           <div className="race-container">
-            <article><span>Posição</span><strong>{driver.position ? `P${driver.position}` : "—"}</strong></article>
-            <article><span>Pontos</span><strong>{driver.points}</strong></article>
-            <article><span>Vitórias</span><strong>{driver.wins}</strong></article>
-            <article><span>Pódios</span><strong>{driver.podiums}</strong></article>
-            <article><span>Poles</span><strong>{driver.poles}</strong></article>
+            <article>
+              <span>Posição</span>
+              <strong>{driver.position ? `P${driver.position}` : "—"}</strong>
+            </article>
+            <article>
+              <span>Pontos</span>
+              <strong>{driver.points}</strong>
+            </article>
+            <article>
+              <span>Vitórias</span>
+              <strong>{driver.wins}</strong>
+            </article>
+            <article>
+              <span>Pódios</span>
+              <strong>{driver.podiums}</strong>
+            </article>
+            <article>
+              <span>Poles</span>
+              <strong>{driver.poles}</strong>
+            </article>
           </div>
         </section>
 
@@ -95,11 +119,18 @@ export default async function DriverProfilePage({
           <div className="race-container tg-profile-story-grid">
             <Reveal className="tg-profile-bio">
               <span>01 / Perfil</span>
-              <h2>Quem está por trás do número.</h2>
-              <p>{driver.bio ?? `${driver.name} compete com o número ${driver.number} na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}</p>
+              <h2>Quem está por trás do capacete.</h2>
+              <p>
+                {driver.bio ??
+                  `${driver.name} compete na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}
+              </p>
               <div>
-                <span><Trophy aria-hidden="true" /> {driver.category}</span>
-                <span><MapPin aria-hidden="true" /> {driver.city ?? "Cidade não publicada"}</span>
+                <span>
+                  <Trophy aria-hidden="true" /> {driver.category}
+                </span>
+                <span>
+                  <MapPin aria-hidden="true" /> {driver.city ?? "Cidade não publicada"}
+                </span>
               </div>
             </Reveal>
             <div className={`tg-profile-portrait${hasPublishedPortrait ? "" : " is-fallback"}`}>
@@ -109,7 +140,9 @@ export default async function DriverProfilePage({
                 fill
                 quality={88}
                 sizes="(max-width: 760px) 100vw, 42vw"
-                style={{ objectPosition: hasPublishedPortrait ? "50% center" : portraitFallback.position }}
+                style={{
+                  objectPosition: hasPublishedPortrait ? "50% center" : portraitFallback.position,
+                }}
               />
             </div>
           </div>
@@ -117,21 +150,36 @@ export default async function DriverProfilePage({
 
         <section className="tg-profile-history">
           <div className="race-container">
-            <EditorialHeading index="02" title="Sessão por sessão, a evolução ganha forma." description="Histórico esportivo publicado pela organização." inverse />
+            <EditorialHeading
+              index="02"
+              title="Sessão por sessão, a evolução ganha forma."
+              description="Histórico esportivo publicado pela organização."
+              inverse
+            />
             {history.length ? (
               <div className="tg-history-list">
                 {history.map((entry, index) => (
                   <Reveal key={entry.id} delay={index * 45}>
                     <article>
                       <span>P{entry.position}</span>
-                      <div><h3>{entry.stageTitle || "Sessão oficial"}</h3><p>Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta {formatLapTime(entry.bestLapMs)}</p></div>
+                      <div>
+                        <h3>{entry.stageTitle || "Sessão oficial"}</h3>
+                        <p>
+                          Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta{" "}
+                          {formatLapTime(entry.bestLapMs)}
+                        </p>
+                      </div>
                       <strong>{entry.points} pts</strong>
                     </article>
                   </Reveal>
                 ))}
               </div>
             ) : (
-              <EditorialEmpty index="02" title="Nenhuma sessão individual publicada." description="O histórico aparecerá quando os resultados oficiais forem disponibilizados." />
+              <EditorialEmpty
+                index="02"
+                title="Nenhuma sessão individual publicada."
+                description="O histórico aparecerá quando os resultados oficiais forem disponibilizados."
+              />
             )}
           </div>
         </section>
@@ -139,8 +187,13 @@ export default async function DriverProfilePage({
         <section className="tg-inline-cta">
           <div className="race-container">
             <Flag aria-hidden="true" />
-            <div><span>Próxima disputa</span><h2>A temporada continua.</h2></div>
-            <Link href="/calendario" className="race-button race-button-primary">Ver calendário <ArrowRight aria-hidden="true" /></Link>
+            <div>
+              <span>Próxima disputa</span>
+              <h2>A temporada continua.</h2>
+            </div>
+            <Link href="/calendario" className="race-button race-button-primary">
+              Ver calendário <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

@@ -6,6 +6,7 @@ import "./globals.css";
 import "./race.css";
 import "./brand-racing-texture.css";
 import "./udk-production-fixes.css";
+import "./pilot-crud.css";
 
 const display = Syne({
   subsets: ["latin"],

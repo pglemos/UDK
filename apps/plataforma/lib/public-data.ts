@@ -26,7 +26,7 @@ export type PublicDriver = {
   slug: string;
   name: string;
   fullName: string;
-  number: number;
+  number: number | null;
   category: string;
   categorySlug: string;
   categoryColor: string;
@@ -85,7 +85,7 @@ export type PublicResultEntry = {
   position: number;
   driverSlug: string;
   driverName: string;
-  driverNumber: number;
+  driverNumber: number | null;
   kartNumber: number | null;
   laps: number;
   totalTimeMs: number | null;
@@ -165,7 +165,7 @@ export function normalizePublicDriver(row: UnknownRow): PublicDriver {
     slug: stringValue(row.slug),
     name,
     fullName: stringValue(row.full_name, name),
-    number: numberValue(row.number),
+    number: nullableNumber(row.number),
     category,
     categorySlug: stringValue(row.category_slug),
     categoryColor: stringValue(row.category_color, "#00D9FF"),
@@ -232,7 +232,7 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
     position: numberValue(row.position),
     driverSlug: stringValue(row.driver_slug),
     driverName: stringValue(row.driver_name),
-    driverNumber: numberValue(row.driver_number),
+    driverNumber: nullableNumber(row.driver_number),
     kartNumber: nullableNumber(row.kart_number),
     laps: numberValue(row.laps),
     totalTimeMs: nullableNumber(row.total_time_ms),

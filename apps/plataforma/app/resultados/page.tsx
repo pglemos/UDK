@@ -4,7 +4,12 @@ import { ArrowRight, ChevronRight, Flag } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, StatusBadge } from "../../components/race/ui";
-import { formatLapTime, getResultEntries, getResultsPage, parsePositiveInt } from "../../lib/public-data";
+import {
+  formatLapTime,
+  getResultEntries,
+  getResultsPage,
+  parsePositiveInt,
+} from "../../lib/public-data";
 
 export const metadata: Metadata = {
   title: "Resultados",
@@ -13,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 function param(value: string | string[] | undefined, fallback = ""): string {
-  return Array.isArray(value) ? value[0] ?? fallback : value ?? fallback;
+  return Array.isArray(value) ? (value[0] ?? fallback) : (value ?? fallback);
 }
 
 export default async function ResultsPage({
@@ -47,14 +52,33 @@ export default async function ResultsPage({
             />
 
             <div className="udk-category-tabs tg-category-tabs">
-              <Link className={category === "geral" ? "is-active" : ""} href="/resultados">Geral</Link>
-              <Link className={category === "rapidos" ? "is-active" : ""} href="/resultados?categoria=rapidos">Ultras Rápidos</Link>
-              <Link className={category === "insanos" ? "is-active" : ""} href="/resultados?categoria=insanos">Ultras Insanos</Link>
+              <Link className={category === "geral" ? "is-active" : ""} href="/resultados">
+                Geral
+              </Link>
+              <Link
+                className={category === "rapidos" ? "is-active" : ""}
+                href="/resultados?categoria=rapidos"
+              >
+                Ultras Rápidos
+              </Link>
+              <Link
+                className={category === "insanos" ? "is-active" : ""}
+                href="/resultados?categoria=insanos"
+              >
+                Ultras Insanos
+              </Link>
             </div>
 
             <div className="tg-result-selector">
-              <div><span>Resultado selecionado</span><h2>{selected?.stageTitle ?? "Aguardando publicação"}</h2></div>
-              {selected ? <StatusBadge status={selected.status} /> : <span className="udk-pending-pill">Pendente</span>}
+              <div>
+                <span>Resultado selecionado</span>
+                <h2>{selected?.stageTitle ?? "Aguardando publicação"}</h2>
+              </div>
+              {selected ? (
+                <StatusBadge status={selected.status} />
+              ) : (
+                <span className="udk-pending-pill">Pendente</span>
+              )}
             </div>
 
             {selected && entries.length >= 3 ? (
@@ -63,7 +87,9 @@ export default async function ResultsPage({
                   {entries.slice(0, 3).map((entry, index) => (
                     <article className={`place-${index + 1}`} key={entry.id}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div className="tg-result-driver-number">#{entry.driverNumber}</div>
+                      {entry.driverNumber !== null ? (
+                        <div className="tg-result-driver-number">#{entry.driverNumber}</div>
+                      ) : null}
                       <h2>{entry.driverName}</h2>
                       <p>{entry.stageTitle}</p>
                       <strong>{formatLapTime(entry.bestLapMs)}</strong>
@@ -74,16 +100,33 @@ export default async function ResultsPage({
 
                 <div className="tg-standing-table-wrap">
                   <table className="udk-data-table tg-standing-table">
-                    <thead><tr><th>Pos.</th><th>Piloto</th><th>Voltas</th><th>Melhor volta</th><th>Penalidade</th><th>Pontos</th></tr></thead>
+                    <thead>
+                      <tr>
+                        <th>Pos.</th>
+                        <th>Piloto</th>
+                        <th>Voltas</th>
+                        <th>Melhor volta</th>
+                        <th>Penalidade</th>
+                        <th>Pontos</th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {entries.map((entry) => (
                         <tr key={entry.id}>
-                          <td data-label="Posição"><span className="udk-rank">{entry.position}</span></td>
-                          <td data-label="Piloto"><strong>{entry.driverName}</strong></td>
+                          <td data-label="Posição">
+                            <span className="udk-rank">{entry.position}</span>
+                          </td>
+                          <td data-label="Piloto">
+                            <strong>{entry.driverName}</strong>
+                          </td>
                           <td data-label="Voltas">{entry.laps}</td>
                           <td data-label="Melhor volta">{formatLapTime(entry.bestLapMs)}</td>
-                          <td data-label="Penalidade">{entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : "—"}</td>
-                          <td data-label="Pontos"><strong className="udk-points">{entry.points}</strong></td>
+                          <td data-label="Penalidade">
+                            {entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : "—"}
+                          </td>
+                          <td data-label="Pontos">
+                            <strong className="udk-points">{entry.points}</strong>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -99,15 +142,24 @@ export default async function ResultsPage({
               />
             )}
 
-            <RacePagination meta={results.meta} basePath="/resultados" params={{ categoria: category, page: String(page) }} />
+            <RacePagination
+              meta={results.meta}
+              basePath="/resultados"
+              params={{ categoria: category, page: String(page) }}
+            />
           </div>
         </section>
 
         <section className="tg-inline-cta">
           <div className="race-container">
             <Flag aria-hidden="true" />
-            <div><span>Próxima bandeirada</span><h2>A temporada ainda tem capítulos pela frente.</h2></div>
-            <Link href="/calendario" className="race-button race-button-primary">Ver calendário <ChevronRight aria-hidden="true" /></Link>
+            <div>
+              <span>Próxima bandeirada</span>
+              <h2>A temporada ainda tem capítulos pela frente.</h2>
+            </div>
+            <Link href="/calendario" className="race-button race-button-primary">
+              Ver calendário <ChevronRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

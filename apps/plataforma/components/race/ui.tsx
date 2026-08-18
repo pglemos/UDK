@@ -1,13 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronRight,
-  Flag,
-  Timer,
-  Trophy,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, Flag, Timer, Trophy } from "lucide-react";
 import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data";
 import { driverVisual, pageHeroVisual } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
@@ -45,8 +38,12 @@ export function PageHero({
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
-        <div className="tg-page-hero-index" aria-hidden="true">{index}</div>
-        <div className="tg-page-scroll" aria-hidden="true"><i /> Explore</div>
+        <div className="tg-page-hero-index" aria-hidden="true">
+          {index}
+        </div>
+        <div className="tg-page-scroll" aria-hidden="true">
+          <i /> Explore
+        </div>
       </div>
     </section>
   );
@@ -102,25 +99,15 @@ export function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function DriverVisual({
-  driver,
-  large = false,
-}: {
-  driver: PublicDriver;
-  large?: boolean;
-}) {
-  const fallback = driverVisual(driver.number || 0);
+export function DriverVisual({ driver, large = false }: { driver: PublicDriver; large?: boolean }) {
+  const fallback = driverVisual(driver.number ?? 0);
 
   return (
-    <div className={`race-driver-visual${large ? " is-large" : ""}${driver.avatarUrl ? "" : " is-fallback"}`}>
+    <div
+      className={`race-driver-visual${large ? " is-large" : ""}${driver.avatarUrl ? "" : " is-fallback"}`}
+    >
       {driver.avatarUrl ? (
-        <Image
-          src={driver.avatarUrl}
-          alt=""
-          fill
-          quality={86}
-          sizes={large ? "240px" : "120px"}
-        />
+        <Image src={driver.avatarUrl} alt="" fill quality={86} sizes={large ? "240px" : "120px"} />
       ) : (
         <>
           <Image
@@ -134,7 +121,7 @@ export function DriverVisual({
           />
           <span className="driver-fallback-shade" aria-hidden="true" />
           <OfficialLogo variant="mark-light" width={large ? 76 : 50} />
-          <strong>#{driver.number}</strong>
+          {driver.number !== null ? <strong>#{driver.number}</strong> : null}
         </>
       )}
     </div>
@@ -156,9 +143,15 @@ export function TrackGlyph({ label = "Traçado oficial" }: { label?: string }) {
 export function StageMeta({ stage }: { stage: PublicStage }) {
   return (
     <div className="race-stage-meta">
-      <span><Flag aria-hidden="true" /> {stage.track}</span>
-      <span><Timer aria-hidden="true" /> {stage.time}</span>
-      <span><Trophy aria-hidden="true" /> {stage.format || "Etapa oficial"}</span>
+      <span>
+        <Flag aria-hidden="true" /> {stage.track}
+      </span>
+      <span>
+        <Timer aria-hidden="true" /> {stage.time}
+      </span>
+      <span>
+        <Trophy aria-hidden="true" /> {stage.format || "Etapa oficial"}
+      </span>
     </div>
   );
 }
@@ -228,8 +221,13 @@ export function RacePagination({
       <div>
         {visible.map((page, index) => (
           <span key={page} className="race-page-slot">
-            {index > 0 && page - (visible[index - 1] ?? page) > 1 ? <i aria-hidden="true">…</i> : null}
-            <Link href={paginationHref(basePath, current, page)} aria-current={page === meta.page ? "page" : undefined}>
+            {index > 0 && page - (visible[index - 1] ?? page) > 1 ? (
+              <i aria-hidden="true">…</i>
+            ) : null}
+            <Link
+              href={paginationHref(basePath, current, page)}
+              aria-current={page === meta.page ? "page" : undefined}
+            >
               {page}
             </Link>
           </span>
