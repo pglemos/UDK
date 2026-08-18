@@ -251,16 +251,40 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
   };
 }
 
-function useFallback<T>(items: T[], fallback: T[]): T[] {
-  return items.length ? items : fallback;
-}
-
 function publicClient() {
   return publicSupabaseClient();
 }
 
 function safeSearch(value: string | undefined): string {
   return (value ?? "").replaceAll("%", "").replaceAll("_", "").trim().slice(0, 80);
+}
+
+function filterAndSortDrivers(
+  drivers: PublicDriver[],
+  category: string | undefined,
+  cleanQuery: string,
+  sort: "position" | "points" | "name",
+): PublicDriver[] {
+  return drivers
+    .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
+    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
+    .sort((a, b) => sort === "name"
+      ? a.name.localeCompare(b.name, "pt-BR")
+      : sort === "points"
+        ? b.points - a.points
+        : (a.position ?? 999) - (b.position ?? 999) || b.points - a.points);
+}
+
+function paginateDrivers(
+  drivers: PublicDriver[],
+  page: number,
+  pageSize: number,
+): PaginatedResult<PublicDriver> {
+  const { from, to } = getPageRange(page, pageSize);
+  return {
+    items: drivers.slice(from, to + 1),
+    meta: buildPageMeta(page, pageSize, drivers.length),
+  };
 }
 
 export async function getCategories(): Promise<PublicCategory[]> {
@@ -272,12 +296,12 @@ export async function getCategories(): Promise<PublicCategory[]> {
     .select("slug,name,color")
     .order("name");
 
-  if (error) return fallbackCategories;
-  return useFallback(((data ?? []) as UnknownRow[]).map((row) => ({
+  if (error) return [];
+  return ((data ?? []) as UnknownRow[]).map((row) => ({
     slug: stringValue(row.slug),
     name: stringValue(row.name),
     color: stringValue(row.color, "#00D9FF"),
-  })), fallbackCategories);
+  }));
 }
 
 export async function getStandingsPage({
@@ -294,9 +318,9 @@ export async function getStandingsPage({
   sort?: "position" | "points" | "name";
 } = {}): Promise<PaginatedResult<PublicDriver>> {
   const client = publicClient();
+  const cleanQuery = safeSearch(query);
   if (!client) {
-    const source = fallbackDrivers;
-    return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
+    return paginateDrivers(filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort), page, pageSize);
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -304,23 +328,19 @@ export async function getStandingsPage({
   let request = client
     .from("public_portal_standings")
     .select("*", { count: "exact" })
-    .order(sortColumn, { ascending: sort === "name" })
+    .order(sortColumn, { ascending: sort !== "points" })
     .range(from, to);
 
   if (category && category !== "geral") request = request.eq("category_slug", category);
-  const cleanQuery = safeSearch(query);
   if (cleanQuery) request = request.ilike("name", `%${cleanQuery}%`);
 
   const { data, count, error } = await request;
-  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
-  const source = useFallback(normalized, fallbackDrivers)
-    .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
-    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
-    .sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "pt-BR") : sort === "points" ? b.points - a.points : (a.position ?? 999) - (b.position ?? 999) || b.points - a.points);
+  if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
 
+  const items = ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
   return {
-    items: source.slice(from, to + 1),
-    meta: buildPageMeta(page, pageSize, error || !normalized.length ? source.length : count ?? source.length),
+    items,
+    meta: buildPageMeta(page, pageSize, count ?? items.length),
   };
 }
 
@@ -338,9 +358,9 @@ export async function getDriversPage({
   sort?: "position" | "points" | "name";
 } = {}): Promise<PaginatedResult<PublicDriver>> {
   const client = publicClient();
+  const cleanQuery = safeSearch(query);
   if (!client) {
-    const source = fallbackDrivers;
-    return { items: source, meta: buildPageMeta(1, pageSize, source.length) };
+    return paginateDrivers(filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort), page, pageSize);
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -348,23 +368,19 @@ export async function getDriversPage({
   let request = client
     .from("public_portal_drivers")
     .select("*", { count: "exact" })
-    .order(sortColumn, { ascending: sort === "name" })
+    .order(sortColumn, { ascending: sort !== "points" })
     .range(from, to);
 
   if (category && category !== "geral") request = request.eq("category_slug", category);
-  const cleanQuery = safeSearch(query);
   if (cleanQuery) request = request.ilike("name", `%${cleanQuery}%`);
 
   const { data, count, error } = await request;
-  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
-  const source = useFallback(normalized, fallbackDrivers)
-    .filter((driver) => !category || category === "geral" || driver.categorySlug === category)
-    .filter((driver) => !cleanQuery || driver.name.toLocaleLowerCase("pt-BR").includes(cleanQuery.toLocaleLowerCase("pt-BR")))
-    .sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "pt-BR") : sort === "points" ? b.points - a.points : b.points - a.points);
+  if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
 
+  const items = ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
   return {
-    items: source.slice(from, to + 1),
-    meta: buildPageMeta(page, pageSize, error || !normalized.length ? source.length : count ?? source.length),
+    items,
+    meta: buildPageMeta(page, pageSize, count ?? items.length),
   };
 }
 
@@ -378,7 +394,7 @@ export async function getDriverBySlug(slug: string): Promise<PublicDriver | null
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !data) return fallbackDrivers.find((item) => item.slug === slug) ?? null;
+  if (error || !data) return null;
   return normalizePublicDriver(data as UnknownRow);
 }
 
@@ -401,8 +417,8 @@ export async function getStages({
   if (format && format !== "todos") request = request.eq("format", format);
 
   const { data, error } = await request;
-  const normalized = error ? [] : ((data ?? []) as UnknownRow[]).map(normalizePublicStage);
-  return useFallback(normalized, fallbackStages)
+  if (error) return [];
+  return ((data ?? []) as UnknownRow[]).map(normalizePublicStage)
     .filter((stage) => !status || status === "todos" || stage.status === status)
     .filter((stage) => !format || format === "todos" || stage.format === format);
 }
