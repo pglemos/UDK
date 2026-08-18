@@ -112,4 +112,13 @@ describe("go-live public pagination", () => {
     expect(pageSource).toContain("const leaderPoints = leaders.items[0]?.points ?? 0");
     expect(pageSource).toContain("leaders.items.slice(0, 3).map");
   });
+
+  it("renders the official standing position so shared ranks survive pagination", () => {
+    const pageSource = readFileSync(new URL("../app/classificacao/page.tsx", import.meta.url), "utf8");
+
+    expect(pageSource).toContain("const officialPosition = driver.position ?? absolutePosition");
+    expect(pageSource).toContain("rank-${officialPosition}");
+    expect(pageSource).toContain("{officialPosition}</span>");
+    expect(pageSource).toContain("driver.position ?? index + 1");
+  });
 });
