@@ -648,7 +648,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           </div>
         </header>
 
-        <section className="content">
+        <section className="content" data-module={activeKey}>
           <div className="page-heading">
             <div>
               <span className="eyebrow">Temporada 2026</span>

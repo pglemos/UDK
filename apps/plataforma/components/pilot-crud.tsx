@@ -177,6 +177,10 @@ function statusClass(value: unknown): string {
   return "status-badge status-warning";
 }
 
+function genderLabel(value: unknown): string {
+  return GENDER_OPTIONS.find(([code]) => code === String(value))?.[1] ?? "Não informado";
+}
+
 function storagePathFromUrl(value: string): string | null {
   const marker = "/storage/v1/object/public/public-media/";
   const index = value.indexOf(marker);
@@ -233,10 +237,10 @@ export function PilotCrud({
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const modalRef = useRef<HTMLElement>(null);
+  const editorRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const savingRef = useRef(false);
 
@@ -287,53 +291,31 @@ export function PilotCrud({
   }, [saving]);
 
   useEffect(() => {
-    if (!modalOpen) return;
+    if (!editorOpen) return;
     previousFocusRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const modal = modalRef.current;
-    if (!modal) return;
-    const modalElement = modal;
-    const selector = [
-      "button:not([disabled])",
-      "input:not([disabled])",
-      "select:not([disabled])",
-      "textarea:not([disabled])",
-      '[tabindex]:not([tabindex="-1"])',
-    ].join(",");
-    const focusable = Array.from(modalElement.querySelectorAll<HTMLElement>(selector));
-    (focusable[0] ?? modalElement).focus();
+    const frame = window.requestAnimationFrame(() => {
+      const editor = editorRef.current;
+      if (!editor) return;
+      editor.scrollIntoView({ behavior: "smooth", block: "start" });
+      editor.focus({ preventScroll: true });
+    });
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape" && !savingRef.current) {
         event.preventDefault();
-        setModalOpen(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const currentFocusable = Array.from(modalElement.querySelectorAll<HTMLElement>(selector));
-      if (!currentFocusable.length) {
-        event.preventDefault();
-        modalElement.focus();
-        return;
-      }
-      const first = currentFocusable[0];
-      const last = currentFocusable[currentFocusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first?.focus();
+        setEditorOpen(false);
       }
     }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => {
+      window.cancelAnimationFrame(frame);
       document.removeEventListener("keydown", handleKeyDown);
       previousFocusRef.current?.focus();
       previousFocusRef.current = null;
     };
-  }, [modalOpen]);
+  }, [editorOpen]);
 
   useEffect(() => {
     if (!photoFile) {
@@ -381,7 +363,7 @@ export function PilotCrud({
     setPhotoPreview(undefined);
     setRemovePhoto(false);
     setError("");
-    setModalOpen(true);
+    setEditorOpen(true);
   }
 
   function openEdit(record: PilotRecord) {
@@ -391,11 +373,11 @@ export function PilotCrud({
     setPhotoPreview(text(record, "avatar_url") || undefined);
     setRemovePhoto(false);
     setError("");
-    setModalOpen(true);
+    setEditorOpen(true);
   }
 
-  function closeModal() {
-    if (!saving) setModalOpen(false);
+  function closeEditor() {
+    if (!saving) setEditorOpen(false);
   }
 
   function selectPhoto(event: ChangeEvent<HTMLInputElement>) {
@@ -499,7 +481,7 @@ export function PilotCrud({
         await removeUploadedPhoto(storagePathFromUrl(previousPhoto));
       }
       setNotice(`Piloto ${editing ? "atualizado" : "cadastrado"} com sucesso.`);
-      setModalOpen(false);
+      setEditorOpen(false);
       await loadRecords();
     } catch (saveError) {
       await removeUploadedPhoto(uploadedPath);
@@ -610,6 +592,7 @@ export function PilotCrud({
                     [
                       record.weight_kg ? `${record.weight_kg} kg` : "",
                       record.height_cm ? `${record.height_cm} cm` : "",
+                      record.gender ? genderLabel(record.gender) : "",
                     ]
                       .filter(Boolean)
                       .join(" · ") || "—";
@@ -664,439 +647,506 @@ export function PilotCrud({
                 })}
               </tbody>
             </table>
+            <div className="pilot-mobile-list" aria-label="Lista de pilotos">
+              {visibleRecords.map((record) => {
+                const name = text(record, "full_name") || "Piloto sem nome";
+                const cityState =
+                  [text(record, "city"), text(record, "state")].filter(Boolean).join("/") || "—";
+                const physical =
+                  [
+                    record.weight_kg ? `${record.weight_kg} kg` : "",
+                    record.height_cm ? `${record.height_cm} cm` : "",
+                    record.gender ? genderLabel(record.gender) : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || "—";
+                return (
+                  <article className="pilot-mobile-card" key={record.id}>
+                    <div className="pilot-mobile-card-head">
+                      <div className="pilot-table-photo">
+                        {text(record, "avatar_url") ? (
+                          <img src={text(record, "avatar_url")} alt={`Foto de ${name}`} />
+                        ) : (
+                          <span>{initials(name) || <UserRound size={17} />}</span>
+                        )}
+                      </div>
+                      <div className="pilot-mobile-card-identity">
+                        <strong>{name}</strong>
+                        <small>{text(record, "email") || "E-mail não informado"}</small>
+                      </div>
+                      <span className={statusClass(record.status)}>
+                        {statusLabel(record.status)}
+                      </span>
+                    </div>
+                    <dl className="pilot-mobile-card-details">
+                      <div>
+                        <dt>WhatsApp</dt>
+                        <dd>{text(record, "whatsapp") || "Não informado"}</dd>
+                      </div>
+                      <div>
+                        <dt>Cidade/UF</dt>
+                        <dd>{cityState}</dd>
+                      </div>
+                      <div>
+                        <dt>Dados físicos</dt>
+                        <dd>{physical}</dd>
+                      </div>
+                    </dl>
+                    {!readOnly ? (
+                      <div className="pilot-mobile-card-actions">
+                        <button
+                          type="button"
+                          className="button-secondary"
+                          onClick={() => openEdit(record)}
+                        >
+                          <Pencil size={16} /> Editar cadastro
+                        </button>
+                        <button
+                          type="button"
+                          className="button-secondary danger-action"
+                          onClick={() => void archive(record)}
+                          disabled={saving}
+                        >
+                          <Trash2 size={16} /> Arquivar
+                        </button>
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
 
-      {modalOpen ? (
-        <div className="modal-backdrop" role="presentation" onMouseDown={closeModal}>
-          <section
-            ref={modalRef}
-            className="modal pilot-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="pilot-modal-title"
-            tabIndex={-1}
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <div className="modal-head">
-              <div>
-                <small>{editing ? "Editar cadastro" : "Novo cadastro"}</small>
-                <h2 id="pilot-modal-title">Dados do piloto</h2>
-              </div>
-              <button
-                className="icon-button"
-                type="button"
-                aria-label="Fechar cadastro"
-                onClick={closeModal}
-                disabled={saving}
-              >
-                <X />
-              </button>
+      {editorOpen ? (
+        <section
+          ref={editorRef}
+          className="pilot-editor"
+          aria-labelledby="pilot-editor-title"
+          tabIndex={-1}
+        >
+          <div className="pilot-editor-head">
+            <div>
+              <small>{editing ? "Editar cadastro" : "Novo cadastro"}</small>
+              <h2 id="pilot-editor-title">Dados do piloto</h2>
+              <p>
+                Preencha o perfil operacional do piloto. O kart é definido por sorteio em cada
+                sessão.
+              </p>
             </div>
-            <form onSubmit={(event) => void save(event)}>
-              <div className="pilot-form-intro">
-                <ShieldCheck size={20} />
-                <p>
-                  Cadastro oficial para organização das baterias, comunicação, lastro e segurança. O
-                  kart será sorteado por sessão.
-                </p>
+            <button
+              className="icon-button"
+              type="button"
+              aria-label="Fechar cadastro"
+              onClick={closeEditor}
+              disabled={saving}
+            >
+              <X />
+            </button>
+          </div>
+          <form onSubmit={(event) => void save(event)}>
+            <div className="pilot-form-intro">
+              <ShieldCheck size={20} />
+              <p>
+                Cadastro oficial para organização das baterias, comunicação, lastro e segurança. O
+                kart será sorteado por sessão.
+              </p>
+            </div>
+
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>01</span>
+                <div>
+                  <h3>Identificação e foto</h3>
+                  <p>Dados usados para localizar e reconhecer o piloto.</p>
+                </div>
               </div>
-
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>01</span>
-                  <div>
-                    <h3>Identificação e foto</h3>
-                    <p>Dados usados para localizar e reconhecer o piloto.</p>
-                  </div>
+              <div className="pilot-photo-field">
+                <div className="pilot-photo-preview">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Prévia da foto do piloto" />
+                  ) : (
+                    <>
+                      <Camera size={28} />
+                      <span>Sem foto cadastrada</span>
+                    </>
+                  )}
                 </div>
-                <div className="pilot-photo-field">
-                  <div className="pilot-photo-preview">
-                    {photoPreview ? (
-                      <img src={photoPreview} alt="Prévia da foto do piloto" />
-                    ) : (
-                      <>
-                        <Camera size={28} />
-                        <span>Sem foto cadastrada</span>
-                      </>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      className="button-secondary pilot-photo-button"
-                      htmlFor="pilot-photo-input"
-                    >
-                      <ImageIcon size={17} /> {photoPreview ? "Trocar foto" : "Inserir foto"}
-                    </label>
-                    <input
-                      id="pilot-photo-input"
-                      className="sr-only"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={selectPhoto}
-                      disabled={saving}
-                    />
-                    <p className="field-hint">JPG, PNG ou WEBP · até 8 MB.</p>
-                    {photoPreview ? (
-                      <button
-                        className="pilot-remove-photo"
-                        type="button"
-                        onClick={() => {
-                          setPhotoFile(undefined);
-                          update("avatar_url", "");
-                          setRemovePhoto(true);
-                        }}
-                        disabled={saving}
-                      >
-                        Remover foto
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              </section>
-
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>02</span>
-                  <div>
-                    <h3>Dados do piloto</h3>
-                    <p>Informações pessoais e de contato.</p>
-                  </div>
-                </div>
-                <div className="form-grid pilot-grid">
-                  <label>
-                    <span>
-                      Temporada <b>*</b>
-                    </span>
-                    <select
-                      required
-                      value={String(values.season_id)}
-                      onChange={(event) => {
-                        update("season_id", event.target.value);
-                        update("category_id", "");
+                <div>
+                  <label
+                    className="button-secondary pilot-photo-button"
+                    htmlFor="pilot-photo-input"
+                  >
+                    <ImageIcon size={17} /> {photoPreview ? "Trocar foto" : "Inserir foto"}
+                  </label>
+                  <input
+                    id="pilot-photo-input"
+                    className="sr-only"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={selectPhoto}
+                    disabled={saving}
+                  />
+                  <p className="field-hint">JPG, PNG ou WEBP · até 8 MB.</p>
+                  {photoPreview ? (
+                    <button
+                      className="pilot-remove-photo"
+                      type="button"
+                      onClick={() => {
+                        setPhotoFile(undefined);
+                        update("avatar_url", "");
+                        setRemovePhoto(true);
                       }}
                       disabled={saving}
                     >
-                      <option value="">Selecione a temporada</option>
-                      {seasons.map((season) => (
-                        <option value={season.id} key={season.id}>
-                          {season.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    <span>Categoria</span>
-                    <select
-                      value={String(values.category_id)}
-                      onChange={(event) => update("category_id", event.target.value)}
-                      disabled={saving || !values.season_id}
-                    >
-                      <option value="">Sem categoria definida</option>
-                      {selectedCategories.map((category) => (
-                        <option value={category.id} key={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="form-wide">
-                    <span>
-                      Nome completo <b>*</b>
-                    </span>
-                    <input
-                      required
-                      placeholder="Nome e sobrenome"
-                      value={String(values.full_name)}
-                      onChange={(event) => update("full_name", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>WhatsApp</span>
-                    <input
-                      type="tel"
-                      placeholder="(21) 99999-9999"
-                      value={String(values.whatsapp)}
-                      onChange={(event) => update("whatsapp", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>CPF</span>
-                    <input
-                      inputMode="numeric"
-                      placeholder="000.000.000-00"
-                      value={String(values.cpf)}
-                      onChange={(event) => update("cpf", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Data de nascimento</span>
-                    <input
-                      type="date"
-                      value={String(values.birth_date)}
-                      onChange={(event) => update("birth_date", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Idade</span>
-                    <input
-                      type="number"
-                      min="5"
-                      max="120"
-                      placeholder="Ex.: 34"
-                      value={String(values.age)}
-                      onChange={(event) => update("age", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>E-mail</span>
-                    <input
-                      type="email"
-                      placeholder="piloto@email.com"
-                      value={String(values.email)}
-                      onChange={(event) => update("email", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Cidade</span>
-                    <input
-                      placeholder="Belo Horizonte"
-                      value={String(values.city)}
-                      onChange={(event) => update("city", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Estado (UF)</span>
-                    <select
-                      value={String(values.state)}
-                      onChange={(event) => update("state", event.target.value)}
-                      disabled={saving}
-                    >
-                      <option value="">Selecione o estado</option>
-                      {STATE_OPTIONS.map(([code, name]) => (
-                        <option value={code} key={code}>
-                          {code} — {name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                      Remover foto
+                    </button>
+                  ) : null}
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>03</span>
-                  <div>
-                    <h3>Dados físicos</h3>
-                    <p>Informações para orientar lastro e organização das baterias.</p>
-                  </div>
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>02</span>
+                <div>
+                  <h3>Dados do piloto</h3>
+                  <p>Informações pessoais e de contato.</p>
                 </div>
-                <div className="form-grid pilot-grid">
-                  <label>
-                    <span>Peso aproximado com equipamento (kg)</span>
-                    <input
-                      type="number"
-                      min="20"
-                      max="300"
-                      step="0.1"
-                      placeholder="Ex.: 92"
-                      value={String(values.weight_kg)}
-                      onChange={(event) => update("weight_kg", event.target.value)}
-                      disabled={saving}
-                    />
-                    <small className="field-hint">
-                      Informe o peso em kg para orientar lastro e organização das baterias.
-                    </small>
-                  </label>
-                  <label>
-                    <span>Altura (cm)</span>
-                    <input
-                      type="number"
-                      min="80"
-                      max="250"
-                      placeholder="Ex.: 178"
-                      value={String(values.height_cm)}
-                      onChange={(event) => update("height_cm", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Sexo</span>
-                    <select
-                      value={String(values.gender)}
-                      onChange={(event) => update("gender", event.target.value)}
-                      disabled={saving}
-                    >
-                      <option value="">Selecione</option>
-                      {GENDER_OPTIONS.map(([code, label]) => (
-                        <option value={code} key={code}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </section>
+              </div>
+              <div className="form-grid pilot-grid">
+                <label>
+                  <span>
+                    Temporada <b>*</b>
+                  </span>
+                  <select
+                    required
+                    value={String(values.season_id)}
+                    onChange={(event) => {
+                      update("season_id", event.target.value);
+                      update("category_id", "");
+                    }}
+                    disabled={saving}
+                  >
+                    <option value="">Selecione a temporada</option>
+                    {seasons.map((season) => (
+                      <option value={season.id} key={season.id}>
+                        {season.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Categoria</span>
+                  <select
+                    value={String(values.category_id)}
+                    onChange={(event) => update("category_id", event.target.value)}
+                    disabled={saving || !values.season_id}
+                  >
+                    <option value="">Sem categoria definida</option>
+                    {selectedCategories.map((category) => (
+                      <option value={category.id} key={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-wide">
+                  <span>
+                    Nome completo <b>*</b>
+                  </span>
+                  <input
+                    required
+                    placeholder="Nome e sobrenome"
+                    value={String(values.full_name)}
+                    onChange={(event) => update("full_name", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>WhatsApp</span>
+                  <input
+                    type="tel"
+                    placeholder="(21) 99999-9999"
+                    value={String(values.whatsapp)}
+                    onChange={(event) => update("whatsapp", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>CPF</span>
+                  <input
+                    inputMode="numeric"
+                    placeholder="000.000.000-00"
+                    value={String(values.cpf)}
+                    onChange={(event) => update("cpf", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Data de nascimento</span>
+                  <input
+                    type="date"
+                    value={String(values.birth_date)}
+                    onChange={(event) => update("birth_date", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Idade</span>
+                  <input
+                    type="number"
+                    min="5"
+                    max="120"
+                    placeholder="Ex.: 34"
+                    value={String(values.age)}
+                    onChange={(event) => update("age", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>E-mail</span>
+                  <input
+                    type="email"
+                    placeholder="piloto@email.com"
+                    value={String(values.email)}
+                    onChange={(event) => update("email", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Cidade</span>
+                  <input
+                    placeholder="Belo Horizonte"
+                    value={String(values.city)}
+                    onChange={(event) => update("city", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Estado (UF)</span>
+                  <select
+                    value={String(values.state)}
+                    onChange={(event) => update("state", event.target.value)}
+                    disabled={saving}
+                  >
+                    <option value="">Selecione o estado</option>
+                    {STATE_OPTIONS.map(([code, name]) => (
+                      <option value={code} key={code}>
+                        {code} — {name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </section>
 
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>04</span>
-                  <div>
-                    <h3>Segurança e saúde</h3>
-                    <p>Dados restritos à operação do campeonato e ao atendimento necessário.</p>
-                  </div>
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>03</span>
+                <div>
+                  <h3>Dados físicos</h3>
+                  <p>Informações para orientar lastro e organização das baterias.</p>
                 </div>
-                <div className="form-grid pilot-grid">
-                  <label>
-                    <span>Contato de emergência</span>
-                    <input
-                      placeholder="Nome completo"
-                      value={String(values.emergency_contact_name)}
-                      onChange={(event) => update("emergency_contact_name", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Telefone de emergência</span>
-                    <input
-                      type="tel"
-                      placeholder="(21) 99999-9999"
-                      value={String(values.emergency_contact_phone)}
-                      onChange={(event) => update("emergency_contact_phone", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Restrições médicas</span>
-                    <textarea
-                      placeholder="Ex.: nenhuma, lesão, restrição física."
-                      rows={3}
-                      value={String(values.medical_restrictions)}
-                      onChange={(event) => update("medical_restrictions", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Alergias</span>
-                    <textarea
-                      placeholder="Ex.: nenhuma, medicamento, alimento."
-                      rows={3}
-                      value={String(values.allergies)}
-                      onChange={(event) => update("allergies", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Medicamentos</span>
-                    <textarea
-                      placeholder="Uso contínuo ou eventual."
-                      rows={3}
-                      value={String(values.medications)}
-                      onChange={(event) => update("medications", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                  <label>
-                    <span>Observações operacionais</span>
-                    <textarea
-                      placeholder="Ex.: necessidade de orientação especial, restrição de agenda, observação para briefing ou nenhuma."
-                      rows={3}
-                      value={String(values.operational_notes)}
-                      onChange={(event) => update("operational_notes", event.target.value)}
-                      disabled={saving}
-                    />
-                  </label>
-                </div>
-              </section>
+              </div>
+              <div className="form-grid pilot-grid">
+                <label>
+                  <span>Peso aproximado com equipamento (kg)</span>
+                  <input
+                    type="number"
+                    min="20"
+                    max="300"
+                    step="0.1"
+                    placeholder="Ex.: 92"
+                    value={String(values.weight_kg)}
+                    onChange={(event) => update("weight_kg", event.target.value)}
+                    disabled={saving}
+                  />
+                  <small className="field-hint">
+                    Informe o peso em kg para orientar lastro e organização das baterias.
+                  </small>
+                </label>
+                <label>
+                  <span>Altura (cm)</span>
+                  <input
+                    type="number"
+                    min="80"
+                    max="250"
+                    placeholder="Ex.: 178"
+                    value={String(values.height_cm)}
+                    onChange={(event) => update("height_cm", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Sexo</span>
+                  <select
+                    value={String(values.gender)}
+                    onChange={(event) => update("gender", event.target.value)}
+                    disabled={saving}
+                  >
+                    <option value="">Selecione</option>
+                    {GENDER_OPTIONS.map(([code, label]) => (
+                      <option value={code} key={code}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </section>
 
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>05</span>
-                  <div>
-                    <h3>Confirmações obrigatórias</h3>
-                    <p>O cadastro só pode ser salvo depois que todos os itens forem confirmados.</p>
-                  </div>
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>04</span>
+                <div>
+                  <h3>Segurança e saúde</h3>
+                  <p>Dados restritos à operação do campeonato e ao atendimento necessário.</p>
                 </div>
-                <div className="pilot-acknowledgements">
-                  {ACKNOWLEDGEMENTS.map(([key, label]) => (
-                    <label className="pilot-acknowledgement" key={key}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(values[key])}
-                        onChange={(event) => update(key, event.target.checked)}
-                        disabled={saving}
-                      />
-                      <span>{label}</span>
-                    </label>
-                  ))}
-                </div>
-              </section>
+              </div>
+              <div className="form-grid pilot-grid">
+                <label>
+                  <span>Contato de emergência</span>
+                  <input
+                    placeholder="Nome completo"
+                    value={String(values.emergency_contact_name)}
+                    onChange={(event) => update("emergency_contact_name", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Telefone de emergência</span>
+                  <input
+                    type="tel"
+                    placeholder="(21) 99999-9999"
+                    value={String(values.emergency_contact_phone)}
+                    onChange={(event) => update("emergency_contact_phone", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Restrições médicas</span>
+                  <textarea
+                    placeholder="Ex.: nenhuma, lesão, restrição física."
+                    rows={3}
+                    value={String(values.medical_restrictions)}
+                    onChange={(event) => update("medical_restrictions", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Alergias</span>
+                  <textarea
+                    placeholder="Ex.: nenhuma, medicamento, alimento."
+                    rows={3}
+                    value={String(values.allergies)}
+                    onChange={(event) => update("allergies", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Medicamentos</span>
+                  <textarea
+                    placeholder="Uso contínuo ou eventual."
+                    rows={3}
+                    value={String(values.medications)}
+                    onChange={(event) => update("medications", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label>
+                  <span>Observações operacionais</span>
+                  <textarea
+                    placeholder="Ex.: necessidade de orientação especial, restrição de agenda, observação para briefing ou nenhuma."
+                    rows={3}
+                    value={String(values.operational_notes)}
+                    onChange={(event) => update("operational_notes", event.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+              </div>
+            </section>
 
-              <section className="pilot-form-section">
-                <div className="pilot-section-heading">
-                  <span>06</span>
-                  <div>
-                    <h3>Publicação e situação</h3>
-                    <p>Controle interno do cadastro e da exibição pública.</p>
-                  </div>
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>05</span>
+                <div>
+                  <h3>Confirmações obrigatórias</h3>
+                  <p>O cadastro só pode ser salvo depois que todos os itens forem confirmados.</p>
                 </div>
-                <div className="form-grid pilot-grid">
-                  <label>
-                    <span>Situação</span>
-                    <select
-                      value={String(values.status)}
-                      onChange={(event) => update("status", event.target.value)}
-                      disabled={saving}
-                    >
-                      {STATUS_OPTIONS.map(([code, label]) => (
-                        <option value={code} key={code}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="checkbox-field pilot-public-toggle">
+              </div>
+              <div className="pilot-acknowledgements">
+                {ACKNOWLEDGEMENTS.map(([key, label]) => (
+                  <label className="pilot-acknowledgement" key={key}>
                     <input
                       type="checkbox"
-                      checked={Boolean(values.public_profile)}
-                      onChange={(event) => update("public_profile", event.target.checked)}
+                      checked={Boolean(values[key])}
+                      onChange={(event) => update(key, event.target.checked)}
                       disabled={saving}
-                    />{" "}
-                    Exibir perfil público
+                    />
+                    <span>{label}</span>
                   </label>
-                </div>
-              </section>
-
-              {error ? (
-                <div className="alert alert-error" role="alert">
-                  {error}
-                </div>
-              ) : null}
-              <div className="modal-actions">
-                <button
-                  className="button-secondary"
-                  type="button"
-                  onClick={closeModal}
-                  disabled={saving}
-                >
-                  Cancelar
-                </button>
-                <button className="button-primary" type="submit" disabled={saving}>
-                  {saving ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}{" "}
-                  Salvar piloto
-                </button>
+                ))}
               </div>
-            </form>
-          </section>
-        </div>
+            </section>
+
+            <section className="pilot-form-section">
+              <div className="pilot-section-heading">
+                <span>06</span>
+                <div>
+                  <h3>Publicação e situação</h3>
+                  <p>Controle interno do cadastro e da exibição pública.</p>
+                </div>
+              </div>
+              <div className="form-grid pilot-grid">
+                <label>
+                  <span>Situação</span>
+                  <select
+                    value={String(values.status)}
+                    onChange={(event) => update("status", event.target.value)}
+                    disabled={saving}
+                  >
+                    {STATUS_OPTIONS.map(([code, label]) => (
+                      <option value={code} key={code}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="checkbox-field pilot-public-toggle">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(values.public_profile)}
+                    onChange={(event) => update("public_profile", event.target.checked)}
+                    disabled={saving}
+                  />{" "}
+                  Exibir perfil público
+                </label>
+              </div>
+            </section>
+
+            {error ? (
+              <div className="alert alert-error" role="alert">
+                {error}
+              </div>
+            ) : null}
+            <div className="modal-actions">
+              <button
+                className="button-secondary"
+                type="button"
+                onClick={closeEditor}
+                disabled={saving}
+              >
+                Cancelar
+              </button>
+              <button className="button-primary" type="submit" disabled={saving}>
+                {saving ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />} Salvar
+                piloto
+              </button>
+            </div>
+          </form>
+        </section>
       ) : null}
     </section>
   );

@@ -1,5 +1,43 @@
+.content[data-module="pilotos"] .page-heading {
+  margin-bottom: 1.35rem;
+}
+
+.content[data-module="pilotos"] .page-heading h1 {
+  font-size: clamp(3.25rem, 5.2vw, 5.8rem);
+  line-height: 0.82;
+}
+
 .pilot-workspace {
   gap: 1.2rem;
+}
+
+.pilot-workspace .module-toolbar {
+  align-items: stretch;
+}
+
+.pilot-workspace .data-card {
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+}
+
+.pilot-workspace .data-card-head {
+  min-height: 72px;
+  padding: 0.95rem 1.2rem;
+}
+
+.pilot-workspace .data-card-head strong {
+  font-size: 2.25rem;
+  line-height: 0.9;
+}
+
+.pilot-workspace .data-card-head span {
+  font-size: 0.74rem;
+}
+
+.pilot-workspace .data-card-head small {
+  max-width: 46ch;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: right;
 }
 
 .pilot-table {
@@ -34,6 +72,7 @@
   display: grid;
   width: 46px;
   height: 46px;
+  flex: 0 0 auto;
   place-items: center;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -84,17 +123,150 @@
   color: var(--danger);
 }
 
-.pilot-modal {
-  width: min(1000px, 100%);
+.pilot-mobile-list {
+  display: none;
 }
 
-.pilot-modal .modal-head {
+.pilot-mobile-card {
+  border-top: 1px solid var(--line);
+  padding: 1rem;
+}
+
+.pilot-mobile-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pilot-mobile-card-identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.pilot-mobile-card-identity strong,
+.pilot-mobile-card-identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pilot-mobile-card-identity strong {
+  color: var(--graphite);
+  font-size: 0.9rem;
+}
+
+.pilot-mobile-card-identity small {
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.pilot-mobile-card-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0 0;
+}
+
+.pilot-mobile-card-details div:last-child {
+  grid-column: 1 / -1;
+}
+
+.pilot-mobile-card-details dt {
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pilot-mobile-card-details dd {
+  margin: 0.25rem 0 0;
+  color: var(--graphite);
+  font-size: 0.78rem;
+}
+
+.pilot-mobile-card-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.pilot-mobile-card-actions button {
+  flex: 1;
+  min-height: 42px;
+  padding-inline: 0.7rem;
+  font-size: 0.68rem;
+}
+
+.danger-action {
+  border-color: rgba(255, 100, 100, 0.35);
+  color: var(--danger);
+}
+
+/* Editor inline: a long operational form stays in the page flow and does not
+   inherit the transformed content container as a fixed-position descendant. */
+.pilot-editor {
+  border: 1px solid var(--line);
+  border-radius: 16px;
   background: var(--surface);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  outline: none;
+  scroll-margin-top: 88px;
 }
 
-.pilot-modal form {
+.pilot-editor:focus-visible {
+  border-color: var(--cyan-deep);
+  box-shadow:
+    0 0 0 4px rgba(0, 217, 255, 0.12),
+    0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.pilot-editor-head {
+  position: sticky;
+  top: 72px;
+  z-index: 8;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  border-radius: 16px 16px 0 0;
+  padding: 1.25rem 1.4rem;
+  background: rgba(17, 20, 23, 0.96);
+  backdrop-filter: blur(14px);
+}
+
+.pilot-editor-head small {
+  color: var(--cyan-deep);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pilot-editor-head h2 {
+  margin: 0.25rem 0 0;
+  color: var(--graphite);
+  font-family: var(--font-barlow), "Arial Narrow", sans-serif;
+  font-size: 2.6rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.pilot-editor-head p {
+  max-width: 68ch;
+  margin: 0.55rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.pilot-editor form {
   display: grid;
   gap: 1.35rem;
+  padding: 1.4rem;
 }
 
 .pilot-form-intro {
@@ -170,8 +342,8 @@
 
 .pilot-photo-preview {
   display: grid;
-  width: 112px;
-  height: 112px;
+  width: 128px;
+  height: 128px;
   flex: 0 0 auto;
   place-items: center;
   overflow: hidden;
@@ -189,7 +361,7 @@
 }
 
 .pilot-photo-preview span {
-  max-width: 8ch;
+  max-width: 10ch;
   font-size: 0.7rem;
   line-height: 1.3;
 }
@@ -198,7 +370,7 @@
   cursor: pointer;
 }
 
-.pilot-modal .field-hint {
+.pilot-editor .field-hint {
   margin: 0.45rem 0 0;
   color: var(--text-muted);
   font-size: 0.72rem;
@@ -228,14 +400,14 @@
   grid-column: 1 / -1;
 }
 
-.pilot-modal .form-grid input,
-.pilot-modal .form-grid select,
-.pilot-modal .form-grid textarea {
+.pilot-editor .form-grid input,
+.pilot-editor .form-grid select,
+.pilot-editor .form-grid textarea {
   min-height: 48px;
   font-size: 1rem;
 }
 
-.pilot-modal .form-grid textarea {
+.pilot-editor .form-grid textarea {
   min-height: 108px;
 }
 
@@ -274,10 +446,74 @@
   min-height: 48px;
 }
 
+.pilot-editor .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 7;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.2rem;
+  padding: 1rem 0 0.1rem;
+  background: linear-gradient(180deg, rgba(17, 20, 23, 0.2), var(--surface) 35%);
+}
+
+@media (max-width: 900px) {
+  .content[data-module="pilotos"] .page-heading h1 {
+    font-size: clamp(3.1rem, 13vw, 4.1rem);
+  }
+}
+
 @media (max-width: 720px) {
+  .pilot-workspace .data-card-head {
+    padding: 0.9rem 1rem;
+  }
+
+  .pilot-workspace .data-card-head small {
+    display: none;
+  }
+
+  .pilot-table {
+    display: none;
+  }
+
+  .table-scroll {
+    overflow: visible;
+  }
+
+  .pilot-mobile-list {
+    display: block;
+  }
+
+  .pilot-mobile-card-head .status-badge {
+    align-self: flex-start;
+  }
+
+  .pilot-editor {
+    border-radius: 14px;
+    scroll-margin-top: 80px;
+  }
+
+  .pilot-editor-head {
+    top: 72px;
+    padding: 1rem;
+  }
+
+  .pilot-editor-head h2 {
+    font-size: 2rem;
+  }
+
+  .pilot-editor-head p {
+    font-size: 0.74rem;
+  }
+
+  .pilot-editor form {
+    padding: 1rem;
+  }
+
   .pilot-photo-field {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
   }
 
   .pilot-photo-preview {
@@ -285,23 +521,37 @@
     height: 96px;
   }
 
+  .pilot-photo-field > div:last-child {
+    min-width: 0;
+  }
+
   .pilot-section-heading h3 {
     font-size: 1.35rem;
   }
 
-  .pilot-modal form {
-    padding: 1rem;
-  }
-
-  .pilot-modal .modal-head {
-    padding: 1rem;
-  }
-
-  .pilot-modal .modal-actions {
+  .pilot-editor .modal-actions {
     flex-direction: column-reverse;
   }
 
-  .pilot-modal .modal-actions button {
+  .pilot-editor .modal-actions button {
     width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .pilot-mobile-card-head {
+    align-items: flex-start;
+  }
+
+  .pilot-mobile-card-head .status-badge {
+    font-size: 0.58rem;
+  }
+
+  .pilot-mobile-card-actions {
+    flex-direction: column;
+  }
+
+  .pilot-photo-field {
+    align-items: flex-start;
   }
 }

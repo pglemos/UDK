@@ -54,6 +54,19 @@ describe("cadastro operacional de pilotos", () => {
     expect(component).not.toContain("P1 Academy");
   });
 
+  it("mantém o editor no fluxo da página e oferece uma lista legível no celular", () => {
+    const page = read("app/painel/[[...slug]]/page.tsx");
+    const component = read("components/pilot-crud.tsx");
+    const styles = read("app/pilot-crud.css");
+
+    expect(page).toContain("data-module={activeKey}");
+    expect(component).toContain('className="pilot-editor"');
+    expect(component).toContain('className="pilot-mobile-list"');
+    expect(component).not.toContain('className="modal-backdrop"');
+    expect(styles).toContain(".pilot-mobile-list");
+    expect(styles).toContain(".pilot-editor");
+  });
+
   it("não exibe número de piloto nem rótulos em inglês nas superfícies relacionadas", () => {
     const publicSources = [
       read("app/page.tsx"),
