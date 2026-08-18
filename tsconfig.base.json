@@ -17,7 +17,7 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "paths": {
-      "@udk/*": ["packages/*/src"]
+      "@udk/*": ["./packages/*/src"]
     }
   }
 }
