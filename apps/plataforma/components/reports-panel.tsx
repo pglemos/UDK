@@ -19,8 +19,12 @@ const reports = [
   { key: "standings", label: "Classificação", description: "Pontos e posições por versão" },
   { key: "penalties", label: "Penalidades", description: "Efeito, situação e visibilidade" },
   { key: "appeals", label: "Recursos", description: "Protocolos e decisões" },
-  { key: "endurance_teams", label: "Equipes Endurance", description: "Composição e homologação" },
-  { key: "stints", label: "Stints", description: "Tempos, voltas e validação" },
+  {
+    key: "endurance_teams",
+    label: "Equipes de resistência",
+    description: "Composição e homologação",
+  },
+  { key: "stints", label: "Trocas de piloto", description: "Tempos, voltas e validação" },
   { key: "audit_events", label: "Auditoria", description: "Histórico imutável de alterações" },
 ] as const;
 

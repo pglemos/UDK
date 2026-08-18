@@ -87,9 +87,6 @@ export default async function ResultsPage({
                   {entries.slice(0, 3).map((entry, index) => (
                     <article className={`place-${index + 1}`} key={entry.id}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      {entry.driverNumber !== null ? (
-                        <div className="tg-result-driver-number">#{entry.driverNumber}</div>
-                      ) : null}
                       <h2>{entry.driverName}</h2>
                       <p>{entry.stageTitle}</p>
                       <strong>{formatLapTime(entry.bestLapMs)}</strong>

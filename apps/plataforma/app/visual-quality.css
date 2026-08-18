@@ -457,7 +457,7 @@ img {
 
 .cinema-ranking-list a,
 .tg-ranking-list a {
-  grid-template-columns: 42px 60px minmax(0, 1fr) auto 24px;
+  grid-template-columns: 42px minmax(0, 1fr) auto 24px;
   gap: clamp(10px, 1.5vw, 22px);
 }
 
@@ -867,7 +867,7 @@ img {
 
   .cinema-ranking-list a,
   .tg-ranking-list a {
-    grid-template-columns: 34px 48px minmax(0, 1fr) auto;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
   }
 
   .cinema-ranking-list a > svg,
@@ -1032,12 +1032,12 @@ img {
 
   .cinema-ranking-list a,
   .tg-ranking-list a {
-    grid-template-columns: 30px 42px minmax(0, 1fr);
+    grid-template-columns: 30px minmax(0, 1fr);
   }
 
   .cinema-ranking-list a > em,
   .tg-ranking-list a > em {
-    grid-column: 3;
+    grid-column: 2;
     justify-self: start;
   }
 

@@ -54,6 +54,23 @@ describe("cadastro operacional de pilotos", () => {
     expect(component).not.toContain("P1 Academy");
   });
 
+  it("não exibe número de piloto nem rótulos em inglês nas superfícies relacionadas", () => {
+    const publicSources = [
+      read("app/page.tsx"),
+      read("app/pilotos/page.tsx"),
+      read("app/pilotos/[slug]/page.tsx"),
+      read("app/classificacao/page.tsx"),
+      read("app/resultados/page.tsx"),
+      read("components/race/editorial-primitives.tsx"),
+      read("components/race/ui.tsx"),
+    ].join("\n");
+
+    expect(publicSources).not.toMatch(/#\{driver\.number\}|#\{entry\.driverNumber\}/);
+    expect(publicSources).not.toContain("Explore");
+    expect(publicSources).not.toContain(">Poles<");
+    expect(publicSources).toContain("Largadas na pole");
+  });
+
   it("torna o número legado opcional no banco e preserva o sorteio por sessão", () => {
     const migration = fs.readFileSync(
       path.join(

@@ -42,7 +42,7 @@ export function PageHero({
           {index}
         </div>
         <div className="tg-page-scroll" aria-hidden="true">
-          <i /> Explore
+          <i /> Conheça
         </div>
       </div>
     </section>
@@ -91,6 +91,12 @@ const statusLabels: Record<string, string> = {
   active: "Ativo",
 };
 
+const formatLabels: Record<string, string> = {
+  regular: "Etapa regular",
+  endurance: "Resistência",
+  special: "Etapa especial",
+};
+
 export function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`race-status race-status-${status.replaceAll("_", "-")}`}>
@@ -121,7 +127,6 @@ export function DriverVisual({ driver, large = false }: { driver: PublicDriver; 
           />
           <span className="driver-fallback-shade" aria-hidden="true" />
           <OfficialLogo variant="mark-light" width={large ? 76 : 50} />
-          {driver.number !== null ? <strong>#{driver.number}</strong> : null}
         </>
       )}
     </div>
@@ -150,7 +155,8 @@ export function StageMeta({ stage }: { stage: PublicStage }) {
         <Timer aria-hidden="true" /> {stage.time}
       </span>
       <span>
-        <Trophy aria-hidden="true" /> {stage.format || "Etapa oficial"}
+        <Trophy aria-hidden="true" />{" "}
+        {formatLabels[stage.format] ?? (stage.format || "Etapa oficial")}
       </span>
     </div>
   );

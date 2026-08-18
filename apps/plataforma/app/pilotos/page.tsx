@@ -39,14 +39,14 @@ export default async function DriversPage({
           index="04"
           eyebrow="Quem constrói o grid"
           title="Pilotos"
-          description="Antes dos números, pessoas. Quando a luz apaga, competidores."
+          description="Antes da pista, pessoas. Quando a luz apaga, competidores."
         />
 
         <section className="tg-drivers-directory">
           <div className="race-container">
             <EditorialHeading
               index="04"
-              title="Cada número carrega uma história diferente."
+              title="Cada piloto carrega uma história diferente."
               description="Busque pilotos, filtre categorias e acompanhe a evolução de quem está na temporada."
             />
 

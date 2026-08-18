@@ -40,7 +40,7 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
   const [driver, history] = await Promise.all([getDriverBySlug(slug), getDriverHistory(slug)]);
   if (!driver) notFound();
 
-  const portraitFallback = driverVisual(driver.number ?? 0);
+  const portraitFallback = driverVisual(driver.position ?? 0);
   const heroSource = resolveVisualSource(
     driver.heroImageUrl ?? driver.avatarUrl,
     premiumVisuals.manifesto,
@@ -84,9 +84,6 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                 </Link>
               </div>
             </div>
-            {driver.number !== null ? (
-              <strong className="tg-driver-profile-number">#{driver.number}</strong>
-            ) : null}
           </div>
         </section>
 
@@ -109,7 +106,7 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
               <strong>{driver.podiums}</strong>
             </article>
             <article>
-              <span>Poles</span>
+              <span>Largadas na pole</span>
               <strong>{driver.poles}</strong>
             </article>
           </div>

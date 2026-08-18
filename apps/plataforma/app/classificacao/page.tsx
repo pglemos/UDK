@@ -61,8 +61,8 @@ export default async function StandingsPage({
               <span>Regra 2026</span>
               <strong>Melhores 6 de 8 resultados</strong>
               <p>
-                São 06 corridas regulares e 02 Endurances. Ao final, os 02 piores resultados são
-                descartados automaticamente.
+                São 06 corridas regulares e 02 provas de resistência. Ao final, os 02 piores
+                resultados são descartados automaticamente.
               </p>
             </aside>
 
@@ -136,7 +136,6 @@ export default async function StandingsPage({
                                   style={{ objectPosition: fallback.position }}
                                 />
                                 <span className="driver-fallback-shade" aria-hidden="true" />
-                                {driver.number !== null ? <strong>#{driver.number}</strong> : null}
                               </>
                             )}
                           </div>
@@ -189,9 +188,6 @@ export default async function StandingsPage({
                             </td>
                             <td data-label="Piloto">
                               <Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}>
-                                {driver.number !== null ? (
-                                  <span className="udk-driver-avatar">#{driver.number}</span>
-                                ) : null}
                                 <strong>{driver.name}</strong>
                               </Link>
                             </td>

@@ -207,7 +207,9 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                 <div className="stage-actions">
                   <Link href="/painel/calendario">Configurar etapa</Link>
                   {allowedKeys.has("inscricoes") ? <Link href="/painel/inscricoes">Revisar inscrições</Link> : null}
-                  {allowedKeys.has("endurance") ? <Link href="/painel/endurance">Equipes Endurance</Link> : null}
+                  {allowedKeys.has("endurance") ? (
+                    <Link href="/painel/endurance">Equipes de resistência</Link>
+                  ) : null}
                 </div>
               </>
             ) : (

@@ -617,7 +617,7 @@
 
   .cinema-ranking-list a,
   .tg-ranking-list a {
-    grid-template-columns: 34px 48px minmax(0, 1fr) auto;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
   }
 
   .cinema-ranking-list a > svg,

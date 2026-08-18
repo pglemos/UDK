@@ -941,7 +941,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                                   <small className="field-hint">
                                     Cadastre ao menos um registro em{" "}
                                     {field.relation?.table === "endurance_teams"
-                                      ? "Equipes Endurance"
+                                      ? "Equipes de resistência"
                                       : field.label}{" "}
                                     antes de continuar.
                                   </small>

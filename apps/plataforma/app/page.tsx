@@ -199,7 +199,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="cinema-proof" aria-label="Números reais do campeonato">
+        <section className="cinema-proof" aria-label="Dados reais do campeonato">
           <div className="race-container">
             <article>
               <Flag aria-hidden="true" />
@@ -253,9 +253,6 @@ export default async function HomePage() {
                       key={driver.slug}
                     >
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      {driver.number !== null ? (
-                        <div className="cinema-podium-number">#{driver.number}</div>
-                      ) : null}
                       <h3>{driver.name}</h3>
                       <p>{driver.category}</p>
                       <strong>
@@ -270,7 +267,6 @@ export default async function HomePage() {
                   {topDrivers.map((driver, index) => (
                     <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      {driver.number !== null ? <b>#{driver.number}</b> : null}
                       <div>
                         <strong>{driver.name}</strong>
                         <small>{driver.category}</small>
@@ -295,7 +291,7 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="04"
-              title="Pessoas antes dos números. Pilotos quando a luz apaga."
+              title="Pessoas antes da pista. Pilotos quando a luz apaga."
               description="Conheça quem constrói o grid e transforma cada encontro em uma história diferente."
               action={{ href: "/pilotos", label: "Todos os pilotos" }}
               inverse

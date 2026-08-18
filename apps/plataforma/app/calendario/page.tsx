@@ -54,7 +54,7 @@ export default async function CalendarPage({
               <select name="formato" defaultValue={format} aria-label="Formato">
                 <option value="todos">Todos os formatos</option>
                 <option value="regular">Etapa regular</option>
-                <option value="endurance">Endurance</option>
+                <option value="endurance">Resistência</option>
               </select>
               <button type="submit" className="race-button race-button-primary">Aplicar filtros</button>
             </form>

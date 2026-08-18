@@ -86,7 +86,7 @@ const navigationGroups: NavigationGroup[] = [
       { key: "mudancas-categoria", label: "Mudanças de categoria", icon: ClipboardCheck },
       { key: "calendario", label: "Calendário", icon: CalendarDays },
       { key: "sessoes", label: "Sessões", icon: CalendarDays },
-      { key: "checkin", label: "Check-in", icon: ClipboardCheck },
+      { key: "checkin", label: "Credenciamento", icon: ClipboardCheck },
       { key: "karts", label: "Karts", icon: Flag },
       { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },
       { key: "creditos", label: "Créditos", icon: HandCoins },
@@ -108,11 +108,11 @@ const navigationGroups: NavigationGroup[] = [
     ],
   },
   {
-    label: "Endurance",
+    label: "Resistência",
     items: [
       { key: "endurance", label: "Equipes", icon: UsersRound },
       { key: "membros-endurance", label: "Membros", icon: Users },
-      { key: "stints", label: "Stints", icon: Sparkles },
+      { key: "stints", label: "Trocas de piloto", icon: Sparkles },
     ],
   },
   {

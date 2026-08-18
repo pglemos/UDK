@@ -123,11 +123,6 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
           <em>{driver.wins} vitórias</em>
         </div>
       </div>
-      {driver.number !== null ? (
-        <span className="cinema-driver-poster-number tg-driver-poster-number">
-          #{driver.number}
-        </span>
-      ) : null}
       <ChevronRight aria-hidden="true" />
     </Link>
   );
