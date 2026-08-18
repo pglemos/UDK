@@ -90,9 +90,10 @@ export default async function StandingsPage({
                       const fallback = driverVisual(index);
                       const source = resolveVisualSource(driver.avatarUrl, fallback);
                       const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
+                      const podiumPosition = driver.position ?? index + 1;
                       return (
-                        <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
-                          <span>{String(index + 1).padStart(2, "0")}</span>
+                        <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${podiumPosition}`} key={driver.slug}>
+                          <span>{String(podiumPosition).padStart(2, "0")}</span>
                           <div className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}>
                             {hasPublishedPortrait ? (
                               <Image
@@ -135,10 +136,11 @@ export default async function StandingsPage({
                     <tbody>
                       {standings.items.map((driver, index) => {
                         const absolutePosition = (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
+                        const officialPosition = driver.position ?? absolutePosition;
                         const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                         return (
                           <tr key={driver.slug}>
-                            <td data-label="Posição"><span className={`udk-rank rank-${absolutePosition}`}>{absolutePosition}</span></td>
+                            <td data-label="Posição"><span className={`udk-rank rank-${officialPosition}`}>{officialPosition}</span></td>
                             <td data-label="Piloto"><Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}><span className="udk-driver-avatar">#{driver.number}</span><strong>{driver.name}</strong></Link></td>
                             <td data-label="Categoria">{driver.category}</td>
                             <td data-label="Vitórias">{driver.wins}</td>
