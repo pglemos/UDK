@@ -17,8 +17,11 @@ const routes = [
   ["pilotos", "pilotos"],
   ["noticias", "noticias"],
   ["regulamento", "regulamento"],
+  ["patrocinadores", "patrocinadores"],
   ["inscricao", "inscricao"],
   ["login", "login"],
+  ["recuperar-senha", "recuperar-senha"],
+  ["nova-senha", "nova-senha"],
 ];
 const viewports = [
   ["desktop", { width: 1440, height: 1100 }],
