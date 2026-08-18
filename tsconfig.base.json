@@ -16,9 +16,8 @@
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "baseUrl": ".",
     "paths": {
-      "@udk/*": ["packages/*/src"]
+      "@udk/*": ["./packages/*/src"]
     }
   }
 }
