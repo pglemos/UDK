@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload visual audit
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: udk-visual-audit-${{ github.event.pull_request.head.sha }}
           path: visual-audit/*
