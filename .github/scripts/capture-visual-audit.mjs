@@ -17,8 +17,11 @@ const routes = [
   ["pilotos", "pilotos"],
   ["noticias", "noticias"],
   ["regulamento", "regulamento"],
+  ["patrocinadores", "patrocinadores"],
   ["inscricao", "inscricao"],
   ["login", "login"],
+  ["recuperar-senha", "recuperar-senha"],
+  ["nova-senha", "nova-senha"],
 ];
 const viewports = [
   ["desktop", { width: 1440, height: 1100 }],
@@ -289,10 +292,18 @@ try {
         });
 
         try {
-          await page.goto(`${baseUrl}/${route}`, {
+          const navigationResponse = await page.goto(`${baseUrl}/${route}`, {
             waitUntil: "networkidle",
             timeout: 45_000,
           });
+          if (!navigationResponse) {
+            throw new Error(`Route ${routeName} returned no navigation response.`);
+          }
+          if (!navigationResponse.ok()) {
+            throw new Error(
+              `Route ${routeName} returned HTTP ${navigationResponse.status()} ${navigationResponse.statusText()}.`,
+            );
+          }
           await scrollAndHydrate(page);
           await sleep(800);
 
