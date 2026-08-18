@@ -32,11 +32,12 @@ export default async function StandingsPage({
   const page = parsePositiveInt(params.page, 1, 500);
   const category = param(params.categoria, "geral");
   const query = param(params.q);
-  const [standings, categories] = await Promise.all([
+  const [standings, leaders, categories] = await Promise.all([
     getStandingsPage({ page, pageSize: 10, category, query, sort: "points" }),
+    getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" }),
     getCategories(),
   ]);
-  const leaderPoints = standings.items[0]?.points ?? 0;
+  const leaderPoints = leaders.items[0]?.points ?? 0;
 
   return (
     <RaceShell>
@@ -83,45 +84,47 @@ export default async function StandingsPage({
 
             {standings.items.length ? (
               <>
-                <section className="tg-standing-podium" aria-label="Pódio da classificação">
-                  {standings.items.slice(0, 3).map((driver, index) => {
-                    const fallback = driverVisual(index);
-                    const source = resolveVisualSource(driver.avatarUrl, fallback);
-                    const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
-                    return (
-                      <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
-                        <span>{String(index + 1).padStart(2, "0")}</span>
-                        <div className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}>
-                          {hasPublishedPortrait ? (
-                            <Image
-                              src={source}
-                              alt=""
-                              fill
-                              quality={86}
-                              sizes="(max-width: 760px) 100vw, 33vw"
-                            />
-                          ) : (
-                            <>
+                {leaders.items.length ? (
+                  <section className="tg-standing-podium" aria-label="Pódio da classificação">
+                    {leaders.items.slice(0, 3).map((driver, index) => {
+                      const fallback = driverVisual(index);
+                      const source = resolveVisualSource(driver.avatarUrl, fallback);
+                      const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
+                      return (
+                        <Link href={`/pilotos/${driver.slug}`} className={`tg-standing-podium-card place-${index + 1}`} key={driver.slug}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <div className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}>
+                            {hasPublishedPortrait ? (
                               <Image
-                                className="driver-fallback-photo"
-                                src={fallback.src}
+                                src={source}
                                 alt=""
                                 fill
-                                quality={84}
+                                quality={86}
                                 sizes="(max-width: 760px) 100vw, 33vw"
-                                style={{ objectPosition: fallback.position }}
                               />
-                              <span className="driver-fallback-shade" aria-hidden="true" />
-                              <strong>#{driver.number}</strong>
-                            </>
-                          )}
-                        </div>
-                        <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
-                        <b>{formatPoints(driver.points)}<small>pts válidos</small></b>
-                      </Link>
-                    );
-                  })}
-                </section>
+                            ) : (
+                              <>
+                                <Image
+                                  className="driver-fallback-photo"
+                                  src={fallback.src}
+                                  alt=""
+                                  fill
+                                  quality={84}
+                                  sizes="(max-width: 760px) 100vw, 33vw"
+                                  style={{ objectPosition: fallback.position }}
+                                />
+                                <span className="driver-fallback-shade" aria-hidden="true" />
+                                <strong>#{driver.number}</strong>
+                              </>
+                            )}
+                          </div>
+                          <div><h2>{driver.name}</h2><p>{driver.category}</p></div>
+                          <b>{formatPoints(driver.points)}<small>pts válidos</small></b>
+                        </Link>
+                      );
+                    })}
+                  </section>
+                ) : null}
 
                 <div className="tg-standing-table-wrap">
                   <table className="udk-data-table tg-standing-table">
@@ -131,15 +134,16 @@ export default async function StandingsPage({
                     </thead>
                     <tbody>
                       {standings.items.map((driver, index) => {
+                        const absolutePosition = (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
                         const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                         return (
                           <tr key={driver.slug}>
-                            <td data-label="Posição"><span className={`udk-rank rank-${index + 1}`}>{(standings.meta.page - 1) * standings.meta.pageSize + index + 1}</span></td>
+                            <td data-label="Posição"><span className={`udk-rank rank-${absolutePosition}`}>{absolutePosition}</span></td>
                             <td data-label="Piloto"><Link className="udk-driver-cell" href={`/pilotos/${driver.slug}`}><span className="udk-driver-avatar">#{driver.number}</span><strong>{driver.name}</strong></Link></td>
                             <td data-label="Categoria">{driver.category}</td>
                             <td data-label="Vitórias">{driver.wins}</td>
                             <td data-label="Pódios">{driver.podiums}</td>
-                            <td data-label="Diferença">{index === 0 ? "Líder" : `-${formatPoints(gap)}`}</td>
+                            <td data-label="Diferença">{gap === 0 ? "Líder" : `-${formatPoints(gap)}`}</td>
                             <td data-label="Pontos brutos">{formatPoints(driver.grossPoints)}</td>
                             <td data-label="Pontos descartados"><span className="udk-discarded-points">{driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"}</span></td>
                             <td data-label="Pontos válidos"><strong className="udk-points">{formatPoints(driver.points)}</strong></td>
