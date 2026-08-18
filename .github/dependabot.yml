@@ -8,8 +8,6 @@ updates:
       time: "09:00"
       timezone: America/Sao_Paulo
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
     commit-message:
       prefix: chore
       include: scope
@@ -22,7 +20,5 @@ updates:
       time: "09:30"
       timezone: America/Sao_Paulo
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
     commit-message:
       prefix: ci
