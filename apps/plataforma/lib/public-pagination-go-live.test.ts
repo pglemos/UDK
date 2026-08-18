@@ -73,6 +73,7 @@ describe("go-live public pagination", () => {
 
     const result = await getStandingsPage({ page: 2, pageSize: 2, sort: "points" });
 
+    expect(query.order).toHaveBeenCalledWith("points", { ascending: false });
     expect(query.range).toHaveBeenCalledWith(2, 3);
     expect(result.items.map((driver) => driver.slug)).toEqual(["driver-3", "driver-4"]);
     expect(result.meta).toMatchObject({ page: 2, pageSize: 2, totalItems: 8, totalPages: 4 });
@@ -84,6 +85,7 @@ describe("go-live public pagination", () => {
 
     const result = await getDriversPage({ page: 2, pageSize: 2, sort: "position" });
 
+    expect(query.order).toHaveBeenCalledWith("position", { ascending: true });
     expect(query.range).toHaveBeenCalledWith(2, 3);
     expect(result.items.map((driver) => driver.slug)).toEqual(["driver-3", "driver-4"]);
   });
