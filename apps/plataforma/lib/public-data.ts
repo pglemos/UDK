@@ -328,7 +328,7 @@ export async function getStandingsPage({
   let request = client
     .from("public_portal_standings")
     .select("*", { count: "exact" })
-    .order(sortColumn, { ascending: sort === "name" })
+    .order(sortColumn, { ascending: sort !== "points" })
     .range(from, to);
 
   if (category && category !== "geral") request = request.eq("category_slug", category);
@@ -368,7 +368,7 @@ export async function getDriversPage({
   let request = client
     .from("public_portal_drivers")
     .select("*", { count: "exact" })
-    .order(sortColumn, { ascending: sort === "name" })
+    .order(sortColumn, { ascending: sort !== "points" })
     .range(from, to);
 
   if (category && category !== "geral") request = request.eq("category_slug", category);
