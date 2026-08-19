@@ -261,7 +261,7 @@ with latest_results as (
     result.version desc,result.updated_at desc
 )
 select result.id,result.title,result.status,result.version,result.fastest_lap_ms,result.published_at,
-  result.stage_id,stage.slug stage_slug,stage.title stage_title,stage.starts_at,stage.track,
+  result.stage_id,stage.slug stage_slug,stage.title stage_title,stage.track,stage.starts_at,
   category.name category,category.slug category_slug
 from latest_results result
 join public.stages stage on stage.id=result.stage_id and stage.deleted_at is null
