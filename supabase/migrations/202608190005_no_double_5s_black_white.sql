@@ -27,9 +27,9 @@ set position = case driver.slug
   when 'lucca-dambros' then 4014
   else entry.position
 end
-from target
-join public.drivers driver on driver.id = entry.driver_id
+from target, public.drivers driver
 where entry.result_id = target.result_id
+  and driver.id = entry.driver_id
   and driver.slug in ('braulio-bonoto', 'lucca-dambros')
   and entry.deleted_at is null;
 
@@ -63,9 +63,9 @@ set
       'P14 preservado conforme TimingOfficialReport. Bráulio permanece P13 porque os +5 s da bandeira preta/branca já estavam incorporados ao TT oficial.'
     else entry.sporting_note
   end
-from target
-join public.drivers driver on driver.id = entry.driver_id
+from target, public.drivers driver
 where entry.result_id = target.result_id
+  and driver.id = entry.driver_id
   and driver.slug in ('braulio-bonoto', 'lucca-dambros')
   and entry.deleted_at is null;
 
