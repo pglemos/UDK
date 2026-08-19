@@ -6,7 +6,13 @@ import { ArrowLeft, ArrowRight, Flag, MapPin, Trophy } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../../components/race/editorial-primitives";
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
-import { formatLapTime, getDriverBySlug, getDriverHistory } from "../../../lib/public-data";
+import {
+  formatLapTime,
+  getDriverBySlug,
+  getDriverHistory,
+  getDriverLaps,
+  type PublicLap,
+} from "../../../lib/public-data";
 import { driverVisual, premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";
 
 export async function generateMetadata({
@@ -35,10 +41,33 @@ export async function generateMetadata({
   };
 }
 
+const speedFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+function formatSpeed(speedKph: number | null): string {
+  return speedKph == null ? "—" : `${speedFormatter.format(speedKph)} km/h`;
+}
+
 export default async function DriverProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [driver, history] = await Promise.all([getDriverBySlug(slug), getDriverHistory(slug)]);
+  const [driver, history, laps] = await Promise.all([
+    getDriverBySlug(slug),
+    getDriverHistory(slug),
+    getDriverLaps(slug),
+  ]);
   if (!driver) notFound();
+
+  const lapsByEntry = new Map<string, PublicLap[]>();
+  for (const lap of laps) {
+    const entryLaps = lapsByEntry.get(lap.resultEntryId) ?? [];
+    entryLaps.push(lap);
+    lapsByEntry.set(lap.resultEntryId, entryLaps);
+  }
+  const lapSessions = history
+    .map((entry) => ({ entry, laps: lapsByEntry.get(entry.id) ?? [] }))
+    .filter((session) => session.laps.length > 0);
 
   const portraitFallback = driverVisual(driver.position ?? 0);
   const heroSource = resolveVisualSource(
@@ -178,6 +207,69 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                 description="O histórico aparecerá quando os resultados oficiais forem disponibilizados."
               />
             )}
+
+            <section id="volta-a-volta" className="tg-profile-laps">
+              <EditorialHeading
+                index="03"
+                title="Volta a volta, sem perder nenhum detalhe."
+                description="Tempos, velocidade e tempo acumulado conforme o relatório oficial do sistema de cronometragem."
+                inverse
+              />
+              {lapSessions.length ? (
+                <div className="tg-lap-sessions">
+                  {lapSessions.map(({ entry, laps: sessionLaps }) => (
+                    <article className="tg-lap-session" key={entry.id}>
+                      <header className="tg-lap-session-header">
+                        <div>
+                          <span>{entry.stageTitle || "Sessão oficial"}</span>
+                          <h3>{sessionLaps.length} voltas registradas</h3>
+                        </div>
+                        <p>Melhor volta {formatLapTime(entry.bestLapMs)}</p>
+                      </header>
+                      <div className="tg-laps-table-wrap">
+                        <table className="udk-data-table tg-laps-table">
+                          <caption className="sr-only">
+                            Volta a volta de {driver.name} em {entry.stageTitle || "sessão oficial"}
+                          </caption>
+                          <thead>
+                            <tr>
+                              <th scope="col">Volta</th>
+                              <th scope="col">Tempo da volta</th>
+                              <th scope="col">Tempo acumulado</th>
+                              <th scope="col">Velocidade</th>
+                              <th scope="col">Situação</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sessionLaps.map((lap) => (
+                              <tr key={lap.id}>
+                                <td data-label="Volta">{lap.lapNumber}</td>
+                                <td data-label="Tempo da volta">{formatLapTime(lap.lapTimeMs)}</td>
+                                <td data-label="Tempo acumulado">
+                                  {formatLapTime(lap.elapsedTimeMs)}
+                                </td>
+                                <td data-label="Velocidade">{formatSpeed(lap.speedKph)}</td>
+                                <td data-label="Situação">
+                                  <span className={lap.valid ? "" : "is-invalid"}>
+                                    {lap.valid ? "Registrada" : (lap.invalidReason ?? "Não válida")}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EditorialEmpty
+                  index="03"
+                  title="Volta a volta ainda não publicada."
+                  description="Os detalhes individuais aparecerão aqui quando o relatório oficial for importado."
+                />
+              )}
+            </section>
           </div>
         </section>
 

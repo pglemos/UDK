@@ -771,6 +771,15 @@
     text-transform: uppercase;
   }
 
+  .tg-laps-table,
+  .tg-laps-table td {
+    color: var(--cinema-ink);
+  }
+
+  .tg-laps-table .is-invalid {
+    color: #9b6400;
+  }
+
   .tg-driver-profile-copy h1 {
     font-size: clamp(4.4rem, 22vw, 7.5rem);
   }

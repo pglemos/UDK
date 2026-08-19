@@ -100,6 +100,24 @@ export type PublicResultEntry = {
   createdAt: string | null;
 };
 
+export type PublicLap = {
+  id: string;
+  resultId: string;
+  resultEntryId: string;
+  driverId: string;
+  driverSlug: string;
+  driverName: string;
+  resultTitle: string;
+  stageTitle: string;
+  lapNumber: number;
+  lapTimeMs: number | null;
+  elapsedTimeMs: number | null;
+  speedKph: number | null;
+  position: number | null;
+  valid: boolean;
+  invalidReason: string | null;
+};
+
 type UnknownRow = Record<string, unknown>;
 
 function stringValue(value: unknown, fallback = ""): string {
@@ -246,6 +264,26 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
     status: stringValue(row.status),
     stageTitle: stringValue(row.stage_title),
     createdAt: nullableString(row.created_at),
+  };
+}
+
+export function normalizePublicLap(row: UnknownRow): PublicLap {
+  return {
+    id: stringValue(row.id),
+    resultId: stringValue(row.result_id),
+    resultEntryId: stringValue(row.result_entry_id),
+    driverId: stringValue(row.driver_id),
+    driverSlug: stringValue(row.driver_slug),
+    driverName: stringValue(row.driver_name),
+    resultTitle: stringValue(row.result_title),
+    stageTitle: stringValue(row.stage_title),
+    lapNumber: numberValue(row.lap_number),
+    lapTimeMs: nullableNumber(row.lap_time_ms),
+    elapsedTimeMs: nullableNumber(row.elapsed_time_ms),
+    speedKph: nullableNumber(row.speed_kph),
+    position: nullableNumber(row.position),
+    valid: row.valid !== false && row.valid !== "false",
+    invalidReason: nullableString(row.invalid_reason),
   };
 }
 
@@ -496,6 +534,21 @@ export async function getDriverHistory(slug: string): Promise<PublicResultEntry[
 
   if (error) return [];
   return ((data ?? []) as UnknownRow[]).map(normalizePublicResultEntry);
+}
+
+export async function getDriverLaps(slug: string): Promise<PublicLap[]> {
+  const client = publicClient();
+  if (!client || !slug) return [];
+
+  const { data, error } = await client
+    .from("public_portal_laps")
+    .select("*")
+    .eq("driver_slug", slug)
+    .order("result_id")
+    .order("lap_number");
+
+  if (error) return [];
+  return ((data ?? []) as UnknownRow[]).map(normalizePublicLap);
 }
 
 export async function getPublicData(): Promise<{

@@ -191,6 +191,7 @@ export default async function ResultsPage({
                             <th>Melhor volta</th>
                             <th>Penalidade</th>
                             <th>Pontos</th>
+                            <th>Detalhes</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -215,6 +216,14 @@ export default async function ResultsPage({
                                   <strong className="udk-points">
                                     {notClassified ? "—" : entry.points}
                                   </strong>
+                                </td>
+                                <td data-label="Detalhes">
+                                  <Link
+                                    className="tg-table-link"
+                                    href={`/pilotos/${entry.driverSlug}#volta-a-volta`}
+                                  >
+                                    Ver voltas <ArrowRight aria-hidden="true" />
+                                  </Link>
                                 </td>
                               </tr>
                             );
