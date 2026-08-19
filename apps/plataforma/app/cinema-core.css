@@ -696,6 +696,15 @@ svg {
   padding-bottom: clamp(48px, 7vw, 104px);
 }
 
+.udk-page-hero.is-compact,
+.udk-page-hero.is-compact .udk-page-hero-inner,
+.tg-page-hero.is-compact,
+.tg-page-hero.is-compact .udk-page-hero-inner,
+.cinema-page-hero.is-compact,
+.cinema-page-hero.is-compact .udk-page-hero-inner {
+  min-height: clamp(380px, 52vh, 540px);
+}
+
 .udk-page-hero-copy > span {
   display: block;
   margin-bottom: 20px;
@@ -1034,6 +1043,7 @@ svg {
 }
 
 .race-pagination > a,
+.race-pagination > span,
 .race-pagination > div a {
   display: inline-flex;
   align-items: center;
@@ -1060,6 +1070,10 @@ svg {
 .race-pagination a[aria-disabled="true"] {
   opacity: 0.35;
   pointer-events: none;
+}
+
+.race-pagination > span[aria-disabled="true"] {
+  opacity: 0.35;
 }
 
 /* Empty states */
@@ -1459,7 +1473,7 @@ svg {
 .race-alert {
   margin: 0 0 18px;
   padding: 14px 16px;
-  border-left: 3px solid currentColor;
+  border: 1px solid currentColor;
   background: rgba(17, 19, 21, 0.06);
   font-size: 0.86rem;
   line-height: 1.55;

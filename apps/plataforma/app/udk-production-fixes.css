@@ -30,10 +30,6 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(0, 217, 255, .45); }
   50% { box-shadow: 0 0 0 8px rgba(0, 217, 255, 0); }
 }
-@keyframes udkScrollBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
-}
 @keyframes udkMarquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -70,11 +66,6 @@ main#conteudo,
 /* D5 — pulso apenas no CTA do hero da home, nunca no header */
 .cinema-home-hero .race-button-primary {
   animation: udkCtaGlow 2.4s ease-in-out infinite;
-}
-
-/* A15 — indicador de scroll com seta animada */
-.cinema-hero-foot svg {
-  animation: udkScrollBounce 1.8s ease-in-out infinite;
 }
 
 /* A8 — feedback de carregamento em qualquer botão ocupado */
@@ -151,12 +142,8 @@ button[aria-busy="true"] svg:first-child {
 }
 
 /* ---------- 3. Hierarquia de pódio (A6) --------------------------------
-   Só a faixa lateral: a tabela de classificação ainda herda o tema claro do
-   globals.css (dívida A1), então nada aqui pode fixar cor de texto ou de
-   fundo — ficaria ilegível em um dos dois temas. */
-.udk-data-table tbody tr:nth-child(1) { box-shadow: inset 3px 0 0 var(--udk-p1); }
-.udk-data-table tbody tr:nth-child(2) { box-shadow: inset 3px 0 0 var(--udk-p2); }
-.udk-data-table tbody tr:nth-child(3) { box-shadow: inset 3px 0 0 var(--udk-p3); }
+   A posição continua explícita no indicador da célula, sem faixas laterais
+   que transformem cada linha em um cartão genérico. */
 .udk-rank.rank-1 { color: var(--udk-p1); }
 .udk-rank.rank-2 { color: var(--udk-p2); }
 .udk-rank.rank-3 { color: var(--udk-p3); }
@@ -291,11 +278,13 @@ button[aria-busy="true"] svg:first-child {
   main#conteudo {
     padding-bottom: calc(var(--udk-tap-lg) + 28px);
   }
+  .race-site.no-mobile-cta main#conteudo {
+    padding-bottom: 0;
+  }
 
   /* A11 — página ativa visível no menu mobile */
   .race-mobile-menu nav a[aria-current="page"] {
     background: rgba(0, 217, 255, .1);
-    box-shadow: inset 3px 0 0 var(--cinema-cyan);
   }
   .race-mobile-menu nav a,
   .race-mobile-menu-actions > a {
@@ -336,9 +325,9 @@ button[aria-busy="true"] svg:first-child {
   font-size: 13px;
   line-height: 1.55;
 }
-.race-alert-success, .alert-success { background: rgba(66, 212, 135, .1); box-shadow: inset 3px 0 0 var(--udk-ok); }
-.race-alert-warning, .alert-warning { background: rgba(255, 202, 88, .1); box-shadow: inset 3px 0 0 var(--udk-warn); }
-.race-alert-error, .alert-error { background: rgba(255, 100, 100, .1); box-shadow: inset 3px 0 0 var(--udk-bad); }
+.race-alert-success, .alert-success { border: 1px solid rgba(66, 212, 135, .42); background: rgba(66, 212, 135, .1); }
+.race-alert-warning, .alert-warning { border: 1px solid rgba(255, 202, 88, .42); background: rgba(255, 202, 88, .1); }
+.race-alert-error, .alert-error { border: 1px solid rgba(255, 100, 100, .42); background: rgba(255, 100, 100, .1); }
 
 /* ---------- 8. Inscrição: stepper no lugar da sidebar (C4) ------------- */
 @media (max-width: 900px) {
@@ -371,9 +360,6 @@ button[aria-busy="true"] svg:first-child {
    do globals.css. O tratamento original é o correto e fica intacto. */
 
 /* ---------- 10. Busca instantânea, filtros como chips (C6) ------------ */
-.udk-toolbar button[type="submit"] {
-  display: none; /* a busca passa a ser debounced no SearchField */
-}
 .udk-toolbar {
   display: flex;
   flex-wrap: wrap;

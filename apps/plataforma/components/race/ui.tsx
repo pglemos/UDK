@@ -2,14 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronRight, Flag, Timer, Trophy } from "lucide-react";
 import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data";
-import { driverVisual, pageHeroVisual } from "../../lib/visual-assets";
-import { OfficialLogo } from "./official-logo";
+import { driverVisual, pageHeroVisual, resolveVisualSource } from "../../lib/visual-assets";
+import { DriverPlaceholder } from "./driver-placeholder";
 
 export function PageHero({
   eyebrow = "Temporada 2026",
   title,
   description,
   index = "UDK",
+  compact = false,
 }: {
   eyebrow?: string;
   title: string;
@@ -20,7 +21,7 @@ export function PageHero({
   const visual = pageHeroVisual(index);
 
   return (
-    <section className="udk-page-hero tg-page-hero">
+    <section className={`udk-page-hero tg-page-hero${compact ? " is-compact" : ""}`}>
       <div className="udk-page-hero-media" aria-hidden="true">
         <Image
           src={visual.src}
@@ -41,9 +42,11 @@ export function PageHero({
         <div className="tg-page-hero-index" aria-hidden="true">
           {index}
         </div>
-        <div className="tg-page-scroll" aria-hidden="true">
-          <i /> Conheça
-        </div>
+        {!compact ? (
+          <div className="tg-page-scroll" aria-hidden="true">
+            <i /> Conheça
+          </div>
+        ) : null}
       </div>
     </section>
   );
@@ -89,6 +92,14 @@ const statusLabels: Record<string, string> = {
   published: "Publicado",
   rectified: "Retificado",
   active: "Ativo",
+  pending: "Pendente",
+  draft: "Rascunho",
+  closed: "Encerrado",
+  finished: "Concluído",
+  approved: "Aprovado",
+  rejected: "Rejeitado",
+  nc: "Não classificado",
+  not_classified: "Não classificado",
 };
 
 const formatLabels: Record<string, string> = {
@@ -97,37 +108,40 @@ const formatLabels: Record<string, string> = {
   special: "Etapa especial",
 };
 
+export function localizeRaceText(value: string | null | undefined): string {
+  return (value ?? "").replace(/\bendurance\b/gi, "Resistência");
+}
+
 export function StatusBadge({ status }: { status: string }) {
+  const normalizedStatus = status.trim().toLowerCase();
+  const label = statusLabels[normalizedStatus] ?? (status.trim() || "Status não informado");
+
   return (
-    <span className={`race-status race-status-${status.replaceAll("_", "-")}`}>
-      {statusLabels[status] ?? status}
+    <span className={`race-status race-status-${normalizedStatus.replaceAll("_", "-")}`}>
+      {label}
     </span>
   );
 }
 
 export function DriverVisual({ driver, large = false }: { driver: PublicDriver; large?: boolean }) {
   const fallback = driverVisual(driver.number ?? 0);
+  const source = resolveVisualSource(driver.avatarUrl, fallback);
+  const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
 
   return (
     <div
-      className={`race-driver-visual${large ? " is-large" : ""}${driver.avatarUrl ? "" : " is-fallback"}`}
+      className={`race-driver-visual${large ? " is-large" : ""}${hasPublishedPortrait ? "" : " is-fallback"}`}
     >
-      {driver.avatarUrl ? (
-        <Image src={driver.avatarUrl} alt="" fill quality={86} sizes={large ? "240px" : "120px"} />
+      {hasPublishedPortrait ? (
+        <Image
+          src={source}
+          alt={`Retrato de ${driver.name}`}
+          fill
+          quality={86}
+          sizes={large ? "240px" : "120px"}
+        />
       ) : (
-        <>
-          <Image
-            className="driver-fallback-photo"
-            src={fallback.src}
-            alt=""
-            fill
-            quality={82}
-            sizes={large ? "240px" : "120px"}
-            style={{ objectPosition: fallback.position }}
-          />
-          <span className="driver-fallback-shade" aria-hidden="true" />
-          <OfficialLogo variant="mark-light" width={large ? 76 : 50} />
-        </>
+        <DriverPlaceholder name={driver.name} className={large ? "is-large" : ""} />
       )}
     </div>
   );
@@ -217,13 +231,15 @@ export function RacePagination({
 
   return (
     <nav className="race-pagination" aria-label="Paginação">
-      <Link
-        href={paginationHref(basePath, current, Math.max(1, meta.page - 1))}
-        aria-disabled={!meta.hasPreviousPage}
-        tabIndex={meta.hasPreviousPage ? undefined : -1}
-      >
-        <ArrowLeft aria-hidden="true" /> <span>Anterior</span>
-      </Link>
+      {meta.hasPreviousPage ? (
+        <Link href={paginationHref(basePath, current, meta.page - 1)}>
+          <ArrowLeft aria-hidden="true" /> <span>Anterior</span>
+        </Link>
+      ) : (
+        <span aria-disabled="true">
+          <ArrowLeft aria-hidden="true" /> <span>Anterior</span>
+        </span>
+      )}
       <div>
         {visible.map((page, index) => (
           <span key={page} className="race-page-slot">
@@ -239,13 +255,15 @@ export function RacePagination({
           </span>
         ))}
       </div>
-      <Link
-        href={paginationHref(basePath, current, Math.min(meta.totalPages, meta.page + 1))}
-        aria-disabled={!meta.hasNextPage}
-        tabIndex={meta.hasNextPage ? undefined : -1}
-      >
-        <span>Próxima</span> <ArrowRight aria-hidden="true" />
-      </Link>
+      {meta.hasNextPage ? (
+        <Link href={paginationHref(basePath, current, meta.page + 1)}>
+          <span>Próxima</span> <ArrowRight aria-hidden="true" />
+        </Link>
+      ) : (
+        <span aria-disabled="true">
+          <span>Próxima</span> <ArrowRight aria-hidden="true" />
+        </span>
+      )}
     </nav>
   );
 }

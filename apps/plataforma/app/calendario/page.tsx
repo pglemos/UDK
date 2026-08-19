@@ -5,7 +5,7 @@ import { ArrowRight, CalendarDays, Flag, MapPin, Timer } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
-import { PageHero, SearchField, StatusBadge } from "../../components/race/ui";
+import { localizeRaceText, PageHero, SearchField, StatusBadge } from "../../components/race/ui";
 import { getStages } from "../../lib/public-data";
 import { resolveVisualSource, stageVisual } from "../../lib/visual-assets";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 function param(value: string | string[] | undefined, fallback = ""): string {
-  return Array.isArray(value) ? value[0] ?? fallback : value ?? fallback;
+  return Array.isArray(value) ? (value[0] ?? fallback) : (value ?? fallback);
 }
 
 export default async function CalendarPage({
@@ -29,7 +29,9 @@ export default async function CalendarPage({
   const query = param(params.q).trim().toLocaleLowerCase("pt-BR");
   const stages = await getStages({ format });
   const filtered = query
-    ? stages.filter((stage) => [stage.title, stage.track, stage.city].join(" ").toLocaleLowerCase("pt-BR").includes(query))
+    ? stages.filter((stage) =>
+        [stage.title, stage.track, stage.city].join(" ").toLocaleLowerCase("pt-BR").includes(query),
+      )
     : stages;
 
   return (
@@ -50,13 +52,18 @@ export default async function CalendarPage({
               description="Filtre o calendário, conheça os traçados e acompanhe quando o grid volta a acelerar."
             />
             <form className="udk-toolbar tg-toolbar" action="/calendario">
-              <SearchField defaultValue={param(params.q)} placeholder="Buscar etapa, traçado ou cidade" />
+              <SearchField
+                defaultValue={param(params.q)}
+                placeholder="Buscar etapa, traçado ou cidade"
+              />
               <select name="formato" defaultValue={format} aria-label="Formato">
                 <option value="todos">Todos os formatos</option>
                 <option value="regular">Etapa regular</option>
                 <option value="endurance">Resistência</option>
               </select>
-              <button type="submit" className="race-button race-button-primary">Aplicar filtros</button>
+              <button type="submit" className="race-button race-button-primary">
+                Aplicar filtros
+              </button>
             </form>
           </div>
         </section>
@@ -80,23 +87,35 @@ export default async function CalendarPage({
                           <StatusBadge status={stage.status} />
                         </div>
                         <div className="tg-calendar-stage-copy">
-                          <h2>{stage.title}</h2>
+                          <h2>{localizeRaceText(stage.title)}</h2>
                           <p>{stage.shortDescription ?? stage.track}</p>
                           <div>
-                            <span><Flag aria-hidden="true" /> {stage.track}</span>
-                            <span><MapPin aria-hidden="true" /> {stage.location} • {stage.city}</span>
-                            <span><Timer aria-hidden="true" /> {stage.time || "Horário a definir"}</span>
+                            <span>
+                              <Flag aria-hidden="true" /> {stage.track}
+                            </span>
+                            <span>
+                              <MapPin aria-hidden="true" /> {stage.location} • {stage.city}
+                            </span>
+                            <span>
+                              <Timer aria-hidden="true" /> {stage.time || "Horário a definir"}
+                            </span>
                           </div>
                         </div>
                         <div className="tg-calendar-stage-media">
                           <Image
                             src={imageSource}
-                            alt={stage.heroImageUrl ? `Imagem da etapa ${stage.title}` : visual.alt}
+                            alt={
+                              stage.heroImageUrl
+                                ? `Imagem da etapa ${localizeRaceText(stage.title)}`
+                                : visual.alt
+                            }
                             fill
                             loading="lazy"
                             quality={86}
                             sizes="(max-width: 760px) 100vw, 28vw"
-                            style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
+                            style={{
+                              objectPosition: stage.heroImageUrl ? "50% center" : visual.position,
+                            }}
                           />
                         </div>
                         <Link href="/inscricao" className="tg-arrow-link">
@@ -121,8 +140,13 @@ export default async function CalendarPage({
         <section className="tg-inline-cta">
           <div className="race-container">
             <CalendarDays aria-hidden="true" />
-            <div><span>Temporada 2026</span><h2>Escolha a etapa. Prepare a volta.</h2></div>
-            <Link href="/inscricao" className="race-button race-button-primary">Começar inscrição <ArrowRight aria-hidden="true" /></Link>
+            <div>
+              <span>Temporada 2026</span>
+              <h2>Escolha a etapa. Prepare a volta.</h2>
+            </div>
+            <Link href="/inscricao" className="race-button race-button-primary">
+              Começar inscrição <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

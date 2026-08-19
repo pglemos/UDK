@@ -623,7 +623,7 @@
   min-height: 68%;
   padding: 26px 22px;
   border-left: 1px solid var(--cinema-line-dark);
-  transition: min-height 480ms var(--cinema-ease), background var(--cinema-fast) ease, color var(--cinema-fast) ease;
+  transition: transform 480ms var(--cinema-ease), background var(--cinema-fast) ease, color var(--cinema-fast) ease;
 }
 
 .cinema-podium-card:last-child,
@@ -645,7 +645,7 @@
 
 .cinema-podium-card:hover,
 .tg-podium-card:hover {
-  min-height: 100%;
+  transform: translateY(-6px);
   background: var(--cinema-cyan);
   color: var(--cinema-ink);
 }
@@ -716,13 +716,71 @@
   align-items: center;
   min-height: 88px;
   border-bottom: 1px solid var(--cinema-line-dark);
-  transition: padding var(--cinema-fast) ease, background var(--cinema-fast) ease;
+  transition: transform var(--cinema-fast) ease, background var(--cinema-fast) ease;
 }
 
 .cinema-ranking-list a:hover,
 .tg-ranking-list a:hover {
-  padding-inline: 14px;
+  transform: translateX(8px);
   background: rgba(0, 217, 255, 0.1);
+}
+
+.tg-driver-placeholder {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(0, 217, 255, 0.18), transparent 42%),
+    linear-gradient(145deg, #182127 0%, #0a0d10 72%);
+  color: var(--cinema-white);
+  text-align: center;
+}
+
+.tg-driver-placeholder::before {
+  content: "";
+  position: absolute;
+  inset: 14% 12%;
+  border: 1px solid rgba(0, 217, 255, 0.22);
+  border-radius: 50%;
+  transform: rotate(-18deg) scaleX(1.35);
+}
+
+.tg-driver-placeholder > span,
+.tg-driver-placeholder > small {
+  position: relative;
+  z-index: 1;
+}
+
+.tg-driver-placeholder > span {
+  color: var(--cinema-cyan);
+  font-family: var(--cinema-display);
+  font-size: clamp(4rem, 10vw, 9rem);
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+}
+
+.tg-driver-placeholder > small {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tg-driver-placeholder.is-hero > span {
+  font-size: clamp(7rem, 19vw, 18rem);
+}
+
+.tg-driver-placeholder.is-profile > span {
+  font-size: clamp(6rem, 12vw, 13rem);
 }
 
 .cinema-ranking-list a > span,

@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Flag, MapPin, Trophy } from "lucide-react";
+import { DriverPlaceholder } from "../../../components/race/driver-placeholder";
 import { EditorialEmpty, EditorialHeading } from "../../../components/race/editorial-primitives";
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
+import { localizeRaceText } from "../../../components/race/ui";
 import {
   formatLapTime,
   getDriverBySlug,
@@ -35,7 +37,7 @@ export async function generateMetadata({
     alternates: { canonical: `/pilotos/${driver.slug}` },
     openGraph: {
       title: `${driver.name} • UDK`,
-      description: `${driver.points} pontos, ${driver.wins} vitórias e ${driver.podiums} pódios na temporada.`,
+      description: `${driver.points} pontos, ${winsLabel(driver.wins)} e ${driver.podiums} pódios na temporada.`,
       images: [coverSource],
     },
   };
@@ -45,6 +47,10 @@ const speedFormatter = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+function winsLabel(value: number): string {
+  return `${value} ${value === 1 ? "vitória" : "vitórias"}`;
+}
 
 function formatSpeed(speedKph: number | null): string {
   return speedKph == null ? "—" : `${speedFormatter.format(speedKph)} km/h`;
@@ -80,21 +86,23 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
   const hasPublishedPortrait = Boolean(driver.avatarUrl) && portraitSource !== portraitFallback.src;
 
   return (
-    <RaceShell>
+    <RaceShell showMobileCta={false}>
       <main id="conteudo" className="tg-driver-profile">
         <section className="tg-driver-profile-hero">
           <div className="tg-driver-profile-media" aria-hidden="true">
-            <Image
-              src={heroSource}
-              alt=""
-              fill
-              priority
-              quality={90}
-              sizes="100vw"
-              style={{
-                objectPosition: hasPublishedHero ? "50% center" : premiumVisuals.manifesto.position,
-              }}
-            />
+            {hasPublishedHero ? (
+              <Image
+                src={heroSource}
+                alt=""
+                fill
+                priority
+                quality={90}
+                sizes="100vw"
+                style={{ objectPosition: "50% center" }}
+              />
+            ) : (
+              <DriverPlaceholder name={driver.name} className="is-hero" decorative />
+            )}
           </div>
           <div className="race-container tg-driver-profile-hero-inner">
             <Link className="tg-arrow-link" href="/pilotos">
@@ -105,7 +113,10 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
               <h1>{driver.name}</h1>
               <p>{[driver.teamName, driver.city].filter(Boolean).join(" • ")}</p>
               <div className="tg-hero-actions">
-                <Link className="race-button race-button-primary" href="/classificacao">
+                <Link className="race-button race-button-primary" href="#volta-a-volta">
+                  Ver volta a volta <ArrowRight aria-hidden="true" />
+                </Link>
+                <Link className="race-button race-button-ghost" href="/classificacao">
                   Ver classificação <ArrowRight aria-hidden="true" />
                 </Link>
                 <Link className="race-button race-button-ghost" href="/resultados">
@@ -160,16 +171,18 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
               </div>
             </Reveal>
             <div className={`tg-profile-portrait${hasPublishedPortrait ? "" : " is-fallback"}`}>
-              <Image
-                src={portraitSource}
-                alt={hasPublishedPortrait ? `Retrato de ${driver.name}` : portraitFallback.alt}
-                fill
-                quality={88}
-                sizes="(max-width: 760px) 100vw, 42vw"
-                style={{
-                  objectPosition: hasPublishedPortrait ? "50% center" : portraitFallback.position,
-                }}
-              />
+              {hasPublishedPortrait ? (
+                <Image
+                  src={portraitSource}
+                  alt={`Retrato de ${driver.name}`}
+                  fill
+                  quality={88}
+                  sizes="(max-width: 760px) 100vw, 42vw"
+                  style={{ objectPosition: "50% center" }}
+                />
+              ) : (
+                <DriverPlaceholder name={driver.name} className="is-profile" />
+              )}
             </div>
           </div>
         </section>
@@ -189,7 +202,7 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                     <article>
                       <span>P{entry.position}</span>
                       <div>
-                        <h3>{entry.stageTitle || "Sessão oficial"}</h3>
+                        <h3>{localizeRaceText(entry.stageTitle) || "Sessão oficial"}</h3>
                         <p>
                           Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta{" "}
                           {formatLapTime(entry.bestLapMs)}
@@ -221,7 +234,7 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                     <article className="tg-lap-session" key={entry.id}>
                       <header className="tg-lap-session-header">
                         <div>
-                          <span>{entry.stageTitle || "Sessão oficial"}</span>
+                          <span>{localizeRaceText(entry.stageTitle) || "Sessão oficial"}</span>
                           <h3>{sessionLaps.length} voltas registradas</h3>
                         </div>
                         <p>Melhor volta {formatLapTime(entry.bestLapMs)}</p>
@@ -229,7 +242,8 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                       <div className="tg-laps-table-wrap">
                         <table className="udk-data-table tg-laps-table">
                           <caption className="sr-only">
-                            Volta a volta de {driver.name} em {entry.stageTitle || "sessão oficial"}
+                            Volta a volta de {driver.name} em{" "}
+                            {localizeRaceText(entry.stageTitle) || "sessão oficial"}
                           </caption>
                           <thead>
                             <tr>

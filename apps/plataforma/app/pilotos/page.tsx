@@ -38,13 +38,14 @@ export default async function DriversPage({
   ]);
 
   return (
-    <RaceShell>
+    <RaceShell showMobileCta={false}>
       <main id="conteudo" className="udk-page tg-internal-page">
         <PageHero
           index="04"
           eyebrow="Quem constrói o grid"
           title="Pilotos"
           description="Antes da pista, pessoas. Quando a luz apaga, competidores."
+          compact
         />
 
         <section className="tg-drivers-directory">
@@ -72,7 +73,11 @@ export default async function DriversPage({
               </a>
             </div>
 
-            <form className="udk-toolbar tg-toolbar" action="/pilotos">
+            <p className="tg-directory-count" aria-live="polite">
+              {drivers.meta.totalItems} {drivers.meta.totalItems === 1 ? "piloto publicado" : "pilotos publicados"}
+            </p>
+
+            <form className="udk-toolbar tg-toolbar" action="/pilotos" aria-label="Filtros de pilotos">
               <SearchField defaultValue={query} placeholder="Buscar piloto" />
               <select name="categoria" defaultValue={category} aria-label="Categoria">
                 <option value="geral">Todas as categorias</option>
@@ -88,7 +93,7 @@ export default async function DriversPage({
                 <option value="name">Nome</option>
               </select>
               <button className="race-button race-button-primary" type="submit">
-                Aplicar
+                Aplicar filtros
               </button>
             </form>
 

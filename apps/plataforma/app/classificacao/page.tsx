@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Download, Trophy } from "lucide-react";
+import { DriverPlaceholder } from "../../components/race/driver-placeholder";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
@@ -41,13 +42,14 @@ export default async function StandingsPage({
   const leaderPoints = leaders.items[0]?.points ?? 0;
 
   return (
-    <RaceShell>
+    <RaceShell showMobileCta={false}>
       <main id="conteudo" className="udk-page tg-internal-page">
         <PageHero
           index="02"
           eyebrow="Pontos oficiais"
           title="Classificação"
           description="A pista decide. O ranking apenas torna visível quem entregou volta após volta."
+          compact
         />
 
         <section className="tg-standings-section">
@@ -110,11 +112,15 @@ export default async function StandingsPage({
               ) : null}
             </div>
 
-            <form className="udk-toolbar tg-toolbar is-compact" action="/classificacao">
+            <form
+              className="udk-toolbar tg-toolbar is-compact"
+              action="/classificacao"
+              aria-label="Busca na classificação"
+            >
               <SearchField defaultValue={query} placeholder="Buscar piloto" />
               <input type="hidden" name="categoria" value={category} />
               <button type="submit" className="race-button race-button-primary">
-                Buscar
+                Aplicar filtros
               </button>
             </form>
 
@@ -147,18 +153,7 @@ export default async function StandingsPage({
                                 sizes="(max-width: 760px) 100vw, 33vw"
                               />
                             ) : (
-                              <>
-                                <Image
-                                  className="driver-fallback-photo"
-                                  src={fallback.src}
-                                  alt=""
-                                  fill
-                                  quality={84}
-                                  sizes="(max-width: 760px) 100vw, 33vw"
-                                  style={{ objectPosition: fallback.position }}
-                                />
-                                <span className="driver-fallback-shade" aria-hidden="true" />
-                              </>
+                              <DriverPlaceholder name={driver.name} />
                             )}
                           </div>
                           <div>
@@ -182,16 +177,18 @@ export default async function StandingsPage({
                     </caption>
                     <thead>
                       <tr>
-                        <th>Pos.</th>
-                        <th>Piloto</th>
-                        <th>Categoria</th>
-                        <th>Vitórias</th>
-                        <th>Pódios</th>
-                        <th>Dif.</th>
-                        <th>Brutos</th>
-                        <th>Descartes</th>
-                        <th>Pontos válidos</th>
-                        <th />
+                        <th scope="col">Pos.</th>
+                        <th scope="col">Piloto</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Vitórias</th>
+                        <th scope="col">Pódios</th>
+                        <th scope="col">Dif.</th>
+                        <th scope="col">Brutos</th>
+                        <th scope="col">Descartes</th>
+                        <th scope="col">Pontos válidos</th>
+                        <th scope="col">
+                          <span className="sr-only">Abrir perfil</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, Flag, MapPin, Timer } from "lucide-react";
 import type { PublicDriver, PublicStage } from "../../lib/public-data";
 import { driverVisual, resolveVisualSource, stageVisual } from "../../lib/visual-assets";
-import { StatusBadge } from "./ui";
+import { DriverPlaceholder } from "./driver-placeholder";
+import { localizeRaceText, StatusBadge } from "./ui";
 
 export function EditorialHeading({
   index,
@@ -70,7 +71,7 @@ export function StageProject({
           <time>{stage.date || "Data a definir"}</time>
           <StatusBadge status={stage.status} />
         </div>
-        <h3>{stage.title}</h3>
+        <h3>{localizeRaceText(stage.title)}</h3>
         <p>{stage.shortDescription ?? stage.track}</p>
         <div className="cinema-stage-meta">
           <span>
@@ -95,7 +96,6 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
   const fallback = driverVisual(index);
   const source = resolveVisualSource(driver.avatarUrl, fallback);
   const hasPublishedPortrait = Boolean(driver.avatarUrl) && source !== fallback.src;
-  const alt = hasPublishedPortrait ? `Retrato de ${driver.name}` : fallback.alt;
 
   return (
     <Link
@@ -104,23 +104,29 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
       style={{ "--poster-index": index } as React.CSSProperties}
     >
       <div className="cinema-driver-poster-media tg-driver-poster-media">
-        <Image
-          src={source}
-          alt={alt}
-          fill
-          priority={index === 0}
-          loading={index === 0 ? undefined : "lazy"}
-          quality={86}
-          sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
-          style={{ objectPosition: hasPublishedPortrait ? "50% center" : fallback.position }}
-        />
+        {hasPublishedPortrait ? (
+          <Image
+            src={source}
+            alt={`Retrato de ${driver.name}`}
+            fill
+            priority={index === 0}
+            loading={index === 0 ? undefined : "lazy"}
+            quality={86}
+            sizes="(max-width: 640px) 100vw, (max-width: 1180px) 50vw, 34vw"
+            style={{ objectPosition: "50% center" }}
+          />
+        ) : (
+          <DriverPlaceholder name={driver.name} />
+        )}
       </div>
       <div className="cinema-driver-poster-copy tg-driver-poster-copy">
         <span>{driver.category}</span>
         <h3>{driver.name}</h3>
         <div>
           <b>{driver.points} pts</b>
-          <em>{driver.wins} vitórias</em>
+          <em>
+            {driver.wins} {driver.wins === 1 ? "vitória" : "vitórias"}
+          </em>
         </div>
       </div>
       <ChevronRight aria-hidden="true" />

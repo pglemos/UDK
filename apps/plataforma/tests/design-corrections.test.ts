@@ -93,9 +93,10 @@ describe("design audit corrections", () => {
     expect(fixes).not.toContain("grid-template-columns: 34px 1fr auto");
     expect(fixes).not.toContain(".udk-data-table td:nth-child(2)");
 
-    // A faixa de pódio sobrevive, mas sem fixar cor de texto ou de fundo:
-    // a tabela ainda herda o tema claro do globals.css.
-    expect(fixes).toContain("box-shadow: inset 3px 0 0 var(--udk-p1)");
+    // A posição continua explícita pela cor do indicador, sem faixas laterais
+    // que façam cada linha parecer um cartão genérico.
+    expect(fixes).toContain(".udk-rank.rank-1 { color: var(--udk-p1); }");
+    expect(fixes).not.toContain("box-shadow: inset 3px 0 0 var(--udk-p1)");
     expect(fixes).not.toContain("background: rgba(255, 198, 75, .08)");
   });
 

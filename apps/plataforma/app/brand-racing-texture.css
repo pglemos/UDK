@@ -12,8 +12,7 @@
 .tg-page-hero,
 .tg-inline-cta,
 .udk-scoring-rule,
-.dashboard-grid,
-.metrics article {
+.dashboard-grid {
   position: relative;
   isolation: isolate;
 }
@@ -124,16 +123,6 @@
   opacity: 0.28;
   mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
   -webkit-mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
-}
-
-.metrics article::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--udk-suit-teal), var(--udk-suit-teal-bright), transparent 72%);
-  opacity: 0.72;
-  pointer-events: none;
 }
 
 @media (max-width: 900px) {

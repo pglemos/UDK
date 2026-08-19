@@ -1231,8 +1231,27 @@
 .udk-regulation-layout aside {
   margin: 42px 0;
   padding: 24px;
-  border-left: 3px solid var(--cinema-cyan-deep);
+  border: 1px solid rgba(0, 111, 130, 0.32);
   background: rgba(0, 217, 255, 0.08);
+}
+
+.tg-directory-count {
+  margin: -8px 0 20px;
+  color: var(--cinema-muted-dark);
+  font-family: var(--cinema-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tg-driver-profile-media > .tg-driver-placeholder {
+  position: absolute;
+  inset: 0;
+}
+
+.tg-profile-portrait > .tg-driver-placeholder {
+  min-height: inherit;
 }
 
 /* Registration */

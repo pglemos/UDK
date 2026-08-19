@@ -42,7 +42,7 @@ describe("UDK 2026 official championship rules", () => {
 
     expect(fallback).toContain("08 resultados pontuáveis");
     expect(fallback).toContain("06 corridas regulares");
-    expect(fallback).toContain("02 Endurances");
+    expect(fallback).toContain("02 provas de resistência");
     expect(fallback).toContain("02 piores resultados");
     expect(fallback).toContain("cada corrida é um resultado pontuável independente");
     expect(fallback).not.toContain("08 corridas regulares");

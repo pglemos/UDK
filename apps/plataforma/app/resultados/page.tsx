@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, Download, Flag } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
-import { PageHero, RacePagination, StatusBadge } from "../../components/race/ui";
+import { localizeRaceText, PageHero, RacePagination, StatusBadge } from "../../components/race/ui";
 import {
   formatLapTime,
   getResultEntries,
@@ -49,13 +49,14 @@ export default async function ResultsPage({
   const selectedPdf = selected ? officialResultPdfForCategory(selected.categorySlug) : null;
 
   return (
-    <RaceShell>
+    <RaceShell showMobileCta={false}>
       <main id="conteudo" className="udk-page tg-internal-page">
         <PageHero
           index="03"
           eyebrow="Bandeirada oficial"
           title="Resultados"
           description="A 1ª etapa foi homologada em duas classificações oficiais, uma por categoria."
+          compact
         />
 
         <section className="tg-results-section">
@@ -95,11 +96,14 @@ export default async function ResultsPage({
                     return (
                       <article className="tg-results-card" key={result.id}>
                         <div className="tg-results-card-topline">
-                          <span>1ª etapa • Endurance • 18/08/2026</span>
+                          <span>1ª etapa • Resistência • 18/08/2026</span>
                           <StatusBadge status={result.status} />
                         </div>
                         <h2>{result.category}</h2>
-                        <p>{result.stageTitle} — classificação oficial separada por categoria.</p>
+                        <p>
+                          {localizeRaceText(result.stageTitle)} — classificação oficial separada por
+                          categoria.
+                        </p>
                         <ol>
                           {entries.map((entry) => (
                             <li key={entry.id}>
@@ -169,7 +173,7 @@ export default async function ResultsPage({
                         <article className={`place-${index + 1}`} key={entry.id}>
                           <span>{String(index + 1).padStart(2, "0")}</span>
                           <h2>{entry.driverName}</h2>
-                          <p>{entry.stageTitle}</p>
+                          <p>{localizeRaceText(entry.stageTitle)}</p>
                           <strong>{formatLapTime(entry.bestLapMs)}</strong>
                           <small>
                             {isNotClassified(entry.status, entry.position)
@@ -185,13 +189,13 @@ export default async function ResultsPage({
                         <caption className="sr-only">Resultado oficial por categoria</caption>
                         <thead>
                           <tr>
-                            <th>Pos.</th>
-                            <th>Piloto</th>
-                            <th>Voltas</th>
-                            <th>Melhor volta</th>
-                            <th>Penalidade</th>
-                            <th>Pontos</th>
-                            <th>Detalhes</th>
+                            <th scope="col">Pos.</th>
+                            <th scope="col">Piloto</th>
+                            <th scope="col">Voltas</th>
+                            <th scope="col">Melhor volta</th>
+                            <th scope="col">Penalidade</th>
+                            <th scope="col">Pontos</th>
+                            <th scope="col">Detalhes</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -221,8 +225,9 @@ export default async function ResultsPage({
                                   <Link
                                     className="tg-table-link"
                                     href={`/pilotos/${entry.driverSlug}#volta-a-volta`}
+                                    aria-label={`Ver volta a volta de ${entry.driverName}`}
                                   >
-                                    Ver voltas <ArrowRight aria-hidden="true" />
+                                    Ver volta a volta <ArrowRight aria-hidden="true" />
                                   </Link>
                                 </td>
                               </tr>

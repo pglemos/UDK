@@ -926,6 +926,17 @@
   }
 }
 
+@media (max-width: 900px) {
+  .udk-page-hero.is-compact,
+  .tg-page-hero.is-compact,
+  .cinema-page-hero.is-compact,
+  .udk-page-hero.is-compact .udk-page-hero-inner,
+  .tg-page-hero.is-compact .udk-page-hero-inner,
+  .cinema-page-hero.is-compact .udk-page-hero-inner {
+    min-height: clamp(320px, 52svh, 440px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

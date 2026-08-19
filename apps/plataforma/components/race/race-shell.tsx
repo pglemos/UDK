@@ -14,9 +14,15 @@ const footerNavigation = [
   ["/regulamento", "Regulamento"],
 ] as const;
 
-export function RaceShell({ children }: { children: React.ReactNode }) {
+export function RaceShell({
+  children,
+  showMobileCta = true,
+}: {
+  children: React.ReactNode;
+  showMobileCta?: boolean;
+}) {
   return (
-    <div className="race-site udk-site cinema-site">
+    <div className={`race-site udk-site cinema-site${showMobileCta ? "" : " no-mobile-cta"}`}>
       <CinematicIntro />
       <ScrollProgress />
       <CinematicRouteCurtain />
@@ -63,7 +69,12 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
 
           <div className="udk-footer-column udk-footer-contact">
             <span>Onde a pista chama</span>
-            <p><MapPin aria-hidden="true" /> Kartódromo Internacional de Betim<br />Betim, Minas Gerais</p>
+            <p>
+              <MapPin aria-hidden="true" />
+              <span>
+                Kartódromo Internacional de Betim<br /> {" "}Betim, Minas Gerais
+              </span>
+            </p>
             <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer">
               <Camera aria-hidden="true" /> Instagram oficial
             </a>
@@ -76,12 +87,14 @@ export function RaceShell({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
 
-      <div className="udk-mobile-cta">
-        <Link href="/inscricao">
-          Entrar no grid <ArrowUpRight aria-hidden="true" size={16} />
-        </Link>
-        <Link href="/login">Entrar</Link>
-      </div>
+      {showMobileCta ? (
+        <div className="udk-mobile-cta">
+          <Link href="/inscricao">
+            Entrar no grid <ArrowUpRight aria-hidden="true" size={16} />
+          </Link>
+          <Link href="/login">Entrar</Link>
+        </div>
+      ) : null}
     </div>
   );
 }

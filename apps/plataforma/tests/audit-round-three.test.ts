@@ -18,30 +18,31 @@ describe("third visual audit safeguards", () => {
     expect(ui).not.toContain("src={premiumVisuals.race.src}");
   });
 
-  it("renders an official racing visual when a driver has no valid published portrait", () => {
-    const assets = read("lib/visual-assets.ts");
+  it("renders an honest photo placeholder when a driver has no published portrait", () => {
     const editorial = read("components/race/editorial-primitives.tsx");
     const ui = read("components/race/ui.tsx");
 
-    expect(assets).toContain("export function driverVisual");
-    expect(assets).toContain("isGenericMediaSource");
     expect(editorial).toContain("driverVisual(index)");
     expect(editorial).toContain("resolveVisualSource(driver.avatarUrl, fallback)");
     expect(editorial).toContain("hasPublishedPortrait");
-    expect(editorial).toContain("src={source}");
-    expect(editorial).toContain("objectPosition: hasPublishedPortrait ?");
+    expect(editorial).toContain('import { DriverPlaceholder } from "./driver-placeholder"');
+    expect(editorial).toContain("<DriverPlaceholder name={driver.name} />");
     expect(editorial).not.toContain('className="driver-fallback-photo"');
     expect(ui).toContain("driverVisual(driver.number ?? 0)");
+    expect(ui).toContain("<DriverPlaceholder name={driver.name}");
   });
 
   it("uses the same sanitized official fallback in the standings podium", () => {
     const standings = read("app/classificacao/page.tsx");
 
     expect(standings).toContain('import Image from "next/image"');
+    expect(standings).toContain(
+      'import { DriverPlaceholder } from "../../components/race/driver-placeholder"',
+    );
     expect(standings).toContain("driverVisual(index)");
     expect(standings).toContain("resolveVisualSource(driver.avatarUrl, fallback)");
     expect(standings).toContain("hasPublishedPortrait");
-    expect(standings).toContain("tg-standing-podium-fallback");
+    expect(standings).toContain("<DriverPlaceholder name={driver.name} />");
   });
 
   it("locks poster media dimensions after every earlier visual override", () => {
