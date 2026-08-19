@@ -57,7 +57,7 @@ insert into public.drivers (
 select scope.season_id, scope.category_id, roster.slug, roster.sport_name, roster.sport_name,
   null, 'approved', true
 from roster join scope using (category_slug)
-on conflict (season_id, slug) do update
+on conflict (season_id, slug) where deleted_at is null do update
 set category_id = excluded.category_id,
     status = 'approved',
     public_profile = true,
@@ -146,7 +146,7 @@ select
 from payload
 join scope using (category_slug)
 join public.drivers driver on driver.season_id=scope.season_id and driver.slug=payload.driver_slug
-on conflict (result_id, driver_id) do update
+on conflict (result_id, driver_id) where deleted_at is null do update
 set position=excluded.position,
     kart_number=excluded.kart_number,
     laps=excluded.laps,
@@ -261,7 +261,7 @@ with latest_results as (
     result.version desc,result.updated_at desc
 )
 select result.id,result.title,result.status,result.version,result.fastest_lap_ms,result.published_at,
-  result.stage_id,stage.slug stage_slug,stage.title stage_title,stage.starts_at,stage.track,
+  result.stage_id,stage.slug stage_slug,stage.title stage_title,stage.track,stage.starts_at,
   category.name category,category.slug category_slug
 from latest_results result
 join public.stages stage on stage.id=result.stage_id and stage.deleted_at is null
