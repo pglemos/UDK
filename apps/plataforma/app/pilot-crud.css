@@ -468,6 +468,10 @@
 }
 
 @media (max-width: 720px) {
+  .pilot-grid {
+    grid-template-columns: 1fr;
+  }
+
   .pilot-workspace .data-card-head {
     padding: 0.9rem 1rem;
   }
