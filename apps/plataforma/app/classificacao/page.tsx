@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Trophy } from "lucide-react";
+import { ArrowRight, ChevronRight, Download, Trophy } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
 import { getCategories, getStandingsPage, parsePositiveInt } from "../../lib/public-data";
+import { officialResultPdf } from "../../lib/official-result-links";
 import { driverVisual, resolveVisualSource } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
@@ -86,6 +87,27 @@ export default async function StandingsPage({
                   {item.name}
                 </Link>
               ))}
+            </div>
+
+            <div className="tg-official-pdf-links" aria-label="PDFs oficiais da primeira etapa">
+              {category === "insanos" || category === "geral" ? (
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.insanos}
+                  download
+                >
+                  PDF Ultra Insanos <Download aria-hidden="true" />
+                </a>
+              ) : null}
+              {category === "rapidos" || category === "geral" ? (
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.rapidos}
+                  download
+                >
+                  PDF Ultras Rápidos <Download aria-hidden="true" />
+                </a>
+              ) : null}
             </div>
 
             <form className="udk-toolbar tg-toolbar is-compact" action="/classificacao">

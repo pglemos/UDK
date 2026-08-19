@@ -71,6 +71,7 @@ export type PublicResult = {
   stageSlug: string;
   stageTitle: string;
   category: string;
+  categorySlug: string;
   status: string;
   version: number;
   fastestLapMs: number | null;
@@ -216,6 +217,7 @@ export function normalizePublicResult(row: UnknownRow): PublicResult {
     stageSlug: stringValue(row.stage_slug) || stringValue(row.stage_id),
     stageTitle: stringValue(row.stage_title),
     category: stringValue(row.category, "Geral"),
+    categorySlug: stringValue(row.category_slug),
     status: stringValue(row.status),
     version: numberValue(row.version, 1),
     fastestLapMs: nullableNumber(row.fastest_lap_ms),

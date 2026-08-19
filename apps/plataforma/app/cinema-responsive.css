@@ -896,6 +896,27 @@
   }
 }
 
+@media (max-width: 760px) {
+  .tg-results-collection {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-results-card {
+    min-height: 0;
+  }
+
+  .tg-results-card-topline,
+  .tg-results-card-actions,
+  .tg-result-selector-actions {
+    align-items: flex-start;
+  }
+
+  .tg-results-card-actions .race-button,
+  .tg-result-selector-actions .race-button {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

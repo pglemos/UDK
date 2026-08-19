@@ -187,7 +187,9 @@
   height: 100%;
   object-fit: cover;
   filter: grayscale(0.24) contrast(1.08);
-  transition: transform 900ms var(--cinema-ease), filter 500ms ease;
+  transition:
+    transform 900ms var(--cinema-ease),
+    filter 500ms ease;
 }
 
 .tg-calendar-stage:hover .tg-calendar-stage-media img {
@@ -220,7 +222,10 @@
   min-height: 68%;
   padding: 28px;
   border-left: 1px solid var(--cinema-line-dark);
-  transition: min-height 480ms var(--cinema-ease), color var(--cinema-fast) ease, background var(--cinema-fast) ease;
+  transition:
+    min-height 480ms var(--cinema-ease),
+    color var(--cinema-fast) ease,
+    background var(--cinema-fast) ease;
 }
 
 .tg-standing-podium-card:last-child {
@@ -233,8 +238,12 @@
   color: white;
 }
 
-.tg-standing-podium-card.place-2 { min-height: 82%; }
-.tg-standing-podium-card.place-3 { min-height: 72%; }
+.tg-standing-podium-card.place-2 {
+  min-height: 82%;
+}
+.tg-standing-podium-card.place-3 {
+  min-height: 72%;
+}
 
 .tg-standing-podium-card:hover {
   min-height: 100%;
@@ -369,8 +378,12 @@
   color: white;
 }
 
-.tg-results-podium article.place-2 { min-height: 84%; }
-.tg-results-podium article.place-3 { min-height: 74%; }
+.tg-results-podium article.place-2 {
+  min-height: 84%;
+}
+.tg-results-podium article.place-3 {
+  min-height: 74%;
+}
 
 .tg-results-podium article > span {
   position: absolute;
@@ -414,6 +427,107 @@
   margin-top: 6px;
   color: currentColor;
   opacity: 0.58;
+}
+
+.tg-results-collection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 42px 0 70px;
+  background: var(--cinema-line-dark);
+}
+
+.tg-results-card {
+  display: flex;
+  min-height: 620px;
+  flex-direction: column;
+  padding: clamp(26px, 4vw, 58px);
+  background: var(--cinema-paper);
+}
+
+.tg-results-card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--cinema-muted-dark);
+  font-family: var(--cinema-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tg-results-card h2 {
+  max-width: 8ch;
+  margin: 58px 0 18px;
+  font-family: var(--cinema-display);
+  font-size: clamp(3rem, 5vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+
+.tg-results-card > p {
+  max-width: 40ch;
+  min-height: 48px;
+  color: var(--cinema-muted-dark);
+  line-height: 1.6;
+}
+
+.tg-results-card ol {
+  display: grid;
+  gap: 0;
+  margin: 34px 0 40px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--cinema-line-dark);
+}
+
+.tg-results-card li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--cinema-line-dark);
+  align-items: center;
+}
+
+.tg-results-card li strong,
+.tg-results-card li b {
+  font-family: var(--cinema-display);
+  font-weight: 900;
+}
+
+.tg-results-card li b {
+  color: var(--cinema-cyan-deep);
+  font-size: 0.78rem;
+}
+
+.tg-results-card-actions,
+.tg-result-selector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.tg-results-card-actions {
+  margin-top: auto;
+}
+
+.race-button-outline.is-light {
+  border-color: var(--cinema-line-dark);
+  color: var(--cinema-ink);
+  --button-hover: var(--cinema-cyan);
+}
+
+.tg-official-pdf-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 34px;
 }
 
 /* Drivers directory */
@@ -464,7 +578,12 @@
 .tg-driver-profile-media::after {
   content: "";
   background:
-    linear-gradient(90deg, rgba(5, 6, 7, 0.94) 0%, rgba(5, 6, 7, 0.58) 52%, rgba(5, 6, 7, 0.1) 100%),
+    linear-gradient(
+      90deg,
+      rgba(5, 6, 7, 0.94) 0%,
+      rgba(5, 6, 7, 0.58) 52%,
+      rgba(5, 6, 7, 0.1) 100%
+    ),
     linear-gradient(0deg, rgba(5, 6, 7, 0.72), transparent 46%);
 }
 
@@ -729,7 +848,9 @@
   height: 100%;
   object-fit: cover;
   filter: grayscale(0.16) contrast(1.06);
-  transition: transform 1s var(--cinema-ease), filter 500ms ease;
+  transition:
+    transform 1s var(--cinema-ease),
+    filter 500ms ease;
 }
 
 .tg-news-directory-feature a:hover img {
@@ -1095,7 +1216,9 @@
   color: var(--cinema-ink);
   text-align: left;
   cursor: pointer;
-  transition: border-color var(--cinema-fast) ease, background var(--cinema-fast) ease;
+  transition:
+    border-color var(--cinema-fast) ease,
+    background var(--cinema-fast) ease;
 }
 
 .race-category-choice button:hover,
@@ -1210,7 +1333,9 @@
   border-bottom: 1px solid var(--cinema-line-dark);
   background: var(--cinema-paper);
   color: var(--cinema-ink);
-  transition: background var(--cinema-fast) ease, color var(--cinema-fast) ease;
+  transition:
+    background var(--cinema-fast) ease,
+    color var(--cinema-fast) ease;
 }
 
 .race-sponsor-card:hover {
