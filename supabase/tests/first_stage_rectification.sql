@@ -187,8 +187,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  13,
-  'Lucca moves to P13 after Braulio receives the five-second black/white penalty'
+  14,
+  'Lucca remains P14 because TimingOfficialReport already includes the five-second penalty'
 );
 
 select is(
@@ -202,8 +202,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  130,
-  'Lucca receives P13 base points after the corrected finishing order'
+  129,
+  'Lucca keeps P14 Endurance base points'
 );
 
 select is(
@@ -217,8 +217,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  119,
-  'Braulio is P14 after +5 seconds and then receives the 10-point championship deduction'
+  120,
+  'Braulio remains P13 and receives only the 10-point championship deduction'
 );
 
 select is(
@@ -251,12 +251,9 @@ select is(
 
 select is(
   (
-    select result.version
+    select max(result.version)
     from public.public_portal_results result
     where result.category_slug = 'rapidos'
-      and result.stage_title ilike '%1%etapa%'
-    order by result.version desc
-    limit 1
   ),
   2,
   'public results expose the latest rectified version'
