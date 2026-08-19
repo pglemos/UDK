@@ -1,9 +1,9 @@
 -- Retificacao completa da 1a etapa UDK 2026 (18/08/2026).
--- Fontes oficiais: TimingOfficialReport, Super Pole e relatorio volta a volta LapTime/Sisecom.
--- Preserva a versao 1 e publica a versao 2 como `rectified`.
+-- Fontes: resultado oficial LapTime, Super Pole, volta a volta e regulamento UDK.
+-- A versao 1 permanece imutavel; a versao 2 registra a decisao esportiva retificada.
 
 -- =============================================================================
--- 1. Modelo de pontuacao: bonus de melhor parada e penalidades em pontos
+-- 1. Pontuacao completa: melhor parada e penalidades em pontos
 -- =============================================================================
 alter table public.points_rules
   add column if not exists best_pit_points numeric(8,2) not null default 0;
@@ -68,7 +68,6 @@ begin
     + case when new.best_pit then selected_rule.best_pit_points else 0 end
     - coalesce(new.penalty_points, 0);
   new.updated_at := now();
-
   return new;
 end
 $$;
@@ -79,8 +78,7 @@ drop trigger if exists result_entries_auto_points on public.result_entries;
 create trigger result_entries_auto_points
 before insert or update of result_id, position, pole, fastest_lap, best_pit, penalty_points, status
 on public.result_entries
-for each row
-execute function public.apply_result_entry_points();
+for each row execute function public.apply_result_entry_points();
 
 create or replace function public.recalculate_result_points(p_result_id uuid)
 returns integer
@@ -96,24 +94,14 @@ begin
   select stage.season_id
   into result_season_id
   from public.results result
-  join public.stages stage
-    on stage.id = result.stage_id
-   and stage.deleted_at is null
-  where result.id = p_result_id
-    and result.deleted_at is null;
+  join public.stages stage on stage.id = result.stage_id and stage.deleted_at is null
+  where result.id = p_result_id and result.deleted_at is null;
 
-  if result_season_id is null then
-    raise exception 'result not found';
-  end if;
-
-  if not public.can_judge_season(result_season_id) then
-    raise exception 'permission denied';
-  end if;
+  if result_season_id is null then raise exception 'result not found'; end if;
+  if not public.can_judge_season(result_season_id) then raise exception 'permission denied'; end if;
 
   selected_rule := public.resolve_result_points_rule(p_result_id);
-  if selected_rule.id is null then
-    raise exception 'active points rule not found';
-  end if;
+  if selected_rule.id is null then raise exception 'active points rule not found'; end if;
 
   update public.result_entries entry
   set
@@ -128,8 +116,7 @@ begin
       + case when entry.best_pit then selected_rule.best_pit_points else 0 end
       - coalesce(entry.penalty_points, 0),
     updated_at = now()
-  where entry.result_id = p_result_id
-    and entry.deleted_at is null;
+  where entry.result_id = p_result_id and entry.deleted_at is null;
 
   get diagnostics updated_count = row_count;
   return updated_count;
@@ -139,7 +126,7 @@ $$;
 grant execute on function public.recalculate_result_points(uuid) to authenticated;
 
 -- =============================================================================
--- 2. Versionamento LapTime: o mesmo racing id pode possuir versoes retificadas
+-- 2. Permite versoes retificadas do mesmo Racing LapTime
 -- =============================================================================
 drop index if exists public.results_laptime_external_unique_idx;
 create unique index results_laptime_external_unique_idx
@@ -153,26 +140,17 @@ create unique index results_laptime_external_unique_idx
   where source_system = 'laptime' and deleted_at is null;
 
 -- =============================================================================
--- 3. Cria versao 2 retificada preservando integralmente a versao 1
+-- 3. Cria os dois resultados v2 a partir da v1 publicada
 -- =============================================================================
 insert into public.results (
-  stage_id,
-  category_id,
-  session_id,
-  title,
-  status,
-  version,
-  fastest_lap_ms,
-  published_at,
-  source_system,
-  external_racing_id,
-  external_imported_at
+  stage_id, category_id, session_id, title, status, version,
+  fastest_lap_ms, published_at, source_system, external_racing_id, external_imported_at
 )
 select
   original.stage_id,
   original.category_id,
   original.session_id,
-  original.title,
+  original.title || ' - retificado',
   'rectified',
   2,
   original.fastest_lap_ms,
@@ -192,8 +170,7 @@ where championship.slug = 'udk'
   and original.version = 1
   and original.deleted_at is null
   and not exists (
-    select 1
-    from public.results existing
+    select 1 from public.results existing
     where existing.stage_id = original.stage_id
       and existing.category_id is not distinct from original.category_id
       and existing.session_id is not distinct from original.session_id
@@ -201,10 +178,8 @@ where championship.slug = 'udk'
       and existing.deleted_at is null
   );
 
-with original_entries as (
-  select
-    original_result.external_racing_id,
-    original_entry.*
+with originals as (
+  select original_result.external_racing_id, original_entry.*
   from public.result_entries original_entry
   join public.results original_result
     on original_result.id = original_entry.result_id
@@ -213,7 +188,7 @@ with original_entries as (
    and original_result.external_racing_id in (2026081801, 2026081802)
    and original_result.deleted_at is null
   where original_entry.deleted_at is null
-), rectified_results as (
+), rectified as (
   select id, external_racing_id
   from public.results
   where version = 2
@@ -223,23 +198,9 @@ with original_entries as (
     and deleted_at is null
 )
 insert into public.result_entries (
-  result_id,
-  driver_id,
-  position,
-  kart_number,
-  laps,
-  total_time_ms,
-  best_lap_ms,
-  penalty_ms,
-  points,
-  pole,
-  fastest_lap,
-  status,
-  external_competitor_id,
-  best_pit,
-  penalty_points,
-  timing_adjustment_laps,
-  sporting_note
+  result_id, driver_id, position, kart_number, laps, total_time_ms, best_lap_ms,
+  penalty_ms, pole, fastest_lap, status, external_competitor_id,
+  best_pit, penalty_points, timing_adjustment_laps, sporting_note
 )
 select
   rectified.id,
@@ -250,7 +211,6 @@ select
   original.total_time_ms,
   original.best_lap_ms,
   original.penalty_ms,
-  original.points,
   original.pole,
   original.fastest_lap,
   original.status,
@@ -259,78 +219,80 @@ select
   0,
   0,
   null
-from original_entries original
-join rectified_results rectified
-  on rectified.external_racing_id = original.external_racing_id
+from originals original
+join rectified on rectified.external_racing_id = original.external_racing_id
 where not exists (
-  select 1
-  from public.result_entries existing
+  select 1 from public.result_entries existing
   where existing.result_id = rectified.id
     and existing.driver_id = original.driver_id
     and existing.deleted_at is null
 );
 
 -- =============================================================================
--- 4. Correcoes esportivas documentadas
+-- 4. Bonus oficiais da etapa
 -- =============================================================================
--- Pole geral da Super Pole: Andre Felisberto (1:07.775).
+-- Pole geral da Super Pole: Andre Felisberto, 1:07.775 (+1).
 update public.result_entries entry
 set pole = (driver.slug = 'andre-felisberto')
-from public.results result
-join public.drivers driver on driver.id = entry.driver_id
+from public.results result, public.drivers driver
 where entry.result_id = result.id
+  and driver.id = entry.driver_id
   and result.version = 2
   and result.status = 'rectified'
   and result.source_system = 'laptime'
   and result.external_racing_id in (2026081801, 2026081802)
   and entry.deleted_at is null;
 
--- Melhor volta geral da corrida: Arthur, 1:04.976.
+-- Melhor volta geral: Arthur, 1:04.976 (+1).
 update public.result_entries entry
 set fastest_lap = (driver.slug = 'arthur-henrique')
-from public.results result
-join public.drivers driver on driver.id = entry.driver_id
+from public.results result, public.drivers driver
 where entry.result_id = result.id
+  and driver.id = entry.driver_id
   and result.version = 2
   and result.status = 'rectified'
   and result.source_system = 'laptime'
   and result.external_racing_id in (2026081801, 2026081802)
   and entry.deleted_at is null;
 
--- Melhor parada valida: Lucas Rabelo, TV 05:00.007, apenas 7 ms acima do minimo.
+-- Melhor parada valida: Lucas Rabelo, TV 05:00.007, somente 7 ms acima do minimo (+10).
 update public.result_entries entry
 set
   best_pit = true,
-  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''), 'Melhor parada Endurance: TV 05:00.007 (+10 pontos).')
-from public.results result
-join public.drivers driver on driver.id = entry.driver_id
+  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''),
+    'Melhor parada Endurance: TV 05:00.007, 7 ms acima do minimo (+10 pontos).')
+from public.results result, public.drivers driver
 where entry.result_id = result.id
+  and driver.id = entry.driver_id
   and result.version = 2
   and result.status = 'rectified'
-  and result.source_system = 'laptime'
   and result.external_racing_id = 2026081801
   and driver.slug = 'lucas-rabelo'
   and entry.deleted_at is null;
 
--- Correcao de cronometragem de Pedro Guilherme: na volta reportada como 18,
--- o sensor/transponder uniu duas voltas em TV 02:16.868. Preserva-se o dado
--- bruto em public.laps; apenas o total oficial e retificado de 46 para 47.
+-- =============================================================================
+-- 5. Retificacao de cronometragem de Pedro Guilherme
+-- =============================================================================
+-- O TV 02:16.868 da volta reportada como 18 reuniu duas voltas pelo sensor/transponder.
+-- Nao se inventam tempos individuais. O dado bruto permanece no volta a volta da v1.
 update public.result_entries entry
 set
   laps = 47,
   timing_adjustment_laps = 1,
-  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''), 'Retificacao de cronometragem: TV 02:16.868 reuniu duas voltas; total oficial 47 voltas. Tempos individuais nao foram inventados.')
-from public.results result
-join public.drivers driver on driver.id = entry.driver_id
+  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''),
+    'Retificacao de cronometragem: TV 02:16.868 reuniu duas voltas; total oficial 47 voltas. Tempos individuais preservados sem estimativa.')
+from public.results result, public.drivers driver
 where entry.result_id = result.id
+  and driver.id = entry.driver_id
   and result.version = 2
   and result.status = 'rectified'
-  and result.source_system = 'laptime'
   and result.external_racing_id = 2026081802
   and driver.slug = 'pedro-guilherme'
   and entry.deleted_at is null;
 
--- Primeira bandeira preta/branca: +5 segundos e -10 pontos conforme regulamento.
+-- =============================================================================
+-- 6. Bandeira preta/branca: +5 segundos e -10 pontos
+-- =============================================================================
 with flagged(driver_slug) as (
   values
     ('francisco-biuchi'::text),
@@ -344,20 +306,55 @@ with flagged(driver_slug) as (
 )
 update public.result_entries entry
 set
-  penalty_ms = entry.penalty_ms + 5000,
+  penalty_ms = coalesce(entry.penalty_ms, 0) + 5000,
   penalty_points = 10,
-  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''), 'Bandeira preta/branca: +5 s e -10 pontos.')
-from public.results result
-join public.drivers driver on driver.id = entry.driver_id
-join flagged on flagged.driver_slug = driver.slug
+  sporting_note = concat_ws(' | ', nullif(entry.sporting_note, ''),
+    'Primeira bandeira preta/branca: +5 s e -10 pontos.')
+from public.results result, public.drivers driver, flagged
 where entry.result_id = result.id
+  and driver.id = entry.driver_id
+  and flagged.driver_slug = driver.slug
   and result.version = 2
   and result.status = 'rectified'
-  and result.source_system = 'laptime'
   and result.external_racing_id in (2026081801, 2026081802)
   and entry.deleted_at is null;
 
--- Persiste as oito decisoes no modulo disciplinar sem duplicar em reaplicacoes.
+-- A penalidade de +5 s altera a ordem entre Bráulio e Lucca, ambos com 46 voltas.
+-- Recalcula TODA a ordem dos classificados por voltas e tempo ajustado, evitando
+-- tratar a posicao bruta LapTime como imutavel apos uma decisao desportiva.
+update public.result_entries entry
+set position = entry.position + 2000
+from public.results result
+where entry.result_id = result.id
+  and result.version = 2
+  and result.status = 'rectified'
+  and result.external_racing_id in (2026081801, 2026081802)
+  and entry.status = 'classified'
+  and entry.deleted_at is null;
+
+with ranked as (
+  select
+    entry.id,
+    row_number() over (
+      partition by entry.result_id
+      order by entry.laps desc, (coalesce(entry.total_time_ms, 0) + coalesce(entry.penalty_ms, 0)) asc, entry.driver_id
+    )::integer as new_position
+  from public.result_entries entry
+  join public.results result on result.id = entry.result_id
+  where result.version = 2
+    and result.status = 'rectified'
+    and result.external_racing_id in (2026081801, 2026081802)
+    and entry.status = 'classified'
+    and entry.deleted_at is null
+)
+update public.result_entries entry
+set position = ranked.new_position
+from ranked
+where entry.id = ranked.id;
+
+-- =============================================================================
+-- 7. Auditoria disciplinar. As -7 voltas de parada ja estao no resultado bruto.
+-- =============================================================================
 with stage_scope as (
   select stage.id as stage_id, season.id as season_id
   from public.stages stage
@@ -370,30 +367,16 @@ with stage_scope as (
   limit 1
 ), flagged(driver_slug) as (
   values
-    ('francisco-biuchi'::text),
-    ('vitor-hugo'),
-    ('rodrigo-boris'),
-    ('pablo-fonseca'),
-    ('wesley-cardoso'),
-    ('fernando-godoy'),
-    ('braulio-bonoto'),
-    ('toninho-da-prata')
+    ('francisco-biuchi'::text), ('vitor-hugo'), ('rodrigo-boris'), ('pablo-fonseca'),
+    ('wesley-cardoso'), ('fernando-godoy'), ('braulio-bonoto'), ('toninho-da-prata')
 )
-insert into public.penalties (
-  stage_id,
-  driver_id,
-  code,
-  summary,
-  effect,
-  status,
-  public_visibility
-)
+insert into public.penalties (stage_id, driver_id, code, summary, effect, status, public_visibility)
 select
   scope.stage_id,
   driver.id,
   'BW-01',
   'Primeira bandeira preta/branca registrada no relatorio oficial da 1a etapa.',
-  '+5 segundos e -10 pontos no campeonato.',
+  '+5 segundos no resultado e -10 pontos no campeonato.',
   'homologated',
   'full'
 from stage_scope scope
@@ -401,16 +384,13 @@ join public.drivers driver on driver.season_id = scope.season_id
 join flagged on flagged.driver_slug = driver.slug
 where driver.deleted_at is null
   and not exists (
-    select 1
-    from public.penalties existing
+    select 1 from public.penalties existing
     where existing.stage_id = scope.stage_id
       and existing.driver_id = driver.id
       and existing.code = 'BW-01'
       and existing.deleted_at is null
   );
 
--- Registra tambem as penalizacoes de parada que JA estao incorporadas ao
--- resultado LapTime (-7 voltas). Nao se descontam as voltas novamente.
 with stage_scope as (
   select stage.id as stage_id, season.id as season_id
   from public.stages stage
@@ -431,24 +411,17 @@ with stage_scope as (
     ('fernando-godoy', 'PIT-INVALID', 'Parada invalida 04:06.087; -7 voltas ja aplicadas pelo LapTime.'),
     ('braulio-bonoto', 'PIT-MISSING', 'Parada obrigatoria nao realizada; -7 voltas ja aplicadas pelo LapTime.')
 )
-insert into public.penalties (
-  stage_id, driver_id, code, summary, effect, status, public_visibility
-)
+insert into public.penalties (stage_id, driver_id, code, summary, effect, status, public_visibility)
 select
-  scope.stage_id,
-  driver.id,
-  pit.code,
-  pit.summary,
-  '-7 voltas, ja refletidas na classificacao oficial LapTime.',
-  'homologated',
-  'full'
+  scope.stage_id, driver.id, pit.code, pit.summary,
+  '-7 voltas, ja refletidas no resultado oficial LapTime.',
+  'homologated', 'full'
 from stage_scope scope
 join public.drivers driver on driver.season_id = scope.season_id
 join pit on pit.driver_slug = driver.slug
 where driver.deleted_at is null
   and not exists (
-    select 1
-    from public.penalties existing
+    select 1 from public.penalties existing
     where existing.stage_id = scope.stage_id
       and existing.driver_id = driver.id
       and existing.code = pit.code
@@ -456,19 +429,13 @@ where driver.deleted_at is null
   );
 
 -- =============================================================================
--- 5. Copia o volta a volta para a versao 2 mantendo a evidencia bruta intacta
+-- 8. Copia o volta a volta bruto para a versao 2
 -- =============================================================================
 with original_laps as (
   select
     original_result.external_racing_id,
-    lap.driver_id,
-    lap.lap_number,
-    lap.lap_time_ms,
-    lap.elapsed_time_ms,
-    lap.speed_kph,
-    lap.position,
-    lap.valid,
-    lap.invalid_reason
+    lap.driver_id, lap.lap_number, lap.lap_time_ms, lap.elapsed_time_ms,
+    lap.speed_kph, lap.position, lap.valid, lap.invalid_reason
   from public.laps lap
   join public.results original_result
     on original_result.id = lap.result_id
@@ -479,55 +446,36 @@ with original_laps as (
   where lap.deleted_at is null
 ), rectified_entries as (
   select
-    result.external_racing_id,
-    result.id as result_id,
-    entry.id as result_entry_id,
-    entry.driver_id
+    result.external_racing_id, result.id as result_id,
+    entry.id as result_entry_id, entry.driver_id
   from public.results result
   join public.result_entries entry on entry.result_id = result.id and entry.deleted_at is null
   where result.version = 2
     and result.status = 'rectified'
-    and result.source_system = 'laptime'
     and result.external_racing_id in (2026081801, 2026081802)
     and result.deleted_at is null
 )
 insert into public.laps (
-  result_id,
-  result_entry_id,
-  driver_id,
-  lap_number,
-  lap_time_ms,
-  elapsed_time_ms,
-  speed_kph,
-  position,
-  valid,
-  invalid_reason
+  result_id, result_entry_id, driver_id, lap_number, lap_time_ms,
+  elapsed_time_ms, speed_kph, position, valid, invalid_reason
 )
 select
-  rectified.result_id,
-  rectified.result_entry_id,
-  original.driver_id,
-  original.lap_number,
-  original.lap_time_ms,
-  original.elapsed_time_ms,
-  original.speed_kph,
-  original.position,
-  original.valid,
-  original.invalid_reason
+  rectified.result_id, rectified.result_entry_id, original.driver_id,
+  original.lap_number, original.lap_time_ms, original.elapsed_time_ms,
+  original.speed_kph, original.position, original.valid, original.invalid_reason
 from original_laps original
 join rectified_entries rectified
   on rectified.external_racing_id = original.external_racing_id
  and rectified.driver_id = original.driver_id
 where not exists (
-  select 1
-  from public.laps existing
+  select 1 from public.laps existing
   where existing.result_entry_id = rectified.result_entry_id
     and existing.lap_number = original.lap_number
     and existing.deleted_at is null
 );
 
 -- =============================================================================
--- 6. Portal publico: evidencia esportiva e ajustes ficam transparentes
+-- 9. Portal publico: mantem as colunas antigas e acrescenta a decomposicao esportiva
 -- =============================================================================
 create or replace view public.public_portal_result_entries
 with (security_invoker = true)
@@ -544,23 +492,21 @@ select
   entry.points,
   entry.pole,
   entry.fastest_lap,
-  entry.best_pit,
-  entry.penalty_points,
-  entry.timing_adjustment_laps,
-  entry.sporting_note,
   entry.status,
   entry.created_at,
   driver.slug as driver_slug,
   driver.sport_name as driver_name,
   driver.number as driver_number,
-  stage.title as stage_title
+  stage.title as stage_title,
+  entry.best_pit,
+  entry.penalty_points,
+  entry.timing_adjustment_laps,
+  entry.sporting_note
 from public.result_entries entry
 join public.results result
   on result.id = entry.result_id
  and result.deleted_at is null
- and result.status = any (
-   array['provisional'::text, 'homologated'::text, 'published'::text, 'rectified'::text]
- )
+ and result.status = any (array['provisional'::text, 'homologated'::text, 'published'::text, 'rectified'::text])
 join public.drivers driver
   on driver.id = entry.driver_id
  and driver.deleted_at is null
@@ -573,7 +519,7 @@ where entry.deleted_at is null;
 grant select on public.public_portal_result_entries to anon, authenticated;
 
 -- =============================================================================
--- 7. Regulamento publico operacional: inclui as regras que faltavam no resumo
+-- 10. Regulamento operacional publicado: inclui Melhor Parada e preta/branca
 -- =============================================================================
 update public.terms term
 set status = 'superseded', updated_at = now()
@@ -592,57 +538,39 @@ with season_scope as (
   join public.championships championship on championship.id = season.championship_id
   where season.year = 2026 and championship.slug = 'udk'
 ), next_version as (
-  select
-    season_scope.id as season_id,
-    coalesce(max(term.version), 0) + 1 as version
+  select season_scope.id as season_id, coalesce(max(term.version), 0) + 1 as version
   from season_scope
-  left join public.terms term
-    on term.season_id = season_scope.id
-   and term.kind = 'regulation'
+  left join public.terms term on term.season_id = season_scope.id and term.kind = 'regulation'
   group by season_scope.id
 )
-insert into public.terms (
-  season_id, kind, title, version, content,
-  required, status, effective_at
-)
+insert into public.terms (season_id, kind, title, version, content, required, status, effective_at)
 select
   next_version.season_id,
   'regulation',
   'Regulamento esportivo UDK 2026 — 2º semestre',
   next_version.version,
   $regulation$
-01. FORMATO DA TEMPORADA
-O campeonato possui 05 etapas. A 1ª e a 5ª etapas são Endurances de 01 hora em traçado único. As etapas 2, 3 e 4 são regulares e possuem 02 corridas cada: primeiro em sentido horário e depois em sentido anti-horário.
+01. FORMATO E PONTUACAO
+A temporada possui 08 resultados pontuaveis: 06 corridas regulares e 02 Endurances. A classificacao final considera os 06 melhores resultados, com ate 02 descartes.
 
-02. RESULTADOS PONTUÁVEIS
-A temporada possui 08 resultados pontuáveis: 06 corridas regulares e 02 Endurances.
+02. CORRIDA REGULAR
+P1 50; P2 45; P3 42; P4 40; P5 38; P6 37; e queda progressiva ate P42 1.
 
-03. DESCARTES
-A classificação final considera os 06 melhores resultados de cada piloto. Os 02 piores resultados entre os 08 eventos pontuáveis são descartados automaticamente. Até o sexto evento concluído não há descarte; após o sétimo evento é descartado o pior resultado; após o oitavo evento são descartados os dois piores resultados.
+03. ENDURANCE
+P1 150; P2 145; P3 142; P4 140; P5 138. A partir do P6, cai 01 ponto por posicao.
 
-04. PONTUAÇÃO DAS CORRIDAS REGULARES
-P1 50; P2 45; P3 42; P4 40; P5 38; P6 37; P7 36; P8 35; P9 34; P10 33; P11 32; P12 31; P13 30; P14 29; P15 28; P16 27; P17 26; P18 25; P19 24; P20 23; P21 22; P22 21; P23 20; P24 19; P25 18; P26 17; P27 16; P28 15; P29 14; P30 13; P31 12; P32 11; P33 10; P34 9; P35 8; P36 7; P37 6; P38 5; P39 4; P40 3; P41 2; P42 1.
-O total informativo da etapa regular é a soma dos pontos obtidos na 1ª e na 2ª corridas. Para efeito de classificação e descarte, cada corrida é um resultado pontuável independente.
+04. BONUS
+Pole Position geral da tomada de tempo: +1 ponto. Melhor volta geral da corrida: +1 ponto. No Endurance, a Melhor Parada recebe +10 pontos. Melhor Parada e o menor TV valido igual ou superior a 05:00.000.
 
-05. PONTUAÇÃO ENDURANCE
-P1 150; P2 145; P3 142; P4 140; P5 138. A partir do P6, a pontuação cai 01 ponto por posição: P6 137, P7 136 e assim sucessivamente até zero.
-
-06. BÔNUS
-Em cada corrida ou Endurance, o piloto recebe 01 ponto adicional pela pole position e 01 ponto adicional pela volta mais rápida. No Endurance, a Melhor Parada recebe 10 pontos adicionais. A Melhor Parada é o menor TV válido igual ou superior a 05:00.000, portanto o tempo válido mais próximo do mínimo regulamentar de cinco minutos.
-
-07. BANDEIRA PRETA/BRANCA
-A primeira advertência por bandeira preta/branca aplica acréscimo de 05 segundos e desconto de 10 pontos no campeonato, conforme a decisão desportiva registrada para a etapa.
+05. BANDEIRA PRETA/BRANCA
+Na primeira advertencia registrada, aplica-se +05 segundos ao resultado e -10 pontos no campeonato.
 $regulation$,
-  true,
-  'published',
-  now()
+  true, 'published', now()
 from next_version;
 
 -- =============================================================================
--- 8. Recalcula e materializa a classificacao apos a retificacao
+-- 11. Nova versao da classificacao usando somente a versao mais recente de cada prova
 -- =============================================================================
--- As atualizacoes acima acionaram o trigger de pontos. Agora cria uma nova
--- versao de standings por categoria usando a versao mais recente de cada prova.
 with season_scope as (
   select season.id as season_id, category.id as category_id
   from public.seasons season
@@ -653,8 +581,7 @@ with season_scope as (
     and category.slug in ('insanos', 'rapidos')
 ), version_scope as (
   select
-    scope.season_id,
-    scope.category_id,
+    scope.season_id, scope.category_id,
     coalesce(max(standing.version), 0) + 1 as next_version
   from season_scope scope
   left join public.standings standing
@@ -664,24 +591,15 @@ with season_scope as (
   group by scope.season_id, scope.category_id
 ), latest_results as (
   select distinct on (
-    stage.season_id,
-    result.category_id,
-    result.stage_id,
+    stage.season_id, result.category_id, result.stage_id,
     coalesce(result.session_id, '00000000-0000-0000-0000-000000000000'::uuid)
   )
-    stage.season_id,
-    result.category_id,
-    result.id as result_id,
-    result.stage_id,
-    result.session_id,
-    result.version,
-    stage.starts_at
+    stage.season_id, result.category_id, result.id as result_id,
+    result.stage_id, result.session_id, result.version, stage.starts_at
   from public.results result
   join public.stages stage on stage.id = result.stage_id and stage.deleted_at is null
   left join public.sessions session_row on session_row.id = result.session_id and session_row.deleted_at is null
-  join season_scope scope
-    on scope.season_id = stage.season_id
-   and scope.category_id = result.category_id
+  join season_scope scope on scope.season_id = stage.season_id and scope.category_id = result.category_id
   where result.status in ('homologated', 'published', 'rectified')
     and result.deleted_at is null
     and (
@@ -689,12 +607,9 @@ with season_scope as (
       or (result.session_id is null and stage.format in ('regular', 'endurance'))
     )
   order by
-    stage.season_id,
-    result.category_id,
-    result.stage_id,
+    stage.season_id, result.category_id, result.stage_id,
     coalesce(result.session_id, '00000000-0000-0000-0000-000000000000'::uuid),
-    result.version desc,
-    result.updated_at desc
+    result.version desc, result.updated_at desc
 ), scoring_events as (
   select
     latest_results.*,
@@ -708,26 +623,16 @@ with season_scope as (
 ), eligible_drivers as (
   select driver.season_id, driver.category_id, driver.id as driver_id
   from public.drivers driver
-  join season_scope scope
-    on scope.season_id = driver.season_id
-   and scope.category_id = driver.category_id
-  where driver.status = 'approved'
-    and driver.deleted_at is null
+  join season_scope scope on scope.season_id = driver.season_id and scope.category_id = driver.category_id
+  where driver.status = 'approved' and driver.deleted_at is null
 ), event_matrix as (
   select
-    driver.season_id,
-    driver.category_id,
-    driver.driver_id,
-    event.result_id,
-    event.event_order,
-    event.event_count,
+    driver.season_id, driver.category_id, driver.driver_id,
+    event.result_id, event.event_order, event.event_count,
     coalesce(entry.points, 0)::numeric(8,2) as event_points,
-    entry.position,
-    coalesce(entry.pole, false) as pole
+    entry.position, coalesce(entry.pole, false) as pole
   from eligible_drivers driver
-  join scoring_events event
-    on event.season_id = driver.season_id
-   and event.category_id = driver.category_id
+  join scoring_events event on event.season_id = driver.season_id and event.category_id = driver.category_id
   left join public.result_entries entry
     on entry.result_id = event.result_id
    and entry.driver_id = driver.driver_id
@@ -743,9 +648,7 @@ with season_scope as (
   from event_matrix
 ), aggregated as (
   select
-    season_id,
-    category_id,
-    driver_id,
+    season_id, category_id, driver_id,
     sum(event_points)::numeric(8,2) as gross_points,
     sum(event_points) filter (
       where worst_rank > least(2, greatest(0, event_count - 6))
@@ -765,30 +668,14 @@ with season_scope as (
   from aggregated
 )
 insert into public.standings (
-  season_id,
-  category_id,
-  driver_id,
-  points,
-  gross_points,
-  wins,
-  podiums,
-  poles,
-  position,
-  version,
-  status
+  season_id, category_id, driver_id, points, gross_points,
+  wins, podiums, poles, position, version, status
 )
 select
-  ranked.season_id,
-  ranked.category_id,
-  ranked.driver_id,
-  ranked.net_points,
-  ranked.gross_points,
-  ranked.wins,
-  ranked.podiums,
-  ranked.poles,
-  ranked.calculated_position,
-  version_scope.next_version,
-  'rectified'
+  ranked.season_id, ranked.category_id, ranked.driver_id,
+  ranked.net_points, ranked.gross_points,
+  ranked.wins, ranked.podiums, ranked.poles,
+  ranked.calculated_position, version_scope.next_version, 'rectified'
 from ranked
 join version_scope
   on version_scope.season_id = ranked.season_id
