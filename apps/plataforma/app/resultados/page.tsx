@@ -11,6 +11,7 @@ import {
   parsePositiveInt,
 } from "../../lib/public-data";
 import { officialResultPdfForCategory } from "../../lib/official-result-links";
+import { getSportingBreakdowns } from "../../lib/sporting-breakdown";
 
 export const metadata: Metadata = {
   title: "Resultados",
@@ -37,6 +38,7 @@ export default async function ResultsPage({
   const results = await getResultsPage({ page, pageSize: 6, category });
   const selected = category !== "geral" ? (results.items[0] ?? null) : null;
   const selectedEntries = selected ? await getResultEntries(selected.id) : [];
+  const selectedSporting = await getSportingBreakdowns(selectedEntries.map((entry) => entry.id));
   const resultCards =
     category === "geral"
       ? await Promise.all(
@@ -64,7 +66,7 @@ export default async function ResultsPage({
             <EditorialHeading
               index="03"
               title="O resultado termina a corrida. A leitura começa depois."
-              description="Tempos, posições, penalizações e pontos aparecem apenas após publicação oficial. O portal soma os pontos-base aos bônus homologados; os PDFs preservam a pontuação-base e trazem a Super Pole em página separada."
+              description="A classificação publicada já considera a decisão desportiva homologada: posição final, bônus de pole e melhor volta, Melhor Parada do Endurance, penalidades e retificações de cronometragem. O dado bruto do LapTime permanece preservado para auditoria."
             />
 
             <div className="udk-category-tabs tg-category-tabs">
@@ -101,8 +103,8 @@ export default async function ResultsPage({
                         </div>
                         <h2>{result.category}</h2>
                         <p>
-                          {localizeRaceText(result.stageTitle)} — classificação oficial separada por
-                          categoria.
+                          {localizeRaceText(result.stageTitle)} — classificação oficial retificada e
+                          separada por categoria.
                         </p>
                         <ol>
                           {entries.map((entry) => (
@@ -176,7 +178,7 @@ export default async function ResultsPage({
                           <p>{localizeRaceText(entry.stageTitle)}</p>
                           <strong>{formatLapTime(entry.bestLapMs)}</strong>
                           <small>
-                            {isNotClassified(entry.status, entry.position)
+                            {isNotClassified(entry.status, entry.position) && entry.points === 0
                               ? "NC"
                               : `${entry.points} pts`}
                           </small>
@@ -193,14 +195,26 @@ export default async function ResultsPage({
                             <th scope="col">Piloto</th>
                             <th scope="col">Voltas</th>
                             <th scope="col">Melhor volta</th>
-                            <th scope="col">Penalidade</th>
-                            <th scope="col">Pontos</th>
+                            <th scope="col">Ajustes</th>
+                            <th scope="col">Pontos finais</th>
                             <th scope="col">Detalhes</th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedEntries.map((entry) => {
                             const notClassified = isNotClassified(entry.status, entry.position);
+                            const sporting = selectedSporting.get(entry.id);
+                            const adjustments = [
+                              entry.pole ? "Pole +1" : null,
+                              entry.fastestLap ? "MV +1" : null,
+                              sporting?.bestPit ? "Pit +10" : null,
+                              entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : null,
+                              sporting?.penaltyPoints ? `-${sporting.penaltyPoints} pts` : null,
+                              sporting?.timingAdjustmentLaps
+                                ? `+${sporting.timingAdjustmentLaps} volta`
+                                : null,
+                            ].filter(Boolean);
+
                             return (
                               <tr key={entry.id}>
                                 <td data-label="Posição">
@@ -210,15 +224,14 @@ export default async function ResultsPage({
                                 </td>
                                 <td data-label="Piloto">
                                   <strong>{entry.driverName}</strong>
+                                  {sporting?.sportingNote ? <small>{sporting.sportingNote}</small> : null}
                                 </td>
                                 <td data-label="Voltas">{entry.laps}</td>
                                 <td data-label="Melhor volta">{formatLapTime(entry.bestLapMs)}</td>
-                                <td data-label="Penalidade">
-                                  {entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : "—"}
-                                </td>
-                                <td data-label="Pontos">
+                                <td data-label="Ajustes">{adjustments.length ? adjustments.join(" • ") : "—"}</td>
+                                <td data-label="Pontos finais">
                                   <strong className="udk-points">
-                                    {notClassified ? "—" : entry.points}
+                                    {notClassified && entry.points === 0 ? "—" : entry.points}
                                   </strong>
                                 </td>
                                 <td data-label="Detalhes">

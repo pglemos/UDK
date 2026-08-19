@@ -38,6 +38,47 @@ describe("UDK 2026 scoring", () => {
     expect(positionPoints("endurance", 143)).toBe(0);
   });
 
+  it("awards ten points only for the best valid Endurance pit stop", () => {
+    expect(scoreResult({ format: "endurance", position: 9, bestPit: true })).toBe(144);
+    expect(scoreResult({ format: "regular", position: 9, bestPit: true })).toBe(34);
+  });
+
+  it("deducts homologated sporting points after bonuses", () => {
+    expect(
+      scoreResult({
+        format: "endurance",
+        position: 16,
+        penaltyPoints: 10,
+      }),
+    ).toBe(117);
+    expect(
+      scoreResult({
+        format: "endurance",
+        position: 2,
+        pole: true,
+        penaltyPoints: 10,
+      }),
+    ).toBe(136);
+  });
+
+  it("scores a non-classified result from bonuses and penalties only", () => {
+    expect(
+      scoreResult({
+        format: "endurance",
+        position: 18,
+        classified: false,
+      }),
+    ).toBe(0);
+    expect(
+      scoreResult({
+        format: "endurance",
+        position: 18,
+        classified: false,
+        penaltyPoints: 10,
+      }),
+    ).toBe(-10);
+  });
+
   it("keeps every result until more than six scoring events have been completed", () => {
     const result = applySeasonDiscards([
       { id: "e1", points: 50 },
