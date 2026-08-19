@@ -7,6 +7,9 @@ export type ScoreResultInput = {
   position: number;
   pole?: boolean;
   fastestLap?: boolean;
+  bestPit?: boolean;
+  penaltyPoints?: number;
+  classified?: boolean;
 };
 
 export type ScoringEventResult = {
@@ -25,6 +28,7 @@ export type SeasonDiscardSummary = {
 export const MAX_SCORING_EVENTS = 8;
 export const COUNTED_RESULTS = 6;
 export const MAX_DISCARDS = 2;
+export const ENDURANCE_BEST_PIT_POINTS = 10;
 
 export const REGULAR_POSITION_POINTS = {
   1: 50,
@@ -98,8 +102,15 @@ export function scoreResult({
   position,
   pole = false,
   fastestLap = false,
+  bestPit = false,
+  penaltyPoints = 0,
+  classified = true,
 }: ScoreResultInput): number {
-  return positionPoints(format, position) + (pole ? 1 : 0) + (fastestLap ? 1 : 0);
+  const basePoints = classified ? positionPoints(format, position) : 0;
+  const pitBonus = format === "endurance" && bestPit ? ENDURANCE_BEST_PIT_POINTS : 0;
+  const sportingPenalty = Number.isFinite(penaltyPoints) ? Math.max(0, penaltyPoints) : 0;
+
+  return basePoints + (pole ? 1 : 0) + (fastestLap ? 1 : 0) + pitBonus - sportingPenalty;
 }
 
 export function applySeasonDiscards(results: readonly ScoringEventResult[]): SeasonDiscardSummary {
@@ -109,7 +120,7 @@ export function applySeasonDiscards(results: readonly ScoringEventResult[]): Sea
 
   const normalized = results.map((result, index) => ({
     ...result,
-    points: Number.isFinite(result.points) ? Math.max(0, result.points) : 0,
+    points: Number.isFinite(result.points) ? result.points : 0,
     index,
   }));
   const grossPoints = normalized.reduce((sum, result) => sum + result.points, 0);
