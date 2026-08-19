@@ -34,7 +34,7 @@ export default async function NewsPage({
 
   return (
     <RaceShell>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="05"
           eyebrow="Do paddock para o público"

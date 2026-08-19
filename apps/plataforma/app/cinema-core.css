@@ -702,7 +702,7 @@ svg {
 .tg-page-hero.is-compact .udk-page-hero-inner,
 .cinema-page-hero.is-compact,
 .cinema-page-hero.is-compact .udk-page-hero-inner {
-  min-height: clamp(380px, 52vh, 540px);
+  min-height: clamp(320px, 42vh, 420px);
 }
 
 .udk-page-hero-copy > span {

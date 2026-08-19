@@ -25,7 +25,7 @@ export default async function SponsorsPage() {
 
   return (
     <RaceShell>
-      <main id="conteudo">
+      <main id="conteudo" tabIndex={-1}>
         <section className="race-page-hero race-page-hero-sponsors">
           <div className="race-container">
             <span className="race-kicker">Parceiros oficiais</span>

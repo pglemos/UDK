@@ -43,7 +43,7 @@ export default async function StandingsPage({
 
   return (
     <RaceShell showMobileCta={false}>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="02"
           eyebrow="Pontos oficiais"

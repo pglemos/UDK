@@ -51,7 +51,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
 
   return (
     <RaceShell>
-      <main id="conteudo" className="tg-article-page">
+      <main id="conteudo" tabIndex={-1} className="tg-article-page">
         <article className="tg-article">
           <header className="tg-article-header">
             <div className="race-container">

@@ -1,4 +1,5 @@
 import { fallbackCategories, fallbackDrivers, fallbackStages } from "./public-data-fallbacks";
+import { formatShortDateLabel } from "./datetime";
 import { publicSupabaseClient } from "./public-supabase";
 
 export type PageMeta = {
@@ -210,7 +211,7 @@ export function normalizePublicStage(row: UnknownRow): PublicStage {
   return {
     id: stringValue(row.id),
     slug: stringValue(row.slug) || stringValue(row.id),
-    date: stringValue(row.date_label),
+    date: formatShortDateLabel(startsAt || stringValue(row.date_label), "America/Sao_Paulo"),
     title: stringValue(row.title),
     format: stringValue(row.format),
     track: stringValue(row.track),
@@ -225,6 +226,67 @@ export function normalizePublicStage(row: UnknownRow): PublicStage {
     heroImageUrl: nullableString(row.hero_image_url),
     shortDescription: nullableString(row.short_description),
   };
+}
+
+const TERMINAL_STAGE_STATUSES = new Set([
+  "cancelled",
+  "completed",
+  "closed",
+  "finished",
+  "homologated",
+  "official",
+  "published",
+  "rectified",
+]);
+
+const REGISTRATION_STAGE_STATUSES = new Set(["registration", "registration_open"]);
+
+function stageStartsAt(stage: PublicStage): number | null {
+  if (!stage.startsAt) return null;
+  const timestamp = new Date(stage.startsAt).getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+export function isStagePast(stage: PublicStage, now = new Date()): boolean {
+  const startsAt = stageStartsAt(stage);
+  return startsAt !== null && startsAt <= now.getTime();
+}
+
+export function getNextUpcomingStage(stages: PublicStage[], now = new Date()): PublicStage | null {
+  return (
+    [...stages]
+      .filter((stage) => {
+        const status = stage.status.trim().toLowerCase();
+        return !TERMINAL_STAGE_STATUSES.has(status) && !isStagePast(stage, now);
+      })
+      .sort(
+        (a, b) =>
+          (stageStartsAt(a) ?? Number.MAX_SAFE_INTEGER) -
+          (stageStartsAt(b) ?? Number.MAX_SAFE_INTEGER),
+      )[0] ?? null
+  );
+}
+
+export function getStageAction(
+  stage: PublicStage | null | undefined,
+  now = new Date(),
+): { href: string; label: string } {
+  if (!stage) return { href: "/calendario", label: "Ver calendário" };
+
+  const status = stage.status.trim().toLowerCase();
+  if (
+    !TERMINAL_STAGE_STATUSES.has(status) &&
+    !isStagePast(stage, now) &&
+    REGISTRATION_STAGE_STATUSES.has(status)
+  ) {
+    return { href: "/inscricao", label: "Entrar no grid" };
+  }
+
+  if (TERMINAL_STAGE_STATUSES.has(status) || isStagePast(stage, now)) {
+    return { href: "/resultados", label: "Ver resultados" };
+  }
+
+  return { href: "/calendario", label: "Ver calendário" };
 }
 
 export function normalizePublicResult(row: UnknownRow): PublicResult {

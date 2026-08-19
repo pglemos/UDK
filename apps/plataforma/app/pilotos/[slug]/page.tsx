@@ -87,7 +87,7 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
 
   return (
     <RaceShell showMobileCta={false}>
-      <main id="conteudo" className="tg-driver-profile">
+      <main id="conteudo" tabIndex={-1} className="tg-driver-profile">
         <section className="tg-driver-profile-hero">
           <div className="tg-driver-profile-media" aria-hidden="true">
             {hasPublishedHero ? (

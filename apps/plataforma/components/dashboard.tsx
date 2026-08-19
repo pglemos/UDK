@@ -71,31 +71,35 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
 
       const now = new Date().toISOString();
       const driversPromise = allowedKeys.has("pilotos")
-        ? client.from("drivers").select("id", { count: "exact", head: true }).eq("status", "approved")
+        ? client.from("drivers").select("id", { count: "exact", head: true }).eq("status", "approved").is("deleted_at", null)
         : emptyCount();
       const registrationsPromise = allowedKeys.has("inscricoes")
         ? client
             .from("registrations")
             .select("id", { count: "exact", head: true })
             .in("status", ["submitted", "documents_pending", "payment_pending", "analysis", "approved"])
+            .is("deleted_at", null)
         : emptyCount();
       const paymentsPromise = allowedKeys.has("financeiro")
         ? client
             .from("payments")
             .select("id", { count: "exact", head: true })
             .in("status", ["proof_sent", "analysis"])
+            .is("deleted_at", null)
         : emptyCount();
       const resultsPromise = allowedKeys.has("resultados")
         ? client
             .from("results")
             .select("id", { count: "exact", head: true })
             .in("status", ["analysis", "provisional"])
+            .is("deleted_at", null)
         : emptyCount();
       const documentsPromise = allowedKeys.has("documentos")
         ? client
             .from("documents")
             .select("id", { count: "exact", head: true })
             .in("status", ["submitted", "analysis", "correction_requested"])
+            .is("deleted_at", null)
         : emptyCount();
       const nextStagePromise = allowedKeys.has("calendario")
         ? client

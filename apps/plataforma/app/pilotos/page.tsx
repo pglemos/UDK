@@ -39,7 +39,7 @@ export default async function DriversPage({
 
   return (
     <RaceShell showMobileCta={false}>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="04"
           eyebrow="Quem constrói o grid"

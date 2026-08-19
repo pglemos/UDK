@@ -52,7 +52,7 @@ export default async function ResultsPage({
 
   return (
     <RaceShell showMobileCta={false}>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="03"
           eyebrow="Bandeirada oficial"
@@ -98,7 +98,7 @@ export default async function ResultsPage({
                     return (
                       <article className="tg-results-card" key={result.id}>
                         <div className="tg-results-card-topline">
-                          <span>1ª etapa • Resistência • 18/08/2026</span>
+                          <span>1ª etapa • Endurance • 18/08/2026</span>
                           <StatusBadge status={result.status} />
                         </div>
                         <h2>{result.category}</h2>

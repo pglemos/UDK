@@ -1,5 +1,54 @@
 const DEFAULT_TIME_ZONE = "America/Sao_Paulo";
 
+const MONTH_LABELS: Record<string, string> = {
+  JAN: "JAN",
+  FEB: "FEV",
+  MAR: "MAR",
+  APR: "ABR",
+  MAY: "MAI",
+  JUN: "JUN",
+  JUL: "JUL",
+  AUG: "AGO",
+  SEP: "SET",
+  OCT: "OUT",
+  NOV: "NOV",
+  DEC: "DEZ",
+};
+
+function normalizeShortDateLabel(value: string): string {
+  return value
+    .trim()
+    .toLocaleUpperCase("pt-BR")
+    .replace(
+      /\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\b/g,
+      (month) => MONTH_LABELS[month] ?? month,
+    );
+}
+
+export function formatShortDateLabel(
+  value: string | null | undefined,
+  timeZone = DEFAULT_TIME_ZONE,
+): string {
+  const fallback = normalizeShortDateLabel(value ?? "");
+  if (!value) return fallback;
+
+  const date = /^\d{4}-\d{2}-\d{2}/.test(value) ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return fallback;
+
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone,
+    day: "2-digit",
+    month: "short",
+  }).formatToParts(date);
+  const day = parts.find((part) => part.type === "day")?.value;
+  const month = parts
+    .find((part) => part.type === "month")
+    ?.value.replaceAll(".", "")
+    .toLocaleUpperCase("pt-BR");
+
+  return day && month ? `${day} ${month}` : fallback;
+}
+
 function parseLocalDateTime(value: string): {
   year: number;
   month: number;

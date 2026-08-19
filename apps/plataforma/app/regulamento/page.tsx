@@ -26,7 +26,7 @@ export default async function RegulationPage() {
 
   return (
     <RaceShell>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="06"
           eyebrow="Regras do campeonato"

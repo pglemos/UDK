@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { menuVisuals } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 
@@ -45,6 +45,16 @@ export function RaceHeader() {
   const home = pathname === "/";
   const previewItem = navigation[preview] ?? navigation[0];
   const previewVisual = menuVisuals[preview] ?? menuVisuals[0];
+
+  const handleSkipToContent = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    const target = document.getElementById("conteudo");
+    if (!target) return;
+
+    event.preventDefault();
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: "start" });
+    window.history.replaceState(null, "", "#conteudo");
+  }, []);
 
   const focusTrigger = useCallback(() => {
     if (restoreFocusTimerRef.current !== null) {
@@ -144,7 +154,7 @@ export function RaceHeader() {
 
   return (
     <>
-      <a className="race-skip-link" href="#conteudo">
+      <a className="race-skip-link" href="#conteudo" onClick={handleSkipToContent}>
         Pular para o conteúdo
       </a>
       <header

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function RegistrationPage() {
   return (
     <RaceShell>
-      <main id="conteudo" className="tg-registration-page">
+      <main id="conteudo" tabIndex={-1} className="tg-registration-page">
         <PageHero
           index="07"
           eyebrow="Seu lugar no grid"

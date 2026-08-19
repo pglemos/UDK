@@ -4,6 +4,8 @@ import {
   formatGap,
   formatLapTime,
   getPageRange,
+  getNextUpcomingStage,
+  getStageAction,
   normalizePublicDriver,
   normalizePublicLap,
   normalizePublicResult,
@@ -65,7 +67,7 @@ describe("public data normalization", () => {
       normalizePublicStage({
         id: "stage-1",
         slug: "etapa-1",
-        date_label: "18 AGO",
+        date_label: "18 AUG",
         title: "Endurance",
         format: "endurance",
         track: "Traçado 01",
@@ -198,5 +200,36 @@ describe("public pagination and timing", () => {
     expect(formatLapTime(null)).toBe("—");
     expect(formatGap(375)).toBe("+0,375");
     expect(formatGap(0)).toBe("Líder");
+  });
+});
+
+describe("public stage actions", () => {
+  const now = new Date("2026-08-19T12:00:00-03:00");
+  const pastStage = normalizePublicStage({
+    id: "past",
+    starts_at: "2026-08-18T21:00:00-03:00",
+    date_label: "18 AUG",
+    title: "Endurance",
+    format: "endurance",
+    status: "homologated",
+  });
+  const nextStage = normalizePublicStage({
+    id: "next",
+    starts_at: "2026-09-08T21:00:00-03:00",
+    date_label: "08 SEP",
+    title: "Etapa regular",
+    format: "regular",
+    status: "registration",
+  });
+
+  it("skips homologated past stages when selecting the next stage", () => {
+    expect(getNextUpcomingStage([pastStage, nextStage], now)?.id).toBe("next");
+  });
+
+  it("does not offer grid entry for a finished stage", () => {
+    expect(getStageAction(pastStage, now)).toEqual({
+      href: "/resultados",
+      label: "Ver resultados",
+    });
   });
 });

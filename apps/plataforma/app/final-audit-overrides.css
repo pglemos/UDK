@@ -1,5 +1,18 @@
 /* Final fixes identified during the complete 18-screen review. */
 
+main#conteudo {
+  scroll-margin-top: calc(var(--cinema-header, 92px) + 16px);
+}
+
+.tg-internal-page > .tg-internal-intro,
+.tg-internal-page > .tg-calendar-section,
+.tg-internal-page > .tg-standings-section,
+.tg-internal-page > .tg-results-section,
+.tg-internal-page > .tg-drivers-directory,
+.tg-internal-page > .tg-news-directory {
+  padding-block: clamp(48px, 6vw, 88px);
+}
+
 .race-registration-summary h2 {
   max-width: 100%;
   font-size: clamp(2.45rem, 3.3vw, 3.35rem);

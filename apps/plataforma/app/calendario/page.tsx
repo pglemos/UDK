@@ -6,7 +6,7 @@ import { EditorialEmpty, EditorialHeading } from "../../components/race/editoria
 import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
 import { localizeRaceText, PageHero, SearchField, StatusBadge } from "../../components/race/ui";
-import { getStages } from "../../lib/public-data";
+import { getNextUpcomingStage, getStageAction, getStages } from "../../lib/public-data";
 import { resolveVisualSource, stageVisual } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
@@ -33,15 +33,17 @@ export default async function CalendarPage({
         [stage.title, stage.track, stage.city].join(" ").toLocaleLowerCase("pt-BR").includes(query),
       )
     : stages;
+  const upcomingStage = getNextUpcomingStage(filtered);
 
   return (
     <RaceShell>
-      <main id="conteudo" className="udk-page tg-internal-page">
+      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
         <PageHero
           index="01"
           eyebrow="Temporada 2026"
           title="Calendário"
           description="Cinco encontros, diferentes traçados e uma temporada construída volta após volta."
+          compact
         />
 
         <section className="tg-internal-intro">
@@ -59,7 +61,7 @@ export default async function CalendarPage({
               <select name="formato" defaultValue={format} aria-label="Formato">
                 <option value="todos">Todos os formatos</option>
                 <option value="regular">Etapa regular</option>
-                <option value="endurance">Resistência</option>
+                <option value="endurance">Endurance</option>
               </select>
               <button type="submit" className="race-button race-button-primary">
                 Aplicar filtros
@@ -77,7 +79,9 @@ export default async function CalendarPage({
                   const imageSource = resolveVisualSource(stage.heroImageUrl, visual);
                   return (
                     <Reveal key={stage.id} delay={index * 45}>
-                      <article className={`tg-calendar-stage${index === 0 ? " is-current" : ""}`}>
+                      <article
+                        className={`tg-calendar-stage${stage.id === upcomingStage?.id ? " is-current" : ""}`}
+                      >
                         <div className="tg-calendar-stage-index">
                           <span>{String(index + 1).padStart(2, "0")}</span>
                           <i />
@@ -118,8 +122,12 @@ export default async function CalendarPage({
                             }}
                           />
                         </div>
-                        <Link href="/inscricao" className="tg-arrow-link">
-                          Entrar no grid <ArrowRight aria-hidden="true" />
+                        <Link
+                          href={getStageAction(stage).href}
+                          className="tg-arrow-link"
+                          aria-label={`${getStageAction(stage).label}: ${stage.title}`}
+                        >
+                          {getStageAction(stage).label} <ArrowRight aria-hidden="true" />
                         </Link>
                       </article>
                     </Reveal>

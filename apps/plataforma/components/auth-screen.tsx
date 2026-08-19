@@ -173,7 +173,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
         <div className="race-auth-copy">
           <span className="race-kicker">Plataforma oficial • 2026</span>
           <h1>
-            Sua temporada
+            Sua temporada{" "}
             <em>começa aqui.</em>
           </h1>
           <p>

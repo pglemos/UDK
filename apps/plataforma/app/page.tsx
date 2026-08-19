@@ -21,7 +21,7 @@ import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
 import { CountUp, RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
-import { getPublicData } from "../lib/public-data";
+import { getNextUpcomingStage, getPublicData, getStageAction } from "../lib/public-data";
 import { newsVisual, premiumVisuals } from "../lib/visual-assets";
 
 export const metadata: Metadata = {
@@ -36,7 +36,8 @@ export default async function HomePage() {
     getPublicContentBundle(),
   ]);
 
-  const nextStage = stages[0] ?? null;
+  const nextStage = getNextUpcomingStage(stages);
+  const nextStageAction = getStageAction(nextStage);
   const topDrivers = [...drivers]
     .sort((a, b) => b.points - a.points || (a.position ?? 999) - (b.position ?? 999))
     .slice(0, 5);
@@ -46,12 +47,12 @@ export default async function HomePage() {
   const secondaryNews = news.slice(1, 4);
   const categories = new Set(drivers.map((driver) => driver.category)).size;
   const totalPodiums = drivers.reduce((sum, driver) => sum + driver.podiums, 0);
-  const registrationOpen = nextStage?.status.includes("registration") ?? false;
+  const registrationOpen = nextStageAction.href === "/inscricao";
   const featuredNewsVisual = newsVisual(0);
 
   return (
     <RaceShell>
-      <main id="conteudo" className="cinema-home">
+      <main id="conteudo" tabIndex={-1} className="cinema-home">
         <section className="cinema-home-hero" data-design="twice-grind-cinematic">
           <HomeHeroMediaLayer />
 
@@ -59,7 +60,7 @@ export default async function HomePage() {
             <Reveal className="cinema-home-hero-copy">
               <span>Temporada 2026 • Betim, Minas Gerais</span>
               <h1>
-                <span>A pista</span>
+                <span>A pista</span>{" "}
                 <em>não espera.</em>
               </h1>
               <p>
@@ -79,7 +80,13 @@ export default async function HomePage() {
             <Reveal className="cinema-next-stage" delay={120}>
               <div className="cinema-next-stage-head">
                 <span>Próxima etapa</span>
-                <b>{registrationOpen ? "Inscrições abertas" : "Temporada 2026"}</b>
+                <b>
+                  {registrationOpen
+                    ? "Inscrições abertas"
+                    : nextStage
+                      ? "Próxima etapa"
+                      : "Calendário atualizado"}
+                </b>
               </div>
               <time>{nextStage?.date ?? "Data a definir"}</time>
               <h2>{nextStage?.title ?? "Calendário oficial"}</h2>
@@ -99,8 +106,8 @@ export default async function HomePage() {
                   <b>Em breve</b>
                 )}
               </div>
-              <Link href="/calendario" className="cinema-arrow-link">
-                Detalhes da etapa <ArrowRight aria-hidden="true" />
+              <Link href={nextStageAction.href} className="cinema-arrow-link">
+                {nextStageAction.label} <ArrowRight aria-hidden="true" />
               </Link>
             </Reveal>
           </div>

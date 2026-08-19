@@ -104,12 +104,12 @@ const statusLabels: Record<string, string> = {
 
 const formatLabels: Record<string, string> = {
   regular: "Etapa regular",
-  endurance: "Resistência",
+  endurance: "Endurance",
   special: "Etapa especial",
 };
 
 export function localizeRaceText(value: string | null | undefined): string {
-  return (value ?? "").replace(/\bendurance\b/gi, "Resistência");
+  return value ?? "";
 }
 
 export function StatusBadge({ status }: { status: string }) {
