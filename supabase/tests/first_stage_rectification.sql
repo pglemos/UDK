@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(18);
+select plan(20);
 
 select has_column(
   'public', 'points_rules', 'best_pit_points',
@@ -178,6 +178,36 @@ select is(
 
 select is(
   (
+    select entry.position
+    from public.result_entries entry
+    join public.results result on result.id = entry.result_id
+    join public.drivers driver on driver.id = entry.driver_id
+    where result.version = 2 and result.status = 'rectified'
+      and driver.slug = 'lucca-dambros'
+      and entry.deleted_at is null
+    limit 1
+  ),
+  13,
+  'Lucca moves to P13 after Braulio receives the five-second black/white penalty'
+);
+
+select is(
+  (
+    select entry.points::integer
+    from public.result_entries entry
+    join public.results result on result.id = entry.result_id
+    join public.drivers driver on driver.id = entry.driver_id
+    where result.version = 2 and result.status = 'rectified'
+      and driver.slug = 'lucca-dambros'
+      and entry.deleted_at is null
+    limit 1
+  ),
+  130,
+  'Lucca receives P13 base points after the corrected finishing order'
+);
+
+select is(
+  (
     select entry.points::integer
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
@@ -187,8 +217,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  120,
-  'Braulio Bonoto has the 10-point black/white sporting deduction'
+  119,
+  'Braulio is P14 after +5 seconds and then receives the 10-point championship deduction'
 );
 
 select is(
