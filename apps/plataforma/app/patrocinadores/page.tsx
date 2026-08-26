@@ -50,7 +50,7 @@ export default async function SponsorsPage() {
                 {sponsors.map((sponsor, index) => {
                   const content = (
                     <>
-                      <div className="race-sponsor-logo">
+                      <div className="race-sponsor-logo" data-sponsor-slug={sponsor.slug}>
                         {sponsor.logoUrl ? (
                           <Image
                             src={sponsor.logoUrl}
@@ -121,7 +121,7 @@ export default async function SponsorsPage() {
                   rel="noreferrer"
                   aria-label={`Abrir Instagram de ${federation.name}`}
                 >
-                  <div className="race-federation-logo">
+                  <div className="race-federation-logo" data-sponsor-slug={federation.slug}>
                     <Image
                       src={federation.logoUrl}
                       alt={`Logo ${federation.name}`}

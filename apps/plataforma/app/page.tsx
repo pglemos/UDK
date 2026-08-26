@@ -407,7 +407,7 @@ export default async function HomePage() {
                 {sponsors.map((sponsor) => {
                   const content = (
                     <>
-                      <span className="cinema-sponsor-mark">
+                      <span className="cinema-sponsor-mark" data-sponsor-slug={sponsor.slug}>
                         <Image
                           src={sponsor.logoUrl}
                           alt={`Logo ${sponsor.name}`}
@@ -454,7 +454,7 @@ export default async function HomePage() {
                     rel="noreferrer"
                     aria-label={`Abrir Instagram de ${federation.name}`}
                   >
-                    <span className="cinema-federation-mark">
+                    <span className="cinema-federation-mark" data-sponsor-slug={federation.slug}>
                       <Image
                         src={federation.logoUrl}
                         alt={`Logo ${federation.name}`}

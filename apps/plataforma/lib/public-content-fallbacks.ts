@@ -62,7 +62,7 @@ export const fallbackSponsors: PublicSponsor[] = [
   {
     name: "Firepit Brasil",
     slug: "firepit-brasil",
-    logoUrl: "/sponsors/firepit-brasil.webp",
+    logoUrl: "/sponsors/firepit-brasil.svg",
     websiteUrl: "https://www.instagram.com/firepitbrasil/",
     tier: "Patrocinador oficial",
   },
@@ -90,14 +90,14 @@ export const fallbackSponsors: PublicSponsor[] = [
   {
     name: "Vintage São Francisco",
     slug: "vintage-sao-francisco",
-    logoUrl: "/sponsors/vintage-sao-francisco.webp",
+    logoUrl: "/sponsors/vintage-sao-francisco.svg",
     websiteUrl: "https://www.instagram.com/vinagreorganico/",
     tier: "Patrocinador oficial",
   },
   {
     name: "Velho Oeste Clube de Tiro",
     slug: "velho-oeste",
-    logoUrl: "/sponsors/velho-oeste.svg",
+    logoUrl: "/sponsors/velho-oeste.png",
     websiteUrl: "",
     tier: "Patrocinador oficial",
   },

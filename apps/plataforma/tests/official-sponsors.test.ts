@@ -37,10 +37,28 @@ describe("official sponsor roster", () => {
     expect(existsSync(publicFile("akamig.svg"))).toBe(true);
   });
 
+  it("uses transparent presentation assets instead of embedded logo backgrounds", () => {
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "firepit-brasil")?.logoUrl).toBe(
+      "/sponsors/firepit-brasil.svg",
+    );
+    expect(
+      fallbackSponsors.find((sponsor) => sponsor.slug === "vintage-sao-francisco")?.logoUrl,
+    ).toBe("/sponsors/vintage-sao-francisco.svg");
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "velho-oeste")?.logoUrl).toBe(
+      "/sponsors/velho-oeste.png",
+    );
+
+    for (const asset of ["grupo-do-carro.svg", "vintage-sao-francisco.svg", "akamig.svg"]) {
+      const source = sourceFile(`../public/sponsors/${asset}`);
+      expect(source).not.toMatch(/<rect[^>]+fill=["']#(?:fff|ffffff|353535)["']/i);
+    }
+    expect(existsSync(publicFile("velho-oeste.png"))).toBe(true);
+  });
+
   it("uses local logo assets and only approved Instagram destinations", () => {
     for (const sponsor of fallbackSponsors) {
       const assetName = sponsor.logoUrl.replace("/sponsors/", "");
-      expect(assetName).toMatch(new RegExp(`^${sponsor.slug}\\.(svg|webp)$`));
+      expect(assetName).toMatch(new RegExp(`^${sponsor.slug}\\.(svg|webp|png)$`));
       expect(
         sponsor.websiteUrl === "" ||
           /^https:\/\/www\.instagram\.com\/[A-Za-z0-9_.]+\/$/.test(sponsor.websiteUrl),
@@ -96,6 +114,9 @@ describe("official sponsor roster", () => {
     const correctionMigration = sourceFile(
       "../../../supabase/migrations/202608250001_official_sponsor_roster_correction.sql",
     );
+    const transparentAssetsMigration = sourceFile(
+      "../../../supabase/migrations/202608250002_transparent_sponsor_assets.sql",
+    );
     const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
     expect(migration).toContain("pvf-transportes");
@@ -110,6 +131,9 @@ describe("official sponsor roster", () => {
     expect(correctionMigration).toContain("guicosmos-tv");
     expect(correctionMigration).toContain("akamig");
     expect(correctionMigration).toContain("status = 'archived'");
+    expect(transparentAssetsMigration).toContain("/sponsors/firepit-brasil.svg");
+    expect(transparentAssetsMigration).toContain("/sponsors/vintage-sao-francisco.svg");
+    expect(transparentAssetsMigration).toContain("/sponsors/velho-oeste.png");
     expect(databaseTest).toContain("the official roster has exactly seven active sponsors");
     expect(databaseTest).toContain("the active sponsor roster contains no duplicate slugs");
     for (const slug of officialSlugs) {

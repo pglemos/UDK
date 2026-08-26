@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 190" role="img" aria-labelledby="title desc">
   <title id="title">Grupo do Carro</title>
   <desc id="desc">Wordmark Grupo do Carro</desc>
-  <rect width="720" height="190" rx="18" fill="#fff"/>
-  <text x="360" y="78" fill="#111315" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" letter-spacing="5" text-anchor="middle">GRUPO</text>
+  <text x="360" y="78" fill="#f5fbff" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" letter-spacing="5" text-anchor="middle">GRUPO</text>
   <text x="360" y="140" fill="#08b9d3" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="900" letter-spacing="2" text-anchor="middle">DO CARRO</text>
 </svg>

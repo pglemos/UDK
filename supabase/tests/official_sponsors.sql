@@ -1,7 +1,7 @@
 create extension if not exists pgtap;
 
 begin;
-select plan(8);
+select plan(9);
 
 select is(
   (
@@ -80,10 +80,28 @@ select is(
     where championship.slug = 'udk'
       and sponsor.status = 'active'
       and sponsor.deleted_at is null
-      and sponsor.logo_url ~ '^/sponsors/[a-z0-9-]+[.](svg|webp)$'
+      and sponsor.logo_url ~ '^/sponsors/[a-z0-9-]+[.](svg|webp|png)$'
   ),
   7::bigint,
   'all official sponsors use local logo assets'
+);
+
+select is(
+  (
+    select count(*)
+    from public.sponsors sponsor
+    join public.championships championship on championship.id = sponsor.championship_id
+    where championship.slug = 'udk'
+      and sponsor.status = 'active'
+      and sponsor.deleted_at is null
+      and sponsor.logo_url in (
+        '/sponsors/firepit-brasil.svg',
+        '/sponsors/vintage-sao-francisco.svg',
+        '/sponsors/velho-oeste.png'
+      )
+  ),
+  3::bigint,
+  'opaque sponsor exports are replaced by transparent assets'
 );
 
 select is(

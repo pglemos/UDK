@@ -1436,6 +1436,14 @@
   line-height: 1.7;
 }
 
+@media (max-width: 460px) {
+  .race-page-hero-sponsors h1 {
+    max-width: 100%;
+    font-size: clamp(2.3rem, 10.4vw, 3.35rem);
+    letter-spacing: -0.065em;
+  }
+}
+
 .race-sponsor-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1463,17 +1471,30 @@
 }
 
 .race-sponsor-logo {
+  position: relative;
   display: grid;
   place-items: center;
+  overflow: hidden;
   min-height: 190px;
   margin-bottom: auto;
-  background: rgba(17, 19, 21, 0.06);
+  border: 1px solid var(--cinema-sponsor-line);
+  border-radius: 14px;
+  background: var(--cinema-sponsor-stage);
+  box-shadow: inset 0 0 0 1px rgba(4, 20, 27, 0.28);
 }
 
 .race-sponsor-logo img {
   max-width: 72%;
   max-height: 120px;
   object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.32));
+}
+
+.race-sponsor-logo[data-sponsor-slug="vintage-sao-francisco"] {
+  --cinema-sponsor-line: rgba(8, 55, 66, 0.36);
+  background:
+    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.36), transparent 35%),
+    linear-gradient(135deg, #8edce4 0%, #41aabd 48%, #197b96 100%);
 }
 
 .race-sponsor-logo strong {
@@ -1491,12 +1512,22 @@
   text-transform: uppercase;
 }
 
+.race-sponsor-card:hover > span {
+  color: var(--cinema-cyan);
+}
+
 .race-sponsor-card h2 {
   margin: 10px 0 0;
   font-family: var(--cinema-display);
   font-size: 2.4rem;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.race-sponsor-card small {
+  margin-top: 12px;
+  color: currentColor;
+  opacity: 0.66;
 }
 
 .race-federations {
@@ -1531,17 +1562,23 @@
 }
 
 .race-federation-logo {
+  position: relative;
   display: grid;
   min-height: 150px;
   margin-bottom: auto;
   place-items: center;
-  background: rgba(17, 19, 21, 0.06);
+  overflow: hidden;
+  border: 1px solid var(--cinema-sponsor-line);
+  border-radius: 14px;
+  background: var(--cinema-sponsor-stage);
+  box-shadow: inset 0 0 0 1px rgba(4, 20, 27, 0.28);
 }
 
 .race-federation-logo img {
   max-width: 82%;
   max-height: 100px;
   object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.32));
 }
 
 .race-federation-card > span {
@@ -1551,6 +1588,10 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.race-federation-card:hover > span {
+  color: var(--cinema-cyan);
 }
 
 .race-federation-card h2 {
