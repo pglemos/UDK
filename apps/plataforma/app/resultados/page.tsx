@@ -10,8 +10,10 @@ import {
   getResultsPage,
   parsePositiveInt,
 } from "../../lib/public-data";
+import type { PublicResultEntry } from "../../lib/public-data";
+import { formatShortDateLabel } from "../../lib/datetime";
 import { officialResultPdfForCategory } from "../../lib/official-result-links";
-import { getSportingBreakdowns } from "../../lib/sporting-breakdown";
+import { getSportingBreakdowns, type SportingBreakdown } from "../../lib/sporting-breakdown";
 
 export const metadata: Metadata = {
   title: "Resultados",
@@ -25,6 +27,20 @@ function param(value: string | string[] | undefined, fallback = ""): string {
 
 function isNotClassified(status: string, position: number): boolean {
   return status.toLowerCase() === "nc" || position >= 999;
+}
+
+function resultAdjustments(
+  entry: PublicResultEntry,
+  sporting: SportingBreakdown | undefined,
+): string[] {
+  return [
+    entry.pole ? "Pole +1" : null,
+    entry.fastestLap ? "MV +1" : null,
+    sporting?.bestPit ? "Pit +10" : null,
+    entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : null,
+    sporting?.penaltyPoints ? `-${sporting.penaltyPoints} pts` : null,
+    sporting?.timingAdjustmentLaps ? `+${sporting.timingAdjustmentLaps} volta` : null,
+  ].filter((value): value is string => Boolean(value));
 }
 
 export default async function ResultsPage({
@@ -65,8 +81,8 @@ export default async function ResultsPage({
           <div className="race-container">
             <EditorialHeading
               index="03"
-              title="O resultado termina a corrida. A leitura começa depois."
-              description="A classificação publicada já considera a decisão desportiva homologada: posição final, bônus de pole e melhor volta, Melhor Parada do Endurance, penalidades e retificações de cronometragem. O dado bruto do LapTime permanece preservado para auditoria."
+              title="Resultado homologado."
+              description="Posições e ajustes oficiais da 1ª etapa, separados por categoria."
             />
 
             <div className="udk-category-tabs tg-category-tabs">
@@ -148,8 +164,13 @@ export default async function ResultsPage({
               <>
                 <div className="tg-result-selector">
                   <div>
-                    <span>Resultado selecionado</span>
+                    <span>Resultado da etapa</span>
                     <h2>{selected?.category ?? "Aguardando publicação"}</h2>
+                    {selected ? (
+                      <p className="tg-result-meta">
+                        1ª etapa · {selected.stageTitle} · {formatShortDateLabel(selected.startsAt)}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="tg-result-selector-actions">
                     {selected ? (
@@ -166,7 +187,7 @@ export default async function ResultsPage({
                 </div>
 
                 {selected && selectedEntries.length >= 3 ? (
-                  <>
+                  <div className="tg-results-content">
                     <section
                       className="tg-results-podium"
                       aria-label={`Pódio ${selected.category}`}
@@ -186,7 +207,7 @@ export default async function ResultsPage({
                       ))}
                     </section>
 
-                    <div className="tg-standing-table-wrap">
+                    <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
                       <table className="udk-data-table tg-standing-table">
                         <caption className="sr-only">Resultado oficial por categoria</caption>
                         <thead>
@@ -204,16 +225,7 @@ export default async function ResultsPage({
                           {selectedEntries.map((entry) => {
                             const notClassified = isNotClassified(entry.status, entry.position);
                             const sporting = selectedSporting.get(entry.id);
-                            const adjustments = [
-                              entry.pole ? "Pole +1" : null,
-                              entry.fastestLap ? "MV +1" : null,
-                              sporting?.bestPit ? "Pit +10" : null,
-                              entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : null,
-                              sporting?.penaltyPoints ? `-${sporting.penaltyPoints} pts` : null,
-                              sporting?.timingAdjustmentLaps
-                                ? `+${sporting.timingAdjustmentLaps} volta`
-                                : null,
-                            ].filter(Boolean);
+                            const adjustments = resultAdjustments(entry, sporting);
 
                             return (
                               <tr key={entry.id}>
@@ -224,11 +236,15 @@ export default async function ResultsPage({
                                 </td>
                                 <td data-label="Piloto">
                                   <strong>{entry.driverName}</strong>
-                                  {sporting?.sportingNote ? <small>{sporting.sportingNote}</small> : null}
+                                  {sporting?.sportingNote ? (
+                                    <small>{sporting.sportingNote}</small>
+                                  ) : null}
                                 </td>
                                 <td data-label="Voltas">{entry.laps}</td>
                                 <td data-label="Melhor volta">{formatLapTime(entry.bestLapMs)}</td>
-                                <td data-label="Ajustes">{adjustments.length ? adjustments.join(" • ") : "—"}</td>
+                                <td data-label="Ajustes">
+                                  {adjustments.length ? adjustments.join(" • ") : "—"}
+                                </td>
                                 <td data-label="Pontos finais">
                                   <strong className="udk-points">
                                     {notClassified && entry.points === 0 ? "—" : entry.points}
@@ -249,7 +265,61 @@ export default async function ResultsPage({
                         </tbody>
                       </table>
                     </div>
-                  </>
+
+                    <ol
+                      className="tg-mobile-result-list"
+                      aria-label={`Resultado resumido ${selected.category}`}
+                    >
+                      {selectedEntries.map((entry) => {
+                        const notClassified = isNotClassified(entry.status, entry.position);
+                        const sporting = selectedSporting.get(entry.id);
+                        const adjustments = resultAdjustments(entry, sporting);
+                        return (
+                          <li className="tg-mobile-result-item" key={entry.id}>
+                            <div className="tg-mobile-result-summary">
+                              <span className="udk-rank">
+                                {notClassified ? "NC" : entry.position}
+                              </span>
+                              <div className="tg-mobile-result-driver">
+                                <strong>{entry.driverName}</strong>
+                                <span>
+                                  {entry.laps} voltas · {formatLapTime(entry.bestLapMs)}
+                                </span>
+                              </div>
+                              <strong className="udk-points">
+                                {notClassified && entry.points === 0 ? "—" : entry.points}
+                                <small>pts</small>
+                              </strong>
+                            </div>
+                            <details>
+                              <summary>Ver detalhes</summary>
+                              <dl className="tg-mobile-detail-grid">
+                                <div>
+                                  <dt>Ajustes</dt>
+                                  <dd>
+                                    {adjustments.length ? adjustments.join(" · ") : "Sem ajustes"}
+                                  </dd>
+                                </div>
+                                {sporting?.sportingNote ? (
+                                  <div className="tg-mobile-detail-wide">
+                                    <dt>Nota oficial</dt>
+                                    <dd>{sporting.sportingNote}</dd>
+                                  </div>
+                                ) : null}
+                              </dl>
+                              <Link
+                                className="tg-table-link"
+                                href={`/pilotos/${entry.driverSlug}#volta-a-volta`}
+                                aria-label={`Ver volta a volta de ${entry.driverName}`}
+                              >
+                                Ver volta a volta <ArrowRight aria-hidden="true" />
+                              </Link>
+                            </details>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
                 ) : (
                   <EditorialEmpty
                     index="03"

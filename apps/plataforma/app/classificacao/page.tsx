@@ -56,9 +56,70 @@ export default async function StandingsPage({
           <div className="race-container">
             <EditorialHeading
               index="02"
-              title="O topo é consequência, não promessa."
-              description="Classificação oficial da temporada, organizada por categoria e atualizada a partir da base do campeonato."
+              title="Ranking da temporada."
+              description="Pontuação oficial por categoria, atualizada após cada etapa."
             />
+
+            <div className="tg-public-data-controls">
+              <div
+                className="udk-category-tabs tg-category-tabs"
+                role="navigation"
+                aria-label="Categorias"
+              >
+                <Link
+                  className={category === "geral" ? "is-active" : ""}
+                  href="/classificacao?categoria=geral"
+                >
+                  Geral
+                </Link>
+                {categories.map((item) => (
+                  <Link
+                    className={category === item.slug ? "is-active" : ""}
+                    href={`/classificacao?categoria=${item.slug}`}
+                    key={item.slug}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+
+              <div
+                className="tg-official-pdf-links"
+                role="group"
+                aria-label="PDFs oficiais da primeira etapa"
+              >
+                {category === "insanos" || category === "geral" ? (
+                  <a
+                    className="race-button race-button-outline is-light"
+                    href={officialResultPdf.insanos}
+                    download
+                  >
+                    PDF Ultra Insanos <Download aria-hidden="true" />
+                  </a>
+                ) : null}
+                {category === "rapidos" || category === "geral" ? (
+                  <a
+                    className="race-button race-button-outline is-light"
+                    href={officialResultPdf.rapidos}
+                    download
+                  >
+                    PDF Ultras Rápidos <Download aria-hidden="true" />
+                  </a>
+                ) : null}
+              </div>
+
+              <form
+                className="udk-toolbar tg-toolbar is-compact"
+                action="/classificacao"
+                aria-label="Busca na classificação"
+              >
+                <SearchField defaultValue={query} placeholder="Buscar piloto" />
+                <input type="hidden" name="categoria" value={category} />
+                <button type="submit" className="race-button race-button-primary">
+                  Buscar piloto
+                </button>
+              </form>
+            </div>
 
             <aside className="udk-scoring-rule" aria-label="Regra de descartes da temporada">
               <span>Regra 2026</span>
@@ -69,63 +130,8 @@ export default async function StandingsPage({
               </p>
             </aside>
 
-            <div
-              className="udk-category-tabs tg-category-tabs"
-              role="navigation"
-              aria-label="Categorias"
-            >
-              <Link
-                className={category === "geral" ? "is-active" : ""}
-                href="/classificacao?categoria=geral"
-              >
-                Geral
-              </Link>
-              {categories.map((item) => (
-                <Link
-                  className={category === item.slug ? "is-active" : ""}
-                  href={`/classificacao?categoria=${item.slug}`}
-                  key={item.slug}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="tg-official-pdf-links" aria-label="PDFs oficiais da primeira etapa">
-              {category === "insanos" || category === "geral" ? (
-                <a
-                  className="race-button race-button-outline is-light"
-                  href={officialResultPdf.insanos}
-                  download
-                >
-                  PDF Ultra Insanos <Download aria-hidden="true" />
-                </a>
-              ) : null}
-              {category === "rapidos" || category === "geral" ? (
-                <a
-                  className="race-button race-button-outline is-light"
-                  href={officialResultPdf.rapidos}
-                  download
-                >
-                  PDF Ultras Rápidos <Download aria-hidden="true" />
-                </a>
-              ) : null}
-            </div>
-
-            <form
-              className="udk-toolbar tg-toolbar is-compact"
-              action="/classificacao"
-              aria-label="Busca na classificação"
-            >
-              <SearchField defaultValue={query} placeholder="Buscar piloto" />
-              <input type="hidden" name="categoria" value={category} />
-              <button type="submit" className="race-button race-button-primary">
-                Aplicar filtros
-              </button>
-            </form>
-
             {standings.items.length ? (
-              <>
+              <div className="tg-standings-content">
                 {leaders.items.length ? (
                   <section className="tg-standing-podium" aria-label="Pódio da classificação">
                     {leaders.items.slice(0, 3).map((driver, index) => {
@@ -170,7 +176,7 @@ export default async function StandingsPage({
                   </section>
                 ) : null}
 
-                <div className="tg-standing-table-wrap">
+                <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
                   <table className="udk-data-table tg-standing-table">
                     <caption className="sr-only">
                       Classificação UDK 2026 com pontuação bruta, descartes e pontos válidos
@@ -241,7 +247,71 @@ export default async function StandingsPage({
                     </tbody>
                   </table>
                 </div>
-              </>
+
+                <ol className="tg-mobile-standing-list" aria-label="Classificação resumida">
+                  {standings.items.map((driver, index) => {
+                    const absolutePosition =
+                      (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
+                    const officialPosition = driver.position ?? absolutePosition;
+                    const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
+                    return (
+                      <li className="tg-mobile-standing-item" key={driver.slug}>
+                        <div className="tg-mobile-standing-summary">
+                          <span className={`udk-rank rank-${officialPosition}`}>
+                            {officialPosition}
+                          </span>
+                          <div className="tg-mobile-standing-driver">
+                            <Link href={`/pilotos/${driver.slug}`}>
+                              <strong>{driver.name}</strong>
+                            </Link>
+                            <span>{driver.category}</span>
+                          </div>
+                          <strong className="udk-points">
+                            {formatPoints(driver.points)}
+                            <small>válidos</small>
+                          </strong>
+                        </div>
+                        <details>
+                          <summary>Ver detalhes</summary>
+                          <dl className="tg-mobile-detail-grid">
+                            <div>
+                              <dt>Diferença</dt>
+                              <dd>{gap === 0 ? "Líder" : `-${formatPoints(gap)} pts`}</dd>
+                            </div>
+                            <div>
+                              <dt>Vitórias</dt>
+                              <dd>{driver.wins}</dd>
+                            </div>
+                            <div>
+                              <dt>Pódios</dt>
+                              <dd>{driver.podiums}</dd>
+                            </div>
+                            <div>
+                              <dt>Brutos</dt>
+                              <dd>{formatPoints(driver.grossPoints)}</dd>
+                            </div>
+                            <div>
+                              <dt>Descartes</dt>
+                              <dd>
+                                {driver.discardedPoints > 0
+                                  ? `-${formatPoints(driver.discardedPoints)}`
+                                  : "—"}
+                              </dd>
+                            </div>
+                          </dl>
+                          <Link
+                            className="tg-table-link"
+                            href={`/pilotos/${driver.slug}`}
+                            aria-label={`Abrir perfil de ${driver.name}`}
+                          >
+                            Abrir perfil <ChevronRight aria-hidden="true" />
+                          </Link>
+                        </details>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
             ) : (
               <EditorialEmpty
                 index="02"
