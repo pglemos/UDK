@@ -277,6 +277,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .cinema-federation-list {
+    align-items: flex-start;
+  }
+
+  .race-federation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .tg-calendar-stage {
     grid-template-columns: 56px minmax(150px, 0.42fr) minmax(0, 1fr);
     grid-template-rows: auto minmax(320px, auto) auto;
@@ -879,6 +887,14 @@
   }
 
   .race-sponsor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cinema-federation-item {
+    width: 100%;
+  }
+
+  .race-federation-grid {
     grid-template-columns: 1fr;
   }
 

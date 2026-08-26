@@ -1,14 +1,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { fallbackSponsors } from "../lib/public-content-fallbacks";
+import { fallbackFederations, fallbackSponsors } from "../lib/public-content-fallbacks";
 import { mergeOfficialSponsors } from "../lib/public-content";
 
 const officialSlugs = [
-  "akamig",
   "firepit-brasil",
   "grupo-emtel",
-  "guicosmos-tv",
+  "grupo-do-carro",
   "transfermix",
   "velho-oeste",
   "veste-custom-wear",
@@ -23,9 +22,19 @@ const sourceFile = (path: string) =>
 
 describe("official sponsor roster", () => {
   it("publishes the exact approved roster without PVF", () => {
-    expect(fallbackSponsors.map((sponsor) => sponsor.slug).sort()).toEqual(officialSlugs);
+    expect(fallbackSponsors.map((sponsor) => sponsor.slug).sort()).toEqual(
+      [...officialSlugs].sort(),
+    );
     expect(fallbackSponsors.some((sponsor) => sponsor.slug.includes("pvf"))).toBe(false);
     expect(fallbackSponsors.every((sponsor) => sponsor.tier === "Patrocinador oficial")).toBe(true);
+    expect(fallbackSponsors.some((sponsor) => sponsor.slug === "akamig")).toBe(false);
+    expect(fallbackSponsors.some((sponsor) => sponsor.slug === "guicosmos-tv")).toBe(false);
+  });
+
+  it("keeps federation entities outside the commercial sponsor roster", () => {
+    expect(fallbackFederations.map((federation) => federation.slug)).toEqual(["akamig"]);
+    expect(fallbackFederations[0]?.label).toBe("Federação parceira");
+    expect(existsSync(publicFile("akamig.svg"))).toBe(true);
   });
 
   it("uses local logo assets and only approved Instagram destinations", () => {
@@ -73,14 +82,19 @@ describe("official sponsor roster", () => {
     expect(page).toContain('loading="lazy"');
     expect(page).toContain('target="_blank"');
     expect(page).toContain('rel="noreferrer"');
+    expect(page).toContain("fallbackFederations");
     expect(home).toContain("cinema-sponsor-list");
     expect(home).toContain("sponsor.logoUrl");
+    expect(home).toContain("cinema-federation-list");
   });
 
   it("ships an idempotent migration and deterministic pgTAP roster coverage", () => {
     const migration = sourceFile("../../../supabase/migrations/202608060001_official_sponsors.sql");
     const followupMigration = sourceFile(
       "../../../supabase/migrations/20260811220000_official_sponsor_assets.sql",
+    );
+    const correctionMigration = sourceFile(
+      "../../../supabase/migrations/202608250001_official_sponsor_roster_correction.sql",
     );
     const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
@@ -91,10 +105,15 @@ describe("official sponsor roster", () => {
     expect(databaseTest).not.toContain("\\ir");
     expect(followupMigration).toContain("velho-oeste");
     expect(followupMigration).toContain("/sponsors/velho-oeste.svg");
-    expect(databaseTest).toContain("the official roster has exactly eight active sponsors");
+    expect(correctionMigration).toContain("Grupo do Carro");
+    expect(correctionMigration).toContain("grupo-do-carro");
+    expect(correctionMigration).toContain("guicosmos-tv");
+    expect(correctionMigration).toContain("akamig");
+    expect(correctionMigration).toContain("status = 'archived'");
+    expect(databaseTest).toContain("the official roster has exactly seven active sponsors");
     expect(databaseTest).toContain("the active sponsor roster contains no duplicate slugs");
     for (const slug of officialSlugs) {
-      expect(followupMigration).toContain(slug);
+      expect(correctionMigration).toContain(slug);
       expect(databaseTest).toContain(slug);
     }
   });

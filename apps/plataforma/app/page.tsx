@@ -21,6 +21,7 @@ import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
 import { CountUp, RaceCountdown, Reveal } from "../components/race/motion";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
+import { fallbackFederations } from "../lib/public-content-fallbacks";
 import { getNextUpcomingStage, getPublicData, getStageAction } from "../lib/public-data";
 import { newsVisual, premiumVisuals } from "../lib/visual-assets";
 
@@ -60,8 +61,7 @@ export default async function HomePage() {
             <Reveal className="cinema-home-hero-copy">
               <span>Temporada 2026 • Betim, Minas Gerais</span>
               <h1>
-                <span>A pista</span>{" "}
-                <em>não espera.</em>
+                <span>A pista</span> <em>não espera.</em>
               </h1>
               <p>
                 Um campeonato construído por quem entende que velocidade sem evolução é apenas
@@ -443,6 +443,35 @@ export default async function HomePage() {
                 As parcerias oficiais serão exibidas assim que forem publicadas pela organização.
               </p>
             )}
+            {fallbackFederations.length ? (
+              <div className="cinema-federation-list" aria-label="Federações parceiras">
+                {fallbackFederations.map((federation) => (
+                  <a
+                    key={federation.slug}
+                    className="cinema-federation-item"
+                    href={federation.websiteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Abrir Instagram de ${federation.name}`}
+                  >
+                    <span className="cinema-federation-mark">
+                      <Image
+                        src={federation.logoUrl}
+                        alt={`Logo ${federation.name}`}
+                        width={160}
+                        height={54}
+                        sizes="160px"
+                      />
+                    </span>
+                    <span className="cinema-federation-copy">
+                      <small>{federation.label}</small>
+                      <strong>{federation.name}</strong>
+                    </span>
+                    <ArrowRight aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
 

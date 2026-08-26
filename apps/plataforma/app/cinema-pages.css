@@ -1498,3 +1498,71 @@
   font-weight: 800;
   text-transform: uppercase;
 }
+
+.race-federations {
+  padding-top: 0;
+}
+
+.race-federation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--cinema-line-dark);
+  border-left: 1px solid var(--cinema-line-dark);
+}
+
+.race-federation-card {
+  display: flex;
+  min-height: 310px;
+  flex-direction: column;
+  padding: 28px;
+  border-right: 1px solid var(--cinema-line-dark);
+  border-bottom: 1px solid var(--cinema-line-dark);
+  background: var(--cinema-paper);
+  color: var(--cinema-ink);
+  text-decoration: none;
+  transition:
+    background var(--cinema-fast) ease,
+    color var(--cinema-fast) ease;
+}
+
+.race-federation-card:hover {
+  background: var(--cinema-ink);
+  color: white;
+}
+
+.race-federation-logo {
+  display: grid;
+  min-height: 150px;
+  margin-bottom: auto;
+  place-items: center;
+  background: rgba(17, 19, 21, 0.06);
+}
+
+.race-federation-logo img {
+  max-width: 82%;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+.race-federation-card > span {
+  margin-top: 26px;
+  color: var(--cinema-cyan-deep);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.race-federation-card h2 {
+  margin: 10px 0 0;
+  font-family: var(--cinema-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.race-federation-card small {
+  margin-top: 12px;
+  color: currentColor;
+  opacity: 0.66;
+}

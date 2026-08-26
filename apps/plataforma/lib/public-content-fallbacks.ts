@@ -67,17 +67,10 @@ export const fallbackSponsors: PublicSponsor[] = [
     tier: "Patrocinador oficial",
   },
   {
-    name: "Guicosmos TV",
-    slug: "guicosmos-tv",
-    logoUrl: "/sponsors/guicosmos-tv.webp",
-    websiteUrl: "https://www.instagram.com/guicosmos_tv/",
-    tier: "Patrocinador oficial",
-  },
-  {
-    name: "AKAMIG",
-    slug: "akamig",
-    logoUrl: "/sponsors/akamig.webp",
-    websiteUrl: "https://www.instagram.com/akamigkart/",
+    name: "Grupo do Carro",
+    slug: "grupo-do-carro",
+    logoUrl: "/sponsors/grupo-do-carro.svg",
+    websiteUrl: "",
     tier: "Patrocinador oficial",
   },
   {
@@ -107,6 +100,16 @@ export const fallbackSponsors: PublicSponsor[] = [
     logoUrl: "/sponsors/velho-oeste.svg",
     websiteUrl: "",
     tier: "Patrocinador oficial",
+  },
+];
+
+export const fallbackFederations = [
+  {
+    name: "AKAMIG",
+    slug: "akamig",
+    logoUrl: "/sponsors/akamig.svg",
+    websiteUrl: "https://www.instagram.com/akamigkart/",
+    label: "Federação parceira",
   },
 ];
 
