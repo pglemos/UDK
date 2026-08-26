@@ -1447,27 +1447,28 @@
 .race-sponsor-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--cinema-line-dark);
-  border-left: 1px solid var(--cinema-line-dark);
+  gap: clamp(28px, 3vw, 52px);
 }
 
 .race-sponsor-card {
   display: flex;
   flex-direction: column;
-  min-height: 360px;
-  padding: 28px;
-  border-right: 1px solid var(--cinema-line-dark);
-  border-bottom: 1px solid var(--cinema-line-dark);
-  background: var(--cinema-paper);
-  color: var(--cinema-ink);
+  min-height: 0;
+  padding: 0 0 8px;
+  background: transparent;
+  color: var(--cinema-white);
   transition:
-    background var(--cinema-fast) ease,
+    transform var(--cinema-fast) ease,
     color var(--cinema-fast) ease;
 }
 
 .race-sponsor-card:hover {
-  background: var(--cinema-ink);
-  color: white;
+  background: transparent;
+  color: var(--cinema-white);
+}
+
+.race-sponsor-grid .race-sponsor-card:hover {
+  box-shadow: none;
 }
 
 .race-sponsor-logo {
@@ -1504,8 +1505,8 @@
 }
 
 .race-sponsor-card > span {
-  margin-top: 26px;
-  color: var(--cinema-cyan-deep);
+  margin-top: 20px;
+  color: var(--cinema-cyan-strong);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -1521,13 +1522,13 @@
   font-family: var(--cinema-display);
   font-size: 2.4rem;
   font-weight: 800;
+  color: var(--cinema-white);
   text-transform: uppercase;
 }
 
 .race-sponsor-card small {
   margin-top: 12px;
-  color: currentColor;
-  opacity: 0.66;
+  color: var(--cinema-muted);
 }
 
 .race-federations {
@@ -1537,34 +1538,31 @@
 .race-federation-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--cinema-line-dark);
-  border-left: 1px solid var(--cinema-line-dark);
+  gap: clamp(28px, 3vw, 52px);
 }
 
 .race-federation-card {
   display: flex;
-  min-height: 310px;
   flex-direction: column;
-  padding: 28px;
-  border-right: 1px solid var(--cinema-line-dark);
-  border-bottom: 1px solid var(--cinema-line-dark);
-  background: var(--cinema-paper);
-  color: var(--cinema-ink);
+  min-height: 0;
+  padding: 0 0 8px;
+  background: transparent;
+  color: var(--cinema-white);
   text-decoration: none;
   transition:
-    background var(--cinema-fast) ease,
+    transform var(--cinema-fast) ease,
     color var(--cinema-fast) ease;
 }
 
 .race-federation-card:hover {
-  background: var(--cinema-ink);
-  color: white;
+  background: transparent;
+  color: var(--cinema-white);
 }
 
 .race-federation-logo {
   position: relative;
   display: grid;
-  min-height: 150px;
+  min-height: 190px;
   margin-bottom: auto;
   place-items: center;
   overflow: hidden;
@@ -1582,8 +1580,8 @@
 }
 
 .race-federation-card > span {
-  margin-top: 26px;
-  color: var(--cinema-cyan-deep);
+  margin-top: 20px;
+  color: var(--cinema-cyan-strong);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -1599,11 +1597,11 @@
   font-family: var(--cinema-display);
   font-size: 2.4rem;
   font-weight: 800;
+  color: var(--cinema-white);
   text-transform: uppercase;
 }
 
 .race-federation-card small {
   margin-top: 12px;
-  color: currentColor;
-  opacity: 0.66;
+  color: var(--cinema-muted);
 }
