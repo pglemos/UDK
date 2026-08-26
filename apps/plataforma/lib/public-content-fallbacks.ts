@@ -15,7 +15,7 @@ export const fallbackNews: PublicContent[] = [
   },
   {
     slug: "categorias-rapidos-insanos",
-    title: "Ultras Rápidos e Ultras Insanos no mesmo grid",
+    title: "Ultra Rápidos e Ultra Insanos",
     summary:
       "Categorias distintas, uma única cultura de pista: evolução, respeito e disputa limpa.",
     content:
