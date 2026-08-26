@@ -187,7 +187,7 @@ export function RaceHeader() {
             Entrar
           </Link>
           <Link className="race-button race-button-primary race-header-cta" href="/inscricao">
-            Entrar no grid <ArrowUpRight aria-hidden="true" size={16} />
+            Começar inscrição <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
           <button
             ref={triggerRef}
@@ -278,7 +278,7 @@ export function RaceHeader() {
             Entrar
           </Link>
           <Link className="race-button race-button-primary" href="/inscricao">
-            Entrar no grid
+            Começar inscrição
           </Link>
         </div>
         <p>UDK 2026 • Kartódromo Internacional de Betim</p>

@@ -16,10 +16,12 @@ const footerNavigation = [
 
 export function RaceShell({
   children,
-  showMobileCta = true,
+  showMobileCta = false,
+  showFooterCallout = true,
 }: {
   children: React.ReactNode;
   showMobileCta?: boolean;
+  showFooterCallout?: boolean;
 }) {
   return (
     <div className={`race-site udk-site cinema-site${showMobileCta ? "" : " no-mobile-cta"}`}>
@@ -31,15 +33,17 @@ export function RaceShell({
       {children}
 
       <footer className="udk-footer cinema-footer">
-        <div className="cinema-footer-callout">
-          <div className="race-container">
-            <span>Temporada 2026</span>
-            <h2>O próximo capítulo pode começar com o seu nome.</h2>
-            <Link className="race-button race-button-primary" href="/inscricao">
-              Começar inscrição <ArrowUpRight aria-hidden="true" />
-            </Link>
+        {showFooterCallout ? (
+          <div className="cinema-footer-callout">
+            <div className="race-container">
+              <span>Temporada 2026</span>
+              <h2>O próximo capítulo pode começar com o seu nome.</h2>
+              <Link className="race-button race-button-primary" href="/inscricao">
+                Começar inscrição <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="race-container udk-footer-main">
           <div className="udk-footer-brand">
@@ -90,7 +94,7 @@ export function RaceShell({
       {showMobileCta ? (
         <div className="udk-mobile-cta">
           <Link href="/inscricao">
-            Entrar no grid <ArrowUpRight aria-hidden="true" size={16} />
+            Começar inscrição <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
           <Link href="/login">Entrar</Link>
         </div>

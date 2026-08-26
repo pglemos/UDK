@@ -42,8 +42,8 @@ export default async function HomePage() {
   const topDrivers = [...drivers]
     .sort((a, b) => b.points - a.points || (a.position ?? 999) - (b.position ?? 999))
     .slice(0, 5);
-  const stagePreview = stages.slice(0, 5);
-  const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 5);
+  const stagePreview = stages.slice(0, 3);
+  const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 4);
   const featuredNews = news[0] ?? null;
   const secondaryNews = news.slice(1, 4);
   const categories = new Set(drivers.map((driver) => driver.category)).size;
@@ -52,7 +52,7 @@ export default async function HomePage() {
   const featuredNewsVisual = newsVisual(0);
 
   return (
-    <RaceShell>
+    <RaceShell showFooterCallout={false}>
       <main id="conteudo" tabIndex={-1} className="cinema-home">
         <section className="cinema-home-hero" data-design="twice-grind-cinematic">
           <HomeHeroMediaLayer />
@@ -69,12 +69,15 @@ export default async function HomePage() {
               </p>
               <div className="cinema-home-actions">
                 <Link href="/inscricao" className="race-button race-button-primary">
-                  Entrar no grid <ArrowRight aria-hidden="true" />
+                  Começar inscrição <ArrowRight aria-hidden="true" />
                 </Link>
                 <Link href="/calendario" className="race-button race-button-ghost">
-                  Ver temporada <CalendarDays aria-hidden="true" />
+                  Ver calendário <CalendarDays aria-hidden="true" />
                 </Link>
               </div>
+              <small className="cinema-home-action-note">
+                Crie sua conta, escolha a categoria e continue pela plataforma oficial.
+              </small>
             </Reveal>
 
             <Reveal className="cinema-next-stage" delay={120}>
@@ -119,6 +122,35 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <section className="cinema-quick-links" aria-label="Acesso rápido ao campeonato">
+          <div className="race-container cinema-quick-links-grid">
+            <Link href="/calendario" className="cinema-quick-link">
+              <CalendarDays aria-hidden="true" />
+              <span>
+                <strong>Calendário</strong>
+                <small>Próximas etapas e traçados</small>
+              </span>
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <Link href="/classificacao" className="cinema-quick-link">
+              <Trophy aria-hidden="true" />
+              <span>
+                <strong>Classificação</strong>
+                <small>Pontuação e posições do grid</small>
+              </span>
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <Link href="/resultados" className="cinema-quick-link">
+              <Timer aria-hidden="true" />
+              <span>
+                <strong>Resultados</strong>
+                <small>Etapas e tempos publicados</small>
+              </span>
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+
         <section className="cinema-motion-strip" aria-label="Identidade do campeonato">
           <div>
             <span>Ultras do Kart</span>
@@ -154,8 +186,8 @@ export default async function HomePage() {
                 constância, respeito e coragem para voltar melhor são o que fazem uma temporada
                 permanecer na memória.
               </p>
-              <Link href="/inscricao" className="cinema-arrow-link">
-                Conhecer o campeonato <ArrowRight aria-hidden="true" />
+              <Link href="/regulamento" className="cinema-arrow-link">
+                Ler o regulamento <ArrowRight aria-hidden="true" />
               </Link>
             </Reveal>
 
@@ -363,7 +395,7 @@ export default async function HomePage() {
                   <div className="cinema-news-feature-media">
                     <Image
                       src={featuredNews.coverImageUrl ?? featuredNewsVisual.src}
-                      alt=""
+                      alt={`Capa da notícia: ${featuredNews.title}`}
                       fill
                       quality={86}
                       sizes="(max-width: 900px) 100vw, 62vw"

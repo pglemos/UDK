@@ -62,7 +62,7 @@ export default async function NewsPage({
                     <div className="tg-news-directory-media">
                       <Image
                         src={featured.coverImageUrl ?? featuredVisual.src}
-                        alt=""
+                        alt={`Capa da notícia: ${featured.title}`}
                         fill
                         priority
                         quality={88}
@@ -88,7 +88,7 @@ export default async function NewsPage({
                         <div>
                           <Image
                             src={item.coverImageUrl ?? visual.src}
-                            alt=""
+                            alt={`Capa da notícia: ${item.title}`}
                             fill
                             quality={84}
                             sizes={index === 0 ? "(max-width: 760px) 100vw, 58vw" : "(max-width: 760px) 100vw, 29vw"}

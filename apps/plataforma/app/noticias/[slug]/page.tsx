@@ -69,7 +69,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
           <div className="tg-article-cover">
             <Image
               src={coverSource}
-              alt=""
+              alt={`Capa da notícia: ${item.title}`}
               fill
               priority
               quality={90}

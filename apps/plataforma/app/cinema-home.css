@@ -1328,6 +1328,11 @@
   --cinema-sponsor-glow: rgba(204, 247, 250, 0.9);
 }
 
+.cinema-sponsor-mark[data-sponsor-slug="grupo-do-carro"] img {
+  width: min(90px, 100%);
+  max-height: 90px;
+}
+
 .cinema-sponsor-mark[data-sponsor-slug="firepit-brasil"] img,
 .cinema-sponsor-mark[data-sponsor-slug="velho-oeste"] img,
 .cinema-sponsor-mark[data-sponsor-slug="vintage-sao-francisco"] img {

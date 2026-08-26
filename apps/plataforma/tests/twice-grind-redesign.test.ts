@@ -12,7 +12,7 @@ describe("UDK Twice + The Grind direction contracts", () => {
 
     expect(header).toContain("cinema-menu-media");
     expect(header).toContain("aria-label=\"Abrir menu\"");
-    expect(header).toContain("Entrar no grid");
+    expect(header).toContain("Começar inscrição");
     expect(shell).toContain("CinematicRouteCurtain");
     expect(shell).toContain("CinematicPointer");
     expect(shell).toContain("OfficialLogo");

@@ -279,7 +279,7 @@ export function getStageAction(
     !isStagePast(stage, now) &&
     REGISTRATION_STAGE_STATUSES.has(status)
   ) {
-    return { href: "/inscricao", label: "Entrar no grid" };
+    return { href: "/inscricao", label: "Começar inscrição" };
   }
 
   if (TERMINAL_STAGE_STATUSES.has(status) || isStagePast(stage, now)) {

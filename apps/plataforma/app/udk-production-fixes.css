@@ -16,7 +16,6 @@
   --udk-tap: 44px;
   --udk-tap-lg: 56px;
 }
-
 /* ---------- 1. Animações base (D1–D14) --------------------------------- */
 @keyframes udkFadeSlideUp {
   from { opacity: 0; transform: translateY(12px); }
@@ -499,4 +498,173 @@ button[aria-busy="true"] svg:first-child {
    hero de propósito, então ali não há para onde recuar. */
 :target {
   scroll-margin-top: calc(var(--cinema-header, 92px) + 16px);
+}
+
+/* ---------- 15. Home consultável sem perder a energia editorial -------- */
+.cinema-quick-links {
+  border-bottom: 1px solid var(--cinema-line-dark);
+  background: var(--cinema-paper);
+  color: var(--cinema-ink);
+}
+
+.cinema-quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cinema-quick-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 104px;
+  padding: 18px 24px;
+  border-left: 1px solid var(--cinema-line-dark);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.cinema-quick-link:last-child {
+  border-right: 1px solid var(--cinema-line-dark);
+}
+
+.cinema-quick-link > svg:first-child {
+  width: 22px;
+  color: var(--cinema-cyan-deep);
+}
+
+.cinema-quick-link > span {
+  display: grid;
+  gap: 4px;
+}
+
+.cinema-quick-link strong {
+  font-family: var(--cinema-display);
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cinema-quick-link small {
+  color: var(--cinema-muted-dark);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.cinema-quick-link > svg:last-child {
+  width: 18px;
+  transition: transform 180ms ease;
+}
+
+.cinema-quick-link:hover,
+.cinema-quick-link:focus-visible {
+  background: var(--cinema-cyan);
+  color: var(--cinema-ink);
+}
+
+.cinema-quick-link:hover > svg:last-child,
+.cinema-quick-link:focus-visible > svg:last-child {
+  transform: translateX(5px);
+}
+
+.cinema-quick-link:hover small,
+.cinema-quick-link:focus-visible small {
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.cinema-home-action-note {
+  display: block;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.cinema-home .cinema-manifesto-grid,
+.cinema-home .cinema-season,
+.cinema-home .cinema-ranking,
+.cinema-home .cinema-drivers,
+.cinema-home .cinema-news {
+  padding-top: clamp(76px, 9vw, 138px);
+  padding-bottom: clamp(76px, 9vw, 138px);
+}
+
+.cinema-home .cinema-community,
+.cinema-home .cinema-community-copy {
+  min-height: min(90svh, 900px);
+}
+
+.cinema-home .cinema-final-cta .race-container {
+  min-height: min(74vh, 740px);
+}
+
+@media (max-width: 900px) {
+  .cinema-quick-link {
+    min-height: 88px;
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cinema-quick-links-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cinema-quick-link,
+  .cinema-quick-link:last-child {
+    min-height: 76px;
+    border-right: 0;
+    border-bottom: 1px solid var(--cinema-line-dark);
+  }
+
+  .cinema-quick-link:last-child {
+    border-bottom: 0;
+  }
+
+  .cinema-home .cinema-manifesto-grid,
+  .cinema-home .cinema-season,
+  .cinema-home .cinema-ranking,
+  .cinema-home .cinema-drivers,
+  .cinema-home .cinema-news {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .cinema-home .cinema-manifesto-media {
+    min-height: 430px;
+  }
+
+  .cinema-home .cinema-stage-media {
+    min-height: 280px;
+  }
+
+  .cinema-home .cinema-stage-copy {
+    padding-block: 24px;
+  }
+
+  .cinema-home .cinema-driver-poster,
+  .cinema-home .cinema-driver-poster:nth-child(n) {
+    min-height: 420px;
+  }
+
+  .cinema-home .cinema-community,
+  .cinema-home .cinema-community-copy {
+    min-height: 560px;
+  }
+
+  .cinema-home .cinema-final-cta .race-container {
+    min-height: 560px;
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinema-quick-link,
+  .cinema-quick-link > svg:last-child {
+    transition: none;
+  }
 }

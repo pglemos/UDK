@@ -1545,6 +1545,11 @@
   --cinema-sponsor-glow: rgba(204, 247, 250, 0.9);
 }
 
+.race-sponsor-logo[data-sponsor-slug="grupo-do-carro"] img {
+  width: min(148px, 86%);
+  max-height: 148px;
+}
+
 .race-sponsor-logo[data-sponsor-slug="firepit-brasil"] img,
 .race-sponsor-logo[data-sponsor-slug="velho-oeste"] img,
 .race-sponsor-logo[data-sponsor-slug="vintage-sao-francisco"] img {

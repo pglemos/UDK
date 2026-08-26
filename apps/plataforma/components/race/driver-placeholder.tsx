@@ -25,7 +25,7 @@ export function DriverPlaceholder({
       aria-hidden={decorative ? true : undefined}
     >
       <span aria-hidden="true">{initials(name)}</span>
-      <small>Foto não publicada</small>
+      <small>Perfil sem foto</small>
     </div>
   );
 }
