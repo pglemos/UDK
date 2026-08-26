@@ -58,7 +58,7 @@ export default async function SponsorsPage() {
                             width={360}
                             height={190}
                             sizes="(max-width: 640px) 80vw, (max-width: 900px) 38vw, 28vw"
-                            loading="lazy"
+                            loading="eager"
                           />
                         ) : (
                           <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>
@@ -126,8 +126,9 @@ export default async function SponsorsPage() {
                       src={federation.logoUrl}
                       alt={`Logo ${federation.name}`}
                       width={360}
-                      height={120}
+                      height={89}
                       sizes="(max-width: 640px) 80vw, 360px"
+                      loading="eager"
                     />
                   </div>
                   <span>{federation.label}</span>

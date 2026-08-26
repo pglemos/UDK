@@ -21,9 +21,10 @@
   --cinema-silver: #c4ccd2;
   --cinema-bronze: #ca8651;
   --cinema-sponsor-line: rgba(151, 239, 255, 0.42);
-  --cinema-sponsor-stage:
-    radial-gradient(circle at 78% 18%, rgba(34, 227, 255, 0.28), transparent 34%),
-    linear-gradient(135deg, #0b8aa8 0%, #07536b 52%, #091a22 100%);
+  --cinema-sponsor-carbon:
+    radial-gradient(circle at 78% 18%, rgba(0, 217, 255, 0.16), transparent 32%),
+    repeating-linear-gradient(125deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 8px),
+    linear-gradient(135deg, #0b202a 0%, #07141b 52%, #050607 100%);
   --cinema-display: var(--font-barlow), "Arial Narrow", Arial, sans-serif;
   --cinema-body: var(--font-inter), Arial, sans-serif;
   --cinema-container: 1480px;

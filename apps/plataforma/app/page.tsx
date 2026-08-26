@@ -414,6 +414,7 @@ export default async function HomePage() {
                           width={220}
                           height={100}
                           sizes="(max-width: 720px) 140px, 180px"
+                          loading="eager"
                         />
                       </span>
                       <strong>{sponsor.name}</strong>
@@ -459,8 +460,9 @@ export default async function HomePage() {
                         src={federation.logoUrl}
                         alt={`Logo ${federation.name}`}
                         width={160}
-                        height={54}
+                        height={40}
                         sizes="160px"
+                        loading="eager"
                       />
                     </span>
                     <span className="cinema-federation-copy">

@@ -99,8 +99,8 @@ describe("official sponsor roster", () => {
     expect(page).toContain("instagramHandle");
     expect(page).toContain("sponsor.logoUrl");
     expect(page).toContain("sponsor.websiteUrl");
-    // A10 — a grade de patrocinadores fica abaixo da dobra, carrega lazy.
-    expect(page).toContain('loading="lazy"');
+    // A10 — as marcas entram sem blocos vazios quando o visitante chega à seção.
+    expect(page).toContain('loading="eager"');
     expect(page).toContain('target="_blank"');
     expect(page).toContain('rel="noreferrer"');
     expect(page).toContain("fallbackFederations");

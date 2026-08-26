@@ -282,7 +282,7 @@
   }
 
   .race-federation-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .tg-calendar-stage {
@@ -674,6 +674,40 @@
 
   .cinema-sponsors .race-container > div {
     display: grid;
+  }
+
+  .cinema-sponsors .race-container {
+    gap: 14px;
+    min-height: 0;
+    padding-block: 24px;
+  }
+
+  .cinema-sponsors .race-container > div.cinema-sponsor-list {
+    gap: 10px 18px;
+  }
+
+  .cinema-sponsor-mark {
+    height: 80px;
+  }
+
+  .cinema-sponsor-mark img {
+    max-height: 76px;
+  }
+
+  .cinema-sponsor-mark[data-sponsor-slug="firepit-brasil"] img,
+  .cinema-sponsor-mark[data-sponsor-slug="velho-oeste"] img,
+  .cinema-sponsor-mark[data-sponsor-slug="vintage-sao-francisco"] img {
+    width: min(100%, 82px);
+  }
+
+  .cinema-sponsor-item strong {
+    font-size: 0.62rem;
+  }
+
+  .cinema-federation-list {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .cinema-final-cta .race-container {

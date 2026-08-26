@@ -1445,16 +1445,39 @@
 }
 
 .race-sponsor-grid {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(28px, 3vw, 52px);
+  gap: clamp(28px, 3vw, 48px) clamp(24px, 3vw, 52px);
+  padding: clamp(28px, 4vw, 54px) clamp(20px, 3vw, 42px);
+  overflow: hidden;
+  border: 1px solid rgba(151, 239, 255, 0.24);
+  border-radius: 24px;
+  background: var(--cinema-sponsor-carbon);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+}
+
+.race-sponsor-grid::before,
+.race-federation-grid::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 16% 24%, rgba(132, 235, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 84% 76%, rgba(0, 217, 255, 0.09), transparent 28%);
+  pointer-events: none;
 }
 
 .race-sponsor-card {
+  position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   min-height: 0;
-  padding: 0 0 8px;
+  padding: 0 0 18px;
   background: transparent;
   color: var(--cinema-white);
   transition:
@@ -1472,30 +1495,60 @@
 }
 
 .race-sponsor-logo {
+  --cinema-sponsor-glow: rgba(0, 217, 255, 0.28);
   position: relative;
+  isolation: isolate;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  min-height: 190px;
+  min-height: 172px;
   margin-bottom: auto;
-  border: 1px solid var(--cinema-sponsor-line);
-  border-radius: 14px;
-  background: var(--cinema-sponsor-stage);
-  box-shadow: inset 0 0 0 1px rgba(4, 20, 27, 0.28);
+  padding: 8px 6px;
+  background: transparent;
+}
+
+.race-sponsor-logo::before,
+.race-federation-logo::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 14% 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cinema-sponsor-glow) 0%, transparent 70%);
+  filter: blur(16px);
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .race-sponsor-logo img {
-  max-width: 72%;
-  max-height: 120px;
+  position: relative;
+  z-index: 1;
+  width: min(86%, 340px);
+  height: auto;
+  max-height: 148px;
   object-fit: contain;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.32));
 }
 
+.race-sponsor-logo[data-sponsor-slug="grupo-emtel"] {
+  --cinema-sponsor-glow: rgba(120, 229, 255, 0.54);
+}
+
+.race-sponsor-logo[data-sponsor-slug="firepit-brasil"] {
+  --cinema-sponsor-glow: rgba(0, 217, 255, 0.2);
+}
+
+.race-sponsor-logo[data-sponsor-slug="veste-custom-wear"] {
+  --cinema-sponsor-glow: rgba(183, 241, 250, 0.64);
+}
+
 .race-sponsor-logo[data-sponsor-slug="vintage-sao-francisco"] {
-  --cinema-sponsor-line: rgba(8, 55, 66, 0.36);
-  background:
-    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.36), transparent 35%),
-    linear-gradient(135deg, #8edce4 0%, #41aabd 48%, #197b96 100%);
+  --cinema-sponsor-glow: rgba(204, 247, 250, 0.9);
+}
+
+.race-sponsor-logo[data-sponsor-slug="firepit-brasil"] img,
+.race-sponsor-logo[data-sponsor-slug="velho-oeste"] img,
+.race-sponsor-logo[data-sponsor-slug="vintage-sao-francisco"] img {
+  width: min(148px, 86%);
 }
 
 .race-sponsor-logo strong {
@@ -1518,9 +1571,9 @@
 }
 
 .race-sponsor-card h2 {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   font-family: var(--cinema-display);
-  font-size: 2.4rem;
+  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
   font-weight: 800;
   color: var(--cinema-white);
   text-transform: uppercase;
@@ -1536,9 +1589,19 @@
 }
 
 .race-federation-grid {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(28px, 3vw, 52px);
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 560px;
+  gap: 0;
+  padding: clamp(24px, 3vw, 38px);
+  overflow: hidden;
+  border: 1px solid rgba(151, 239, 255, 0.24);
+  border-radius: 24px;
+  background: var(--cinema-sponsor-carbon);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
 .race-federation-card {
@@ -1560,21 +1623,22 @@
 }
 
 .race-federation-logo {
+  --cinema-sponsor-glow: rgba(0, 217, 255, 0.34);
   position: relative;
+  isolation: isolate;
   display: grid;
-  min-height: 190px;
+  min-height: 160px;
   margin-bottom: auto;
   place-items: center;
-  overflow: hidden;
-  border: 1px solid var(--cinema-sponsor-line);
-  border-radius: 14px;
-  background: var(--cinema-sponsor-stage);
-  box-shadow: inset 0 0 0 1px rgba(4, 20, 27, 0.28);
 }
 
 .race-federation-logo img {
-  max-width: 82%;
-  max-height: 100px;
+  position: relative;
+  z-index: 1;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 120px;
   object-fit: contain;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.32));
 }
@@ -1593,9 +1657,9 @@
 }
 
 .race-federation-card h2 {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   font-family: var(--cinema-display);
-  font-size: 2.4rem;
+  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
   font-weight: 800;
   color: var(--cinema-white);
   text-transform: uppercase;

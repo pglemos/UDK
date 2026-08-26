@@ -92,7 +92,6 @@ button[aria-busy="true"] svg:first-child {
 .tg-standing-podium-card,
 .tg-driver-directory-grid > * > a,
 .tg-news-directory-grid > a,
-.race-sponsor-card,
 .metrics article {
   transition:
     transform 200ms var(--cinema-ease, ease),
@@ -102,7 +101,6 @@ button[aria-busy="true"] svg:first-child {
 .tg-calendar-stage:hover,
 .tg-standing-podium-card:hover,
 .tg-news-directory-grid > a:hover,
-.race-sponsor-card:hover,
 .metrics article:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
@@ -128,6 +126,12 @@ button[aria-busy="true"] svg:first-child {
 /* A13 — patrocinadores clicáveis com transição real */
 .race-sponsor-card {
   cursor: pointer;
+  transition: transform 200ms var(--cinema-ease, ease), color 200ms ease;
+}
+.race-sponsor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: none;
+  border-color: transparent;
 }
 .race-sponsor-card img {
   transition: filter 300ms ease, opacity 300ms ease;
