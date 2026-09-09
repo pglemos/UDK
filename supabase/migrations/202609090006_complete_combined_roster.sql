@@ -113,7 +113,11 @@ security definer
 set search_path = public
 as $$
   select (
-    session_user = 'postgres'
+    -- SECURITY DEFINER runs with the function owner. Supabase's migration
+    -- connection can expose a pooler/admin session user instead of the
+    -- function owner as session_user, so use current_user for this scoped,
+    -- transaction-local migration context.
+    current_user = 'postgres'
     and current_setting('udk.migration_context', true) = 'standings_rebuild'
   ) or public.has_active_role(array['admin','organization','judge'], null, p_season_id)
 $$;
