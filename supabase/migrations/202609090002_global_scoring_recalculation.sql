@@ -88,8 +88,11 @@ where entry.result_id=result.id and result.status in ('homologated','published',
   and result.deleted_at is null and stage.deleted_at is null and entry.deleted_at is null;
 
 do $$
-declare v_season_id uuid; v_category_id uuid;
+declare v_season_id uuid; v_category_id uuid; v_admin_id uuid;
 begin
+  select user_id into v_admin_id from public.user_roles where role='admin' and (expires_at is null or expires_at>now()) limit 1;
+  if v_admin_id is null then raise exception 'no active admin available for standings recalculation'; end if;
+  perform set_config('request.jwt.claim.sub', v_admin_id::text, true);
   select season.id into v_season_id from public.seasons season
   join public.championships championship on championship.id=season.championship_id
   where championship.slug='udk' and season.year=2026;
