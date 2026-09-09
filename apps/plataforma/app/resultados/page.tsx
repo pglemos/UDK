@@ -12,7 +12,7 @@ import {
 } from "../../lib/public-data";
 import type { PublicResultEntry } from "../../lib/public-data";
 import { formatShortDateLabel } from "../../lib/datetime";
-import { officialResultPdfForCategory } from "../../lib/official-result-links";
+import { officialResultPdfForResult } from "../../lib/official-result-links";
 import { getSportingBreakdowns, type SportingBreakdown } from "../../lib/sporting-breakdown";
 
 export const metadata: Metadata = {
@@ -64,7 +64,9 @@ export default async function ResultsPage({
           })),
         )
       : [];
-  const selectedPdf = selected ? officialResultPdfForCategory(selected.categorySlug) : null;
+  const selectedPdf = selected
+    ? officialResultPdfForResult(selected.categorySlug, selected.startsAt)
+    : null;
 
   return (
     <RaceShell showMobileCta={false}>
@@ -110,11 +112,15 @@ export default async function ResultsPage({
                   aria-label="Resultados oficiais por categoria"
                 >
                   {resultCards.map(({ result, entries }) => {
-                    const pdfUrl = officialResultPdfForCategory(result.categorySlug);
+                    const pdfUrl = officialResultPdfForResult(result.categorySlug, result.startsAt);
                     return (
                       <article className="tg-results-card" key={result.id}>
                         <div className="tg-results-card-topline">
-                          <span>1ª etapa • Endurance • 18/08/2026</span>
+                          <span>
+                            {result.startsAt?.startsWith("2026-09-08")
+                              ? "2ª etapa • Regular • 08/09/2026"
+                              : "1ª etapa • Endurance • 18/08/2026"}
+                          </span>
                           <StatusBadge status={result.status} />
                         </div>
                         <h2>{result.category}</h2>
