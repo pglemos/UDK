@@ -48,17 +48,17 @@ on public.result_entries for each row execute function public.apply_result_entry
 update public.result_entries entry set pole=false, fastest_lap=false
 from public.results result where result.id=entry.result_id and result.external_racing_id between 2026090801 and 2026090804;
 update public.result_entries entry set fastest_lap=true
-from public.results result join public.drivers driver on driver.id=entry.driver_id
-where result.id=entry.result_id and result.external_racing_id=2026090801 and driver.slug='lucas-rabelo';
+from public.results result, public.drivers driver
+where result.id=entry.result_id and driver.id=entry.driver_id and result.external_racing_id=2026090801 and driver.slug='lucas-rabelo';
 update public.result_entries entry set pole=true
-from public.results result join public.drivers driver on driver.id=entry.driver_id
-where result.id=entry.result_id and result.external_racing_id=2026090801 and driver.slug='bernardo-thadeu';
+from public.results result, public.drivers driver
+where result.id=entry.result_id and driver.id=entry.driver_id and result.external_racing_id=2026090801 and driver.slug='bernardo-thadeu';
 update public.result_entries entry set pole=true, fastest_lap=true
-from public.results result join public.drivers driver on driver.id=entry.driver_id
-where result.id=entry.result_id and result.external_racing_id=2026090802 and driver.slug='andre-felisberto';
+from public.results result, public.drivers driver
+where result.id=entry.result_id and driver.id=entry.driver_id and result.external_racing_id=2026090802 and driver.slug='andre-felisberto';
 update public.result_entries entry set fastest_lap=true
-from public.results result join public.drivers driver on driver.id=entry.driver_id
-where result.id=entry.result_id and result.external_racing_id=2026090802 and driver.slug='arthur-henrique';
+from public.results result, public.drivers driver
+where result.id=entry.result_id and driver.id=entry.driver_id and result.external_racing_id=2026090802 and driver.slug='arthur-henrique';
 
 -- Libera as posições antes de substituir a classificação por posição geral.
 update public.result_entries entry set position=position+10000
