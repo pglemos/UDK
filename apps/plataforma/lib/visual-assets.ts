@@ -26,7 +26,7 @@ export const premiumVisuals = {
   },
   manifesto: {
     src: "/media/official/heroes/pilotos.webp",
-    alt: "Pilotos do UDK reunidos durante a temporada",
+    alt: "Piloto de kart comemorando com troféu e bandeira quadriculada",
     position: "50% center",
   },
   community: {
@@ -147,7 +147,7 @@ const pageHeroVisuals: Record<string, PremiumVisual> = {
   },
   "04": {
     src: "/media/official/heroes/pilotos.webp",
-    alt: "Pilotos do UDK no paddock",
+    alt: "Piloto de kart comemorando com troféu e bandeira quadriculada",
     position: "50% center",
   },
   "05": {

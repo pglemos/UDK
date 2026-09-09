@@ -33,26 +33,51 @@ export default async function StandingsPage({
   const params = await searchParams;
   const page = parsePositiveInt(params.page, 1, 500);
   const category = param(params.categoria, "geral");
-  const query = param(params.q);
+  const query = param(params.q).trim();
   const [standings, leaders, categories] = await Promise.all([
     getStandingsPage({ page, pageSize: 10, category, query, sort: "points" }),
     getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" }),
     getCategories(),
   ]);
-  const leaderPoints = leaders.items[0]?.points ?? 0;
+  const categoryName =
+    category === "geral"
+      ? "Geral"
+      : categories.find((item) => item.slug === category)?.name ?? category;
+  const leaderPoints = leaders.items[0]?.points ?? standings.items[0]?.points ?? 0;
+  const hasQuery = Boolean(query);
+  const resultCountLabel = `${standings.meta.totalItems} ${
+    standings.meta.totalItems === 1 ? "piloto encontrado" : "pilotos encontrados"
+  }`;
+  const resultsContext = hasQuery
+    ? `${categoryName} · ${resultCountLabel} para “${query}”`
+    : `${categoryName} · ${resultCountLabel} no ranking oficial`;
+  const emptyAction = hasQuery
+    ? {
+        href:
+          category === "geral"
+            ? "/classificacao"
+            : `/classificacao?categoria=${encodeURIComponent(category)}`,
+        label: "Limpar busca",
+      }
+    : { href: "/classificacao", label: "Ver classificação geral" };
 
   return (
-    <RaceShell showMobileCta={false}>
-      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
+    <RaceShell showMobileCta={false} showFooterCallout={false}>
+      <main
+        id="conteudo"
+        tabIndex={-1}
+        className="udk-page tg-internal-page tg-standings-page"
+      >
         <PageHero
           index="02"
           eyebrow="Pontos oficiais"
           title="Classificação"
           description="A pista decide. O ranking apenas torna visível quem entregou volta após volta."
           compact
+          action={{ href: "#ranking", label: "Ir direto ao ranking" }}
         />
 
-        <section className="tg-standings-section">
+        <section className="tg-standings-section" id="ranking">
           <div className="race-container">
             <EditorialHeading
               index="02"
@@ -61,14 +86,14 @@ export default async function StandingsPage({
             />
 
             <div className="tg-public-data-controls">
-              <div
+              <nav
                 className="udk-category-tabs tg-category-tabs"
-                role="navigation"
-                aria-label="Categorias"
+                aria-label="Filtrar classificação por categoria"
               >
                 <Link
                   className={category === "geral" ? "is-active" : ""}
                   href="/classificacao?categoria=geral"
+                  aria-current={category === "geral" ? "page" : undefined}
                 >
                   Geral
                 </Link>
@@ -76,12 +101,13 @@ export default async function StandingsPage({
                   <Link
                     className={category === item.slug ? "is-active" : ""}
                     href={`/classificacao?categoria=${item.slug}`}
+                    aria-current={category === item.slug ? "page" : undefined}
                     key={item.slug}
                   >
                     {item.name}
                   </Link>
                 ))}
-              </div>
+              </nav>
 
               <div
                 className="tg-official-pdf-links"
@@ -89,25 +115,40 @@ export default async function StandingsPage({
                 aria-label="PDFs oficiais por corrida"
               >
                 <a
-                  className="race-button race-button-outline is-light"
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da etapa Endurance"
                   href={officialResultPdf.endurance}
                   download
                 >
-                  PDF Endurance <Download aria-hidden="true" />
+                  <span>
+                    <strong>Endurance</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
                 </a>
                 <a
-                  className="race-button race-button-outline is-light"
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da Corrida 1"
                   href={officialResultPdf.corrida1}
                   download
                 >
-                  PDF Corrida 1 <Download aria-hidden="true" />
+                  <span>
+                    <strong>Corrida 1</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
                 </a>
                 <a
-                  className="race-button race-button-outline is-light"
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da Corrida 2"
                   href={officialResultPdf.corrida2}
                   download
                 >
-                  PDF Corrida 2 <Download aria-hidden="true" />
+                  <span>
+                    <strong>Corrida 2</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
                 </a>
               </div>
 
@@ -128,55 +169,70 @@ export default async function StandingsPage({
               <span>Regra 2026</span>
               <strong>Melhores 6 de 8 resultados</strong>
               <p>
-                São 06 corridas regulares e 02 provas de resistência. Ao final, os 02 piores
-                resultados são descartados automaticamente.
+                A temporada tem 06 corridas regulares e 02 provas de resistência. Até o 6º evento
+                não há descarte; após o 7º, o pior resultado é descartado; após o 8º, os dois
+                piores.
               </p>
             </aside>
 
+            <p className="tg-standings-context" aria-live="polite">
+              {resultsContext}
+            </p>
+
             {standings.items.length ? (
               <div className="tg-standings-content">
-                {leaders.items.length ? (
-                  <section className="tg-standing-podium" aria-label="Pódio da classificação">
-                    {leaders.items.slice(0, 3).map((driver, index) => {
-                      const fallback = driverVisual(index);
-                      const source = resolveVisualSource(driver.avatarUrl, fallback);
-                      const hasPublishedPortrait =
-                        Boolean(driver.avatarUrl) && source !== fallback.src;
-                      const podiumPosition = driver.position ?? index + 1;
-                      return (
-                        <Link
-                          href={`/pilotos/${driver.slug}`}
-                          className={`tg-standing-podium-card place-${podiumPosition}`}
-                          key={driver.slug}
-                        >
-                          <span>{String(podiumPosition).padStart(2, "0")}</span>
-                          <div
-                            className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}
+                {!hasQuery && leaders.items.length ? (
+                  <>
+                    <header className="tg-standing-podium-heading">
+                      <span>Em destaque</span>
+                      <h3 id="podium-title">Pódio atual</h3>
+                      <p>Os três primeiros da classificação {categoryName.toLowerCase()}.</p>
+                    </header>
+                    <section
+                      className="tg-standing-podium"
+                      aria-labelledby="podium-title"
+                    >
+                      {leaders.items.slice(0, 3).map((driver, index) => {
+                        const fallback = driverVisual(index);
+                        const source = resolveVisualSource(driver.avatarUrl, fallback);
+                        const hasPublishedPortrait =
+                          Boolean(driver.avatarUrl) && source !== fallback.src;
+                        const podiumPosition = index + 1;
+                        return (
+                          <Link
+                            href={`/pilotos/${driver.slug}`}
+                            className={`tg-standing-podium-card place-${podiumPosition}`}
+                            key={driver.slug}
                           >
-                            {hasPublishedPortrait ? (
-                              <Image
-                                src={source}
-                                alt=""
-                                fill
-                                quality={86}
-                                sizes="(max-width: 760px) 100vw, 33vw"
-                              />
-                            ) : (
-                              <DriverPlaceholder name={driver.name} />
-                            )}
-                          </div>
-                          <div>
-                            <h2>{driver.name}</h2>
-                            <p>{driver.category}</p>
-                          </div>
-                          <b>
-                            {formatPoints(driver.points)}
-                            <small>pts válidos</small>
-                          </b>
-                        </Link>
-                      );
-                    })}
-                  </section>
+                            <span>{String(podiumPosition).padStart(2, "0")}</span>
+                            <div
+                              className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}
+                            >
+                              {hasPublishedPortrait ? (
+                                <Image
+                                  src={source}
+                                  alt=""
+                                  fill
+                                  quality={86}
+                                  sizes="(max-width: 760px) 100vw, 33vw"
+                                />
+                              ) : (
+                                <DriverPlaceholder name={driver.name} />
+                              )}
+                            </div>
+                            <div>
+                              <h4>{driver.name}</h4>
+                              <p>{driver.category}</p>
+                            </div>
+                            <b>
+                              {formatPoints(driver.points)}
+                              <small>pts válidos</small>
+                            </b>
+                          </Link>
+                        );
+                      })}
+                    </section>
+                  </>
                 ) : null}
 
                 <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
@@ -186,7 +242,7 @@ export default async function StandingsPage({
                     </caption>
                     <thead>
                       <tr>
-                        <th scope="col">Pos.</th>
+                        <th scope="col">Ordem</th>
                         <th scope="col">Piloto</th>
                         <th scope="col">Categoria</th>
                         <th scope="col">Vitórias</th>
@@ -204,14 +260,13 @@ export default async function StandingsPage({
                       {standings.items.map((driver, index) => {
                         const absolutePosition =
                           (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
-                        const officialPosition = driver.position ?? absolutePosition;
                         const gap =
                           Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                         return (
                           <tr key={driver.slug}>
-                            <td data-label="Posição">
-                              <span className={`udk-rank rank-${officialPosition}`}>
-                                {officialPosition}
+                            <td data-label="Ordem">
+                              <span className={`udk-rank rank-${absolutePosition}`}>
+                                {absolutePosition}
                               </span>
                             </td>
                             <td data-label="Piloto">
@@ -219,7 +274,14 @@ export default async function StandingsPage({
                                 <strong>{driver.name}</strong>
                               </Link>
                             </td>
-                            <td data-label="Categoria">{driver.category}</td>
+                            <td data-label="Categoria">
+                              <span>{driver.category}</span>
+                              {category === "geral" && driver.position ? (
+                                <small className="tg-category-position">
+                                  {driver.position}º na categoria
+                                </small>
+                              ) : null}
+                            </td>
                             <td data-label="Vitórias">{driver.wins}</td>
                             <td data-label="Pódios">{driver.podiums}</td>
                             <td data-label="Diferença">
@@ -255,19 +317,21 @@ export default async function StandingsPage({
                   {standings.items.map((driver, index) => {
                     const absolutePosition =
                       (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
-                    const officialPosition = driver.position ?? absolutePosition;
                     const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                     return (
                       <li className="tg-mobile-standing-item" key={driver.slug}>
                         <div className="tg-mobile-standing-summary">
-                          <span className={`udk-rank rank-${officialPosition}`}>
-                            {officialPosition}
+                          <span className={`udk-rank rank-${absolutePosition}`}>
+                            {absolutePosition}
                           </span>
                           <div className="tg-mobile-standing-driver">
                             <Link href={`/pilotos/${driver.slug}`}>
                               <strong>{driver.name}</strong>
                             </Link>
                             <span>{driver.category}</span>
+                            {category === "geral" && driver.position ? (
+                              <small>{driver.position}º na categoria</small>
+                            ) : null}
                           </div>
                           <strong className="udk-points">
                             {formatPoints(driver.points)}
@@ -318,9 +382,17 @@ export default async function StandingsPage({
             ) : (
               <EditorialEmpty
                 index="02"
-                title="Nenhum piloto encontrado nesta leitura."
-                description="Ajuste a categoria ou a busca para voltar ao ranking oficial."
-                action={{ href: "/classificacao", label: "Ver classificação geral" }}
+                title={
+                  hasQuery
+                    ? `Nenhum piloto encontrado para “${query}”.`
+                    : `Nenhum piloto encontrado em ${categoryName}.`
+                }
+                description={
+                  hasQuery
+                    ? "Tente outro nome ou limpe a busca para ver os pilotos desta categoria."
+                    : "Escolha outra categoria para voltar ao ranking oficial."
+                }
+                action={emptyAction}
               />
             )}
 
@@ -328,6 +400,7 @@ export default async function StandingsPage({
               meta={standings.meta}
               basePath="/classificacao"
               params={{ categoria: category, q: query || undefined, page: String(page) }}
+              showStatus
             />
           </div>
         </section>

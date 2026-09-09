@@ -517,6 +517,24 @@
   margin-top: auto;
 }
 
+.tg-results-list {
+  display: grid;
+  gap: 92px;
+  margin-top: 42px;
+}
+
+.tg-result-panel {
+  min-width: 0;
+}
+
+.tg-result-panel .tg-result-selector {
+  margin-top: 0;
+}
+
+.tg-result-panel .tg-results-podium {
+  margin-top: 0;
+}
+
 .race-button-outline.is-light {
   border-color: var(--cinema-line-dark);
   color: var(--cinema-ink);

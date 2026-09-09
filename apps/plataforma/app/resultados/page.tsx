@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Download, Flag } from "lucide-react";
+import { ArrowRight, ChevronRight, Download, Flag, Search } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { localizeRaceText, PageHero, RacePagination, StatusBadge } from "../../components/race/ui";
@@ -46,6 +46,41 @@ function categoryLabel(category: string): string {
   return "todas as categorias";
 }
 
+function categoryHref(category: string, query: string): string {
+  const params = new URLSearchParams();
+  if (category !== "geral") params.set("categoria", category);
+  if (query) params.set("piloto", query);
+  const search = params.toString();
+  return search ? `/resultados?${search}` : "/resultados";
+}
+
+function matchesDriver(entry: PublicResultEntry, query: string): boolean {
+  if (!query) return true;
+  const normalizedQuery = query.toLocaleLowerCase("pt-BR");
+  return `${entry.driverName} ${entry.driverSlug}`
+    .toLocaleLowerCase("pt-BR")
+    .includes(normalizedQuery);
+}
+
+function resultPublishedLabel(result: PublicResult): string {
+  if (!result.publishedAt) return `Versão ${result.version}`;
+
+  const publishedAt = new Date(result.publishedAt);
+  if (Number.isNaN(publishedAt.getTime())) return `Versão ${result.version}`;
+
+  const date = publishedAt
+    .toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "America/Sao_Paulo",
+    })
+    .replaceAll(".", "")
+    .toLocaleUpperCase("pt-BR");
+
+  return `Publicada em ${date} · versão ${result.version}`;
+}
+
 function raceLabel(result: PublicResult): string {
   const source = `${result.sessionName} ${result.title}`.toLocaleLowerCase("pt-BR");
   if (source.includes("endurance")) return "Endurance";
@@ -68,6 +103,18 @@ function resultAdjustments(
   ].filter((value): value is string => Boolean(value));
 }
 
+function AdjustmentList({ adjustments }: { adjustments: string[] }) {
+  if (!adjustments.length) return <span className="tg-adjustments-empty">Sem ajustes</span>;
+
+  return (
+    <ul className="tg-adjustment-list" aria-label="Ajustes do resultado">
+      {adjustments.map((adjustment) => (
+        <li key={adjustment}>{adjustment}</li>
+      ))}
+    </ul>
+  );
+}
+
 function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: string }) {
   const { result, entries, sporting } = bundle;
   const pdfUrl = officialResultPdfForResult(result.sessionName, result.title);
@@ -76,20 +123,31 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
   return (
     <section className="tg-result-panel" id={`resultado-${result.id}`}>
       <div className="tg-result-selector">
-        <div>
-          <span>
+        <div className="tg-result-selector-copy">
+          <span className="tg-result-date">
             {localizeRaceText(result.stageTitle)} · {formatShortDateLabel(result.startsAt)}
           </span>
           <h2>{raceLabel(result)}</h2>
           <p className="tg-result-meta">
-            Classificação geral conjunta · leitura por {categoryLabel(category)}
+            Posição geral preservada · leitura por {categoryLabel(category)}
           </p>
+          <div className="tg-result-proof" aria-label="Informações da publicação">
+            <span>{resultPublishedLabel(result)}</span>
+            <span>
+              {entries.length} {entries.length === 1 ? "piloto" : "pilotos"} nesta leitura
+            </span>
+          </div>
         </div>
         <div className="tg-result-selector-actions">
           <StatusBadge status={result.status} />
           {pdfUrl ? (
-            <a className="race-button race-button-primary" href={pdfUrl} download>
-              Baixar PDF geral <Download aria-hidden="true" />
+            <a
+              className="race-button race-button-primary"
+              href={pdfUrl}
+              download
+              aria-label={`Baixar resultado oficial em PDF de ${raceLabel(result)}`}
+            >
+              Baixar resultado oficial <Download aria-hidden="true" />
             </a>
           ) : null}
         </div>
@@ -153,16 +211,19 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                       <td data-label="Piloto">
                         <strong>{entry.driverName}</strong>
                         {entrySporting?.sportingNote ? (
-                          <small>{entrySporting.sportingNote}</small>
+                          <details className="tg-result-note">
+                            <summary>Ver nota oficial</summary>
+                            <p>{entrySporting.sportingNote}</p>
+                          </details>
                         ) : null}
                       </td>
                       {isGeneral ? <td data-label="Categoria">{entry.category}</td> : null}
                       <td data-label="Voltas">{entry.laps}</td>
                       <td data-label="Melhor volta">{formatLapTime(entry.bestLapMs)}</td>
                       <td data-label="Ajustes">
-                        {adjustments.length ? adjustments.join(" • ") : "—"}
+                        <AdjustmentList adjustments={adjustments} />
                       </td>
-                      <td data-label="Pontos finais">
+                      <td data-label="Pontos na prova">
                         <strong className="udk-points">
                           {notClassified && entry.points === 0 ? "—" : entry.points}
                         </strong>
@@ -207,7 +268,10 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                         {entry.category} · {entry.laps} voltas · {formatLapTime(entry.bestLapMs)}
                       </span>
                     </div>
-                    <strong className="udk-points">
+                    <strong
+                      className="udk-points"
+                      aria-label={`${notClassified && entry.points === 0 ? "Sem" : entry.points} pontos`}
+                    >
                       {notClassified && entry.points === 0 ? "—" : entry.points}
                       <small>pts</small>
                     </strong>
@@ -217,7 +281,9 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                     <dl className="tg-mobile-detail-grid">
                       <div>
                         <dt>Ajustes</dt>
-                        <dd>{adjustments.length ? adjustments.join(" · ") : "Sem ajustes"}</dd>
+                        <dd>
+                          <AdjustmentList adjustments={adjustments} />
+                        </dd>
                       </div>
                       {entrySporting?.sportingNote ? (
                         <div className="tg-mobile-detail-wide">
@@ -258,12 +324,18 @@ export default async function ResultsPage({
 }) {
   const params = await searchParams;
   const page = parsePositiveInt(params.page, 1, 500);
-  const category = param(params.categoria, "geral");
+  const requestedCategory = param(params.categoria, "geral");
+  const category = ["geral", "rapidos", "insanos"].includes(requestedCategory)
+    ? requestedCategory
+    : "geral";
+  const query = param(params.piloto).trim().slice(0, 80);
   const results = await getResultsPage({ page, pageSize: 6 });
   const bundles = await Promise.all(
     results.items.map(async (result) => {
       const allEntries = await getResultEntries(result.id);
-      const entries = filterResultEntriesByCategory(allEntries, category);
+      const entries = filterResultEntriesByCategory(allEntries, category).filter((entry) =>
+        matchesDriver(entry, query),
+      );
       return {
         result,
         entries,
@@ -271,6 +343,12 @@ export default async function ResultsPage({
       } satisfies ResultBundle;
     }),
   );
+  const visibleBundles = query ? bundles.filter((bundle) => bundle.entries.length > 0) : bundles;
+  const visibleEntryCount = visibleBundles.reduce(
+    (total, bundle) => total + bundle.entries.length,
+    0,
+  );
+  const clearHref = categoryHref(category, "");
 
   return (
     <RaceShell showMobileCta={false}>
@@ -291,30 +369,110 @@ export default async function ResultsPage({
               description="Os resultados históricos foram recalculados. Pilotos de categorias diferentes permanecem na mesma ordem de chegada e na mesma tabela de pontos."
             />
 
-            <div className="udk-category-tabs tg-category-tabs" aria-label="Filtro por categoria">
-              <Link className={category === "geral" ? "is-active" : ""} href="/resultados">
-                Geral
-              </Link>
-              <Link
-                className={category === "rapidos" ? "is-active" : ""}
-                href="/resultados?categoria=rapidos"
-              >
-                Ultras Rápidos
-              </Link>
-              <Link
-                className={category === "insanos" ? "is-active" : ""}
-                href="/resultados?categoria=insanos"
-              >
-                Ultras Insanos
-              </Link>
-            </div>
+            <section className="tg-results-tools" aria-label="Encontrar um resultado">
+              <form className="tg-result-search" method="get" role="search">
+                <label htmlFor="result-driver-search">Buscar por piloto</label>
+                <div className="tg-result-search-row">
+                  <div className="tg-result-search-input">
+                    <Search aria-hidden="true" />
+                    <input
+                      id="result-driver-search"
+                      name="piloto"
+                      type="search"
+                      placeholder="Ex.: André Felisberto"
+                      defaultValue={query}
+                      autoComplete="off"
+                    />
+                  </div>
+                  {category !== "geral" ? (
+                    <input type="hidden" name="categoria" value={category} />
+                  ) : null}
+                  <button className="race-button race-button-primary" type="submit">
+                    Buscar
+                  </button>
+                  {query ? (
+                    <Link className="race-button race-button-ghost" href={clearHref}>
+                      Limpar
+                    </Link>
+                  ) : null}
+                </div>
+              </form>
 
-            {bundles.length ? (
+              <div className="tg-result-filter-block">
+                <div className="tg-result-filter-heading">
+                  <span>Exibir linhas</span>
+                  <p>O filtro muda a leitura, não a posição geral nem os pontos publicados.</p>
+                </div>
+                <nav
+                  className="udk-category-tabs tg-category-tabs"
+                  aria-label="Filtrar por categoria"
+                >
+                  {(
+                    [
+                      ["geral", "Todas as categorias"],
+                      ["rapidos", "Ultras Rápidos"],
+                      ["insanos", "Ultras Insanos"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <Link
+                      className={category === value ? "is-active" : ""}
+                      href={categoryHref(value, query)}
+                      aria-current={category === value ? "true" : undefined}
+                      aria-label={`${label}${category === value ? " (selecionado)" : ""}`}
+                      key={value}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </section>
+
+            {visibleBundles.length ? (
+              <nav className="tg-results-index" aria-label="Índice de resultados">
+                <div className="tg-results-index-heading">
+                  <span>Arquivo de provas</span>
+                  <strong>
+                    {visibleBundles.length}{" "}
+                    {visibleBundles.length === 1 ? "resultado" : "resultados"}
+                    {query
+                      ? ` · ${visibleEntryCount} ${visibleEntryCount === 1 ? "piloto" : "pilotos"}`
+                      : ""}
+                  </strong>
+                </div>
+                <ol>
+                  {visibleBundles.map(({ result, entries }) => (
+                    <li key={result.id}>
+                      <a
+                        href={`#resultado-${result.id}`}
+                        aria-label={`Ir para ${raceLabel(result)}, ${formatShortDateLabel(result.startsAt)}`}
+                      >
+                        <span>{raceLabel(result)}</span>
+                        <small>
+                          {formatShortDateLabel(result.startsAt)} · {entries.length}{" "}
+                          {entries.length === 1 ? "piloto" : "pilotos"}
+                        </small>
+                        <ChevronRight aria-hidden="true" />
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            ) : null}
+
+            {visibleBundles.length ? (
               <div className="tg-results-list" aria-label="Resultados oficiais por corrida">
-                {bundles.map((bundle) => (
+                {visibleBundles.map((bundle) => (
                   <ResultPanel bundle={bundle} category={category} key={bundle.result.id} />
                 ))}
               </div>
+            ) : query ? (
+              <EditorialEmpty
+                index="03"
+                title="Nenhum piloto encontrado."
+                description={`Não há resultado publicado para “${query}” nesta leitura. Tente outro nome ou limpe a busca para ver todas as provas.`}
+                action={{ href: clearHref, label: "Limpar busca" }}
+              />
             ) : (
               <EditorialEmpty
                 index="03"
@@ -327,7 +485,7 @@ export default async function ResultsPage({
             <RacePagination
               meta={results.meta}
               basePath="/resultados"
-              params={{ categoria: category, page: String(page) }}
+              params={{ categoria: category, piloto: query, page: String(page) }}
             />
           </div>
         </section>

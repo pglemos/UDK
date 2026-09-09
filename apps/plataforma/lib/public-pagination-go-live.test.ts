@@ -127,19 +127,23 @@ describe("go-live public pagination", () => {
     expect(pageSource).toContain(
       'getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })',
     );
-    expect(pageSource).toContain("const leaderPoints = leaders.items[0]?.points ?? 0");
+    expect(pageSource).toContain(
+      "const leaderPoints = leaders.items[0]?.points ?? standings.items[0]?.points ?? 0",
+    );
     expect(pageSource).toMatch(/leaders\.items\.slice\(0, 3\)\.map/);
   });
 
-  it("renders the official standing position so shared ranks survive pagination", () => {
+  it("renders list order while preserving category position in the general view", () => {
     const pageSource = readFileSync(
       new URL("../app/classificacao/page.tsx", import.meta.url),
       "utf8",
     );
 
-    expect(pageSource).toContain("const officialPosition = driver.position ?? absolutePosition");
-    expect(pageSource).toContain("rank-${officialPosition}");
-    expect(pageSource).toMatch(/\{officialPosition\}\s*<\/span>/);
-    expect(pageSource).toContain("driver.position ?? index + 1");
+    expect(pageSource).toContain("const absolutePosition =");
+    expect(pageSource).toContain("rank-${absolutePosition}");
+    expect(pageSource).toMatch(/\{absolutePosition\}\s*<\/span>/);
+    expect(pageSource).toContain("{driver.position}º na categoria");
+    expect(pageSource).toContain("const podiumPosition = index + 1");
+    expect(pageSource).not.toContain("officialPosition");
   });
 });

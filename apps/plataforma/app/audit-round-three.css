@@ -58,6 +58,390 @@
   }
 }
 
+/* Results: make the official archive answer-first without changing the UDK world. */
+.tg-results-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(22px, 4vw, 56px);
+  margin: 34px 0 28px;
+  padding: 24px 0;
+  border-block: 1px solid var(--cinema-line-dark);
+}
+
+.tg-result-search,
+.tg-result-filter-block {
+  min-width: 0;
+}
+
+.tg-result-search > label,
+.tg-result-filter-heading > span,
+.tg-results-index-heading > span {
+  display: block;
+  color: var(--cinema-muted-dark);
+  font-family: var(--cinema-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tg-result-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.tg-result-search-input {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid var(--cinema-line-dark);
+  background: white;
+}
+
+.tg-result-search-input svg {
+  flex: 0 0 auto;
+  width: 18px;
+  color: var(--cinema-muted-dark);
+}
+
+.tg-result-search-input input {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--cinema-ink);
+}
+
+.tg-result-search .race-button {
+  min-height: 54px;
+}
+
+.tg-result-search .race-button-ghost {
+  border-color: var(--cinema-ink);
+  color: var(--cinema-ink);
+  --button-hover: var(--cinema-cyan);
+}
+
+.tg-result-filter-block {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.tg-result-filter-heading p {
+  max-width: 46ch;
+  margin: 6px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.tg-result-filter-block .tg-category-tabs {
+  margin: 0;
+}
+
+.tg-results-index {
+  margin: 0 0 56px;
+  border-bottom: 1px solid var(--cinema-line-dark);
+}
+
+.tg-result-panel {
+  scroll-margin-top: 24px;
+}
+
+.tg-results-index-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 0 14px;
+}
+
+.tg-results-index-heading strong {
+  color: var(--cinema-ink);
+  font-family: var(--cinema-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tg-results-index ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--cinema-line-dark);
+}
+
+.tg-results-index li {
+  min-width: 0;
+  background: var(--cinema-paper);
+}
+
+.tg-results-index a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 14px;
+  min-height: 92px;
+  align-items: center;
+  padding: 18px 20px;
+  transition:
+    background var(--cinema-fast) ease,
+    color var(--cinema-fast) ease;
+}
+
+.tg-results-index a:hover,
+.tg-results-index a:focus-visible {
+  background: var(--cinema-ink);
+  color: white;
+}
+
+.tg-results-index a > span {
+  font-family: var(--cinema-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.tg-results-index a small {
+  grid-column: 1;
+  color: var(--cinema-muted-dark);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.tg-results-index a:hover small,
+.tg-results-index a:focus-visible small {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tg-results-index a svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 20px;
+}
+
+.tg-result-selector-copy {
+  min-width: 0;
+}
+
+.tg-result-selector .tg-result-date {
+  display: block;
+}
+
+.tg-result-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tg-result-proof span {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid var(--cinema-line-dark);
+  color: var(--cinema-muted-dark);
+  font-family: var(--cinema-display);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tg-result-selector-actions {
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.tg-result-selector-actions .race-button {
+  white-space: nowrap;
+}
+
+.tg-adjustment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tg-adjustment-list li {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 3px 7px;
+  border: 1px solid var(--cinema-line-dark);
+  color: var(--cinema-ink);
+  font-family: var(--cinema-display);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.tg-adjustments-empty {
+  color: var(--cinema-muted-dark);
+}
+
+.tg-result-note {
+  margin-top: 7px;
+}
+
+.tg-result-note summary {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  color: var(--cinema-cyan-deep);
+  cursor: pointer;
+  font-family: var(--cinema-display);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tg-result-note p {
+  max-width: 42ch;
+  margin: 6px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.tg-standing-table {
+  min-width: 980px;
+  table-layout: fixed;
+}
+
+.tg-standing-table th:nth-child(1),
+.tg-standing-table td:nth-child(1) {
+  width: 72px;
+}
+
+.tg-standing-table th:nth-child(2),
+.tg-standing-table td:nth-child(2) {
+  width: 25%;
+}
+
+.tg-standing-table th:nth-child(3),
+.tg-standing-table td:nth-child(3) {
+  width: 17%;
+}
+
+.tg-standing-table td {
+  padding-block: 15px;
+}
+
+.tg-standing-table td > strong {
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .tg-results-tools {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .tg-result-search-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .tg-result-search-input {
+    grid-column: 1 / -1;
+  }
+
+  .tg-result-search .race-button {
+    width: auto;
+  }
+
+  .tg-results-index ol {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-result-selector-actions {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .tg-result-selector-actions .race-button {
+    width: auto;
+  }
+
+  .tg-result-panel .tg-desktop-standing-table-wrap {
+    display: none;
+  }
+
+  .tg-result-panel .tg-mobile-result-list {
+    display: grid;
+  }
+}
+
+@media (max-width: 760px) {
+  .tg-results-tools {
+    margin-top: 24px;
+    padding-block: 18px;
+  }
+
+  .tg-result-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-result-search .race-button,
+  .tg-result-selector-actions .race-button {
+    width: 100%;
+  }
+
+  .tg-results-index {
+    margin-bottom: 38px;
+  }
+
+  .tg-results-index-heading {
+    display: grid;
+    gap: 6px;
+  }
+
+  .tg-results-index a {
+    min-height: 76px;
+    padding: 15px 16px;
+  }
+
+  .tg-result-proof {
+    margin-top: 14px;
+  }
+
+  .tg-result-proof span {
+    font-size: 0.6rem;
+  }
+
+  .tg-result-selector-actions {
+    gap: 10px;
+  }
+
+  .tg-mobile-result-driver > span {
+    max-width: 25ch;
+  }
+
+  .tg-mobile-detail-grid .tg-adjustment-list {
+    justify-content: flex-end;
+  }
+}
+
 .cinema-driver-poster-media > img,
 .tg-driver-poster-media > img {
   position: absolute !important;
@@ -285,6 +669,22 @@
   text-transform: uppercase;
 }
 
+.tg-result-position {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.tg-result-status {
+  color: var(--cinema-muted-dark);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .tg-mobile-standing-list,
 .tg-mobile-result-list {
   display: none;
@@ -395,6 +795,11 @@
     padding: 18px 0;
   }
 
+  .tg-results-list {
+    gap: 54px;
+    margin-top: 28px;
+  }
+
   .tg-result-selector h2 {
     margin-top: 8px;
     font-size: clamp(2.2rem, 10vw, 3.2rem);
@@ -447,7 +852,7 @@
   }
 
   .tg-mobile-standing-summary > .udk-rank,
-  .tg-mobile-result-summary > .udk-rank {
+  .tg-mobile-result-summary > .tg-result-position .udk-rank {
     display: inline-grid;
     min-width: 36px;
     min-height: 36px;

@@ -1,0 +1,267 @@
+/* Classification-only refinements. Keep the shared racing system untouched. */
+.tg-page-hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 24px;
+  color: var(--cinema-cyan);
+  font-family: var(--cinema-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tg-page-hero-action svg {
+  width: 17px;
+  transition: transform var(--cinema-fast) ease;
+}
+
+.tg-page-hero-action:hover svg,
+.tg-page-hero-action:focus-visible svg {
+  transform: translateX(4px);
+}
+
+.tg-standings-page .tg-toolbar {
+  width: min(100%, 760px);
+  margin-bottom: 0;
+}
+
+.tg-standings-page .tg-official-pdf-links {
+  align-items: stretch;
+}
+
+.tg-standings-page .tg-pdf-link,
+.tg-official-pdf-links .tg-pdf-link {
+  flex: 0 1 220px;
+  justify-content: space-between;
+  min-height: 62px;
+  text-align: left;
+}
+
+.tg-pdf-link > span {
+  display: grid;
+  gap: 4px;
+}
+
+.tg-pdf-link strong {
+  font-family: var(--cinema-display);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tg-pdf-link small {
+  color: var(--cinema-muted-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tg-pdf-link:hover small,
+.tg-pdf-link:focus-visible small {
+  color: currentColor;
+}
+
+.tg-standings-context {
+  margin: 0 0 26px;
+  color: var(--cinema-muted-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.tg-standing-podium-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: baseline;
+  margin-bottom: 14px;
+}
+
+.tg-standing-podium-heading > span {
+  color: var(--cinema-cyan-deep);
+  font-family: var(--cinema-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tg-standing-podium-heading h3 {
+  margin: 0;
+  font-family: var(--cinema-display);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.tg-standing-podium-heading p {
+  grid-column: 2;
+  margin: 6px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.tg-standings-page .tg-standing-podium {
+  min-height: clamp(390px, 34vw, 520px);
+  margin-bottom: 38px;
+}
+
+.tg-standings-page .tg-standing-podium-card h4 {
+  margin: 0;
+  font-family: var(--cinema-display);
+  font-size: clamp(1.8rem, 3.1vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+  text-transform: uppercase;
+}
+
+.tg-standings-page .tg-standing-table td[data-label="Categoria"] > span,
+.tg-category-position {
+  display: block;
+}
+
+.tg-category-position {
+  margin-top: 5px;
+  color: var(--cinema-muted-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.tg-standings-page .race-pagination-status {
+  margin: 0 auto;
+  color: var(--cinema-muted-dark);
+  font-family: var(--cinema-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .tg-standings-page .race-pagination > a,
+  .tg-standings-page .race-pagination > span[aria-disabled="true"] {
+    flex: 0 0 auto;
+  }
+
+  .tg-standings-page .race-pagination-status {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .tg-standings-page .tg-toolbar {
+    width: 100%;
+  }
+
+  .tg-standings-page .tg-official-pdf-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tg-standings-page .tg-pdf-link,
+  .tg-official-pdf-links .tg-pdf-link {
+    min-width: 0;
+    min-height: 58px;
+    padding-inline: 13px;
+  }
+
+  .tg-standings-page .tg-pdf-link:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .tg-pdf-link strong {
+    font-size: 0.75rem;
+  }
+
+  .tg-pdf-link small {
+    font-size: 0.6rem;
+  }
+
+  .tg-standings-context {
+    margin-bottom: 20px;
+    font-size: 0.7rem;
+  }
+
+  .tg-standing-podium-heading {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .tg-standing-podium-heading p {
+    grid-column: auto;
+    margin-top: 0;
+  }
+
+  .tg-standings-page .tg-standing-podium {
+    order: 1;
+    min-height: 0;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .tg-standings-page .tg-mobile-standing-list {
+    order: 2;
+  }
+
+  .tg-standings-page .tg-standing-podium-card,
+  .tg-standings-page .tg-standing-podium-card.place-1,
+  .tg-standings-page .tg-standing-podium-card.place-2,
+  .tg-standings-page .tg-standing-podium-card.place-3 {
+    min-height: 208px;
+    padding: 14px;
+  }
+
+  .tg-standings-page .tg-standing-podium-card > span {
+    top: 12px;
+    left: 14px;
+  }
+
+  .tg-standings-page .tg-standing-podium-visual {
+    min-height: 88px;
+  }
+
+  .tg-standings-page .tg-standing-podium-card h4 {
+    max-width: 12ch;
+    font-size: clamp(1.4rem, 7vw, 2rem);
+    line-height: 0.9;
+  }
+
+  .tg-standings-page .tg-standing-podium-card > b {
+    font-size: 1.35rem;
+  }
+
+  .tg-standings-page .tg-standing-podium-card small {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 0.58rem;
+  }
+
+  .tg-standings-page .tg-mobile-standing-driver > small {
+    display: block;
+    margin-top: 3px;
+    color: var(--cinema-cyan-deep);
+    font-size: 0.64rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+}

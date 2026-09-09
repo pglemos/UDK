@@ -11,12 +11,14 @@ export function PageHero({
   description,
   index = "UDK",
   compact = false,
+  action,
 }: {
   eyebrow?: string;
   title: string;
   description: string;
   index?: string;
   compact?: boolean;
+  action?: { href: string; label: string };
 }) {
   const visual = pageHeroVisual(index);
 
@@ -38,6 +40,11 @@ export function PageHero({
           <span>{eyebrow}</span>
           <h1>{title}</h1>
           <p>{description}</p>
+          {action ? (
+            <Link className="tg-page-hero-action" href={action.href}>
+              {action.label} <ArrowRight aria-hidden="true" />
+            </Link>
+          ) : null}
         </div>
         <div className="tg-page-hero-index" aria-hidden="true">
           {index}
@@ -212,10 +219,12 @@ export function RacePagination({
   meta,
   basePath,
   params,
+  showStatus = false,
 }: {
   meta: PageMeta;
   basePath: string;
   params: Record<string, string | undefined>;
+  showStatus?: boolean;
 }) {
   if (meta.totalPages <= 1) return null;
 
@@ -255,6 +264,12 @@ export function RacePagination({
           </span>
         ))}
       </div>
+      {showStatus ? (
+        <p className="race-pagination-status" aria-live="polite">
+          Página {meta.page} de {meta.totalPages}
+          <span className="sr-only"> · {meta.totalItems} resultados</span>
+        </p>
+      ) : null}
       {meta.hasNextPage ? (
         <Link href={paginationHref(basePath, current, meta.page + 1)}>
           <span>Próxima</span> <ArrowRight aria-hidden="true" />

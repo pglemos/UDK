@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06",
+  "generatedAt": "2026-08-26",
   "policy": {
     "productionSources": "Local files only; Google Drive sources are provenance only",
     "pilotIdentity": "No facial recognition or inferred identity used",
@@ -54,12 +54,12 @@
     },
     {
       "path": "/media/official/heroes/pilotos.webp",
-      "source": "ULT-DPTO-Cover.jpg + ULT-FLAVIO-Cover.jpg",
+      "source": "ChatGPT image generation from UDK visual brief (2026-08-26)",
       "purpose": "Pilotos page hero",
-      "width": 1920,
-      "height": 1080,
-      "crop": "two-portrait collage with left text-safe area",
-      "transform": "WebP quality 86"
+      "width": 1672,
+      "height": 941,
+      "crop": "16:9 cinematic composition with left text-safe area",
+      "transform": "Generated PNG exported to WebP quality 92"
     },
     {
       "path": "/media/official/heroes/noticias.webp",
@@ -144,12 +144,12 @@
     },
     {
       "path": "/media/official/stages/stage-01.webp",
-      "source": "IMG_4290.MOV @ 1.45s",
+      "source": "ChatGPT image generation from UDK visual brief (2026-08-26)",
       "purpose": "Stage fallback 01",
-      "width": 1200,
-      "height": 800,
-      "crop": "3:2 action crop",
-      "transform": "WebP quality 84"
+      "width": 1536,
+      "height": 1024,
+      "crop": "3:2 low-angle finish-line composition",
+      "transform": "Generated PNG exported to WebP quality 92"
     },
     {
       "path": "/media/official/stages/stage-02.webp",
@@ -171,21 +171,21 @@
     },
     {
       "path": "/media/official/stages/stage-04.webp",
-      "source": "255A.mp4 @ 1.40s",
+      "source": "ChatGPT image generation from UDK visual brief (2026-08-26)",
       "purpose": "Stage fallback 04",
-      "width": 720,
-      "height": 960,
-      "crop": "vertical track crop",
-      "transform": "WebP quality 84"
+      "width": 1086,
+      "height": 1448,
+      "crop": "3:4 low-angle two-kart composition",
+      "transform": "Generated PNG exported to WebP quality 92"
     },
     {
       "path": "/media/official/stages/stage-05.webp",
-      "source": "275A.mp4 @ 7.00s",
+      "source": "ChatGPT image generation from UDK visual brief (2026-08-26)",
       "purpose": "Stage fallback 05",
-      "width": 720,
-      "height": 960,
-      "crop": "vertical pack crop",
-      "transform": "WebP quality 84"
+      "width": 1086,
+      "height": 1448,
+      "crop": "3:4 low-angle pack composition",
+      "transform": "Generated PNG exported to WebP quality 92"
     },
     {
       "path": "/media/official/news/news-01.webp",
