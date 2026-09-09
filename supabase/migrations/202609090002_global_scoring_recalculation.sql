@@ -44,6 +44,22 @@ drop trigger if exists result_entries_auto_points on public.result_entries;
 create trigger result_entries_auto_points before insert or update of result_id,position,pole,fastest_lap,best_pit,penalty_points,status
 on public.result_entries for each row execute function public.apply_result_entry_points();
 
+-- Migrations run as the database owner, before any auth user exists. Keep the
+-- normal RPC authorization intact and allow only this transaction-local,
+-- owner-only context to rebuild standings internally.
+create or replace function public.can_judge_season(p_season_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select (
+    session_user = 'postgres'
+    and current_setting('udk.migration_context', true) = 'standings_rebuild'
+  ) or public.has_active_role(array['admin','organization','judge'], null, p_season_id)
+$$;
+
 -- Corrida 1: Bernardo pole, Lucas volta rápida. Corrida 2: André pole, Arthur volta rápida.
 update public.result_entries entry set pole=false, fastest_lap=false
 from public.results result where result.id=entry.result_id and result.external_racing_id between 2026090801 and 2026090804;
@@ -88,11 +104,9 @@ where entry.result_id=result.id and result.status in ('homologated','published',
   and result.deleted_at is null and stage.deleted_at is null and entry.deleted_at is null;
 
 do $$
-declare v_season_id uuid; v_category_id uuid; v_admin_id uuid;
+declare v_season_id uuid; v_category_id uuid;
 begin
-  select user_id into v_admin_id from public.user_roles where role='admin' and (expires_at is null or expires_at>now()) limit 1;
-  if v_admin_id is null then raise exception 'no active admin available for standings recalculation'; end if;
-  perform set_config('request.jwt.claim.sub', v_admin_id::text, true);
+  perform set_config('udk.migration_context', 'standings_rebuild', true);
   select season.id into v_season_id from public.seasons season
   join public.championships championship on championship.id=season.championship_id
   where championship.slug='udk' and season.year=2026;
