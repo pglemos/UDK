@@ -58,12 +58,14 @@ select is(
     where championship.slug = 'udk'
       and season.year = 2026
       and (stage.starts_at at time zone 'America/Sao_Paulo')::date = date '2026-08-18'
-      and result.version = 2
+      and result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and result.deleted_at is null
   ),
-  2::bigint,
-  'both 1st-stage category results have a rectified version 2'
+  1::bigint,
+  'the 1st-stage Endurance is one rectified combined result'
 );
 
 select is(
@@ -76,11 +78,12 @@ select is(
     where championship.slug = 'udk'
       and season.year = 2026
       and (stage.starts_at at time zone 'America/Sao_Paulo')::date = date '2026-08-18'
-      and result.version = 1
-      and result.deleted_at is null
+      and result.category_id is not null
+      and result.version in (1, 2)
+      and result.deleted_at is not null
   ),
-  2::bigint,
-  'published version 1 remains preserved after rectification'
+  4::bigint,
+  'category result versions remain preserved as archived audit'
 );
 
 select is(
@@ -90,7 +93,9 @@ select is(
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
     join public.stages stage on stage.id = result.stage_id
-    where result.version = 2
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and driver.slug = 'pedro-guilherme'
       and (stage.starts_at at time zone 'America/Sao_Paulo')::date = date '2026-08-18'
@@ -107,7 +112,9 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'lucas-rabelo'
       and entry.deleted_at is null
     limit 1
@@ -122,7 +129,9 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'andre-felisberto'
       and entry.deleted_at is null
     limit 1
@@ -137,43 +146,58 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'arthur-henrique'
       and entry.deleted_at is null
     limit 1
   ),
-  151,
-  'Arthur receives the overall fastest-lap bonus'
+  133,
+  'Arthur receives the overall Endurance fastest-lap bonus'
 );
 
-select is(
+select ok(
   (
-    select entry.points::integer
+    select entry.points = coalesce((rule.position_points ->> entry.position::text)::numeric, 0)
+      and not entry.pole
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    join public.stages stage on stage.id = result.stage_id
+    join public.points_rules rule
+      on rule.season_id = stage.season_id
+     and rule.event_format = stage.format
+     and rule.category_id is null
+     and rule.active
+     and rule.deleted_at is null
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'bernardo'
       and entry.deleted_at is null
+    order by rule.version desc
     limit 1
   ),
-  132,
-  'Bernardo keeps category pole information out of overall bonus scoring'
+  'Bernardo receives only the combined-position Endurance points'
 );
 
-select is(
+select ok(
   (
-    select entry.points::integer
+    select entry.position > 30
+      and entry.points = -10
+      and entry.penalty_ms = 0
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'vitor-hugo'
       and entry.deleted_at is null
     limit 1
   ),
-  117,
-  'Vitor Hugo has the 10-point black/white sporting deduction'
+  'Vitor Hugo is beyond Endurance P30 and keeps only the sporting deduction'
 );
 
 select is(
@@ -182,13 +206,15 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
     limit 1
   ),
-  14,
-  'Lucca remains P14 because TimingOfficialReport already includes the five-second penalty'
+  33,
+  'Lucca remains at the combined Endurance position'
 );
 
 select is(
@@ -197,28 +223,37 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
     limit 1
   ),
-  129,
-  'Lucca keeps P14 Endurance base points'
+  0,
+  'Lucca receives no Endurance arrival points after P30'
 );
 
-select is(
+select ok(
   (
-    select entry.points::integer
+    select entry.position < lucca.position
+      and entry.position > 30
+      and entry.points = -10
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2 and result.status = 'rectified'
+    join public.result_entries lucca on lucca.result_id = entry.result_id
+    join public.drivers lucca_driver on lucca_driver.id = lucca.driver_id
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1 and result.status = 'rectified'
       and driver.slug = 'braulio-bonoto'
+      and lucca_driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
+      and lucca.deleted_at is null
     limit 1
   ),
-  120,
-  'Braulio remains P13 and receives only the 10-point championship deduction'
+  'Braulio stays ahead of Lucca and receives only the sporting deduction'
 );
 
 select is(

@@ -18,30 +18,39 @@ select is(
     where championship.slug = 'udk'
       and season.year = 2026
       and (stage.starts_at at time zone 'America/Sao_Paulo')::date = date '2026-08-18'
-      and result.version = 2
+      and result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and entry.penalty_points = 10
       and entry.penalty_ms = 0
       and entry.deleted_at is null
   ),
   8::bigint,
-  'all eight black/white flags deduct points without adding another five seconds'
+  'all eight combined Endurance flags deduct points without adding another five seconds'
 );
 
-select is(
+select ok(
   (
-    select entry.position
+    select entry.position < lucca.position
+      and entry.position > 30
+      and entry.penalty_ms = 0
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2
+    join public.result_entries lucca on lucca.result_id = entry.result_id
+    join public.drivers lucca_driver on lucca_driver.id = lucca.driver_id
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and driver.slug = 'braulio-bonoto'
+      and lucca_driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
+      and lucca.deleted_at is null
     limit 1
   ),
-  13,
-  'Braulio keeps P13 because the official LapTime result already contains the five-second penalty'
+  'Braulio remains ahead of Lucca in the combined result'
 );
 
 select is(
@@ -50,14 +59,16 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and driver.slug = 'braulio-bonoto'
       and entry.deleted_at is null
     limit 1
   ),
-  120,
-  'Braulio receives P13 base points minus only the 10-point championship deduction'
+  -10,
+  'Braulio receives only the championship deduction after Endurance P30'
 );
 
 select is(
@@ -66,14 +77,16 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
     limit 1
   ),
-  14,
-  'Lucca remains P14 because no second time penalty is added to Braulio'
+  33,
+  'Lucca remains P33 in the combined Endurance result'
 );
 
 select is(
@@ -82,14 +95,16 @@ select is(
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
-    where result.version = 2
+    where result.category_id is null
+      and result.external_racing_id = 2026081801
+      and result.version = 1
       and result.status = 'rectified'
       and driver.slug = 'lucca-dambros'
       and entry.deleted_at is null
     limit 1
   ),
-  129,
-  'Lucca keeps P14 Endurance base points'
+  0,
+  'Lucca receives no arrival points after Endurance P30'
 );
 
 select * from finish();
