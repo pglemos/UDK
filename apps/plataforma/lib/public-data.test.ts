@@ -3,6 +3,7 @@ import {
   buildPageMeta,
   formatGap,
   formatLapTime,
+  filterResultEntriesByCategory,
   getPageRange,
   getNextUpcomingStage,
   getStageAction,
@@ -200,6 +201,35 @@ describe("public pagination and timing", () => {
     expect(formatLapTime(null)).toBe("—");
     expect(formatGap(375)).toBe("+0,375");
     expect(formatGap(0)).toBe("Líder");
+  });
+});
+
+describe("combined race results", () => {
+  it("filters a general result by category without renumbering global positions", () => {
+    const entries = [
+      normalizePublicResultEntry({
+        id: "entry-insanos",
+        result_id: "race-1",
+        position: 1,
+        driver_slug: "andre-felisberto",
+        driver_name: "André Felisberto",
+        category: "Ultras Insanos",
+        category_slug: "insanos",
+      }),
+      normalizePublicResultEntry({
+        id: "entry-rapidos",
+        result_id: "race-1",
+        position: 9,
+        driver_slug: "raphael-werner",
+        driver_name: "Raphael Werner",
+        category: "Ultras Rápidos",
+        category_slug: "rapidos",
+      }),
+    ];
+
+    expect(
+      filterResultEntriesByCategory(entries, "rapidos").map((entry) => entry.position),
+    ).toEqual([9]);
   });
 });
 

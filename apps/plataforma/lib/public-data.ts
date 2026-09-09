@@ -71,6 +71,8 @@ export type PublicResult = {
   stageId: string;
   stageSlug: string;
   stageTitle: string;
+  sessionName: string;
+  sessionKind: string;
   category: string;
   categorySlug: string;
   status: string;
@@ -88,6 +90,8 @@ export type PublicResultEntry = {
   driverSlug: string;
   driverName: string;
   driverNumber: number | null;
+  category: string;
+  categorySlug: string;
   kartNumber: number | null;
   laps: number;
   totalTimeMs: number | null;
@@ -296,6 +300,8 @@ export function normalizePublicResult(row: UnknownRow): PublicResult {
     stageId: stringValue(row.stage_id),
     stageSlug: stringValue(row.stage_slug) || stringValue(row.stage_id),
     stageTitle: stringValue(row.stage_title),
+    sessionName: stringValue(row.session_name),
+    sessionKind: stringValue(row.session_kind),
     category: stringValue(row.category, "Geral"),
     categorySlug: stringValue(row.category_slug),
     status: stringValue(row.status),
@@ -315,6 +321,8 @@ export function normalizePublicResultEntry(row: UnknownRow): PublicResultEntry {
     driverSlug: stringValue(row.driver_slug),
     driverName: stringValue(row.driver_name),
     driverNumber: nullableNumber(row.driver_number),
+    category: stringValue(row.category, "Geral"),
+    categorySlug: stringValue(row.category_slug),
     kartNumber: nullableNumber(row.kart_number),
     laps: numberValue(row.laps),
     totalTimeMs: nullableNumber(row.total_time_ms),
@@ -539,12 +547,10 @@ export async function getStages({
 export async function getResultsPage({
   page = 1,
   pageSize = 8,
-  category,
   status,
 }: {
   page?: number;
   pageSize?: number;
-  category?: string;
   status?: string;
 } = {}): Promise<PaginatedResult<PublicResult>> {
   const client = publicClient();
@@ -557,7 +563,6 @@ export async function getResultsPage({
     .order("starts_at", { ascending: false })
     .range(from, to);
 
-  if (category && category !== "geral") request = request.eq("category_slug", category);
   if (status && status !== "todos") request = request.eq("status", status);
 
   const { data, count, error } = await request;
@@ -567,6 +572,14 @@ export async function getResultsPage({
     items: ((data ?? []) as UnknownRow[]).map(normalizePublicResult),
     meta: buildPageMeta(page, pageSize, count ?? 0),
   };
+}
+
+export function filterResultEntriesByCategory(
+  entries: PublicResultEntry[],
+  category?: string,
+): PublicResultEntry[] {
+  if (!category || category === "geral") return entries;
+  return entries.filter((entry) => entry.categorySlug === category);
 }
 
 export async function getResultEntries(resultId: string): Promise<PublicResultEntry[]> {

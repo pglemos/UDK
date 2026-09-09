@@ -97,9 +97,9 @@ select is(
   'Endurance P6 continues at 137 points'
 );
 
-select is(
+select ok(
   (
-    select (rule.position_points ->> '142')::integer
+    select rule.position_points ? '30' and not (rule.position_points ? '31')
     from public.points_rules rule
     join public.seasons season on season.id = rule.season_id
     join public.championships championship on championship.id = season.championship_id
@@ -108,8 +108,7 @@ select is(
       and rule.active and rule.deleted_at is null
     order by rule.version desc limit 1
   ),
-  1,
-  'Endurance sequence reaches one point at P142'
+  'Endurance table ends at P30; later positions receive no arrival points'
 );
 
 select is(

@@ -86,26 +86,29 @@ export default async function StandingsPage({
               <div
                 className="tg-official-pdf-links"
                 role="group"
-                aria-label="PDFs oficiais da primeira etapa"
+                aria-label="PDFs oficiais por corrida"
               >
-                {category === "insanos" || category === "geral" ? (
-                  <a
-                    className="race-button race-button-outline is-light"
-                    href={officialResultPdf.insanos}
-                    download
-                  >
-                    PDF Ultra Insanos <Download aria-hidden="true" />
-                  </a>
-                ) : null}
-                {category === "rapidos" || category === "geral" ? (
-                  <a
-                    className="race-button race-button-outline is-light"
-                    href={officialResultPdf.rapidos}
-                    download
-                  >
-                    PDF Ultras Rápidos <Download aria-hidden="true" />
-                  </a>
-                ) : null}
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.endurance}
+                  download
+                >
+                  PDF Endurance <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.corrida1}
+                  download
+                >
+                  PDF Corrida 1 <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.corrida2}
+                  download
+                >
+                  PDF Corrida 2 <Download aria-hidden="true" />
+                </a>
               </div>
 
               <form

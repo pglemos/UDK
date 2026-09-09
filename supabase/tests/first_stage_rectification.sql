@@ -245,18 +245,19 @@ select is(
     from public.public_portal_standings standing
     where standing.slug = 'lucas-rabelo'
   ),
-  144,
-  'public standings expose Lucas Rabelo corrected total'
+  235,
+  'public standings expose Lucas Rabelo recalculated total'
 );
 
 select is(
   (
-    select max(result.version)
+    select count(*)
     from public.public_portal_results result
-    where result.category_slug = 'rapidos'
+    where result.category_slug is null
+      and result.title = 'Resultado oficial - 1a etapa - Endurance - Geral'
   ),
-  2,
-  'public results expose the latest rectified version'
+  1::bigint,
+  'public results expose one combined Endurance result'
 );
 
 select * from finish();

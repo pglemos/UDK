@@ -56,28 +56,40 @@ export default async function DriversPage({
               description="Busque pilotos, filtre categorias e acompanhe a evolução de quem está na temporada."
             />
 
-            <div className="tg-official-pdf-links" aria-label="PDFs oficiais da primeira etapa">
+            <div className="tg-official-pdf-links" aria-label="PDFs oficiais por corrida">
               <a
                 className="race-button race-button-outline is-light"
-                href={officialResultPdf.insanos}
+                href={officialResultPdf.endurance}
                 download
               >
-                Resultado Insanos <Download aria-hidden="true" />
+                Resultado Endurance <Download aria-hidden="true" />
               </a>
               <a
                 className="race-button race-button-outline is-light"
-                href={officialResultPdf.rapidos}
+                href={officialResultPdf.corrida1}
                 download
               >
-                Resultado Rápidos <Download aria-hidden="true" />
+                Resultado Corrida 1 <Download aria-hidden="true" />
+              </a>
+              <a
+                className="race-button race-button-outline is-light"
+                href={officialResultPdf.corrida2}
+                download
+              >
+                Resultado Corrida 2 <Download aria-hidden="true" />
               </a>
             </div>
 
             <p className="tg-directory-count" aria-live="polite">
-              {drivers.meta.totalItems} {drivers.meta.totalItems === 1 ? "piloto publicado" : "pilotos publicados"}
+              {drivers.meta.totalItems}{" "}
+              {drivers.meta.totalItems === 1 ? "piloto publicado" : "pilotos publicados"}
             </p>
 
-            <form className="udk-toolbar tg-toolbar" action="/pilotos" aria-label="Filtros de pilotos">
+            <form
+              className="udk-toolbar tg-toolbar"
+              action="/pilotos"
+              aria-label="Filtros de pilotos"
+            >
               <SearchField defaultValue={query} placeholder="Buscar piloto" />
               <select name="categoria" defaultValue={category} aria-label="Categoria">
                 <option value="geral">Todas as categorias</option>

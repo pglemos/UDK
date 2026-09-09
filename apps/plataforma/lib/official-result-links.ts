@@ -1,26 +1,15 @@
 export const officialResultPdf = {
-  insanos: "/resultados/udk-2026-1a-etapa-ultra-insanos.pdf",
-  rapidos: "/resultados/udk-2026-1a-etapa-ultras-rapidos.pdf",
-  segundaEtapaInsanos: "/resultados/udk-2026-2a-etapa-ultra-insanos-corrida.pdf",
-  segundaEtapaRapidos: "/resultados/udk-2026-2a-etapa-ultras-rapidos-corrida.pdf",
+  endurance: "/resultados/udk-2026-1a-etapa-endurance-geral.pdf",
+  corrida1: "/resultados/udk-2026-2a-etapa-corrida-1-geral.pdf",
+  corrida2: "/resultados/udk-2026-2a-etapa-corrida-2-geral.pdf",
 } as const;
 
-export type OfficialResultCategory = keyof typeof officialResultPdf;
+export type OfficialResultKey = keyof typeof officialResultPdf;
 
-export function officialResultPdfForCategory(category: string): string | null {
-  if (category === "insanos" || category === "rapidos") {
-    return officialResultPdf[category];
-  }
+export function officialResultPdfForResult(sessionName: string, title = ""): string | null {
+  const source = `${sessionName} ${title}`.toLocaleLowerCase("pt-BR");
+  if (source.includes("endurance")) return officialResultPdf.endurance;
+  if (source.includes("corrida 1")) return officialResultPdf.corrida1;
+  if (source.includes("corrida 2")) return officialResultPdf.corrida2;
   return null;
-}
-
-export function officialResultPdfForResult(category: string, startsAt: string | null): string | null {
-  if (startsAt?.startsWith("2026-09-08")) {
-    return category === "insanos"
-      ? officialResultPdf.segundaEtapaInsanos
-      : category === "rapidos"
-        ? officialResultPdf.segundaEtapaRapidos
-        : null;
-  }
-  return officialResultPdfForCategory(category);
 }
