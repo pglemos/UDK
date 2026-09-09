@@ -40,8 +40,8 @@ with rows(category_slug,session_name,driver_slug,position,points) as (values
  join public.sessions ss on ss.id=r.session_id
  where r.external_racing_id between 2026090801 and 2026090804
 ), inserted as (
- insert into public.result_entries(result_id,driver_id,position,status,points,gross_points,penalty_points)
- select sc.result_id,d.id,rows.position,'classified',rows.points,rows.points,0
+ insert into public.result_entries(result_id,driver_id,position,status,points,penalty_points)
+ select sc.result_id,d.id,rows.position,'classified',rows.points,0
  from rows join scope sc using(category_slug,session_name)
  join public.drivers d on d.season_id=sc.season_id and d.slug=rows.driver_slug
  where not exists (select 1 from public.result_entries e where e.result_id=sc.result_id and e.driver_id=d.id and e.deleted_at is null)
