@@ -184,8 +184,8 @@ select ok(
 
 select ok(
   (
-    select entry.position > 30
-      and entry.points = -10
+    select entry.position = 30
+      and entry.points = 103
       and entry.penalty_ms = 0
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
@@ -197,7 +197,7 @@ select ok(
       and entry.deleted_at is null
     limit 1
   ),
-  'Vitor Hugo is beyond Endurance P30 and keeps only the sporting deduction'
+  'Vitor Hugo keeps P30 Endurance points minus the sporting deduction'
 );
 
 select is(
@@ -213,7 +213,7 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  33,
+  29,
   'Lucca remains at the combined Endurance position'
 );
 
@@ -230,15 +230,15 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  0,
-  'Lucca receives no Endurance arrival points after P30'
+  114,
+  'Lucca receives the combined P29 Endurance points'
 );
 
 select ok(
   (
-    select entry.position < lucca.position
-      and entry.position > 30
-      and entry.points = -10
+    select entry.position = 28
+      and entry.position < lucca.position
+      and entry.points = 105
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
     join public.drivers driver on driver.id = entry.driver_id
@@ -253,7 +253,7 @@ select ok(
       and lucca.deleted_at is null
     limit 1
   ),
-  'Braulio stays ahead of Lucca and receives only the sporting deduction'
+  'Braulio stays at combined P28 with only the sporting deduction'
 );
 
 select is(

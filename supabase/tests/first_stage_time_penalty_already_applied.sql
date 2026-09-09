@@ -32,8 +32,8 @@ select is(
 
 select ok(
   (
-    select entry.position < lucca.position
-      and entry.position > 30
+    select entry.position = 28
+      and entry.position < lucca.position
       and entry.penalty_ms = 0
     from public.result_entries entry
     join public.results result on result.id = entry.result_id
@@ -50,7 +50,7 @@ select ok(
       and lucca.deleted_at is null
     limit 1
   ),
-  'Braulio remains ahead of Lucca in the combined result'
+  'Braulio remains P28 ahead of Lucca in the combined result'
 );
 
 select is(
@@ -67,8 +67,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  -10,
-  'Braulio receives only the championship deduction after Endurance P30'
+  105,
+  'Braulio receives P28 Endurance points minus the championship deduction'
 );
 
 select is(
@@ -85,8 +85,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  33,
-  'Lucca remains P33 in the combined Endurance result'
+  29,
+  'Lucca remains P29 in the combined Endurance result'
 );
 
 select is(
@@ -103,8 +103,8 @@ select is(
       and entry.deleted_at is null
     limit 1
   ),
-  0,
-  'Lucca receives no arrival points after Endurance P30'
+  114,
+  'Lucca receives the combined P29 Endurance points'
 );
 
 select * from finish();
