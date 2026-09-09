@@ -88,12 +88,12 @@ where entry.result_id=result.id and result.status in ('homologated','published',
   and result.deleted_at is null and stage.deleted_at is null and entry.deleted_at is null;
 
 do $$
-declare season_id uuid; category_id uuid;
+declare v_season_id uuid; v_category_id uuid;
 begin
-  select season.id into season_id from public.seasons season
+  select season.id into v_season_id from public.seasons season
   join public.championships championship on championship.id=season.championship_id
   where championship.slug='udk' and season.year=2026;
-  for category_id in select category.id from public.categories category where category.season_id=season_id and category.deleted_at is null loop
-    perform public.recalculate_standings(season_id, category_id);
+  for v_category_id in select category.id from public.categories category where category.season_id=v_season_id and category.deleted_at is null loop
+    perform public.recalculate_standings(v_season_id, v_category_id);
   end loop;
 end $$;
