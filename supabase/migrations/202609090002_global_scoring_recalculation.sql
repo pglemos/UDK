@@ -18,7 +18,6 @@ with scope as (
   union all
   select 'endurance', jsonb_object_agg(position::text, points order by position), 1, 1, 10
   from (select position, case position when 1 then 150 when 2 then 145 when 3 then 142 when 4 then 140 when 5 then 138 when 6 then 137 when 7 then 136 when 8 then 135 when 9 then 134 when 10 then 133 when 11 then 132 when 12 then 131 when 13 then 130 when 14 then 129 when 15 then 128 when 16 then 127 when 17 then 126 when 18 then 125 when 19 then 124 when 20 then 123 else 143-position end points from generate_series(1,30) position) x
-  group by event_format
 )
 update public.points_rules rule
 set position_points=maps.position_points, pole_points=maps.pole_points,
