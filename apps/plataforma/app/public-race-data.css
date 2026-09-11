@@ -1,0 +1,602 @@
+/* Public timing and standings share a compact, readable consultation layout. */
+.tg-data-page {
+  background: var(--cinema-paper);
+  color: var(--cinema-ink);
+  font-variant-numeric: tabular-nums;
+  --data-sticky-offset: calc(var(--cinema-header) + 136px);
+}
+
+.tg-data-page .tg-data-heading {
+  padding: calc(var(--cinema-header) + 28px) 0 26px;
+  background:
+    linear-gradient(90deg, rgba(5, 6, 7, 0.95), rgba(5, 6, 7, 0.76)),
+    url("/media/official/heroes/classificacao.webp") center 45% / cover;
+  color: var(--cinema-paper);
+}
+
+.tg-results-page .tg-data-heading {
+  background-image:
+    linear-gradient(90deg, rgba(5, 6, 7, 0.95), rgba(5, 6, 7, 0.76)),
+    url("/media/official/heroes/resultados.webp");
+}
+
+.tg-data-heading > .race-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.tg-data-heading h1 {
+  margin: 0;
+  font-family: var(--cinema-display);
+  font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.tg-data-heading p {
+  max-width: 70ch;
+  margin: 12px 0 0;
+  color: var(--cinema-paper-2);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.tg-data-heading-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  color: var(--cinema-cyan);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.tg-data-heading .tg-publication-context {
+  max-width: 40ch;
+  font-size: 0.875rem;
+}
+
+.tg-publication-context a {
+  color: var(--cinema-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tg-data-page .tg-standings-section,
+.tg-data-page .tg-results-section {
+  padding-block: 28px 48px;
+}
+
+.tg-data-page .tg-public-data-controls,
+.tg-data-page .tg-results-tools {
+  gap: 20px 32px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+.tg-data-page .tg-category-tabs {
+  gap: 8px;
+  margin: 0;
+}
+
+.tg-data-page .tg-category-tabs a,
+.tg-data-page .race-button,
+.tg-data-page .race-pagination > a {
+  min-height: 44px;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+.tg-data-page .tg-category-tabs a {
+  padding: 10px 14px;
+  text-transform: none;
+}
+
+.tg-data-page .tg-result-search > label,
+.tg-data-page .tg-result-filter-heading > span {
+  color: var(--cinema-ink);
+  font-family: var(--cinema-body);
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-data-page .tg-result-search-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.tg-data-page .tg-result-search-row > .race-button-ghost {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.tg-data-page .tg-toolbar {
+  gap: 10px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.tg-data-page input {
+  caret-color: var(--cinema-cyan-deep);
+  font-size: 1rem;
+}
+
+.tg-data-page :is(input, a, button, summary):focus-visible {
+  outline: 2px solid var(--cinema-cyan-deep);
+  outline-offset: 4px;
+}
+
+.tg-data-heading a:focus-visible {
+  outline-color: var(--cinema-cyan);
+}
+
+.tg-data-help {
+  margin: 12px 0 20px;
+  border-bottom: 1px solid var(--cinema-line-dark);
+}
+
+.tg-data-help > summary {
+  display: list-item;
+  min-height: 44px;
+  padding: 10px 0;
+  color: var(--cinema-cyan-deep);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tg-data-help p,
+.tg-data-help dt,
+.tg-data-help dd {
+  max-width: 70ch;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.tg-data-help p {
+  margin: 0 0 14px;
+}
+
+.tg-scoring-explainer dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 32px;
+  margin: 0 0 16px;
+}
+
+.tg-scoring-explainer dt {
+  font-weight: 700;
+}
+
+.tg-scoring-explainer dd {
+  margin: 4px 0 0;
+  color: var(--cinema-muted-dark);
+}
+
+.tg-data-page .tg-results-index {
+  position: sticky;
+  top: var(--cinema-header);
+  z-index: 20;
+  margin: 0 0 24px;
+  padding-top: 12px;
+  background: var(--cinema-paper);
+}
+
+.tg-data-page .tg-results-index-heading {
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.tg-data-page .tg-results-index-heading :is(span, strong) {
+  font-family: var(--cinema-body);
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-data-page .tg-results-index ol {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-color: var(--cinema-cyan-deep) var(--cinema-paper-2);
+}
+
+.tg-data-page .tg-results-index li {
+  flex: 1 0 100px;
+}
+
+.tg-data-page .tg-results-index a {
+  min-height: 64px;
+  padding: 10px 14px;
+  gap: 4px;
+}
+
+.tg-data-page .tg-results-index a > span {
+  font-size: 1.125rem;
+}
+
+.tg-data-page .tg-results-index a small {
+  font-size: 0.8125rem;
+}
+
+.tg-data-page .tg-result-panel {
+  scroll-margin-top: var(--data-sticky-offset);
+}
+
+.tg-data-page .tg-results-list {
+  gap: 48px;
+}
+
+.tg-data-page .tg-result-selector {
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 0 0 16px;
+}
+
+.tg-data-page .tg-result-selector h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.tg-data-page .tg-result-selector :is(span, .tg-result-meta),
+.tg-data-page .tg-result-proof span {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-data-page .tg-result-proof {
+  gap: 4px 16px;
+  margin-top: 8px;
+}
+
+.tg-data-page .tg-result-proof span {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  font-weight: 500;
+}
+
+.tg-data-page .tg-result-selector-actions {
+  gap: 8px;
+}
+
+.tg-data-page .tg-standing-table {
+  min-width: 0;
+  table-layout: auto;
+}
+
+.tg-data-page .tg-standing-table :is(th, td) {
+  width: auto;
+  padding: 14px 10px;
+  font-size: 0.875rem;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.tg-data-page .tg-standing-table th {
+  font-size: 0.8125rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-data-page .tg-standing-table td:nth-child(2) {
+  min-width: 150px;
+}
+
+.tg-data-page .udk-rank {
+  display: inline-grid;
+  min-width: 36px;
+  min-height: 36px;
+  place-items: center;
+  color: var(--cinema-ink);
+  font-size: 1rem;
+}
+
+.tg-data-page .tg-standing-table :is(.tg-category-position, td[data-label="Categoria"] > span),
+.tg-data-page .tg-adjustment-list li,
+.tg-data-page .tg-table-link,
+.tg-data-page .tg-result-note summary,
+.tg-data-page .tg-result-note p,
+.tg-data-page .tg-mobile-detail-grid :is(dt, dd) {
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-data-page .tg-adjustment-list li {
+  white-space: normal;
+}
+
+.tg-data-page .tg-table-link,
+.tg-data-page .tg-result-note summary {
+  min-height: 44px;
+}
+
+.tg-data-page .tg-table-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: normal;
+}
+
+.tg-data-page .tg-table-link svg {
+  flex-shrink: 0;
+}
+
+.tg-data-page .tg-standings-context,
+.tg-data-page .race-pagination-status {
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-result-highlights-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0 0 20px;
+  list-style: none;
+}
+
+.tg-result-highlights {
+  order: 4;
+}
+
+.tg-standing-leaders,
+.tg-standings-documents {
+  margin-top: 40px;
+}
+
+.tg-standing-leaders h2,
+.tg-standings-documents h2 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.tg-standing-leaders-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tg-standing-leaders-list a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding-block: 12px;
+  border-block: 1px solid var(--cinema-line-dark);
+}
+
+.tg-standing-leaders-list strong,
+.tg-standing-leaders-list small {
+  display: block;
+}
+
+.tg-standing-leaders-list small,
+.tg-data-page .tg-pdf-link small {
+  margin-top: 4px;
+  color: var(--cinema-muted-dark);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tg-standing-leaders-list b {
+  color: var(--cinema-cyan-deep);
+  font-size: 1.25rem;
+  text-align: right;
+}
+
+.tg-data-page .tg-standings-documents .tg-official-pdf-links {
+  flex-wrap: wrap;
+}
+
+.tg-result-highlights-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.tg-result-highlights-list h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tg-result-highlights-list p {
+  margin: 4px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: 0.875rem;
+}
+
+.tg-data-page .tg-inline-cta .race-container {
+  min-height: 0;
+  padding-block: 24px;
+}
+
+.tg-data-page .tg-inline-cta h2 {
+  max-width: 36ch;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+@media (max-width: 1100px) {
+  .tg-data-page .tg-desktop-standing-table-wrap {
+    display: none;
+  }
+
+  .tg-data-page .tg-mobile-standing-list,
+  .tg-data-page .tg-mobile-result-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tg-data-page .tg-mobile-standing-item,
+  .tg-data-page .tg-mobile-result-item {
+    padding-block: 8px;
+    border-block: 0;
+    border-bottom: 1px solid var(--cinema-line-dark);
+  }
+
+  .tg-data-page .tg-mobile-standing-summary,
+  .tg-data-page .tg-mobile-result-summary {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    min-height: 76px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tg-data-page .tg-mobile-standing-driver,
+  .tg-data-page .tg-mobile-result-driver {
+    min-width: 0;
+  }
+
+  .tg-data-page .tg-mobile-standing-driver strong,
+  .tg-data-page .tg-mobile-result-driver strong {
+    display: block;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tg-data-page .tg-mobile-standing-driver > :is(span, small),
+  .tg-data-page .tg-mobile-result-driver > span {
+    display: block;
+    margin-top: 4px;
+    color: var(--cinema-muted-dark);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .tg-data-page .tg-mobile-standing-summary > .udk-points,
+  .tg-data-page .tg-mobile-result-summary > .udk-points {
+    display: grid;
+    justify-items: end;
+    font-size: 1.375rem;
+  }
+
+  .tg-data-page .udk-points small {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  .tg-data-page .tg-mobile-standing-item summary,
+  .tg-data-page .tg-mobile-result-item summary {
+    display: list-item;
+    min-height: 44px;
+    padding-block: 10px;
+    color: var(--cinema-cyan-deep);
+    font-size: 0.875rem;
+    letter-spacing: normal;
+    text-transform: none;
+    cursor: pointer;
+  }
+
+  .tg-data-page .tg-mobile-standing-item summary::after,
+  .tg-data-page .tg-mobile-result-item summary::after {
+    content: none;
+  }
+
+  .tg-data-page .tg-mobile-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding-bottom: 16px;
+  }
+
+  .tg-data-page .tg-mobile-detail-grid dd {
+    margin: 4px 0 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .tg-standing-leaders-list,
+  .tg-scoring-explainer dl {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-data-heading > .race-container {
+    display: block;
+  }
+
+  .tg-data-page .tg-data-heading {
+    padding-top: calc(var(--cinema-header) + 20px);
+    padding-bottom: 16px;
+  }
+
+  .tg-data-heading-link {
+    margin-top: 8px;
+  }
+
+  .tg-data-page .tg-standings-section,
+  .tg-data-page .tg-results-section {
+    padding-top: 20px;
+  }
+
+  .tg-data-page .tg-results-tools {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tg-data-page .tg-category-tabs a {
+    flex: 1 1 auto;
+    padding-inline: 10px;
+    text-align: center;
+  }
+
+  .tg-data-page .tg-result-selector {
+    display: grid;
+  }
+
+  .tg-data-page .tg-result-selector-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tg-data-page .tg-result-selector-actions .race-button {
+    width: auto;
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .tg-data-page .tg-results-index-heading :is(span, strong) {
+    font-size: 0.8125rem;
+  }
+
+  .tg-data-page .tg-results-index a {
+    padding: 8px;
+  }
+
+  .tg-data-page .tg-results-index a svg {
+    display: none;
+  }
+
+  .tg-data-page .tg-results-index a > span {
+    font-size: 1rem;
+  }
+}

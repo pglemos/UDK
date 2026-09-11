@@ -32,17 +32,13 @@ describe("third visual audit safeguards", () => {
     expect(ui).toContain("<DriverPlaceholder name={driver.name}");
   });
 
-  it("uses the same sanitized official fallback in the standings podium", () => {
+  it("keeps the standings leaders as accessible text rows", () => {
     const standings = read("app/classificacao/page.tsx");
 
-    expect(standings).toContain('import Image from "next/image"');
-    expect(standings).toContain(
-      'import { DriverPlaceholder } from "../../components/race/driver-placeholder"',
-    );
-    expect(standings).toContain("driverVisual(index)");
-    expect(standings).toContain("resolveVisualSource(driver.avatarUrl, fallback)");
-    expect(standings).toContain("hasPublishedPortrait");
-    expect(standings).toContain("<DriverPlaceholder name={driver.name} />");
+    expect(standings).toContain('className="tg-standing-leaders"');
+    expect(standings).toContain("leaders.items.slice(0, 3)");
+    expect(standings).toContain("driver.rankingPosition");
+    expect(standings).not.toContain('import Image from "next/image"');
   });
 
   it("locks poster media dimensions after every earlier visual override", () => {

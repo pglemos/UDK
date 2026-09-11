@@ -57,7 +57,8 @@ describe("UDK 2026 official championship rules", () => {
     expect(publicData).toContain("discardedPoints");
     expect(standingsPage).toContain("grossPoints");
     expect(standingsPage).toContain("discardedPoints");
-    expect(standingsPage).toContain("Melhores 6 de 8 resultados");
+    expect(standingsPage).toContain("melhores 6 de 8 resultados");
+    expect(standingsPage).toContain("tg-scoring-explainer");
     expect(standingsPage).toContain("formatPoints");
     expect(compactStandingsPage).toContain(
       'driver.discardedPoints > 0 ? `-${formatPoints(driver.discardedPoints)}` : "—"',

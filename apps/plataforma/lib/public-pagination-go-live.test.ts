@@ -79,8 +79,11 @@ describe("go-live public pagination", () => {
     const result = await getStandingsPage({ page: 2, pageSize: 2, sort: "points" });
 
     expect(query.order).toHaveBeenCalledWith("points", { ascending: false });
+    expect(query.order).toHaveBeenCalledWith("position", { ascending: true });
+    expect(query.order).toHaveBeenCalledWith("id", { ascending: true });
     expect(query.range).toHaveBeenCalledWith(2, 3);
     expect(result.items.map((driver) => driver.slug)).toEqual(["driver-3", "driver-4"]);
+    expect(result.items.map((driver) => driver.rankingPosition)).toEqual([3, 4]);
     expect(result.meta).toMatchObject({ page: 2, pageSize: 2, totalItems: 8, totalPages: 4 });
   });
 
@@ -123,7 +126,6 @@ describe("go-live public pagination", () => {
       "utf8",
     );
 
-    expect(pageSource).toContain("const [standings, leaders, categories] = await Promise.all");
     expect(pageSource).toContain(
       'getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })',
     );
@@ -133,17 +135,62 @@ describe("go-live public pagination", () => {
     expect(pageSource).toMatch(/leaders\.items\.slice\(0, 3\)\.map/);
   });
 
-  it("renders list order while preserving category position in the general view", () => {
-    const pageSource = readFileSync(
-      new URL("../app/classificacao/page.tsx", import.meta.url),
-      "utf8",
-    );
+  it("keeps the published category position when a search returns one driver", async () => {
+    const query = createQuery({ data: [pageTwoRows[1]!], count: 1, error: null });
+    mockedPublicSupabaseClient.mockReturnValue({ from: vi.fn(() => query) } as never);
 
-    expect(pageSource).toContain("const absolutePosition =");
-    expect(pageSource).toContain("rank-${absolutePosition}");
-    expect(pageSource).toMatch(/\{absolutePosition\}\s*<\/span>/);
-    expect(pageSource).toContain("{driver.position}º na categoria");
-    expect(pageSource).toContain("const podiumPosition = index + 1");
-    expect(pageSource).not.toContain("officialPosition");
+    const result = await getStandingsPage({
+      category: "rapidos",
+      query: "Piloto 4",
+      sort: "points",
+    });
+
+    expect(result.items[0]).toMatchObject({ slug: "driver-4", position: 4, rankingPosition: 4 });
+    expect(result.meta.totalItems).toBe(1);
+  });
+
+  it("keeps the unfiltered general rank when searching across categories", async () => {
+    const filteredQuery = createQuery({ data: [pageTwoRows[1]!], count: 1, error: null });
+    const rankQuery = createQuery({
+      data: [{ id: "driver-1" }, { id: "driver-2" }, { id: "driver-3" }, { id: "driver-4" }],
+      count: 4,
+      error: null,
+    });
+    const from = vi.fn().mockReturnValueOnce(filteredQuery).mockReturnValueOnce(rankQuery);
+    mockedPublicSupabaseClient.mockReturnValue({ from } as never);
+
+    const result = await getStandingsPage({ category: "geral", query: "Piloto 4", sort: "points" });
+
+    expect(result.items[0]?.rankingPosition).toBe(4);
+    expect(result.meta.totalItems).toBe(1);
+    expect(rankQuery.ilike).not.toHaveBeenCalled();
+    expect(rankQuery.order.mock.calls).toEqual([
+      ["points", { ascending: false }],
+      ["position", { ascending: true }],
+      ["id", { ascending: true }],
+    ]);
+  });
+
+  it("does not invent first place if the unfiltered rank lookup fails", async () => {
+    const filteredQuery = createQuery({ data: [pageTwoRows[1]!], count: 1, error: null });
+    const rankQuery = createQuery({ data: null, count: null, error: new Error("unavailable") });
+    const from = vi.fn().mockReturnValueOnce(filteredQuery).mockReturnValueOnce(rankQuery);
+    mockedPublicSupabaseClient.mockReturnValue({ from } as never);
+
+    const result = await getStandingsPage({ query: "Piloto 4", sort: "points" });
+
+    expect(result.items[0]?.rankingPosition).toBeNull();
+    expect(result.items[0]?.points).toBe(70);
+  });
+
+  it("keeps general ranks stable through fallback search and pagination", async () => {
+    mockedPublicSupabaseClient.mockReturnValue(null);
+    const full = await getStandingsPage({ pageSize: 100, sort: "points" });
+    const expected = full.items[3]!;
+    const filtered = await getStandingsPage({ query: expected.name, sort: "points" });
+    const page = await getStandingsPage({ page: 2, pageSize: 3, sort: "points" });
+
+    expect(filtered.items.find((driver) => driver.id === expected.id)?.rankingPosition).toBe(4);
+    expect(page.items[0]?.rankingPosition).toBe(4);
   });
 });

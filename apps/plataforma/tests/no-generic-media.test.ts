@@ -28,10 +28,10 @@ describe("official media only", () => {
       expect(fallbackContent).not.toContain(host);
     }
 
-    expect(fallbackContent).toContain('/media/official/news/news-01.webp');
-    expect(fallbackContent).toContain('/media/official/news/news-02.webp');
-    expect(fallbackContent).toContain('/media/official/news/news-03.webp');
-    expect(fallbackContent).toContain('/media/official/stages/stage-05.webp');
+    expect(fallbackContent).toContain("/media/official/news/news-01.webp");
+    expect(fallbackContent).toContain("/media/official/news/news-02.webp");
+    expect(fallbackContent).toContain("/media/official/news/news-03.webp");
+    expect(fallbackContent).toContain("/media/official/stages/stage-05.webp");
   });
 
   it("sanitizes generic media before content reaches public pages", () => {
@@ -49,13 +49,15 @@ describe("official media only", () => {
   });
 
   it("uses official fallbacks for driver cards, podiums, and profiles", () => {
-    const standings = source("app/classificacao/page.tsx");
     const driverProfile = source("app/pilotos/[slug]/page.tsx");
     const primitives = source("components/race/editorial-primitives.tsx");
 
-    for (const file of [standings, driverProfile, primitives]) {
+    for (const file of [driverProfile, primitives]) {
       expect(file).toContain("resolveVisualSource");
     }
+
+    const standings = source("app/classificacao/page.tsx");
+    expect(standings).not.toContain("images.unsplash.com");
 
     expect(driverProfile).toContain("portraitFallback");
     expect(driverProfile).toContain("premiumVisuals.manifesto");

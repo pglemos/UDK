@@ -8,12 +8,14 @@ import { EditorialEmpty, EditorialHeading } from "../../../components/race/edito
 import { Reveal } from "../../../components/race/motion";
 import { RaceShell } from "../../../components/race/race-shell";
 import { localizeRaceText } from "../../../components/race/ui";
+import { getRequestedResult, selectDriverLapSessions } from "../../../lib/driver-lap-sessions";
+import { officialResultPdfForResult } from "../../../lib/official-result-links";
 import {
   formatLapTime,
   getDriverBySlug,
   getDriverHistory,
   getDriverLaps,
-  type PublicLap,
+  getResultEntries,
 } from "../../../lib/public-data";
 import { driverVisual, premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";
 
@@ -56,24 +58,46 @@ function formatSpeed(speedKph: number | null): string {
   return speedKph == null ? "—" : `${speedFormatter.format(speedKph)} km/h`;
 }
 
-export default async function DriverProfilePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const [driver, history, laps] = await Promise.all([
+export default async function DriverProfilePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ resultado?: string | string[] }>;
+}) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const requestedResultId =
+    query.resultado === undefined
+      ? undefined
+      : typeof query.resultado === "string"
+        ? query.resultado.toLowerCase()
+        : "";
+  const [driver, history, laps, selectedResult] = await Promise.all([
     getDriverBySlug(slug),
     getDriverHistory(slug),
     getDriverLaps(slug),
+    getRequestedResult(requestedResultId),
   ]);
   if (!driver) notFound();
 
-  const lapsByEntry = new Map<string, PublicLap[]>();
-  for (const lap of laps) {
-    const entryLaps = lapsByEntry.get(lap.resultEntryId) ?? [];
-    entryLaps.push(lap);
-    lapsByEntry.set(lap.resultEntryId, entryLaps);
-  }
-  const lapSessions = history
-    .map((entry) => ({ entry, laps: lapsByEntry.get(entry.id) ?? [] }))
-    .filter((session) => session.laps.length > 0);
+  // A requested race may be older than the profile's ten-entry history window.
+  const selectedEntries = selectedResult
+    ? (await getResultEntries(selectedResult.id)).filter((entry) => entry.driverSlug === slug)
+    : [];
+  const lapSessions = selectDriverLapSessions(
+    requestedResultId === undefined ? history : selectedEntries,
+    laps,
+    requestedResultId,
+  );
+  const selectedRaceLabel = selectedResult
+    ? localizeRaceText(selectedResult.sessionName || selectedResult.title)
+    : null;
+  const selectedPdf = selectedResult
+    ? officialResultPdfForResult(selectedResult.sessionName, selectedResult.title)
+    : null;
+  const selectedResultsHref = selectedResult
+    ? `/resultados#resultado-${selectedResult.id}`
+    : "/resultados";
 
   const portraitFallback = driverVisual(driver.position ?? 0);
   const heroSource = resolveVisualSource(
@@ -224,8 +248,15 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
             <section id="volta-a-volta" className="tg-profile-laps">
               <EditorialHeading
                 index="03"
-                title="Volta a volta, sem perder nenhum detalhe."
+                title={
+                  selectedRaceLabel
+                    ? `Volta a volta: ${selectedRaceLabel}`
+                    : "Volta a volta, sem perder nenhum detalhe."
+                }
                 description="Tempos, velocidade e tempo acumulado conforme o relatório oficial do sistema de cronometragem."
+                {...(requestedResultId !== undefined
+                  ? { action: { href: selectedResultsHref, label: "Voltar aos resultados" } }
+                  : {})}
                 inverse
               />
               {lapSessions.length ? (
@@ -234,7 +265,11 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                     <article className="tg-lap-session" key={entry.id}>
                       <header className="tg-lap-session-header">
                         <div>
-                          <span>{localizeRaceText(entry.stageTitle) || "Sessão oficial"}</span>
+                          <span>
+                            {selectedRaceLabel ||
+                              localizeRaceText(entry.stageTitle) ||
+                              "Sessão oficial"}
+                          </span>
                           <h3>{sessionLaps.length} voltas registradas</h3>
                         </div>
                         <p>Melhor volta {formatLapTime(entry.bestLapMs)}</p>
@@ -243,7 +278,9 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
                         <table className="udk-data-table tg-laps-table">
                           <caption className="sr-only">
                             Volta a volta de {driver.name} em{" "}
-                            {localizeRaceText(entry.stageTitle) || "sessão oficial"}
+                            {selectedRaceLabel ||
+                              localizeRaceText(entry.stageTitle) ||
+                              "sessão oficial"}
                           </caption>
                           <thead>
                             <tr>
@@ -279,8 +316,27 @@ export default async function DriverProfilePage({ params }: { params: Promise<{ 
               ) : (
                 <EditorialEmpty
                   index="03"
-                  title="Volta a volta ainda não publicada."
-                  description="Os detalhes individuais aparecerão aqui quando o relatório oficial for importado."
+                  title={
+                    requestedResultId !== undefined && !selectedResult
+                      ? "Prova não encontrada."
+                      : selectedResult && !selectedEntries.length
+                        ? "Piloto sem resultado nesta prova."
+                        : "Volta a volta ainda não publicada."
+                  }
+                  description={
+                    selectedRaceLabel && !selectedEntries.length
+                      ? `Não há resultado publicado de ${driver.name} em ${selectedRaceLabel}. Consulte a classificação desta prova ou escolha outra corrida.`
+                      : selectedRaceLabel
+                        ? `Os tempos de cada volta de ${driver.name} em ${selectedRaceLabel} ainda não estão disponíveis. Consulte o resultado oficial desta prova.`
+                        : requestedResultId !== undefined
+                          ? "O link não corresponde a uma prova publicada. Volte aos resultados para selecionar a corrida."
+                          : "Os detalhes individuais aparecerão aqui quando o relatório oficial for importado."
+                  }
+                  {...(selectedPdf
+                    ? { action: { href: selectedPdf, label: "Abrir PDF desta prova" } }
+                    : requestedResultId !== undefined
+                      ? { action: { href: selectedResultsHref, label: "Escolher uma prova" } }
+                      : {})}
                 />
               )}
             </section>

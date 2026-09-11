@@ -46,6 +46,10 @@ export type PublicDriver = {
   bio: string | null;
 };
 
+export type PublicStanding = PublicDriver & {
+  rankingPosition: number | null;
+};
+
 export type PublicStage = {
   id: string;
   slug: string;
@@ -428,15 +432,30 @@ export async function getStandingsPage({
   category?: string;
   query?: string;
   sort?: "position" | "points" | "name";
-} = {}): Promise<PaginatedResult<PublicDriver>> {
+} = {}): Promise<PaginatedResult<PublicStanding>> {
   const client = publicClient();
   const cleanQuery = safeSearch(query);
+  const isCategoryRanking = Boolean(category && category !== "geral");
   if (!client) {
-    return paginateDrivers(
-      filterAndSortDrivers([...fallbackDrivers], category, cleanQuery, sort),
+    const ranked = [...fallbackDrivers].sort(
+      (a, b) =>
+        b.points - a.points ||
+        (a.position ?? Infinity) - (b.position ?? Infinity) ||
+        a.id.localeCompare(b.id),
+    );
+    const positions = new Map(ranked.map((driver, index) => [driver.id, index + 1]));
+    const result = paginateDrivers(
+      filterAndSortDrivers(ranked, category, cleanQuery, sort),
       page,
       pageSize,
     );
+    return {
+      ...result,
+      items: result.items.map((driver) => ({
+        ...driver,
+        rankingPosition: isCategoryRanking ? driver.position : (positions.get(driver.id) ?? null),
+      })),
+    };
   }
 
   const { from, to } = getPageRange(page, pageSize);
@@ -445,6 +464,8 @@ export async function getStandingsPage({
     .from("public_portal_standings")
     .select("*", { count: "exact" })
     .order(sortColumn, { ascending: sort !== "points" })
+    .order("position", { ascending: true })
+    .order("id", { ascending: true })
     .range(from, to);
 
   if (category && category !== "geral") request = request.eq("category_slug", category);
@@ -453,11 +474,52 @@ export async function getStandingsPage({
   const { data, count, error } = await request;
   if (error) return { items: [], meta: buildPageMeta(page, pageSize, 0) };
 
-  const items = ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
+  const drivers = ((data ?? []) as UnknownRow[]).map(normalizePublicDriver);
+  const positions = new Map<string, number>();
+  if (!isCategoryRanking && drivers.length && (cleanQuery || sort !== "points")) {
+    // Search changes which rows are visible, never their position in the full ranking.
+    // Read only IDs, in the same deterministic order used by the unfiltered points table.
+    let rankFrom = 0;
+    let rankCount = Infinity;
+    while (rankFrom < rankCount) {
+      const ranked = await client
+        .from("public_portal_standings")
+        .select("id", { count: "exact" })
+        .order("points", { ascending: false })
+        .order("position", { ascending: true })
+        .order("id", { ascending: true })
+        .range(rankFrom, rankFrom + 999);
+      if (ranked.error || !ranked.data?.length) break;
+      ranked.data.forEach((row, index) => positions.set(stringValue(row.id), rankFrom + index + 1));
+      rankFrom += ranked.data.length;
+      rankCount = ranked.count ?? rankFrom;
+      if (drivers.every((driver) => positions.has(driver.id))) break;
+    }
+  }
+  const items = drivers.map((driver, index) => ({
+    ...driver,
+    rankingPosition: isCategoryRanking
+      ? driver.position
+      : cleanQuery || sort !== "points"
+        ? (positions.get(driver.id) ?? null)
+        : from + index + 1,
+  }));
   return {
     items,
     meta: buildPageMeta(page, pageSize, count ?? items.length),
   };
+}
+
+export async function getLatestResultPublication(): Promise<PublicResult | null> {
+  const client = publicClient();
+  if (!client) return null;
+  const { data, error } = await client
+    .from("public_portal_results")
+    .select("*")
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+  return error || !data ? null : normalizePublicResult(data as UnknownRow);
 }
 
 export async function getDriversPage({

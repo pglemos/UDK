@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Download, Flag, Search } from "lucide-react";
-import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
+import { EditorialEmpty } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
-import { localizeRaceText, PageHero, RacePagination, StatusBadge } from "../../components/race/ui";
+import { localizeRaceText, RacePagination, StatusBadge } from "../../components/race/ui";
 import {
   filterResultEntriesByCategory,
   formatLapTime,
@@ -75,8 +75,7 @@ function resultPublishedLabel(result: PublicResult): string {
       year: "numeric",
       timeZone: "America/Sao_Paulo",
     })
-    .replaceAll(".", "")
-    .toLocaleUpperCase("pt-BR");
+    .replaceAll(".", "");
 
   return `Publicada em ${date} · versão ${result.version}`;
 }
@@ -95,8 +94,8 @@ function resultAdjustments(
 ): string[] {
   return [
     entry.pole ? "Pole +1" : null,
-    entry.fastestLap ? "MV +1" : null,
-    sporting?.bestPit ? "Pit +10" : null,
+    entry.fastestLap ? "Melhor volta +1" : null,
+    sporting?.bestPit ? "Melhor pit stop +10" : null,
     entry.penaltyMs ? `+${entry.penaltyMs / 1000}s` : null,
     sporting?.penaltyPoints ? `-${sporting.penaltyPoints} pts` : null,
     sporting?.timingAdjustmentLaps ? `+${sporting.timingAdjustmentLaps} volta` : null,
@@ -124,13 +123,11 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
     <section className="tg-result-panel" id={`resultado-${result.id}`}>
       <div className="tg-result-selector">
         <div className="tg-result-selector-copy">
+          <h2>{raceLabel(result)}</h2>
           <span className="tg-result-date">
             {localizeRaceText(result.stageTitle)} · {formatShortDateLabel(result.startsAt)}
           </span>
-          <h2>{raceLabel(result)}</h2>
-          <p className="tg-result-meta">
-            Posição geral preservada · leitura por {categoryLabel(category)}
-          </p>
+          <p className="tg-result-meta">Posição geral · {categoryLabel(category)}</p>
           <div className="tg-result-proof" aria-label="Informações da publicação">
             <span>{resultPublishedLabel(result)}</span>
             <span>
@@ -155,25 +152,6 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
 
       {entries.length ? (
         <div className="tg-results-content">
-          <section
-            className="tg-results-podium"
-            aria-label={`Destaques ${raceLabel(result)}${isGeneral ? "" : ` - ${categoryLabel(category)}`}`}
-          >
-            {entries.slice(0, 3).map((entry, index) => (
-              <article className={`place-${index + 1}`} key={entry.id}>
-                <span>{String(entry.position).padStart(2, "0")}</span>
-                <h2>{entry.driverName}</h2>
-                <p>{entry.category}</p>
-                <strong>{formatLapTime(entry.bestLapMs)}</strong>
-                <small>
-                  {isNotClassified(entry.status, entry.position) && entry.points === 0
-                    ? "NC"
-                    : `${entry.points} pts`}
-                </small>
-              </article>
-            ))}
-          </section>
-
           <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
             <table className="udk-data-table tg-standing-table">
               <caption className="sr-only">
@@ -182,7 +160,7 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
               </caption>
               <thead>
                 <tr>
-                  <th scope="col">Pos.</th>
+                  <th scope="col">Posição</th>
                   <th scope="col">Piloto</th>
                   {isGeneral ? <th scope="col">Categoria</th> : null}
                   <th scope="col">Voltas</th>
@@ -231,8 +209,8 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                       <td data-label="Detalhes">
                         <Link
                           className="tg-table-link"
-                          href={`/pilotos/${entry.driverSlug}#volta-a-volta`}
-                          aria-label={`Ver volta a volta de ${entry.driverName}`}
+                          href={`/pilotos/${entry.driverSlug}?resultado=${encodeURIComponent(result.id)}#volta-a-volta`}
+                          aria-label={`Ver volta a volta de ${entry.driverName} em ${raceLabel(result)}`}
                         >
                           Ver volta a volta <ArrowRight aria-hidden="true" />
                         </Link>
@@ -265,8 +243,9 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                     <div className="tg-mobile-result-driver">
                       <strong>{entry.driverName}</strong>
                       <span>
-                        {entry.category} · {entry.laps} voltas · {formatLapTime(entry.bestLapMs)}
+                        {entry.category} · {entry.laps} voltas
                       </span>
+                      <span>Melhor volta: {formatLapTime(entry.bestLapMs)}</span>
                     </div>
                     <strong
                       className="udk-points"
@@ -294,8 +273,8 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                     </dl>
                     <Link
                       className="tg-table-link"
-                      href={`/pilotos/${entry.driverSlug}#volta-a-volta`}
-                      aria-label={`Ver volta a volta de ${entry.driverName}`}
+                      href={`/pilotos/${entry.driverSlug}?resultado=${encodeURIComponent(result.id)}#volta-a-volta`}
+                      aria-label={`Ver volta a volta de ${entry.driverName} em ${raceLabel(result)}`}
                     >
                       Ver volta a volta <ChevronRight aria-hidden="true" />
                     </Link>
@@ -304,6 +283,27 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
               );
             })}
           </ol>
+          <details className="tg-data-help tg-result-highlights">
+            <summary>Destaques de {raceLabel(result)}</summary>
+            <ol className="tg-result-highlights-list">
+              {entries.slice(0, 3).map((entry) => (
+                <li key={entry.id}>
+                  <span className="udk-rank">{visiblePosition(entry)}</span>
+                  <div>
+                    <h3>{entry.driverName}</h3>
+                    <p>
+                      {entry.category} · Melhor volta: {formatLapTime(entry.bestLapMs)}
+                    </p>
+                  </div>
+                  <strong>
+                    {isNotClassified(entry.status, entry.position) && entry.points === 0
+                      ? "NC"
+                      : `${entry.points} pts`}
+                  </strong>
+                </li>
+              ))}
+            </ol>
+          </details>
         </div>
       ) : (
         <EditorialEmpty
@@ -344,31 +344,32 @@ export default async function ResultsPage({
     }),
   );
   const visibleBundles = query ? bundles.filter((bundle) => bundle.entries.length > 0) : bundles;
-  const visibleEntryCount = visibleBundles.reduce(
-    (total, bundle) => total + bundle.entries.length,
-    0,
-  );
+  const visibleDriverCount = new Set(
+    visibleBundles.flatMap((bundle) => bundle.entries.map((entry) => entry.driverSlug)),
+  ).size;
   const clearHref = categoryHref(category, "");
 
   return (
-    <RaceShell showMobileCta={false}>
-      <main id="conteudo" tabIndex={-1} className="udk-page tg-internal-page">
-        <PageHero
-          index="03"
-          eyebrow="Bandeirada oficial"
-          title="Resultados"
-          description="Um resultado por corrida. A categoria apenas separa a leitura; a posição e a pontuação seguem a classificação geral conjunta."
-          compact
-        />
+    <RaceShell showMobileCta={false} showFooterCallout={false}>
+      <main
+        id="conteudo"
+        tabIndex={-1}
+        className="udk-page tg-internal-page tg-data-page tg-results-page"
+      >
+        <header className="tg-data-heading">
+          <div className="race-container">
+            <div>
+              <h1>Resultados</h1>
+              <p>Temporada 2026 · Classificação e tempos de cada corrida.</p>
+            </div>
+            <Link href="/classificacao" className="tg-data-heading-link">
+              Ver classificação da temporada <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
+        </header>
 
         <section className="tg-results-section">
           <div className="race-container">
-            <EditorialHeading
-              index="03"
-              title="Cada corrida, uma classificação geral."
-              description="Os resultados históricos foram recalculados. Pilotos de categorias diferentes permanecem na mesma ordem de chegada e na mesma tabela de pontos."
-            />
-
             <section className="tg-results-tools" aria-label="Encontrar um resultado">
               <form className="tg-result-search" method="get" role="search">
                 <label htmlFor="result-driver-search">Buscar por piloto</label>
@@ -400,8 +401,7 @@ export default async function ResultsPage({
 
               <div className="tg-result-filter-block">
                 <div className="tg-result-filter-heading">
-                  <span>Exibir linhas</span>
-                  <p>O filtro muda a leitura, não a posição geral nem os pontos publicados.</p>
+                  <span>Categoria</span>
                 </div>
                 <nav
                   className="udk-category-tabs tg-category-tabs"
@@ -409,7 +409,7 @@ export default async function ResultsPage({
                 >
                   {(
                     [
-                      ["geral", "Todas as categorias"],
+                      ["geral", "Todas"],
                       ["rapidos", "Ultras Rápidos"],
                       ["insanos", "Ultras Insanos"],
                     ] as const
@@ -428,30 +428,37 @@ export default async function ResultsPage({
               </div>
             </section>
 
+            <details className="tg-data-help">
+              <summary>Como ler os resultados</summary>
+              <p>
+                Os filtros preservam a posição geral e os pontos da prova. Melhor volta é o menor
+                tempo de uma volta, não o tempo total da corrida. NC significa não classificado.
+              </p>
+              <p>
+                Ajustes mostram os bônus e penalizações publicados. As notas oficiais e o PDF de
+                cada prova trazem os detalhes.
+              </p>
+            </details>
+
             {visibleBundles.length ? (
               <nav className="tg-results-index" aria-label="Índice de resultados">
                 <div className="tg-results-index-heading">
-                  <span>Arquivo de provas</span>
-                  <strong>
-                    {visibleBundles.length}{" "}
-                    {visibleBundles.length === 1 ? "resultado" : "resultados"}
+                  <span>Escolher prova</span>
+                  <strong aria-live="polite">
                     {query
-                      ? ` · ${visibleEntryCount} ${visibleEntryCount === 1 ? "piloto" : "pilotos"}`
-                      : ""}
+                      ? `${visibleDriverCount} ${visibleDriverCount === 1 ? "piloto" : "pilotos"} em ${visibleBundles.length} ${visibleBundles.length === 1 ? "prova" : "provas"}`
+                      : `${visibleBundles.length} provas`}
                   </strong>
                 </div>
                 <ol>
-                  {visibleBundles.map(({ result, entries }) => (
+                  {visibleBundles.map(({ result }) => (
                     <li key={result.id}>
                       <a
                         href={`#resultado-${result.id}`}
                         aria-label={`Ir para ${raceLabel(result)}, ${formatShortDateLabel(result.startsAt)}`}
                       >
                         <span>{raceLabel(result)}</span>
-                        <small>
-                          {formatShortDateLabel(result.startsAt)} · {entries.length}{" "}
-                          {entries.length === 1 ? "piloto" : "pilotos"}
-                        </small>
+                        <small>{formatShortDateLabel(result.startsAt)}</small>
                         <ChevronRight aria-hidden="true" />
                       </a>
                     </li>
@@ -477,7 +484,7 @@ export default async function ResultsPage({
               <EditorialEmpty
                 index="03"
                 title="Resultados oficiais ainda não publicados."
-                description="O pódio e os PDFs aparecerão após homologação. Nenhum vencedor, tempo ou posição foi criado apenas para preencher a tela."
+                description="Os resultados e os PDFs estarão disponíveis após a homologação de cada prova."
                 action={{ href: "/calendario", label: "Ver próximas etapas" }}
               />
             )}

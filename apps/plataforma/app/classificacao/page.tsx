@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Download, Trophy } from "lucide-react";
-import { DriverPlaceholder } from "../../components/race/driver-placeholder";
-import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
+import { ChevronRight, Download } from "lucide-react";
+import { EditorialEmpty } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
-import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
-import { getCategories, getStandingsPage, parsePositiveInt } from "../../lib/public-data";
+import { RacePagination, SearchField } from "../../components/race/ui";
+import {
+  getCategories,
+  getLatestResultPublication,
+  getStandingsPage,
+  parsePositiveInt,
+} from "../../lib/public-data";
 import { officialResultPdf } from "../../lib/official-result-links";
-import { driverVisual, resolveVisualSource } from "../../lib/visual-assets";
 
 export const metadata: Metadata = {
   title: "Classificação",
@@ -34,15 +36,16 @@ export default async function StandingsPage({
   const page = parsePositiveInt(params.page, 1, 500);
   const category = param(params.categoria, "geral");
   const query = param(params.q).trim();
-  const [standings, leaders, categories] = await Promise.all([
+  const [standings, leaders, categories, latestPublication] = await Promise.all([
     getStandingsPage({ page, pageSize: 10, category, query, sort: "points" }),
     getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" }),
     getCategories(),
+    getLatestResultPublication(),
   ]);
   const categoryName =
     category === "geral"
       ? "Geral"
-      : categories.find((item) => item.slug === category)?.name ?? category;
+      : (categories.find((item) => item.slug === category)?.name ?? category);
   const leaderPoints = leaders.items[0]?.points ?? standings.items[0]?.points ?? 0;
   const hasQuery = Boolean(query);
   const resultCountLabel = `${standings.meta.totalItems} ${
@@ -51,6 +54,16 @@ export default async function StandingsPage({
   const resultsContext = hasQuery
     ? `${categoryName} · ${resultCountLabel} para “${query}”`
     : `${categoryName} · ${resultCountLabel} no ranking oficial`;
+  const clearSearchHref =
+    category === "geral"
+      ? "/classificacao"
+      : `/classificacao?categoria=${encodeURIComponent(category)}`;
+  const publicationDate = latestPublication?.publishedAt
+    ? new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeZone: "America/Sao_Paulo",
+      }).format(new Date(latestPublication.publishedAt))
+    : null;
   const emptyAction = hasQuery
     ? {
         href:
@@ -66,25 +79,29 @@ export default async function StandingsPage({
       <main
         id="conteudo"
         tabIndex={-1}
-        className="udk-page tg-internal-page tg-standings-page"
+        className="udk-page tg-internal-page tg-data-page tg-standings-page"
       >
-        <PageHero
-          index="02"
-          eyebrow="Pontos oficiais"
-          title="Classificação"
-          description="A pista decide. O ranking apenas torna visível quem entregou volta após volta."
-          compact
-          action={{ href: "#ranking", label: "Ir direto ao ranking" }}
-        />
-
-        <section className="tg-standings-section" id="ranking">
+        <header className="tg-data-heading">
           <div className="race-container">
-            <EditorialHeading
-              index="02"
-              title="Ranking da temporada."
-              description="Pontuação oficial por categoria, atualizada após cada etapa."
-            />
+            <div>
+              <h1>Classificação</h1>
+              <p>Temporada 2026 · Posição e pontos por categoria.</p>
+            </div>
+            {latestPublication && publicationDate ? (
+              <p className="tg-publication-context">
+                Último resultado publicado:{" "}
+                <Link href={`/resultados#resultado-${latestPublication.id}`}>
+                  {latestPublication.title}
+                </Link>{" "}
+                ·{" "}
+                <time dateTime={latestPublication.publishedAt ?? undefined}>{publicationDate}</time>
+              </p>
+            ) : null}
+          </div>
+        </header>
 
+        <section className="tg-standings-section" id="ranking" aria-label="Ranking da temporada">
+          <div className="race-container">
             <div className="tg-public-data-controls">
               <nav
                 className="udk-category-tabs tg-category-tabs"
@@ -109,49 +126,6 @@ export default async function StandingsPage({
                 ))}
               </nav>
 
-              <div
-                className="tg-official-pdf-links"
-                role="group"
-                aria-label="PDFs oficiais por corrida"
-              >
-                <a
-                  className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da etapa Endurance"
-                  href={officialResultPdf.endurance}
-                  download
-                >
-                  <span>
-                    <strong>Endurance</strong>
-                    <small>PDF oficial</small>
-                  </span>
-                  <Download aria-hidden="true" />
-                </a>
-                <a
-                  className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da Corrida 1"
-                  href={officialResultPdf.corrida1}
-                  download
-                >
-                  <span>
-                    <strong>Corrida 1</strong>
-                    <small>PDF oficial</small>
-                  </span>
-                  <Download aria-hidden="true" />
-                </a>
-                <a
-                  className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da Corrida 2"
-                  href={officialResultPdf.corrida2}
-                  download
-                >
-                  <span>
-                    <strong>Corrida 2</strong>
-                    <small>PDF oficial</small>
-                  </span>
-                  <Download aria-hidden="true" />
-                </a>
-              </div>
-
               <form
                 className="udk-toolbar tg-toolbar is-compact"
                 action="/classificacao"
@@ -162,18 +136,49 @@ export default async function StandingsPage({
                 <button type="submit" className="race-button race-button-primary">
                   Buscar piloto
                 </button>
+                {hasQuery ? (
+                  <Link href={clearSearchHref} className="tg-table-link">
+                    Limpar busca
+                  </Link>
+                ) : null}
               </form>
             </div>
 
-            <aside className="udk-scoring-rule" aria-label="Regra de descartes da temporada">
-              <span>Regra 2026</span>
-              <strong>Melhores 6 de 8 resultados</strong>
+            <details className="tg-data-help tg-scoring-explainer">
+              <summary>Como ler os pontos e os descartes</summary>
+              <dl>
+                <div>
+                  <dt>Pontos brutos</dt>
+                  <dd>Soma dos pontos antes dos descartes.</dd>
+                </div>
+                <div>
+                  <dt>Descartes</dt>
+                  <dd>Pontos retirados conforme a regra da temporada.</dd>
+                </div>
+                <div>
+                  <dt>Pontos válidos</dt>
+                  <dd>Pontos brutos menos descartes; usados na classificação.</dd>
+                </div>
+                <div>
+                  <dt>Diferença para o líder</dt>
+                  <dd>
+                    Pontos válidos que faltam para alcançar o líder da visão geral ou da categoria
+                    selecionada, independentemente da busca.
+                  </dd>
+                </div>
+              </dl>
               <p>
-                A temporada tem 06 corridas regulares e 02 provas de resistência. Até o 6º evento
-                não há descarte; após o 7º, o pior resultado é descartado; após o 8º, os dois
-                piores.
+                <strong>Regra 2026: melhores 6 de 8 resultados.</strong> A temporada tem 6 corridas
+                regulares e 2 provas de resistência. Até o 6º evento não há descarte; após o 7º, o
+                pior resultado é descartado; após o 8º, os dois piores.
               </p>
-            </aside>
+              {category === "geral" ? (
+                <p>
+                  A visão geral reúne os pilotos por pontos válidos. A posição oficial de cada
+                  categoria aparece junto ao nome da categoria.
+                </p>
+              ) : null}
+            </details>
 
             <p className="tg-standings-context" aria-live="polite">
               {resultsContext}
@@ -181,60 +186,6 @@ export default async function StandingsPage({
 
             {standings.items.length ? (
               <div className="tg-standings-content">
-                {!hasQuery && leaders.items.length ? (
-                  <>
-                    <header className="tg-standing-podium-heading">
-                      <span>Em destaque</span>
-                      <h3 id="podium-title">Pódio atual</h3>
-                      <p>Os três primeiros da classificação {categoryName.toLowerCase()}.</p>
-                    </header>
-                    <section
-                      className="tg-standing-podium"
-                      aria-labelledby="podium-title"
-                    >
-                      {leaders.items.slice(0, 3).map((driver, index) => {
-                        const fallback = driverVisual(index);
-                        const source = resolveVisualSource(driver.avatarUrl, fallback);
-                        const hasPublishedPortrait =
-                          Boolean(driver.avatarUrl) && source !== fallback.src;
-                        const podiumPosition = index + 1;
-                        return (
-                          <Link
-                            href={`/pilotos/${driver.slug}`}
-                            className={`tg-standing-podium-card place-${podiumPosition}`}
-                            key={driver.slug}
-                          >
-                            <span>{String(podiumPosition).padStart(2, "0")}</span>
-                            <div
-                              className={`tg-standing-podium-visual${hasPublishedPortrait ? "" : " tg-standing-podium-fallback"}`}
-                            >
-                              {hasPublishedPortrait ? (
-                                <Image
-                                  src={source}
-                                  alt=""
-                                  fill
-                                  quality={86}
-                                  sizes="(max-width: 760px) 100vw, 33vw"
-                                />
-                              ) : (
-                                <DriverPlaceholder name={driver.name} />
-                              )}
-                            </div>
-                            <div>
-                              <h4>{driver.name}</h4>
-                              <p>{driver.category}</p>
-                            </div>
-                            <b>
-                              {formatPoints(driver.points)}
-                              <small>pts válidos</small>
-                            </b>
-                          </Link>
-                        );
-                      })}
-                    </section>
-                  </>
-                ) : null}
-
                 <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
                   <table className="udk-data-table tg-standing-table">
                     <caption className="sr-only">
@@ -242,12 +193,12 @@ export default async function StandingsPage({
                     </caption>
                     <thead>
                       <tr>
-                        <th scope="col">Ordem</th>
+                        <th scope="col">{category === "geral" ? "Ordem geral" : "Posição"}</th>
                         <th scope="col">Piloto</th>
                         <th scope="col">Categoria</th>
                         <th scope="col">Vitórias</th>
                         <th scope="col">Pódios</th>
-                        <th scope="col">Dif.</th>
+                        <th scope="col">Diferença para o líder</th>
                         <th scope="col">Brutos</th>
                         <th scope="col">Descartes</th>
                         <th scope="col">Pontos válidos</th>
@@ -257,16 +208,15 @@ export default async function StandingsPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {standings.items.map((driver, index) => {
-                        const absolutePosition =
-                          (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
+                      {standings.items.map((driver) => {
+                        const absolutePosition = driver.rankingPosition;
                         const gap =
                           Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                         return (
                           <tr key={driver.slug}>
-                            <td data-label="Ordem">
-                              <span className={`udk-rank rank-${absolutePosition}`}>
-                                {absolutePosition}
+                            <td data-label={category === "geral" ? "Ordem geral" : "Posição"}>
+                              <span className={`udk-rank rank-${absolutePosition ?? "—"}`}>
+                                {absolutePosition ?? "—"}
                               </span>
                             </td>
                             <td data-label="Piloto">
@@ -284,7 +234,7 @@ export default async function StandingsPage({
                             </td>
                             <td data-label="Vitórias">{driver.wins}</td>
                             <td data-label="Pódios">{driver.podiums}</td>
-                            <td data-label="Diferença">
+                            <td data-label="Diferença para o líder">
                               {gap === 0 ? "Líder" : `-${formatPoints(gap)}`}
                             </td>
                             <td data-label="Pontos brutos">{formatPoints(driver.grossPoints)}</td>
@@ -314,15 +264,18 @@ export default async function StandingsPage({
                 </div>
 
                 <ol className="tg-mobile-standing-list" aria-label="Classificação resumida">
-                  {standings.items.map((driver, index) => {
-                    const absolutePosition =
-                      (standings.meta.page - 1) * standings.meta.pageSize + index + 1;
+                  {standings.items.map((driver) => {
+                    const absolutePosition = driver.rankingPosition;
                     const gap = Math.round(Math.max(0, leaderPoints - driver.points) * 100) / 100;
                     return (
-                      <li className="tg-mobile-standing-item" key={driver.slug}>
+                      <li
+                        className="tg-mobile-standing-item"
+                        key={driver.slug}
+                        value={absolutePosition ?? undefined}
+                      >
                         <div className="tg-mobile-standing-summary">
-                          <span className={`udk-rank rank-${absolutePosition}`}>
-                            {absolutePosition}
+                          <span className={`udk-rank rank-${absolutePosition ?? "—"}`}>
+                            {absolutePosition ?? "—"}
                           </span>
                           <div className="tg-mobile-standing-driver">
                             <Link href={`/pilotos/${driver.slug}`}>
@@ -335,14 +288,14 @@ export default async function StandingsPage({
                           </div>
                           <strong className="udk-points">
                             {formatPoints(driver.points)}
-                            <small>válidos</small>
+                            <small>pts válidos</small>
                           </strong>
                         </div>
                         <details>
                           <summary>Ver detalhes</summary>
                           <dl className="tg-mobile-detail-grid">
                             <div>
-                              <dt>Diferença</dt>
+                              <dt>Diferença para o líder</dt>
                               <dd>{gap === 0 ? "Líder" : `-${formatPoints(gap)} pts`}</dd>
                             </div>
                             <div>
@@ -402,19 +355,78 @@ export default async function StandingsPage({
               params={{ categoria: category, q: query || undefined, page: String(page) }}
               showStatus
             />
-          </div>
-        </section>
 
-        <section className="tg-inline-cta is-dark">
-          <div className="race-container">
-            <Trophy aria-hidden="true" />
-            <div>
-              <span>Seu nome no ranking</span>
-              <h2>Entre no grid e construa a próxima posição.</h2>
-            </div>
-            <Link href="/inscricao" className="race-button race-button-primary">
-              Iniciar inscrição <ArrowRight aria-hidden="true" />
-            </Link>
+            {!hasQuery && leaders.items.length ? (
+              <section className="tg-standing-leaders" aria-labelledby="podium-title">
+                <h2 id="podium-title">
+                  {category === "geral" ? "Líderes por pontos" : `Pódio · ${categoryName}`}
+                </h2>
+                <ol className="tg-standing-leaders-list">
+                  {leaders.items.slice(0, 3).map((driver) => (
+                    <li key={driver.slug}>
+                      <Link href={`/pilotos/${driver.slug}`}>
+                        <span className="tg-standing-leader-position">
+                          {driver.rankingPosition ?? "—"}º
+                        </span>
+                        <span>
+                          <strong>{driver.name}</strong>
+                          <small>{driver.category}</small>
+                        </span>
+                        <b>
+                          {formatPoints(driver.points)} <small>pts válidos</small>
+                        </b>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
+
+            <section className="tg-standings-documents" aria-labelledby="standings-documents-title">
+              <h2 id="standings-documents-title">Documentos oficiais</h2>
+              <div
+                className="tg-official-pdf-links"
+                role="group"
+                aria-label="PDFs oficiais por corrida"
+              >
+                <a
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da etapa Endurance"
+                  href={officialResultPdf.endurance}
+                  download
+                >
+                  <span>
+                    <strong>Endurance</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da Corrida 1"
+                  href={officialResultPdf.corrida1}
+                  download
+                >
+                  <span>
+                    <strong>Corrida 1</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light tg-pdf-link"
+                  aria-label="Baixar PDF oficial da Corrida 2"
+                  href={officialResultPdf.corrida2}
+                  download
+                >
+                  <span>
+                    <strong>Corrida 2</strong>
+                    <small>PDF oficial</small>
+                  </span>
+                  <Download aria-hidden="true" />
+                </a>
+              </div>
+            </section>
           </div>
         </section>
       </main>
