@@ -29,6 +29,7 @@ const barlow = Barlow_Condensed({
   style: ["normal", "italic"],
   variable: "--font-barlow",
   display: "swap",
+  preload: false,
 });
 
 const inter = Inter({
@@ -36,6 +37,7 @@ const inter = Inter({
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-inter",
   display: "swap",
+  preload: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udkkart.vercel.app";

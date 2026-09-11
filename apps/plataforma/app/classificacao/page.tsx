@@ -176,53 +176,22 @@ export default async function StandingsPage({
               </form>
             </div>
 
-            <details className="tg-data-help tg-scoring-explainer">
-              <summary>Ver regras de pontuação e descartes</summary>
-              <dl>
-                <div>
-                  <dt>Pontos brutos</dt>
-                  <dd>Soma dos pontos antes dos descartes.</dd>
-                </div>
-                <div>
-                  <dt>Descartes</dt>
-                  <dd>Pontos retirados conforme a regra da temporada.</dd>
-                </div>
-                <div>
-                  <dt>Pontos válidos</dt>
-                  <dd>Pontos brutos menos descartes; usados na classificação.</dd>
-                </div>
-                <div>
-                  <dt>Diferença para o líder</dt>
-                  <dd>
-                    Pontos válidos que faltam para alcançar o líder da visão geral ou da categoria
-                    selecionada, independentemente da busca.
-                  </dd>
-                </div>
-              </dl>
-              <p>
-                <strong>Regra 2026: melhores 6 de 8 resultados.</strong> A temporada tem 6 corridas
-                regulares e 2 provas de resistência. Até o 6º evento não há descarte; após o 7º, o
-                pior resultado é descartado; após o 8º, os dois piores.
-              </p>
-              {category === "geral" ? (
-                <p>
-                  A visão geral reúne os pilotos por pontos válidos. A posição oficial de cada
-                  categoria aparece junto ao nome da categoria.
-                </p>
-              ) : null}
-            </details>
-
             <p className="tg-data-legend" id="standing-legend">
               {category === "geral"
                 ? "Classificação geral · todas as categorias."
                 : `Classificação da categoria ${categoryName}.`}{" "}
               Pontos válidos são os usados no ranking; brutos e descartes mostram como o total foi
               calculado.
+              <span className="tg-standing-order-note">
+                {category === "geral"
+                  ? "Ordem geral compara todas as categorias; a posição na categoria aparece sob o nome."
+                  : `Posição mostra o lugar dentro de ${categoryName}; o total segue os pontos válidos da temporada.`}
+              </span>
             </p>
 
             {leaderDriver ? (
               <p className="tg-standing-leader-summary">
-                Líder{category === "geral" ? " geral" : ` · ${categoryName}`}: {" "}
+                Líder{category === "geral" ? " geral" : ` · ${categoryName}`}:{" "}
                 <Link href={`/pilotos/${leaderDriver.slug}`}>{leaderDriver.name}</Link> ·{" "}
                 <strong>{formatPoints(leaderDriver.points)} pts válidos</strong>
               </p>
@@ -471,6 +440,42 @@ export default async function StandingsPage({
                 </a>
               </div>
             </section>
+
+            <details className="tg-data-help tg-scoring-explainer">
+              <summary>Ver regras de pontuação e descartes</summary>
+              <dl>
+                <div>
+                  <dt>Pontos brutos</dt>
+                  <dd>Soma dos pontos antes dos descartes.</dd>
+                </div>
+                <div>
+                  <dt>Descartes</dt>
+                  <dd>Pontos retirados conforme a regra da temporada.</dd>
+                </div>
+                <div>
+                  <dt>Pontos válidos</dt>
+                  <dd>Pontos brutos menos descartes; usados na classificação.</dd>
+                </div>
+                <div>
+                  <dt>Diferença para o líder</dt>
+                  <dd>
+                    Pontos válidos que faltam para alcançar o líder da visão geral ou da categoria
+                    selecionada, independentemente da busca.
+                  </dd>
+                </div>
+              </dl>
+              <p>
+                <strong>Regra 2026: melhores 6 de 8 resultados.</strong> A temporada tem 6 corridas
+                regulares e 2 provas de resistência. Até o 6º evento não há descarte; após o 7º, o
+                pior resultado é descartado; após o 8º, os dois piores.
+              </p>
+              {category === "geral" ? (
+                <p>
+                  A visão geral reúne os pilotos por pontos válidos. A posição oficial de cada
+                  categoria aparece junto ao nome da categoria.
+                </p>
+              ) : null}
+            </details>
           </div>
         </section>
       </main>

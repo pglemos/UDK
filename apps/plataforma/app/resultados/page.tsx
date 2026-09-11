@@ -123,6 +123,19 @@ function AdjustmentList({ adjustments }: { adjustments: string[] }) {
   );
 }
 
+function ResultAdjustmentsDisclosure({ adjustments }: { adjustments: string[] }) {
+  if (!adjustments.length) return <span className="tg-adjustments-empty">Sem ajustes</span>;
+
+  return (
+    <details className="tg-result-adjustments">
+      <summary>
+        {adjustments.length} {adjustments.length === 1 ? "ajuste" : "ajustes"}
+      </summary>
+      <AdjustmentList adjustments={adjustments} />
+    </details>
+  );
+}
+
 function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: string }) {
   const { result, entries, sporting } = bundle;
   const pdfUrl = officialResultPdfForResult(result.sessionName, result.title);
@@ -181,9 +194,15 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                   <th scope="col">Posição</th>
                   <th scope="col">Piloto</th>
                   {isGeneral ? <th scope="col">Categoria</th> : null}
-                  <th scope="col">Voltas</th>
-                  <th scope="col">Melhor volta</th>
-                  <th scope="col">Ajustes</th>
+                  <th className="tg-result-secondary-column" scope="col">
+                    Voltas
+                  </th>
+                  <th className="tg-result-secondary-column" scope="col">
+                    Melhor volta
+                  </th>
+                  <th className="tg-result-secondary-column" scope="col">
+                    Ajustes
+                  </th>
                   <th scope="col">Pontos na prova</th>
                   <th scope="col">Detalhes</th>
                 </tr>
@@ -214,10 +233,14 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
                         ) : null}
                       </td>
                       {isGeneral ? <td data-label="Categoria">{entry.category}</td> : null}
-                      <td data-label="Voltas">{entry.laps}</td>
-                      <td data-label="Melhor volta">{formatLapTime(entry.bestLapMs)}</td>
-                      <td data-label="Ajustes">
-                        <AdjustmentList adjustments={adjustments} />
+                      <td className="tg-result-secondary-column" data-label="Voltas">
+                        {entry.laps}
+                      </td>
+                      <td className="tg-result-secondary-column" data-label="Melhor volta">
+                        {formatLapTime(entry.bestLapMs)}
+                      </td>
+                      <td className="tg-result-secondary-column" data-label="Ajustes">
+                        <ResultAdjustmentsDisclosure adjustments={adjustments} />
                       </td>
                       <td data-label="Pontos na prova">
                         <strong className="udk-points">
@@ -314,9 +337,11 @@ function ResultPanel({ bundle, category }: { bundle: ResultBundle; category: str
         />
       )}
 
-      <a className="tg-result-back-to-index" href="#resultados-index">
-        Voltar ao índice de provas
-      </a>
+      <div className="tg-result-secondary-actions" aria-label="Ações secundárias da prova">
+        <a className="tg-result-back-to-index" href="#resultados-index">
+          Voltar ao índice de provas
+        </a>
+      </div>
     </section>
   );
 }
@@ -351,6 +376,14 @@ export default async function ResultsPage({
   const visibleDriverCount = new Set(
     visibleBundles.flatMap((bundle) => bundle.entries.map((entry) => entry.driverSlug)),
   ).size;
+  const latestBundle = visibleBundles[0];
+  const latestFeaturedEntry = latestBundle
+    ? (latestBundle.entries.find(
+        (entry) => entry.position === 1 && !isNotClassified(entry.status, entry.position),
+      ) ??
+      latestBundle.entries.find((entry) => !isNotClassified(entry.status, entry.position)) ??
+      latestBundle.entries[0])
+    : undefined;
   const clearHref = categoryHref(category, "");
 
   return (
@@ -374,6 +407,28 @@ export default async function ResultsPage({
 
         <section className="tg-results-section">
           <div className="race-container">
+            {!query && latestBundle && latestFeaturedEntry ? (
+              <div className="tg-results-quick-summary" aria-label="Resultado mais recente">
+                <div>
+                  <span>Resultado mais recente</span>
+                  <strong>{resultHeadingLabel(latestBundle.result)}</strong>
+                  <small>{formatShortDateLabel(latestBundle.result.startsAt)}</small>
+                </div>
+                <div className="tg-results-quick-driver">
+                  <span>
+                    {visiblePosition(latestFeaturedEntry) === "NC"
+                      ? "Classificação"
+                      : `${visiblePosition(latestFeaturedEntry)}º lugar`}
+                  </span>
+                  <strong>{latestFeaturedEntry.driverName}</strong>
+                  <small>{latestFeaturedEntry.points} pts na prova</small>
+                </div>
+                <a href={`#resultado-${latestBundle.result.id}`}>
+                  Abrir resultado completo <ArrowRight aria-hidden="true" />
+                </a>
+              </div>
+            ) : null}
+
             <section className="tg-results-tools" aria-label="Encontrar um resultado">
               <form className="tg-result-search" method="get" role="search">
                 <label htmlFor="result-driver-search">Buscar por piloto</label>
@@ -433,18 +488,6 @@ export default async function ResultsPage({
               </div>
             </section>
 
-            <details className="tg-data-help">
-              <summary>Como ler os resultados</summary>
-              <p>
-                Os filtros preservam a posição geral e os pontos da prova. Melhor volta é o menor
-                tempo de uma volta, não o tempo total da corrida. NC significa não classificado.
-              </p>
-              <p>
-                Ajustes mostram os bônus e penalizações publicados. As notas oficiais e o PDF de
-                cada prova trazem os detalhes.
-              </p>
-            </details>
-
             <p className="tg-data-legend" id="results-legend">
               NC = não classificado · melhor volta = menor tempo de uma volta · ajustes = bônus,
               penalizações ou voltas acrescentadas.
@@ -464,7 +507,10 @@ export default async function ResultsPage({
                       : `${visibleBundles.length} provas`}
                   </strong>
                 </div>
-                <ol>
+                <p className="tg-results-index-hint" id="resultados-index-hint">
+                  Deslize para ver todas as provas ou use Tab para selecionar uma.
+                </p>
+                <ol tabIndex={0} aria-describedby="resultados-index-hint">
                   {visibleBundles.map(({ result }) => (
                     <li key={result.id}>
                       <a
@@ -486,26 +532,45 @@ export default async function ResultsPage({
             {visibleBundles.length ? (
               <div className="tg-results-list" aria-label="Resultados oficiais por corrida">
                 <PublicResultsBehavior />
-                {visibleBundles.map((bundle, index) => (
-                  <details
-                    className="tg-result-disclosure"
-                    data-result-disclosure="true"
-                    id={`resultado-${bundle.result.id}`}
-                    key={bundle.result.id}
-                    open={index === 0}
-                  >
-                    <summary className="tg-result-disclosure-summary">
-                      <span className="tg-result-disclosure-closed">
-                        <strong>{resultHeadingLabel(bundle.result)}</strong>
-                        <small>{resultPublishedLabel(bundle.result)}</small>
-                      </span>
-                      <span className="tg-result-disclosure-open">
-                        Recolher {resultHeadingLabel(bundle.result)}
-                      </span>
-                    </summary>
-                    <ResultPanel bundle={bundle} category={category} />
-                  </details>
-                ))}
+                {visibleBundles.map((bundle, index) => {
+                  const featuredEntry =
+                    bundle.entries.find(
+                      (entry) =>
+                        entry.position === 1 && !isNotClassified(entry.status, entry.position),
+                    ) ??
+                    bundle.entries.find(
+                      (entry) => !isNotClassified(entry.status, entry.position),
+                    ) ??
+                    bundle.entries[0];
+
+                  return (
+                    <details
+                      className="tg-result-disclosure"
+                      data-result-disclosure="true"
+                      id={`resultado-${bundle.result.id}`}
+                      key={bundle.result.id}
+                      open={index === 0}
+                    >
+                      <summary className="tg-result-disclosure-summary">
+                        <span className="tg-result-disclosure-closed">
+                          <strong>{resultHeadingLabel(bundle.result)}</strong>
+                          <small>{resultPublishedLabel(bundle.result)}</small>
+                          {featuredEntry ? (
+                            <small className="tg-result-disclosure-winner">
+                              {visiblePosition(featuredEntry) === "NC"
+                                ? `${featuredEntry.driverName} · NC`
+                                : `${visiblePosition(featuredEntry)}º ${featuredEntry.driverName} · ${featuredEntry.points} pts`}
+                            </small>
+                          ) : null}
+                        </span>
+                        <span className="tg-result-disclosure-open">
+                          Recolher {resultHeadingLabel(bundle.result)}
+                        </span>
+                      </summary>
+                      <ResultPanel bundle={bundle} category={category} />
+                    </details>
+                  );
+                })}
               </div>
             ) : query ? (
               <EditorialEmpty
@@ -528,6 +593,18 @@ export default async function ResultsPage({
               basePath="/resultados"
               params={{ categoria: category, piloto: query, page: String(page) }}
             />
+
+            <details className="tg-data-help">
+              <summary>Como ler os resultados</summary>
+              <p>
+                Os filtros preservam a posição geral e os pontos da prova. Melhor volta é o menor
+                tempo de uma volta, não o tempo total da corrida. NC significa não classificado.
+              </p>
+              <p>
+                Ajustes mostram os bônus e penalizações publicados. As notas oficiais e o PDF de
+                cada prova trazem os detalhes.
+              </p>
+            </details>
           </div>
         </section>
 

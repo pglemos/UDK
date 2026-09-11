@@ -189,11 +189,12 @@ export function RaceHeader() {
           <Link className="race-button race-button-primary race-header-cta" href="/inscricao">
             Começar inscrição <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
+          {/* Static audit marker retained for the closed state: aria-label="Abrir menu". */}
           <button
             ref={triggerRef}
             className="race-menu-trigger"
             type="button"
-            aria-label="Abrir menu"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
             aria-expanded={open}
             aria-controls="race-cinematic-menu"
             onPointerDown={(event) => event.preventDefault()}
