@@ -32,12 +32,16 @@ describe("third visual audit safeguards", () => {
     expect(ui).toContain("<DriverPlaceholder name={driver.name}");
   });
 
-  it("keeps the standings leaders as accessible text rows", () => {
+  it("keeps one authoritative standings table without a redundant leader block", () => {
     const standings = read("app/classificacao/page.tsx");
 
-    expect(standings).toContain('className="tg-standing-leaders"');
-    expect(standings).toContain("leaders.items.slice(0, 3)");
+    expect(standings).toContain(
+      'getStandingsPage({ page: 1, pageSize: 1, category, sort: "points" })',
+    );
+    expect(standings).toContain("leader.items[0]?.points");
     expect(standings).toContain("driver.rankingPosition");
+    expect(standings).not.toContain('className="tg-standing-leaders"');
+    expect(standings).not.toContain("leaders.items.slice(0, 3)");
     expect(standings).not.toContain('import Image from "next/image"');
   });
 

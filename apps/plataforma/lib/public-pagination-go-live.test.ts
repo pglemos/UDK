@@ -127,12 +127,12 @@ describe("go-live public pagination", () => {
     );
 
     expect(pageSource).toContain(
-      'getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" })',
+      'getStandingsPage({ page: 1, pageSize: 1, category, sort: "points" })',
     );
     expect(pageSource).toContain(
-      "const leaderPoints = leaders.items[0]?.points ?? standings.items[0]?.points ?? 0",
+      "const leaderPoints = leader.items[0]?.points ?? standings.items[0]?.points ?? 0",
     );
-    expect(pageSource).toMatch(/leaders\.items\.slice\(0, 3\)\.map/);
+    expect(pageSource).not.toMatch(/leaders\.items\.slice\(0, 3\)\.map/);
   });
 
   it("keeps the published category position when a search returns one driver", async () => {

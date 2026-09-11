@@ -17,6 +17,7 @@ import {
   getDriverLaps,
   getResultEntries,
 } from "../../../lib/public-data";
+import { resultHeadingLabel } from "../../../lib/public-result-labels";
 import { driverVisual, premiumVisuals, resolveVisualSource } from "../../../lib/visual-assets";
 
 export async function generateMetadata({
@@ -90,7 +91,7 @@ export default async function DriverProfilePage({
     requestedResultId,
   );
   const selectedRaceLabel = selectedResult
-    ? localizeRaceText(selectedResult.sessionName || selectedResult.title)
+    ? resultHeadingLabel(selectedResult)
     : null;
   const selectedPdf = selectedResult
     ? officialResultPdfForResult(selectedResult.sessionName, selectedResult.title)

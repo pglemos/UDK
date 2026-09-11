@@ -10,7 +10,8 @@ import {
   getStandingsPage,
   parsePositiveInt,
 } from "../../lib/public-data";
-import { officialResultPdf } from "../../lib/official-result-links";
+import { officialResultPdf, officialResultPdfForResult } from "../../lib/official-result-links";
+import { resultHeadingLabel } from "../../lib/public-result-labels";
 
 export const metadata: Metadata = {
   title: "Classificação",
@@ -27,6 +28,15 @@ function formatPoints(value: number): string {
   return rounded.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 }
 
+function publicationStatusLabel(status: string): string {
+  const normalized = status.trim().toLowerCase();
+  if (normalized === "rectified") return "Retificado";
+  if (normalized === "published") return "Publicado";
+  if (normalized === "homologated") return "Homologado";
+  if (normalized === "official") return "Oficial";
+  return status.trim() || "Status não informado";
+}
+
 export default async function StandingsPage({
   searchParams,
 }: {
@@ -36,9 +46,9 @@ export default async function StandingsPage({
   const page = parsePositiveInt(params.page, 1, 500);
   const category = param(params.categoria, "geral");
   const query = param(params.q).trim();
-  const [standings, leaders, categories, latestPublication] = await Promise.all([
+  const [standings, leader, categories, latestPublication] = await Promise.all([
     getStandingsPage({ page, pageSize: 10, category, query, sort: "points" }),
-    getStandingsPage({ page: 1, pageSize: 3, category, sort: "points" }),
+    getStandingsPage({ page: 1, pageSize: 1, category, sort: "points" }),
     getCategories(),
     getLatestResultPublication(),
   ]);
@@ -46,8 +56,9 @@ export default async function StandingsPage({
     category === "geral"
       ? "Geral"
       : (categories.find((item) => item.slug === category)?.name ?? category);
-  const leaderPoints = leaders.items[0]?.points ?? standings.items[0]?.points ?? 0;
   const hasQuery = Boolean(query);
+  const leaderDriver = leader.items[0] ?? (!hasQuery ? standings.items[0] : null);
+  const leaderPoints = leader.items[0]?.points ?? standings.items[0]?.points ?? 0;
   const resultCountLabel = `${standings.meta.totalItems} ${
     standings.meta.totalItems === 1 ? "piloto encontrado" : "pilotos encontrados"
   }`;
@@ -63,6 +74,9 @@ export default async function StandingsPage({
         dateStyle: "short",
         timeZone: "America/Sao_Paulo",
       }).format(new Date(latestPublication.publishedAt))
+    : null;
+  const latestPublicationPdf = latestPublication
+    ? officialResultPdfForResult(latestPublication.sessionName, latestPublication.title)
     : null;
   const emptyAction = hasQuery
     ? {
@@ -89,12 +103,30 @@ export default async function StandingsPage({
             </div>
             {latestPublication && publicationDate ? (
               <p className="tg-publication-context">
-                Último resultado publicado:{" "}
+                Ranking atualizado pelo resultado mais recente:{" "}
                 <Link href={`/resultados#resultado-${latestPublication.id}`}>
-                  {latestPublication.title}
-                </Link>{" "}
-                ·{" "}
-                <time dateTime={latestPublication.publishedAt ?? undefined}>{publicationDate}</time>
+                  {resultHeadingLabel(latestPublication)}
+                </Link>
+                <span>
+                  {publicationStatusLabel(latestPublication.status)} · versão{" "}
+                  {latestPublication.version} ·{" "}
+                  <time dateTime={latestPublication.publishedAt ?? undefined}>
+                    {publicationDate}
+                  </time>
+                  {latestPublicationPdf ? (
+                    <>
+                      {" · "}
+                      <a
+                        className="tg-publication-pdf"
+                        href={latestPublicationPdf}
+                        download
+                        aria-label={`Baixar PDF oficial de ${resultHeadingLabel(latestPublication)}`}
+                      >
+                        PDF oficial
+                      </a>
+                    </>
+                  ) : null}
+                </span>
               </p>
             ) : null}
           </div>
@@ -145,7 +177,7 @@ export default async function StandingsPage({
             </div>
 
             <details className="tg-data-help tg-scoring-explainer">
-              <summary>Como ler os pontos e os descartes</summary>
+              <summary>Ver regras de pontuação e descartes</summary>
               <dl>
                 <div>
                   <dt>Pontos brutos</dt>
@@ -180,6 +212,22 @@ export default async function StandingsPage({
               ) : null}
             </details>
 
+            <p className="tg-data-legend" id="standing-legend">
+              {category === "geral"
+                ? "Classificação geral · todas as categorias."
+                : `Classificação da categoria ${categoryName}.`}{" "}
+              Pontos válidos são os usados no ranking; brutos e descartes mostram como o total foi
+              calculado.
+            </p>
+
+            {leaderDriver ? (
+              <p className="tg-standing-leader-summary">
+                Líder{category === "geral" ? " geral" : ` · ${categoryName}`}: {" "}
+                <Link href={`/pilotos/${leaderDriver.slug}`}>{leaderDriver.name}</Link> ·{" "}
+                <strong>{formatPoints(leaderDriver.points)} pts válidos</strong>
+              </p>
+            ) : null}
+
             <p className="tg-standings-context" aria-live="polite">
               {resultsContext}
             </p>
@@ -187,20 +235,22 @@ export default async function StandingsPage({
             {standings.items.length ? (
               <div className="tg-standings-content">
                 <div className="tg-standing-table-wrap tg-desktop-standing-table-wrap">
-                  <table className="udk-data-table tg-standing-table">
+                  <table
+                    className="udk-data-table tg-standing-table"
+                    aria-describedby="standing-legend"
+                  >
                     <caption className="sr-only">
-                      Classificação UDK 2026 com pontuação bruta, descartes e pontos válidos
+                      {category === "geral"
+                        ? "Classificação geral"
+                        : `Classificação de ${categoryName}`}{" "}
+                      UDK 2026 com pontuação bruta, descartes e pontos válidos
                     </caption>
                     <thead>
                       <tr>
                         <th scope="col">{category === "geral" ? "Ordem geral" : "Posição"}</th>
                         <th scope="col">Piloto</th>
                         <th scope="col">Categoria</th>
-                        <th scope="col">Vitórias</th>
-                        <th scope="col">Pódios</th>
-                        <th scope="col">Diferença para o líder</th>
-                        <th scope="col">Brutos</th>
-                        <th scope="col">Descartes</th>
+                        <th scope="col">Métricas</th>
                         <th scope="col">Pontos válidos</th>
                         <th scope="col">
                           <span className="sr-only">Abrir perfil</span>
@@ -232,18 +282,38 @@ export default async function StandingsPage({
                                 </small>
                               ) : null}
                             </td>
-                            <td data-label="Vitórias">{driver.wins}</td>
-                            <td data-label="Pódios">{driver.podiums}</td>
-                            <td data-label="Diferença para o líder">
-                              {gap === 0 ? "Líder" : `-${formatPoints(gap)}`}
-                            </td>
-                            <td data-label="Pontos brutos">{formatPoints(driver.grossPoints)}</td>
-                            <td data-label="Pontos descartados">
-                              <span className="udk-discarded-points">
-                                {driver.discardedPoints > 0
-                                  ? `-${formatPoints(driver.discardedPoints)}`
-                                  : "—"}
-                              </span>
+                            <td data-label="Métricas">
+                              <details className="tg-standing-metrics">
+                                <summary>Ver métricas</summary>
+                                <dl>
+                                  <div>
+                                    <dt>Diferença para o líder</dt>
+                                    <dd>{gap === 0 ? "Líder" : `-${formatPoints(gap)}`}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Vitórias</dt>
+                                    <dd>{driver.wins}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Pódios</dt>
+                                    <dd>{driver.podiums}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Brutos</dt>
+                                    <dd>{formatPoints(driver.grossPoints)}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Descartes</dt>
+                                    <dd>
+                                      <span className="udk-discarded-points">
+                                        {driver.discardedPoints > 0
+                                          ? `-${formatPoints(driver.discardedPoints)}`
+                                          : "—"}
+                                      </span>
+                                    </dd>
+                                  </div>
+                                </dl>
+                              </details>
                             </td>
                             <td data-label="Pontos válidos">
                               <strong className="udk-points">{formatPoints(driver.points)}</strong>
@@ -356,32 +426,6 @@ export default async function StandingsPage({
               showStatus
             />
 
-            {!hasQuery && leaders.items.length ? (
-              <section className="tg-standing-leaders" aria-labelledby="podium-title">
-                <h2 id="podium-title">
-                  {category === "geral" ? "Líderes por pontos" : `Pódio · ${categoryName}`}
-                </h2>
-                <ol className="tg-standing-leaders-list">
-                  {leaders.items.slice(0, 3).map((driver) => (
-                    <li key={driver.slug}>
-                      <Link href={`/pilotos/${driver.slug}`}>
-                        <span className="tg-standing-leader-position">
-                          {driver.rankingPosition ?? "—"}º
-                        </span>
-                        <span>
-                          <strong>{driver.name}</strong>
-                          <small>{driver.category}</small>
-                        </span>
-                        <b>
-                          {formatPoints(driver.points)} <small>pts válidos</small>
-                        </b>
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            ) : null}
-
             <section className="tg-standings-documents" aria-labelledby="standings-documents-title">
               <h2 id="standings-documents-title">Documentos oficiais</h2>
               <div
@@ -391,7 +435,7 @@ export default async function StandingsPage({
               >
                 <a
                   className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da etapa Endurance"
+                  aria-label="Endurance · PDF oficial (baixar)"
                   href={officialResultPdf.endurance}
                   download
                 >
@@ -403,7 +447,7 @@ export default async function StandingsPage({
                 </a>
                 <a
                   className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da Corrida 1"
+                  aria-label="Corrida 1 · PDF oficial (baixar)"
                   href={officialResultPdf.corrida1}
                   download
                 >
@@ -415,7 +459,7 @@ export default async function StandingsPage({
                 </a>
                 <a
                   className="race-button race-button-outline is-light tg-pdf-link"
-                  aria-label="Baixar PDF oficial da Corrida 2"
+                  aria-label="Corrida 2 · PDF oficial (baixar)"
                   href={officialResultPdf.corrida2}
                   download
                 >
