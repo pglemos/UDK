@@ -67,6 +67,21 @@ describe("official sponsor roster", () => {
     }
   });
 
+  it("publishes the corrected sponsor name and verified destinations", () => {
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "vintage-sao-francisco")?.name).toBe(
+      "Vinagre São Francisco",
+    );
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "transfermix")?.websiteUrl).toBe(
+      "https://www.instagram.com/transfermixbh/",
+    );
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "velho-oeste")?.websiteUrl).toBe(
+      "https://www.instagram.com/velhooesteclubedetiro/",
+    );
+    expect(fallbackSponsors.find((sponsor) => sponsor.slug === "grupo-do-carro")?.websiteUrl).toBe(
+      "",
+    );
+  });
+
   it("keeps canonical public data while accepting database rows by slug", () => {
     const merged = mergeOfficialSponsors([
       {
@@ -124,6 +139,9 @@ describe("official sponsor roster", () => {
     const transparentAssetsMigration = sourceFile(
       "../../../supabase/migrations/202608250002_transparent_sponsor_assets.sql",
     );
+    const destinationsMigration = sourceFile(
+      "../../../supabase/migrations/202609200001_sponsor_names_and_destinations.sql",
+    );
     const databaseTest = sourceFile("../../../supabase/tests/official_sponsors.sql");
 
     expect(migration).toContain("pvf-transportes");
@@ -141,6 +159,9 @@ describe("official sponsor roster", () => {
     expect(transparentAssetsMigration).toContain("/sponsors/firepit-brasil.svg");
     expect(transparentAssetsMigration).toContain("/sponsors/vintage-sao-francisco.svg");
     expect(transparentAssetsMigration).toContain("/sponsors/velho-oeste.png");
+    expect(destinationsMigration).toContain("Vinagre São Francisco");
+    expect(destinationsMigration).toContain("https://www.instagram.com/transfermixbh/");
+    expect(destinationsMigration).toContain("https://www.instagram.com/velhooesteclubedetiro/");
     expect(databaseTest).toContain("the official roster has exactly seven active sponsors");
     expect(databaseTest).toContain("the active sponsor roster contains no duplicate slugs");
     for (const slug of officialSlugs) {

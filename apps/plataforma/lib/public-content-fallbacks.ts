@@ -77,7 +77,7 @@ export const fallbackSponsors: PublicSponsor[] = [
     name: "TransferMix",
     slug: "transfermix",
     logoUrl: "/sponsors/transfermix.svg",
-    websiteUrl: "https://www.instagram.com/transfermixbrindes/",
+    websiteUrl: "https://www.instagram.com/transfermixbh/",
     tier: "Patrocinador oficial",
   },
   {
@@ -88,7 +88,7 @@ export const fallbackSponsors: PublicSponsor[] = [
     tier: "Patrocinador oficial",
   },
   {
-    name: "Vintage São Francisco",
+    name: "Vinagre São Francisco",
     slug: "vintage-sao-francisco",
     logoUrl: "/sponsors/vintage-sao-francisco.svg",
     websiteUrl: "https://www.instagram.com/vinagreorganico/",
@@ -98,7 +98,7 @@ export const fallbackSponsors: PublicSponsor[] = [
     name: "Velho Oeste Clube de Tiro",
     slug: "velho-oeste",
     logoUrl: "/sponsors/velho-oeste.png",
-    websiteUrl: "",
+    websiteUrl: "https://www.instagram.com/velhooesteclubedetiro/",
     tier: "Patrocinador oficial",
   },
 ];
