@@ -6,9 +6,47 @@
       {
         "rule": "design-system-font",
         "value": "sfmono-regular",
-        "files": ["apps/plataforma/app/globals.css"],
+        "files": [
+          "apps/plataforma/app/globals.css"
+        ],
         "createdAt": "2026-10-06T14:24:38.957Z",
         "reason": "Agente: pilha monospace nativa restrita a contadores numericos legados .nav-group a > .count; .metrics b recebe Archivo por .shell .metrics b em race.css. CSS legado confirmado anterior ao redesign."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.65rem",
+        "files": [
+          "apps/plataforma/app/race.css"
+        ],
+        "createdAt": "2026-10-06T23:03:14.444Z",
+        "reason": "Agente: ajuste local do nome no cartao sem retrato .cinema-driver-poster.is-fallback h3; medidas 26.4px e capturas pilotos desktop/mobile em .impeccable/review/triage-css-20261006 preservam nomes reais sem overflow."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2.4rem",
+        "files": [
+          "apps/plataforma/app/race.css"
+        ],
+        "createdAt": "2026-10-06T23:03:14.641Z",
+        "reason": "Agente: titulo local Qual e sua categoria em .race-registration-copy h2; captura inscricao-desktop e medida 38.4px em .impeccable/review/triage-css-20261006 confirmam hierarquia intencional do formulario."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "3.2rem",
+        "files": [
+          "apps/plataforma/app/race.css"
+        ],
+        "createdAt": "2026-10-06T23:03:14.836Z",
+        "reason": "Agente: titulo local Entrar em .race-auth-form h1; captura login-desktop e medida 51.2px em .impeccable/review/triage-css-20261006 confirmam hierarquia propria do acesso, com variante mobile menor."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "apps/plataforma/app/race.css"
+        ],
+        "createdAt": "2026-10-06T23:03:15.040Z",
+        "reason": "Agente: ajuste local dos nomes na Home mobile .udk-leader-list strong; captura home-mobile e medida 15.2px em .impeccable/review/triage-css-20261006 preservam leitura e coluna de pontos no viewport 390px."
       }
     ]
   }

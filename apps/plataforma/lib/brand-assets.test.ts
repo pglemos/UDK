@@ -44,7 +44,7 @@ describe("official UDK identity", () => {
     expect(assets).toContain("/icons/udk-avatar-512.png");
     expect(header).toContain("OfficialLogo");
     expect(shell).toContain("OfficialLogo");
-    expect(css).toContain("#00d9ff");
-    expect(logo).not.toMatch(/filter:|fill=.*00d9ff|stroke=.*00d9ff/i);
+    expect(css).toContain("--cinema-cyan: #28cce5");
+    expect(logo).not.toMatch(/filter:|(?:fill|stroke)=.*(?:00d9ff|28cce5)/i);
   });
 });

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-06T22:41:12.610730+00:00",
+  "generatedAt": "2026-10-06T23:01:37.505838+00:00",
   "title": "Design System: Ultras do Kart",
   "extensions": {
     "colorMeta": {
@@ -353,6 +353,21 @@
           "oklch(83.6% 0.02694 211.06)",
           "oklch(95% 0.02694 211.06)"
         ]
+      },
+      "placeholder-ink": {
+        "role": "neutral",
+        "displayName": "Azul de placeholder",
+        "purpose": "Iniciais sem retrato real no fundo escuro do perfil; --cinema-placeholder-ink em race.css.",
+        "tonalRamp": [
+          "oklch(15.0% 0.06032 224.61)",
+          "oklch(26.4% 0.06032 224.61)",
+          "oklch(37.9% 0.06032 224.61)",
+          "oklch(49.3% 0.06032 224.61)",
+          "oklch(60.7% 0.06032 224.61)",
+          "oklch(72.1% 0.06032 224.61)",
+          "oklch(83.6% 0.06032 224.61)",
+          "oklch(95.0% 0.06032 224.61)"
+        ]
       }
     },
     "typographyMeta": {
@@ -362,7 +377,7 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Cabeçalhos públicos internos compactos."
+        "purpose": "Título público padrão; cabeçalhos internos têm variante compacta."
       },
       "title": {
         "displayName": "Title",
@@ -392,6 +407,82 @@
       "metadata": {
         "displayName": "Metadados",
         "purpose": "Rótulos, publicação, cabeçalhos de tabela e status; mínimo 0.75rem."
+      },
+      "internal-headline": {
+        "displayName": "Cabeçalho interno",
+        "purpose": "Cabeçalhos públicos compactos de consulta e navegação."
+      },
+      "subheading": {
+        "displayName": "Subtítulo público",
+        "purpose": "Títulos públicos de terceiro nível."
+      },
+      "article-heading": {
+        "displayName": "Título editorial",
+        "purpose": "Título de artigo; não é escala operacional."
+      },
+      "display-mobile": {
+        "displayName": "Abertura no celular",
+        "purpose": "Identidade da Home no celular; conserva a hierarquia sobre fotografia real."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Leitura editorial, descrições amplas e campos de acesso/operação."
+      },
+      "section-compact": {
+        "displayName": "Section compact",
+        "purpose": "Resumo de temporada, documentos oficiais, notícias secundárias, pontos e seleção de categoria."
+      },
+      "section-small": {
+        "displayName": "Section small",
+        "purpose": "Versão do regulamento, histórico, sessões de volta e seções do editor; datas e resumos de resultados."
+      },
+      "section-mobile": {
+        "displayName": "Section mobile",
+        "purpose": "Seções, perfis e datas em tela pequena; pontos e título de patrocinadores."
+      },
+      "feature-title": {
+        "displayName": "Feature title",
+        "purpose": "Título de notícia em destaque e título do formulário de acesso no celular."
+      },
+      "identity-large": {
+        "displayName": "Identity large",
+        "purpose": "Título de configuração e iniciais no placeholder de perfil; não é título operacional."
+      },
+      "data-highlight": {
+        "displayName": "Data highlight",
+        "purpose": "Datas de etapa e resumos de resultados ou histórico no celular."
+      },
+      "data-compact": {
+        "displayName": "Data compact",
+        "purpose": "Posição na classificação e data compacta no celular."
+      },
+      "context-title": {
+        "displayName": "Context title",
+        "purpose": "Nome da próxima etapa e valor principal do resumo de resultados."
+      },
+      "row-title": {
+        "displayName": "Row title",
+        "purpose": "Nome do piloto no resumo da temporada e nome da etapa na lista de datas."
+      },
+      "data-prominent": {
+        "displayName": "Data prominent",
+        "purpose": "Contagem regressiva, nome em poster de piloto e pontos em listas móveis."
+      },
+      "state-title": {
+        "displayName": "State title",
+        "purpose": "Seletor de resultados, mensagem de acesso negado e limite da navegação no menu."
+      },
+      "editorial-mobile": {
+        "displayName": "Editorial mobile",
+        "purpose": "Título de artigo no celular e chamada da imagem no menu."
+      },
+      "mobile-subtitle": {
+        "displayName": "Mobile subtitle",
+        "purpose": "Pontos do resumo da temporada e subtítulo de seção do editor no celular."
+      },
+      "public-headline-mobile": {
+        "displayName": "Public headline mobile",
+        "purpose": "Cabeçalhos públicos no celular; consultas de dados podem usar uma variante menor."
       }
     },
     "shadows": [
@@ -467,7 +558,7 @@
       "refersTo": "button-outline",
       "description": "Ação com contorno na cor de texto.",
       "html": "<button class=\"ds-outline\">Ler regulamento</button>",
-      "css": ".ds-outline{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:13px 22px;border:1px solid transparent;border-radius:4px;font-size:.875rem;font-weight:600;line-height:1.4;text-align:center;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--cinema-ink,#14242d);border-color:currentColor}.ds-outline:hover{background:#718b9912}.ds-outline:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+      "css": ".ds-outline{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:13px 22px;border:1px solid transparent;border-radius:4px;font-size:.875rem;font-weight:600;line-height:1.4;text-align:center;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--cinema-ink,#14242d);border-color:currentColor}.ds-outline:hover{background:color-mix(in srgb,var(--cinema-muted-dark,#526772) 7.059%,transparent)}.ds-outline:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
     },
     {
       "name": "Busca pública",

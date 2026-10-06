@@ -15,6 +15,7 @@ colors:
   ink: "#14242d"
   muted-light: "#aabdc7"
   muted-dark: "#526772"
+  placeholder-ink: "#538497"
   line-light: "#ffffff26"
   line-dark: "#14242d26"
   field-white: "#ffffff"
@@ -36,7 +37,7 @@ typography:
     letterSpacing: "-0.035em"
   headline:
     fontFamily: "Archivo, Arial, sans-serif"
-    fontSize: "clamp(2.5rem, 4vw, 3.5rem)"
+    fontSize: "clamp(2.8rem, 5vw, 5rem)"
     fontWeight: 700
     lineHeight: 1.04
     letterSpacing: "-0.02em"
@@ -46,6 +47,30 @@ typography:
     fontWeight: 700
     lineHeight: 1.04
     letterSpacing: "-0.02em"
+  internal-headline:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "clamp(2.5rem, 4vw, 3.5rem)"
+    fontWeight: 700
+    lineHeight: 1.04
+    letterSpacing: "-0.02em"
+  subheading:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "clamp(1.3rem, 2vw, 1.9rem)"
+    fontWeight: 700
+    lineHeight: 1.04
+    letterSpacing: "-0.02em"
+  article-heading:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "clamp(3rem, 5vw, 5.5rem)"
+    fontWeight: 700
+    lineHeight: 1.04
+    letterSpacing: "-0.02em"
+  display-mobile:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "clamp(3.25rem, 14vw, 4.5rem)"
+    fontWeight: 850
+    lineHeight: 0.96
+    letterSpacing: "-0.035em"
   operation-title:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "clamp(2rem, 3vw, 2.75rem)"
@@ -67,6 +92,36 @@ typography:
   data:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "0.875rem"
+  reading:
+    fontSize: "1rem"
+  section-compact:
+    fontSize: "1.8rem"
+  section-small:
+    fontSize: "1.6rem"
+  section-mobile:
+    fontSize: "1.5rem"
+  feature-title:
+    fontSize: "2.6rem"
+  identity-large:
+    fontSize: "4.5rem"
+  data-highlight:
+    fontSize: "1.4rem"
+  data-compact:
+    fontSize: "1.3rem"
+  context-title:
+    fontSize: "1.125rem"
+  row-title:
+    fontSize: "1.1rem"
+  data-prominent:
+    fontSize: "1.9rem"
+  state-title:
+    fontSize: "2.3rem"
+  editorial-mobile:
+    fontSize: "3rem"
+  mobile-subtitle:
+    fontSize: "1.35rem"
+  public-headline-mobile:
+    fontSize: "2.7rem"
 rounded:
   sharp: "0px"
   status: "3px"
@@ -74,6 +129,8 @@ rounded:
   panel: "6px"
   operation: "8px"
   modal: "10px"
+  editor: "16px"
+  pill: "999px"
   circle: "50%"
 spacing:
   "8": "8px"
@@ -179,6 +236,7 @@ A paleta une azul quase preto, ciano nas ações e neutros frios para leitura.
 - **Papel frio** (`paper`, `paper-muted`) e **canvas** (`canvas`): leitura pública, cabeçalhos de tabela e fundo operacional.
 - **Tinta azul** (`ink`): títulos e leitura sobre claro.
 - **Texto secundário claro/escuro** (`muted-light`, `muted-dark`): descrições e metadados conforme o fundo.
+- **Azul de placeholder** (`placeholder-ink`): iniciais sem retrato real no fundo escuro do perfil; mantém a cor existente e não representa novo acento de marca.
 - **Divisores claros/escuros** (`line-light`, `line-dark`, `operation-line`): estrutura de linhas, painéis e campos.
 
 Estados usam pares próprios: `success`/`success-bg` para publicação e confirmação, `warning`/`warning-bg` para provisório ou atenção, `danger`/`danger-bg` para erro ou cancelamento. `registration-bg` acompanha inscrição aberta com texto em ciano profundo. São cores semânticas, não novos acentos de marca.
@@ -194,14 +252,38 @@ Estados usam pares próprios: `success`/`success-bg` para publicação e confirm
 
 ### Hierarchy
 
-- **Display**: identidade na abertura, com peso 850 e limite de 6rem; `typography.display`. No celular, usa `clamp(3.25rem, 14vw, 4.5rem)`.
-- **Headline**: cabeçalhos públicos internos, com peso 700; `typography.headline`. Dados e controles seguem próximos ao título.
+- **Display**: identidade na abertura, com peso 850 e limite de 6rem; `typography.display`. No celular, usa `typography.display-mobile`.
+- **Headline**: título público padrão, com peso 700; `typography.headline`. Cabeçalhos internos compactos usam `typography.internal-headline`; dados e controles seguem próximos ao título.
+- **Subheading**: subtítulos públicos de terceiro nível; `typography.subheading`.
+- **Article heading**: título editorial de artigo; `typography.article-heading`. Sua escala não é herdada pelo painel.
 - **Title**: títulos públicos de seção, com peso 700; `typography.title`. A operação usa títulos de painel menores, em geral 1.7–2rem.
 - **Operation title**: título de tarefa no painel, com peso 700 e limite de 2.75rem; `typography.operation-title`. No celular, passa a 2rem.
 - **Body**: descrições e conteúdo de tabelas usam 0.875rem; leitura editorial e descrições mais amplas chegam a 1rem. Parágrafos públicos têm limite de 70ch; introduções internas, 65ch.
 - **Label**: ações principais, navegação de desktop e categorias usam `typography.label`, com peso 600.
 - **Metadata**: rótulos, contexto de publicação, cabeçalhos de tabela e status usam `typography.metadata`; o mínimo é 0.75rem.
 - **Data**: tabelas públicas usam `typography.data`, com números tabulares. Datas, pontos e métricas aumentam de tamanho conforme a informação, sem criar uma escala para cada exceção.
+
+### Reused size roles
+
+Os tamanhos adicionais do frontmatter são variantes observadas, não uma sequência para aplicar indiscriminadamente. Herdam Archivo; peso e altura de linha continuam próprios de cada componente.
+
+| Token                               | Papel existente                                                                                       |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `typography.reading`                | Leitura editorial, descrições amplas e campos de acesso/operação.                                     |
+| `typography.section-compact`        | Resumo de temporada, documentos oficiais, notícias secundárias, pontos e seleção de categoria.        |
+| `typography.section-small`          | Versão do regulamento, histórico, sessões de volta e seções do editor; datas e resumos de resultados. |
+| `typography.section-mobile`         | Seções, perfis e datas em tela pequena; pontos e título de patrocinadores.                            |
+| `typography.feature-title`          | Título de notícia em destaque e título do formulário de acesso no celular.                            |
+| `typography.identity-large`         | Título de configuração e iniciais no placeholder de perfil; não é título operacional.                 |
+| `typography.data-highlight`         | Datas de etapa e resumos de resultados ou histórico no celular.                                       |
+| `typography.data-compact`           | Posição na classificação e data compacta no celular.                                                  |
+| `typography.context-title`          | Nome da próxima etapa e valor principal do resumo de resultados.                                      |
+| `typography.row-title`              | Nome do piloto no resumo da temporada e nome da etapa na lista de datas.                              |
+| `typography.data-prominent`         | Contagem regressiva, nome em poster de piloto e pontos em listas móveis.                              |
+| `typography.state-title`            | Seletor de resultados, mensagem de acesso negado e limite da navegação no menu.                       |
+| `typography.editorial-mobile`       | Título de artigo no celular e chamada da imagem no menu.                                              |
+| `typography.mobile-subtitle`        | Pontos do resumo da temporada e subtítulo de seção do editor no celular.                              |
+| `typography.public-headline-mobile` | Cabeçalhos públicos no celular; consultas de dados podem usar uma variante menor.                     |
 
 No celular (até 760px), cabeçalhos públicos internos ficam em 2.5–2.7rem e títulos de seção em 2rem. Identidade, artigo, perfil de piloto e acesso têm hierarquias próprias; seus valores não são regras para títulos operacionais.
 
@@ -227,7 +309,7 @@ Transições de cor/borda duram 0.18s, menu 0.2s e resposta de fotografia 0.4s. 
 
 ## Shapes
 
-Blocos de identidade e fotografia principal são retangulares. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. Badges operacionais legados e o editor de pilotos conservam variantes locais de raio, sem ampliá-las a todos os containers. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
+Blocos de identidade e fotografia principal são retangulares. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. O editor de pilotos e seu cabeçalho usam `editor`; badges de status e identificadores operacionais arredondados usam `pill`. Esses raios permanecem nesses papéis e não substituem os raios de controles e painéis. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
 
 ## Components
 
@@ -237,11 +319,11 @@ Ações diretas com peso 600, rótulo legível e ícone SVG opcional. A variante
 
 ### Chips
 
-Tabs de categoria usam borda fina e raio de controle; seleção combina superfície azul escura e texto branco frio. Status associa rótulo textual, contorno e par de cor semântica; não depende apenas da cor. Indicadores oficiais reutilizam o par de sucesso.
+Tabs de categoria usam borda fina e raio de controle; seleção combina superfície azul escura e texto branco frio. Status público usa o raio `status`; badges operacionais usam `pill`. Ambos associam rótulo textual, contorno e par de cor semântica; não dependem apenas da cor. Indicadores oficiais reutilizam o par de sucesso.
 
 ### Cards / Containers
 
-Resumos usam branco, borda escura translúcida e raio de painel. Containers de tabela mantêm borda e overflow horizontal no desktop. Cartões de patrocinador usam superfície azul escura com marca íntegra em `object-fit: contain`; no hover, a borda recebe ciano. Painéis operacionais usam branco, raio de operação e nenhuma sombra.
+Resumos usam branco, borda escura translúcida e raio de painel. Containers de tabela mantêm borda e overflow horizontal no desktop. Cartões de patrocinador usam superfície azul escura com marca íntegra em `object-fit: contain`; no hover, a borda recebe ciano. Painéis operacionais usam branco, raio de operação e nenhuma sombra. O editor inline de pilotos usa raio `editor` no container, cabeçalho e prévia de foto; mantém o formulário no fluxo da página.
 
 ### Inputs / Fields
 
