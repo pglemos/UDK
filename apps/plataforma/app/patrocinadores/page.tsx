@@ -29,9 +29,8 @@ export default async function SponsorsPage() {
       <main id="conteudo" tabIndex={-1}>
         <section className="race-page-hero race-page-hero-sponsors">
           <div className="race-container">
-            <span className="race-kicker">Parceiros oficiais</span>
             <h1>Patrocinadores</h1>
-            <p>Marcas que compartilham o grid, a pista e a evolução do UDK.</p>
+            <p>Parceiros do campeonato Ultras do Kart.</p>
           </div>
         </section>
 
@@ -40,8 +39,8 @@ export default async function SponsorsPage() {
             <Reveal>
               <SectionHeading
                 eyebrow="Quem acelera conosco"
-                title="Parcerias que movem o campeonato"
-                description="Exposição oficial com contexto esportivo, presença editorial e conexão real com a comunidade do kart."
+                title="Patrocinadores oficiais"
+                description="Conheça as marcas que apoiam a temporada 2026."
               />
             </Reveal>
 
@@ -64,8 +63,8 @@ export default async function SponsorsPage() {
                           <strong>{sponsor.name.slice(0, 2).toUpperCase()}</strong>
                         )}
                       </div>
-                      <span>{sponsor.tier || "Patrocinador oficial"}</span>
                       <h2>{sponsor.name}</h2>
+                      <span>{sponsor.tier || "Patrocinador oficial"}</span>
                       {sponsor.websiteUrl ? (
                         <small>{instagramHandle(sponsor.websiteUrl)}</small>
                       ) : null}
@@ -95,7 +94,7 @@ export default async function SponsorsPage() {
               <EmptyState
                 eyebrow="Grid de parceiros"
                 title="Espaço reservado às marcas oficiais"
-                description="Os patrocinadores ativos serão exibidos assim que a organização concluir a publicação no Supabase."
+                description="As marcas parceiras aparecerão aqui após a publicação pela organização."
               />
             )}
           </div>
@@ -107,7 +106,7 @@ export default async function SponsorsPage() {
               <SectionHeading
                 eyebrow="Entidade esportiva"
                 title="Federação parceira"
-                description="Akamig é apresentada separadamente das marcas que patrocinam o campeonato."
+                description="Associação de Kart Amador de Minas Gerais."
               />
             </Reveal>
 
@@ -131,8 +130,8 @@ export default async function SponsorsPage() {
                       loading="eager"
                     />
                   </div>
-                  <span>{federation.label}</span>
                   <h2>{federation.name}</h2>
+                  <span>{federation.label}</span>
                   <small>{instagramHandle(federation.websiteUrl)}</small>
                 </a>
               ))}

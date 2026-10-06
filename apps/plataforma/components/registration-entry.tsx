@@ -52,8 +52,7 @@ export function RegistrationEntry() {
         </div>
 
         <div className="race-registration-copy">
-          <span className="race-kicker">Etapa 01 de 06</span>
-          <h2>Prepare sua entrada no grid</h2>
+          <h2>Iniciar inscrição</h2>
           <p>
             Escolha a categoria de interesse e avance para a plataforma oficial. Perfil, documentos,
             termos e confirmação ficam reunidos na sua conta para acompanhar cada passo.
@@ -115,7 +114,6 @@ export function RegistrationEntry() {
       </section>
 
       <aside className="race-registration-summary">
-        <span className="race-kicker">Sua inscrição</span>
         <h2>Temporada 2026</h2>
         <div className="race-summary-list">
           <div>

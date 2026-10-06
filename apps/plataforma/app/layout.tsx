@@ -1,23 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Archivo } from "next/font/google";
 import { PwaRegister } from "../components/pwa-register";
 import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
 import "./pilot-crud.css";
 import "./race.css";
 
-const barlow = Barlow_Condensed({
+const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-  variable: "--font-barlow",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-inter",
+  variable: "--font-archivo",
   display: "swap",
 });
 
@@ -65,11 +56,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="pt-BR"
-      data-scroll-behavior="smooth"
-      className={`${barlow.variable} ${inter.variable}`}
-    >
+    <html lang="pt-BR" data-scroll-behavior="smooth" className={archivo.variable}>
       <body>
         <PwaRegister />
         {children}

@@ -18,14 +18,13 @@ describe("design audit corrections", () => {
   it("self-hosts the display and body fonts instead of fetching Google Fonts (A3)", () => {
     const layout = read("app/layout.tsx");
 
-    expect(layout).toContain("Barlow_Condensed");
-    expect(layout).toContain('variable: "--font-barlow"');
-    expect(layout).toContain('variable: "--font-inter"');
+    expect(layout).toContain("Archivo");
+    expect(layout).toContain('variable: "--font-archivo"');
 
     for (const sheet of ["app/globals.css", "app/race.css"]) {
       expect(read(sheet)).not.toContain("fonts.googleapis.com");
     }
-    expect(read("app/race.css")).toContain("--cinema-display: var(--font-barlow)");
+    expect(read("app/race.css")).toContain("--cinema-display: var(--font-archivo)");
     expect(read("app/globals.css")).toContain("font-family: var(--font-inter)");
   });
 
@@ -41,7 +40,8 @@ describe("design audit corrections", () => {
     const home = read("app/page.tsx");
     expect(header).toContain('href="/inscricao"');
     expect(header).toContain("race-mobile-menu-actions");
-    expect(home).toContain('href="/inscricao"');
+    expect(home).toContain("getStageAction(nextStage)");
+    expect(home).toContain("href={nextStageAction.href}");
   });
 
   it("filters instantly with a debounced search field (C6)", () => {
@@ -70,10 +70,7 @@ describe("design audit corrections", () => {
   });
 
   it("publishes championship numbers immediately instead of showing temporary zeroes", () => {
-    const home = read("app/page.tsx");
     const motion = read("components/race/motion.tsx");
-    expect(home).toContain("<CountUp value={totalPodiums} />");
-    expect(home).toContain("pódios entre {drivers.length}");
     expect(motion).toContain("value.toLocaleString");
     expect(motion).not.toContain("setDisplay(0)");
   });

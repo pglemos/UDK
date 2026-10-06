@@ -46,10 +46,9 @@ describe("official UDK media", () => {
     expect(new Set(matches).size).toBeGreaterThanOrEqual(8);
   });
 
-  it("loads one responsive poster for the motion-aware Home hero", () => {
+  it("preserves motion-aware media and uses the selected official photograph on Home", () => {
     const component = read("components/race/home-hero-media.tsx");
     const home = read("app/page.tsx");
-    const entry = read("app/race.css");
     const styles = read("app/race.css");
 
     expect(component).toContain('"use client"');
@@ -65,9 +64,10 @@ describe("official UDK media", () => {
     expect(component).toContain("muted");
     expect(component).toContain("playsInline");
     expect(component).toContain("onError");
-    expect(home).toContain("<HomeHeroMediaLayer />");
-    expect(entry).toContain(".official-home-hero-video.is-ready");
-    expect(entry).not.toContain("@import");
+    expect(home).toContain("src={premiumVisuals.race.src}");
+    expect(home).toContain("priority");
+    expect(home).toContain('sizes="(max-width: 760px) 100vw, 50vw"');
+    expect(styles).not.toContain("@import");
     expect(styles).toContain("/media/official/heroes/login.webp");
   });
 

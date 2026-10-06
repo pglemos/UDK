@@ -22,8 +22,7 @@ export default function RegistrationPage() {
         />
         <section className="tg-registration-intro">
           <div className="race-container">
-            <span>01 / Comece por aqui</span>
-            <h2>Seu próximo passo: entrar no grid.</h2>
+            <h2>Escolha sua categoria</h2>
             <p>
               Escolha sua categoria de interesse e continue dentro da plataforma oficial para
               completar dados, documentos, termos e pagamento.

@@ -612,7 +612,7 @@ export default async function ResultsPage({
           <div className="race-container">
             <Flag aria-hidden="true" />
             <div>
-              <h2>A temporada ainda tem capítulos pela frente.</h2>
+              <h2>Próximas etapas</h2>
             </div>
             <Link href="/calendario" className="race-button race-button-primary">
               Ver calendário <ChevronRight aria-hidden="true" />

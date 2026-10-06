@@ -69,7 +69,7 @@ describe("UDK 2026 official championship rules", () => {
     const layout = readApp("app/layout.tsx");
     const styles = readApp("app/race.css");
     expect(layout).toContain('import "./race.css";');
-    expect(styles).toContain("--cinema-cyan: #00d9ff");
+    expect(styles).toContain("--cinema-cyan: #28cce5");
     expect(styles).toContain(".udk-page-hero-media");
     expect(styles).toContain(".cinema-home-hero-media");
     expect(styles).not.toContain("mask-image");

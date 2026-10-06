@@ -39,14 +39,14 @@ export default async function NewsPage({
           index="05"
           eyebrow="Do paddock para o público"
           title="Notícias"
-          description="Comunicados, bastidores e histórias oficiais de quem vive a temporada."
+          description="Comunicados da organização e cobertura das etapas."
         />
 
         <section className="tg-news-directory">
           <div className="race-container">
             <EditorialHeading
               index="05"
-              title="As últimas do campeonato."
+              title="Publicações"
               description="Busque comunicados e conteúdos publicados pela organização."
             />
 
@@ -73,8 +73,8 @@ export default async function NewsPage({
                       />
                     </div>
                     <div>
-                      <span>{featured.category}</span>
                       <h2>{featured.title}</h2>
+                      <span>{featured.category}</span>
                       <p>{featured.summary}</p>
                       <time>
                         {new Date(featured.publishedAt).toLocaleDateString("pt-BR", {
@@ -113,8 +113,8 @@ export default async function NewsPage({
                             style={{ objectPosition: visual.position }}
                           />
                         </div>
-                        <span>{item.category}</span>
                         <h3>{item.title}</h3>
+                        <span>{item.category}</span>
                         <p>{item.summary}</p>
                         <time>{new Date(item.publishedAt).toLocaleDateString("pt-BR")}</time>
                       </Link>
@@ -126,7 +126,7 @@ export default async function NewsPage({
               <EditorialEmpty
                 index="05"
                 title="Nenhuma notícia oficial publicada."
-                description="O espaço editorial está pronto. Comunicados e bastidores aparecerão quando forem publicados pela organização, sem matérias fictícias para decorar a página."
+                description="Os comunicados aparecerão aqui quando forem publicados pela organização."
                 action={{ href: "/calendario", label: "Acompanhar a temporada" }}
               />
             )}

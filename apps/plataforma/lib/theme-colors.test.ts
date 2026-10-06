@@ -37,14 +37,14 @@ describe("UDK cinematic brand theme", () => {
   it("defines the approved cinematic palette and official cyan accent", () => {
     expect(publicCss).toContain("--cinema-black: #081116;");
     expect(publicCss).toContain("--cinema-white: #f7fafb;");
-    expect(publicCss).toContain("--cinema-paper: #f4f7f8;");
-    expect(publicCss).toContain("--cinema-cyan: #00d9ff;");
+    expect(publicCss).toContain("--cinema-paper: #f0f5f7;");
+    expect(publicCss).toContain("--cinema-cyan: #28cce5;");
     expect(publicCss).toContain("--cinema-cyan-deep: #006577;");
   });
 
   it("keeps accessible contrast for primary and editorial surfaces", () => {
-    expect(contrast("#00d9ff", "#081116")).toBeGreaterThanOrEqual(4.5);
-    expect(contrast("#14242d", "#f4f7f8")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#28cce5", "#081116")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#14242d", "#f0f5f7")).toBeGreaterThanOrEqual(4.5);
     expect(contrast("#006577", "#f7fafb")).toBeGreaterThanOrEqual(4.5);
   });
 });

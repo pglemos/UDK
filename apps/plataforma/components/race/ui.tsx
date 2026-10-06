@@ -44,21 +44,12 @@ export function PageHero({
             </Link>
           ) : null}
         </div>
-        <div className="tg-page-hero-index" aria-hidden="true">
-          {index}
-        </div>
-        {!compact ? (
-          <div className="tg-page-scroll" aria-hidden="true">
-            <i /> Conheça
-          </div>
-        ) : null}
       </div>
     </section>
   );
 }
 
 export function SectionHeading({
-  eyebrow,
   title,
   description,
   action,
@@ -70,7 +61,6 @@ export function SectionHeading({
 }) {
   return (
     <div className="race-section-heading tg-section-heading">
-      <span>{eyebrow}</span>
       <div>
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
@@ -194,7 +184,6 @@ export function EmptyState({
 }) {
   return (
     <div className="race-empty tg-empty-state">
-      <span>{eyebrow}</span>
       <Flag aria-hidden="true" />
       <h2>{title}</h2>
       <p>{description}</p>

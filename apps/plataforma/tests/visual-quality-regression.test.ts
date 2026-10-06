@@ -18,11 +18,10 @@ describe("UDK visual quality regressions", () => {
     const layout = read("app/layout.tsx");
     const styles = read("app/race.css");
     expect(layout).toContain('from "next/font/google"');
-    expect(layout).toContain("Barlow_Condensed");
-    expect(layout).toContain("Inter");
+    expect(layout).toContain("Archivo");
     expect(layout).not.toMatch(/Manrope|Syne/);
-    expect(styles).toContain("var(--font-barlow)");
-    expect(styles).toContain("var(--font-inter)");
+    expect(styles).toContain("var(--font-archivo)");
+    expect(styles).toContain("--font-inter: var(--font-archivo)");
   });
 
   it("uses multiple optimized official visual sources instead of a repeated fallback", () => {

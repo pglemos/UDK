@@ -109,7 +109,9 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
 
       if (mode === "reset") {
         const redirectTo = passwordRecoveryRedirect(window.location.origin);
-        const { error: resetError } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+        const { error: resetError } = await client.auth.resetPasswordForEmail(email, {
+          redirectTo,
+        });
         if (resetError) setError(resetError.message);
         else setNotice("E-mail de recuperação enviado. Verifique sua caixa de entrada.");
         return;
@@ -171,33 +173,31 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
         </Link>
 
         <div className="race-auth-copy">
-          <span className="race-kicker">Plataforma oficial • 2026</span>
-          <h1>
-            Sua temporada{" "}
-            <em>começa aqui.</em>
-          </h1>
-          <p>
-            Acompanhe sua inscrição, documentos, etapas e resultados dentro do ambiente oficial
-            do campeonato.
-          </p>
+          <h2>Área do piloto</h2>
+          <p>Inscrições, documentos e resultados da temporada UDK.</p>
         </div>
 
         <div className="race-auth-features">
-          <span><CheckCircle2 aria-hidden="true" /> Inscrição acompanhada</span>
-          <span><CheckCircle2 aria-hidden="true" /> Documentos organizados</span>
-          <span><CheckCircle2 aria-hidden="true" /> Resultados oficiais</span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Inscrição acompanhada
+          </span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Documentos organizados
+          </span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Resultados oficiais
+          </span>
         </div>
       </section>
 
       <section className="race-auth-panel">
         <form className="race-auth-form" onSubmit={submit}>
-          <span className="race-kicker">Acesso UDK</span>
-          <h2>{title}</h2>
+          <h1>{title}</h1>
           <p>
             {mode === "signin"
               ? "Use sua conta para acompanhar sua participação no campeonato."
               : mode === "signup"
-                ? "Crie sua conta para iniciar a inscrição e entrar no grid."
+                ? "Crie sua conta para se inscrever no campeonato."
                 : mode === "reset"
                   ? "Enviaremos um link seguro para o e-mail cadastrado."
                   : "Defina uma nova senha com pelo menos oito caracteres."}
@@ -205,11 +205,20 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
 
           {!configured ? (
             <div className="race-alert race-alert-warning" role="status">
-              O acesso está temporariamente indisponível porque a conexão da plataforma não foi configurada.
+              O acesso está temporariamente indisponível porque a conexão da plataforma não foi
+              configurada.
             </div>
           ) : null}
-          {error ? <div className="race-alert race-alert-error" role="alert">{error}</div> : null}
-          {notice ? <div className="race-alert race-alert-success" role="status">{notice}</div> : null}
+          {error ? (
+            <div className="race-alert race-alert-error" role="alert">
+              {error}
+            </div>
+          ) : null}
+          {notice ? (
+            <div className="race-alert race-alert-success" role="status">
+              {notice}
+            </div>
+          ) : null}
 
           <div className={`race-form-grid${mode === "signup" ? " is-two" : ""}`}>
             {mode === "signup" ? (
@@ -306,17 +315,27 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
             type="submit"
             disabled={loading || !configured}
           >
-            {loading ? <LoaderCircle className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
+            {loading ? (
+              <LoaderCircle className="spin" aria-hidden="true" />
+            ) : (
+              <ArrowRight aria-hidden="true" />
+            )}
             {submitLabel}
           </button>
 
           <div className="race-auth-links">
             {mode !== "signin" ? (
-              <button type="button" onClick={() => changeMode("signin")}>Voltar para o login</button>
+              <button type="button" onClick={() => changeMode("signin")}>
+                Voltar para o login
+              </button>
             ) : (
               <>
-                <button type="button" onClick={() => changeMode("signup")}>Criar conta</button>
-                <button type="button" onClick={() => changeMode("reset")}>Esqueci a senha</button>
+                <button type="button" onClick={() => changeMode("signup")}>
+                  Criar conta
+                </button>
+                <button type="button" onClick={() => changeMode("reset")}>
+                  Esqueci a senha
+                </button>
               </>
             )}
             <Link href="/">Voltar ao portal</Link>

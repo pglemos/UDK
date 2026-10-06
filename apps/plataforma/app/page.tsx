@@ -1,24 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowDownRight,
-  ArrowRight,
-  CalendarDays,
-  Flag,
-  MapPin,
-  Timer,
-  Trophy,
-  Users,
-} from "lucide-react";
-import {
-  DriverPoster,
-  EditorialEmpty,
-  EditorialHeading,
-  StageProject,
-} from "../components/race/editorial-primitives";
-import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
-import { CountUp, RaceCountdown, Reveal } from "../components/race/motion";
+import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
+import { EditorialEmpty, EditorialHeading } from "../components/race/editorial-primitives";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
 import { fallbackFederations } from "../lib/public-content-fallbacks";
@@ -48,312 +32,134 @@ export default async function HomePage() {
     followingStage,
     getNextUpcomingStage(remainingStages.filter((stage) => stage.id !== followingStage?.id)),
   ].filter((stage) => stage !== null);
-  const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 4);
   const featuredNews = news[0] ?? null;
   const secondaryNews = news.slice(1, 4);
-  const categories = new Set(drivers.map((driver) => driver.category)).size;
-  const totalPodiums = drivers.reduce((sum, driver) => sum + driver.podiums, 0);
-  const registrationOpen = nextStageAction.href === "/inscricao";
   const featuredNewsVisual = newsVisual(0);
 
   return (
     <RaceShell showFooterCallout={false}>
       <main id="conteudo" tabIndex={-1} className="cinema-home">
-        <section className="cinema-home-hero" data-design="twice-grind-cinematic">
-          <HomeHeroMediaLayer />
-
-          <div className="race-container cinema-home-hero-grid">
-            <Reveal className="cinema-home-hero-copy">
-              <span>Temporada 2026 • Betim, Minas Gerais</span>
+        <section className="cinema-home-hero">
+          <div className="race-container udk-team-opening">
+            <div className="udk-team-copy">
               <h1>
-                <span>A pista</span> <em>não espera.</em>
+                <span>ULTRAS</span>
+                <span>DO KART</span>
               </h1>
-              <p>
-                O campeonato Ultras do Kart. Disputa de verdade, evolução a cada volta e uma
-                comunidade que vive a pista em Betim.
+              <p className="udk-season-location">
+                Campeonato 2026 <span>Betim, MG</span>
               </p>
-              <div className="cinema-home-actions">
-                <Link href="/inscricao" className="race-button race-button-primary">
-                  Começar inscrição <ArrowRight aria-hidden="true" />
-                </Link>
-                <Link href="/calendario" className="race-button race-button-ghost">
-                  Ver calendário <CalendarDays aria-hidden="true" />
-                </Link>
-              </div>
-              <small className="cinema-home-action-note">
-                Crie sua conta, escolha a categoria e continue pela plataforma oficial.
-              </small>
-            </Reveal>
-          </div>
-
-          <div className="race-container cinema-hero-foot">
-            <span>Campeonato Ultras do Kart</span>
-            <ArrowDownRight aria-hidden="true" />
-          </div>
-        </section>
-
-        <section className="cinema-next-race" aria-label="Próxima etapa">
-          <div className="race-container cinema-next-stage">
-            <div className="cinema-next-stage-main">
-              <time>{nextStage?.date ?? "Em breve"}</time>
-              <div>
-                <div className="cinema-next-stage-head">
-                  <span>Próxima etapa</span>
-                  <b>{registrationOpen ? "Inscrições abertas" : "Calendário atualizado"}</b>
+              <section className="udk-race-ticket" aria-label="Próxima etapa">
+                <div className="udk-ticket-heading">
+                  <h2>Próxima etapa</h2>
+                  <CalendarDays aria-hidden="true" />
                 </div>
-                <h2>{nextStage?.title ?? "Calendário oficial"}</h2>
-                <p>{nextStage?.track ?? "Traçado oficial"}</p>
-                <div className="cinema-next-stage-location">
-                  <MapPin aria-hidden="true" />
-                  <span>
-                    {nextStage?.location ?? "Kartódromo Internacional de Betim"} ·{" "}
-                    {nextStage?.time ?? "Horário a definir"}
-                  </span>
+                <div className="udk-ticket-date">
+                  <time dateTime={nextStage?.startsAt ?? undefined}>
+                    {nextStage?.date ?? "Em breve"}
+                  </time>
+                  <span>{nextStage?.time ?? "Horário a definir"}</span>
                 </div>
+                <h3>{nextStage?.title ?? "Calendário oficial"}</h3>
+                <p>{nextStage?.track ?? "Traçado a definir"}</p>
+                <div className="udk-ticket-actions">
+                  <Link href={nextStageAction.href} className="race-button race-button-primary">
+                    {nextStageAction.label} <ArrowRight aria-hidden="true" />
+                  </Link>
+                  <Link href="/calendario" className="cinema-arrow-link">
+                    Ver calendário <ArrowRight aria-hidden="true" />
+                  </Link>
+                </div>
+              </section>
+            </div>
+            <figure className="udk-team-photo">
+              <div className="cinema-home-hero-media">
+                <Image
+                  src={premiumVisuals.race.src}
+                  alt={premiumVisuals.race.alt}
+                  fill
+                  priority
+                  quality={90}
+                  sizes="(max-width: 760px) 100vw, 50vw"
+                  style={{ objectPosition: premiumVisuals.race.position }}
+                />
               </div>
-            </div>
-            <div className="cinema-next-stage-countdown">
-              <span>Até a largada</span>
-              {nextStage?.startsAt ? (
-                <RaceCountdown target={nextStage.startsAt} />
-              ) : (
-                <b>Em breve</b>
-              )}
-            </div>
-            <Link href={nextStageAction.href} className="race-button race-button-primary">
-              {nextStageAction.label} <ArrowRight aria-hidden="true" />
-            </Link>
+              <figcaption>
+                <MapPin aria-hidden="true" /> Kartódromo Internacional de Betim
+              </figcaption>
+            </figure>
           </div>
         </section>
 
-        <section className="cinema-quick-links" aria-label="Acesso rápido ao campeonato">
-          <div className="race-container cinema-quick-links-grid">
-            <Link href="/calendario" className="cinema-quick-link">
-              <CalendarDays aria-hidden="true" />
-              <span>
-                <strong>Calendário</strong>
-                <small>Próximas etapas e traçados</small>
-              </span>
-              <ArrowRight aria-hidden="true" />
-            </Link>
-            <Link href="/classificacao" className="cinema-quick-link">
-              <Trophy aria-hidden="true" />
-              <span>
-                <strong>Classificação</strong>
-                <small>Pontuação e posições do grid</small>
-              </span>
-              <ArrowRight aria-hidden="true" />
-            </Link>
-            <Link href="/resultados" className="cinema-quick-link">
-              <Timer aria-hidden="true" />
-              <span>
-                <strong>Resultados</strong>
-                <small>Etapas e tempos publicados</small>
-              </span>
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </div>
-        </section>
-
-        <section className="cinema-manifesto">
-          <div className="race-container cinema-manifesto-grid">
-            <Reveal className="cinema-manifesto-copy">
-              <h2>O kart é só o começo.</h2>
-              <p>
-                Um grid que se encontra para competir e voltar melhor. Conheça o campeonato, suas
-                categorias e as regras que fazem a disputa acontecer.
-              </p>
-              <Link href="/regulamento" className="cinema-arrow-link">
-                Ler o regulamento <ArrowRight aria-hidden="true" />
-              </Link>
-            </Reveal>
-
-            <Reveal className="cinema-manifesto-media" delay={100}>
-              <Image
-                src={premiumVisuals.manifesto.src}
-                alt={premiumVisuals.manifesto.alt}
-                fill
-                quality={88}
-                sizes="(max-width: 900px) 100vw, 44vw"
-                style={{ objectPosition: premiumVisuals.manifesto.position }}
+        <section className="udk-season-board" aria-label="Resumo da temporada">
+          <div className="race-container udk-season-board-grid">
+            <section className="cinema-ranking">
+              <EditorialHeading
+                index=""
+                title="Classificação"
+                action={{ href: "/classificacao", label: "Ver completa" }}
               />
-              <strong>{String(drivers.length).padStart(2, "0")}</strong>
-              <span>Pilotos publicados. Uma comunidade em movimento.</span>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="cinema-season">
-          <div className="race-container">
-            <EditorialHeading
-              index="02"
-              title="O próximo encontro é na pista."
-              description="Datas, traçados e tudo que você precisa para acompanhar a temporada 2026."
-              action={{ href: "/calendario", label: "Calendário completo" }}
-              inverse
-            />
-
-            <div className="cinema-season-grid">
-              {nextStage ? (
-                <StageProject stage={nextStage} index={0} featured />
+              {topDrivers.length ? (
+                <ol className="udk-leader-list">
+                  {topDrivers.map((driver, index) => (
+                    <li key={driver.slug}>
+                      <Link href={`/pilotos/${driver.slug}`}>
+                        <span className="udk-leader-position">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div>
+                          <strong>{driver.name}</strong>
+                          <small>{driver.category}</small>
+                        </div>
+                        <span className="udk-leader-points">
+                          {driver.points}
+                          <small>pts</small>
+                        </span>
+                        <ArrowRight aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
               ) : (
                 <EditorialEmpty
-                  index="02"
-                  title="O calendário oficial ainda não foi publicado."
-                  description="As etapas aparecerão aqui assim que a organização disponibilizar os dados da temporada."
+                  index=""
+                  title="Classificação ainda não publicada"
+                  description="Consulte os resultados após a primeira etapa."
                 />
               )}
-
-              {stagePreview.length > 0 ? (
-                <div className="cinema-stage-rail" aria-label="Outras etapas da temporada">
-                  {stagePreview.map((stage, index) => (
-                    <Reveal key={stage.id} delay={index * 55}>
-                      <StageProject stage={stage} index={index + 1} />
-                    </Reveal>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </section>
-
-        <section className="cinema-proof" aria-label="Dados reais do campeonato">
-          <div className="race-container">
-            <article>
-              <Flag aria-hidden="true" />
-              <strong>
-                <CountUp value={stages.length} minimumIntegerDigits={2} />
-              </strong>
-              <span>etapas oficiais</span>
-            </article>
-            <article>
-              <Users aria-hidden="true" />
-              <strong>
-                <CountUp value={drivers.length} minimumIntegerDigits={2} />
-              </strong>
-              <span>pilotos publicados</span>
-            </article>
-            <article>
-              <Trophy aria-hidden="true" />
-              <strong>
-                <CountUp value={totalPodiums} />
-              </strong>
-              <span>
-                pódios entre {drivers.length} {drivers.length === 1 ? "piloto" : "pilotos"}
-              </span>
-            </article>
-            <article>
-              <Timer aria-hidden="true" />
-              <strong>
-                <CountUp value={categories} minimumIntegerDigits={2} />
-              </strong>
-              <span>categorias</span>
-            </article>
-          </div>
-        </section>
-
-        <section className="cinema-ranking">
-          <div className="race-container">
-            <EditorialHeading
-              index="03"
-              title="A disputa pelo topo."
-              description="Confira quem lidera a temporada. Pontuação oficial atualizada a cada etapa."
-              action={{ href: "/classificacao", label: "Ver classificação" }}
-            />
-
-            {topDrivers.length ? (
-              <div className="cinema-ranking-layout">
-                <div className="cinema-podium" aria-label="Três primeiros colocados">
-                  {topDrivers.slice(0, 3).map((driver, index) => (
-                    <Link
-                      href={`/pilotos/${driver.slug}`}
-                      className={`cinema-podium-card place-${index + 1}`}
-                      key={driver.slug}
-                    >
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <h3>{driver.name}</h3>
-                      <p>{driver.category}</p>
-                      <strong>
-                        {driver.points}
-                        <small>pts</small>
-                      </strong>
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="cinema-ranking-list">
-                  {topDrivers.slice(3).map((driver, index) => (
-                    <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
-                      <span>{String(index + 4).padStart(2, "0")}</span>
+              <Link href="/resultados" className="cinema-arrow-link udk-board-more">
+                Resultados e tempos <ArrowRight aria-hidden="true" />
+              </Link>
+            </section>
+            <section className="cinema-season">
+              <EditorialHeading
+                index=""
+                title="Próximas etapas"
+                action={{ href: "/calendario", label: "Todas as datas" }}
+              />
+              {stagePreview.length ? (
+                <div className="udk-next-dates">
+                  {stagePreview.map((stage) => (
+                    <Link href="/calendario" key={stage.id}>
+                      <time dateTime={stage.startsAt ?? undefined}>{stage.date}</time>
                       <div>
-                        <strong>{driver.name}</strong>
-                        <small>{driver.category}</small>
+                        <h3>{stage.title}</h3>
+                        <p>{stage.track}</p>
+                        <small>
+                          {stage.time} · {stage.city}
+                        </small>
                       </div>
-                      <em>{driver.points} pts</em>
                       <ArrowRight aria-hidden="true" />
                     </Link>
                   ))}
                 </div>
-              </div>
-            ) : (
-              <EditorialEmpty
-                index="03"
-                title="A classificação ainda não começou."
-                description="Os pilotos e pontos aparecerão após a publicação oficial da temporada."
-              />
-            )}
-          </div>
-        </section>
-
-        <section className="cinema-drivers">
-          <div className="race-container">
-            <EditorialHeading
-              index="04"
-              title="Conheça o grid."
-              description="Os pilotos, os pontos e as histórias por trás de cada capacete."
-              action={{ href: "/pilotos", label: "Todos os pilotos" }}
-              inverse
-            />
-
-            {driverPreview.length ? (
-              <div className="cinema-driver-mosaic">
-                {driverPreview.map((driver, index) => (
-                  <DriverPoster driver={driver} index={index} key={driver.slug} />
-                ))}
-              </div>
-            ) : (
-              <EditorialEmpty
-                index="04"
-                title="Os perfis oficiais ainda não foram publicados."
-                description="O grid aparecerá aqui quando os pilotos forem disponibilizados pela organização."
-              />
-            )}
-          </div>
-        </section>
-
-        <section className="cinema-community">
-          <div className="cinema-community-media" aria-hidden="true">
-            <Image
-              src={premiumVisuals.community.src}
-              alt=""
-              fill
-              quality={88}
-              sizes="100vw"
-              style={{ objectPosition: premiumVisuals.community.position }}
-            />
-          </div>
-          <div className="race-container cinema-community-copy">
-            <h2>Rivais na pista. Ultras em todo lugar.</h2>
-            <p>
-              Do briefing à bandeirada, a comunidade faz parte de cada volta. Respeito, troca de
-              experiência e vontade de acelerar juntos.
-            </p>
-            <div className="cinema-community-values">
-              <span>Respeito</span>
-              <span>Constância</span>
-              <span>Disputa limpa</span>
-              <span>Evolução</span>
-            </div>
+              ) : (
+                <p>Novas datas serão publicadas pela organização.</p>
+              )}
+              <Link href="/regulamento" className="cinema-arrow-link udk-board-more">
+                Regulamento 2026 <ArrowRight aria-hidden="true" />
+              </Link>
+            </section>
           </div>
         </section>
 
@@ -361,8 +167,8 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="06"
-              title="Direto do paddock."
-              description="Comunicados, bastidores e decisões oficiais do campeonato."
+              title="Notícias"
+              description="Comunicados da organização e cobertura das etapas."
               action={{ href: "/noticias", label: "Todas as notícias" }}
             />
 
@@ -380,8 +186,8 @@ export default async function HomePage() {
                     />
                   </div>
                   <div>
-                    <span>{featuredNews.category}</span>
                     <h3>{featuredNews.title}</h3>
+                    <span>{featuredNews.category}</span>
                     <p>{featuredNews.summary}</p>
                     <time>{new Date(featuredNews.publishedAt).toLocaleDateString("pt-BR")}</time>
                   </div>
@@ -389,8 +195,8 @@ export default async function HomePage() {
                 <div className="cinema-news-secondary">
                   {secondaryNews.map((item) => (
                     <Link href={`/noticias/${item.slug}`} key={item.slug}>
-                      <span>{item.category}</span>
                       <h3>{item.title}</h3>
+                      <span>{item.category}</span>
                       <time>{new Date(item.publishedAt).toLocaleDateString("pt-BR")}</time>
                       <ArrowRight aria-hidden="true" />
                     </Link>
@@ -400,8 +206,8 @@ export default async function HomePage() {
             ) : (
               <EditorialEmpty
                 index="06"
-                title="As histórias oficiais ainda estão sendo preparadas."
-                description="Quando a organização publicar comunicados e bastidores, eles aparecerão aqui sem conteúdo fictício para completar o layout."
+                title="Nenhuma notícia publicada"
+                description="Os comunicados da organização aparecerão aqui."
                 action={{ href: "/calendario", label: "Acompanhar o calendário" }}
               />
             )}
@@ -410,7 +216,7 @@ export default async function HomePage() {
 
         <section className="cinema-sponsors">
           <div className="race-container">
-            <span>Marcas que aceleram com o UDK</span>
+            <h2>Patrocinadores</h2>
             {sponsors.length ? (
               <div className="cinema-sponsor-list">
                 {sponsors.map((sponsor) => {
@@ -483,18 +289,6 @@ export default async function HomePage() {
                 ))}
               </div>
             ) : null}
-          </div>
-        </section>
-
-        <section className="cinema-final-cta">
-          <div className="race-container">
-            <h2>A próxima largada pode ser sua.</h2>
-            <p>
-              Crie sua conta, escolha a categoria e acompanhe cada etapa pela plataforma oficial.
-            </p>
-            <Link href="/inscricao" className="race-button race-button-primary">
-              Começar inscrição <ArrowRight aria-hidden="true" />
-            </Link>
           </div>
         </section>
       </main>

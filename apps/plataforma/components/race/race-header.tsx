@@ -188,7 +188,7 @@ export function RaceHeader() {
             Entrar
           </Link>
           <Link className="race-button race-button-primary race-header-cta" href="/inscricao">
-            Começar inscrição <ArrowUpRight aria-hidden="true" size={16} />
+            Inscreva-se <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
           {/* Static audit marker retained for the closed state: aria-label="Abrir menu". */}
           <button
@@ -228,7 +228,6 @@ export function RaceHeader() {
             style={{ objectPosition: previewVisual.position }}
           />
           <div className="cinema-menu-caption">
-            <span>{previewItem.index}</span>
             <strong>{previewItem.label}</strong>
             <small>UDK • Temporada 2026</small>
           </div>
@@ -259,7 +258,7 @@ export function RaceHeader() {
         </div>
 
         <nav aria-label="Todas as páginas">
-          {navigation.map(({ href, label, index }, itemIndex) => (
+          {navigation.map(({ href, label }, itemIndex) => (
             <Link
               key={href}
               href={href}
@@ -268,7 +267,6 @@ export function RaceHeader() {
               onMouseEnter={() => setPreview(itemIndex)}
               onFocus={() => setPreview(itemIndex)}
             >
-              <span>{index}</span>
               {label}
               <ArrowUpRight aria-hidden="true" />
             </Link>
@@ -280,7 +278,7 @@ export function RaceHeader() {
             Entrar
           </Link>
           <Link className="race-button race-button-primary" href="/inscricao">
-            Começar inscrição
+            Inscreva-se
           </Link>
         </div>
         <p>UDK 2026 • Kartódromo Internacional de Betim</p>

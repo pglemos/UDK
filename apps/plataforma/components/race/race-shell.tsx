@@ -30,10 +30,9 @@ export function RaceShell({
         {showFooterCallout ? (
           <div className="cinema-footer-callout">
             <div className="race-container">
-              <span>Temporada 2026</span>
-              <h2>Faça parte do próximo grid.</h2>
+              <h2>Inscrições 2026</h2>
               <Link className="race-button race-button-primary" href="/inscricao">
-                Começar inscrição <ArrowUpRight aria-hidden="true" />
+                Inscreva-se <ArrowUpRight aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -42,10 +41,7 @@ export function RaceShell({
         <div className="race-container udk-footer-main">
           <div className="udk-footer-brand">
             <OfficialLogo variant="negative" width={190} />
-            <p>
-              O campeonato de quem vive o kart. Competição, evolução e respeito no Kartódromo de
-              Betim.
-            </p>
+            <p>Campeonato Ultras do Kart. Kartódromo Internacional de Betim, Minas Gerais.</p>
           </div>
 
           <div className="udk-footer-column">
@@ -86,14 +82,14 @@ export function RaceShell({
 
         <div className="race-container udk-footer-bottom">
           <span>© 2026 Ultras do Kart. Todos os direitos reservados.</span>
-          <span>UDK • A pista não espera.</span>
+          <span>Calendário, resultados e classificação oficiais.</span>
         </div>
       </footer>
 
       {showMobileCta ? (
         <div className="udk-mobile-cta">
           <Link href="/inscricao">
-            Começar inscrição <ArrowUpRight aria-hidden="true" size={16} />
+            Inscreva-se <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
           <Link href="/login">Entrar</Link>
         </div>

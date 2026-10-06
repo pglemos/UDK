@@ -4,6 +4,7 @@ import { EditorialHeading } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, StatusBadge } from "../../components/race/ui";
 import { getRegulations } from "../../lib/public-content";
+import { parseRegulationSections } from "../../lib/regulation-sections";
 
 export const metadata: Metadata = {
   title: "Regulamento",
@@ -11,18 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/regulamento" },
 };
 
-function parseSections(content: string) {
-  return content.split(/\n\n+/).map((block, index) => {
-    const [rawHeading, ...body] = block.split("\n");
-    const heading = rawHeading ?? `Seção ${index + 1}`;
-    return { id: `secao-${index + 1}`, heading, body: body.join(" ") };
-  });
-}
-
 export default async function RegulationPage() {
   const regulations = await getRegulations();
   const current = regulations[0];
-  const sections = parseSections(
+  const sections = parseRegulationSections(
     current?.content ??
       "01. PUBLICAÇÃO PENDENTE\nA versão oficial será disponibilizada pela organização.",
   );
@@ -34,14 +27,14 @@ export default async function RegulationPage() {
           index="06"
           eyebrow="Regras do campeonato"
           title="Regulamento"
-          description="Clareza antes da largada. Consulte a versão pública e os capítulos publicados pela organização."
+          description="Regras, categorias e pontuação do campeonato 2026."
         />
 
         <section className="tg-regulation-section">
           <div className="race-container">
             <EditorialHeading
               index="06"
-              title="Tudo que você precisa saber para correr."
+              title="Regulamento 2026"
               description="A navegação abaixo organiza o conteúdo público sem substituir o documento integral homologado."
             />
 

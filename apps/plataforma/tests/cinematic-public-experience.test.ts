@@ -29,24 +29,23 @@ describe("UDK cinematic public experience", () => {
     expect(motion).toContain("cinema-route-curtain");
   });
 
-  it("builds the complete home narrative", () => {
+  it("builds the approved team opening and season board", () => {
     const home = read("app/page.tsx");
     for (const marker of [
       "cinema-home-hero",
-      "cinema-manifesto",
+      "udk-team-opening",
+      "udk-race-ticket",
+      "udk-season-board",
       "cinema-season",
-      "cinema-proof",
       "cinema-ranking",
-      "cinema-drivers",
-      "cinema-community",
       "cinema-news",
       "cinema-sponsors",
-      "cinema-final-cta",
     ]) {
       expect(home).toContain(marker);
     }
-    expect(home).toContain("A pista");
-    expect(home).toContain("não espera.");
+    expect(home).toContain("ULTRAS");
+    expect(home).toContain("DO KART");
+    expect(home).not.toContain("A pista não espera");
   });
 
   it("keeps all public routes in the shared shell", () => {

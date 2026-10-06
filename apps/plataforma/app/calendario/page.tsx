@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Flag, MapPin, Timer } from "lucide-react";
+import { ArrowRight, Flag, MapPin, Timer } from "lucide-react";
 import { EditorialEmpty, EditorialHeading } from "../../components/race/editorial-primitives";
 import { Reveal } from "../../components/race/motion";
 import { RaceShell } from "../../components/race/race-shell";
@@ -42,7 +42,7 @@ export default async function CalendarPage({
           index="01"
           eyebrow="Temporada 2026"
           title="Calendário"
-          description="Cinco encontros, diferentes traçados e uma temporada construída volta após volta."
+          description="Datas, horários e traçados da temporada 2026."
           compact
         />
 
@@ -50,8 +50,8 @@ export default async function CalendarPage({
           <div className="race-container">
             <EditorialHeading
               index="01"
-              title="Todas as etapas, em um só lugar."
-              description="Filtre o calendário, conheça os traçados e acompanhe quando o grid volta a acelerar."
+              title="Etapas 2026"
+              description="Consulte as etapas programadas e concluídas."
             />
             <form className="udk-toolbar tg-toolbar" action="/calendario">
               <SearchField
@@ -142,19 +142,6 @@ export default async function CalendarPage({
                 action={{ href: "/calendario", label: "Limpar filtros" }}
               />
             )}
-          </div>
-        </section>
-
-        <section className="tg-inline-cta">
-          <div className="race-container">
-            <CalendarDays aria-hidden="true" />
-            <div>
-              <span>Temporada 2026</span>
-              <h2>Escolha a etapa. Prepare a volta.</h2>
-            </div>
-            <Link href="/inscricao" className="race-button race-button-primary">
-              Começar inscrição <ArrowRight aria-hidden="true" />
-            </Link>
           </div>
         </section>
       </main>

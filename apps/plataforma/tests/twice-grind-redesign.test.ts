@@ -5,36 +5,35 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
-describe("UDK Twice + The Grind direction contracts", () => {
+describe("UDK Equipe direction contracts", () => {
   it("keeps the immersive global shell and official brand", () => {
     const header = read("components/race/race-header.tsx");
     const shell = read("components/race/race-shell.tsx");
 
     expect(header).toContain("cinema-menu-media");
     expect(header).toContain('aria-label="Abrir menu"');
-    expect(header).toContain("Começar inscrição");
+    expect(header).toContain("Inscreva-se");
     expect(shell).not.toContain("CinematicRouteCurtain");
     expect(shell).not.toContain("CinematicPointer");
     expect(shell).toContain("OfficialLogo");
   });
 
-  it("builds the complete cinematic home narrative", () => {
+  it("builds the approved team opening and season board", () => {
     const home = read("app/page.tsx");
     for (const marker of [
       "cinema-home-hero",
-      "cinema-manifesto",
+      "udk-team-opening",
+      "udk-race-ticket",
+      "udk-season-board",
       "cinema-season",
       "cinema-ranking",
-      "cinema-drivers",
-      "cinema-community",
       "cinema-news",
       "cinema-sponsors",
-      "cinema-final-cta",
     ]) {
       expect(home).toContain(marker);
     }
-    expect(home).toContain("A pista");
-    expect(home).toContain("não espera");
+    expect(home).toContain("ULTRAS");
+    expect(home).toContain("DO KART");
   });
 
   it("keeps all public routes inside the same editorial system", () => {

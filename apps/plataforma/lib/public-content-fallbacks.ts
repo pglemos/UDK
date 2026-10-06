@@ -17,7 +17,7 @@ export const fallbackNews: PublicContent[] = [
     slug: "categorias-rapidos-insanos",
     title: "Ultra Rápidos e Ultra Insanos",
     summary:
-      "Categorias distintas, uma única cultura de pista: evolução, respeito e disputa limpa.",
+      "Conheça as categorias Ultras Rápidos e Ultras Insanos e consulte a classificação de cada uma.",
     content:
       "O portal organiza a temporada por categoria e mantém classificação, pilotos e calendário em consulta pública.",
     category: "Campeonato",
@@ -29,7 +29,7 @@ export const fallbackNews: PublicContent[] = [
     slug: "plataforma-oficial-udk",
     title: "Plataforma oficial UDK entra no ar",
     summary:
-      "Calendário, classificação, pilotos, resultados e inscrição reunidos em uma experiência única.",
+      "Consulte calendário, classificação e resultados ou inicie sua inscrição na plataforma UDK.",
     content:
       "A plataforma oficial do UDK centraliza as informações públicas e os fluxos de participação do campeonato.",
     category: "Comunicado",
@@ -41,7 +41,7 @@ export const fallbackNews: PublicContent[] = [
     slug: "proxima-etapa-endurance",
     title: "Resistência abre a sequência final da temporada",
     summary:
-      "A prova de agosto exige consistência, estratégia e trabalho de equipe sob as luzes de Betim.",
+      "A etapa de agosto terá uma prova de resistência no traçado 01 invertido com chicane, em Betim.",
     content:
       "A próxima etapa prevista no calendário é uma prova de resistência no traçado 01 invertido com chicane.",
     category: "Etapa",

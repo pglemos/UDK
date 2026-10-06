@@ -1,0 +1,549 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T14:17:38.090995+00:00",
+  "title": "Design System: Ultras do Kart",
+  "extensions": {
+    "colorMeta": {
+      "cyan": {
+        "role": "primary",
+        "displayName": "Cyan",
+        "tonalRamp": [
+          "oklch(15% 0.12842 211.07)",
+          "oklch(26.4% 0.12842 211.07)",
+          "oklch(37.9% 0.12842 211.07)",
+          "oklch(49.3% 0.12842 211.07)",
+          "oklch(60.7% 0.12842 211.07)",
+          "oklch(72.1% 0.12842 211.07)",
+          "oklch(83.6% 0.12842 211.07)",
+          "oklch(95% 0.12842 211.07)"
+        ]
+      },
+      "cyan-hover": {
+        "role": "primary",
+        "displayName": "Cyan Hover",
+        "tonalRamp": [
+          "oklch(15% 0.11634 210.50)",
+          "oklch(26.4% 0.11634 210.50)",
+          "oklch(37.9% 0.11634 210.50)",
+          "oklch(49.3% 0.11634 210.50)",
+          "oklch(60.7% 0.11634 210.50)",
+          "oklch(72.1% 0.11634 210.50)",
+          "oklch(83.6% 0.11634 210.50)",
+          "oklch(95% 0.11634 210.50)"
+        ]
+      },
+      "cyan-deep": {
+        "role": "primary",
+        "displayName": "Cyan Deep",
+        "tonalRamp": [
+          "oklch(15% 0.08267 215.54)",
+          "oklch(26.4% 0.08267 215.54)",
+          "oklch(37.9% 0.08267 215.54)",
+          "oklch(49.3% 0.08267 215.54)",
+          "oklch(60.7% 0.08267 215.54)",
+          "oklch(72.1% 0.08267 215.54)",
+          "oklch(83.6% 0.08267 215.54)",
+          "oklch(95% 0.08267 215.54)"
+        ]
+      },
+      "black": {
+        "role": "neutral",
+        "displayName": "Black",
+        "tonalRamp": [
+          "oklch(15% 0.01723 233.09)",
+          "oklch(26.4% 0.01723 233.09)",
+          "oklch(37.9% 0.01723 233.09)",
+          "oklch(49.3% 0.01723 233.09)",
+          "oklch(60.7% 0.01723 233.09)",
+          "oklch(72.1% 0.01723 233.09)",
+          "oklch(83.6% 0.01723 233.09)",
+          "oklch(95% 0.01723 233.09)"
+        ]
+      },
+      "black-soft": {
+        "role": "neutral",
+        "displayName": "Black Soft",
+        "tonalRamp": [
+          "oklch(15% 0.02488 234.48)",
+          "oklch(26.4% 0.02488 234.48)",
+          "oklch(37.9% 0.02488 234.48)",
+          "oklch(49.3% 0.02488 234.48)",
+          "oklch(60.7% 0.02488 234.48)",
+          "oklch(72.1% 0.02488 234.48)",
+          "oklch(83.6% 0.02488 234.48)",
+          "oklch(95% 0.02488 234.48)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface Dark",
+        "tonalRamp": [
+          "oklch(15% 0.03031 233.94)",
+          "oklch(26.4% 0.03031 233.94)",
+          "oklch(37.9% 0.03031 233.94)",
+          "oklch(49.3% 0.03031 233.94)",
+          "oklch(60.7% 0.03031 233.94)",
+          "oklch(72.1% 0.03031 233.94)",
+          "oklch(83.6% 0.03031 233.94)",
+          "oklch(95% 0.03031 233.94)"
+        ]
+      },
+      "surface-dark-raised": {
+        "role": "neutral",
+        "displayName": "Surface Dark Raised",
+        "tonalRamp": [
+          "oklch(15% 0.03305 228.45)",
+          "oklch(26.4% 0.03305 228.45)",
+          "oklch(37.9% 0.03305 228.45)",
+          "oklch(49.3% 0.03305 228.45)",
+          "oklch(60.7% 0.03305 228.45)",
+          "oklch(72.1% 0.03305 228.45)",
+          "oklch(83.6% 0.03305 228.45)",
+          "oklch(95% 0.03305 228.45)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "tonalRamp": [
+          "oklch(15% 0.00346 219.53)",
+          "oklch(26.4% 0.00346 219.53)",
+          "oklch(37.9% 0.00346 219.53)",
+          "oklch(49.3% 0.00346 219.53)",
+          "oklch(60.7% 0.00346 219.53)",
+          "oklch(72.1% 0.00346 219.53)",
+          "oklch(83.6% 0.00346 219.53)",
+          "oklch(95% 0.00346 219.53)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.00598 223.46)",
+          "oklch(26.4% 0.00598 223.46)",
+          "oklch(37.9% 0.00598 223.46)",
+          "oklch(49.3% 0.00598 223.46)",
+          "oklch(60.7% 0.00598 223.46)",
+          "oklch(72.1% 0.00598 223.46)",
+          "oklch(83.6% 0.00598 223.46)",
+          "oklch(95% 0.00598 223.46)"
+        ]
+      },
+      "paper-muted": {
+        "role": "neutral",
+        "displayName": "Paper Muted",
+        "tonalRamp": [
+          "oklch(15% 0.00853 225.08)",
+          "oklch(26.4% 0.00853 225.08)",
+          "oklch(37.9% 0.00853 225.08)",
+          "oklch(49.3% 0.00853 225.08)",
+          "oklch(60.7% 0.00853 225.08)",
+          "oklch(72.1% 0.00853 225.08)",
+          "oklch(83.6% 0.00853 225.08)",
+          "oklch(95% 0.00853 225.08)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.02753 234.07)",
+          "oklch(26.4% 0.02753 234.07)",
+          "oklch(37.9% 0.02753 234.07)",
+          "oklch(49.3% 0.02753 234.07)",
+          "oklch(60.7% 0.02753 234.07)",
+          "oklch(72.1% 0.02753 234.07)",
+          "oklch(83.6% 0.02753 234.07)",
+          "oklch(95% 0.02753 234.07)"
+        ]
+      },
+      "muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Light",
+        "tonalRamp": [
+          "oklch(15% 0.02529 230.54)",
+          "oklch(26.4% 0.02529 230.54)",
+          "oklch(37.9% 0.02529 230.54)",
+          "oklch(49.3% 0.02529 230.54)",
+          "oklch(60.7% 0.02529 230.54)",
+          "oklch(72.1% 0.02529 230.54)",
+          "oklch(83.6% 0.02529 230.54)",
+          "oklch(95% 0.02529 230.54)"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Dark",
+        "tonalRamp": [
+          "oklch(15% 0.03070 230.95)",
+          "oklch(26.4% 0.03070 230.95)",
+          "oklch(37.9% 0.03070 230.95)",
+          "oklch(49.3% 0.03070 230.95)",
+          "oklch(60.7% 0.03070 230.95)",
+          "oklch(72.1% 0.03070 230.95)",
+          "oklch(83.6% 0.03070 230.95)",
+          "oklch(95% 0.03070 230.95)"
+        ]
+      },
+      "line-light": {
+        "role": "neutral",
+        "displayName": "Line Light",
+        "tonalRamp": [
+          "oklch(15% 0.00000 89.88 / 0.149)",
+          "oklch(26.4% 0.00000 89.88 / 0.149)",
+          "oklch(37.9% 0.00000 89.88 / 0.149)",
+          "oklch(49.3% 0.00000 89.88 / 0.149)",
+          "oklch(60.7% 0.00000 89.88 / 0.149)",
+          "oklch(72.1% 0.00000 89.88 / 0.149)",
+          "oklch(83.6% 0.00000 89.88 / 0.149)",
+          "oklch(95% 0.00000 89.88 / 0.149)"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Line Dark",
+        "tonalRamp": [
+          "oklch(15% 0.02753 234.07 / 0.149)",
+          "oklch(26.4% 0.02753 234.07 / 0.149)",
+          "oklch(37.9% 0.02753 234.07 / 0.149)",
+          "oklch(49.3% 0.02753 234.07 / 0.149)",
+          "oklch(60.7% 0.02753 234.07 / 0.149)",
+          "oklch(72.1% 0.02753 234.07 / 0.149)",
+          "oklch(83.6% 0.02753 234.07 / 0.149)",
+          "oklch(95% 0.02753 234.07 / 0.149)"
+        ]
+      },
+      "field-white": {
+        "role": "neutral",
+        "displayName": "Field White",
+        "tonalRamp": [
+          "oklch(15% 0.00000 89.88)",
+          "oklch(26.4% 0.00000 89.88)",
+          "oklch(37.9% 0.00000 89.88)",
+          "oklch(49.3% 0.00000 89.88)",
+          "oklch(60.7% 0.00000 89.88)",
+          "oklch(72.1% 0.00000 89.88)",
+          "oklch(83.6% 0.00000 89.88)",
+          "oklch(95% 0.00000 89.88)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.00599 223.46)",
+          "oklch(26.4% 0.00599 223.46)",
+          "oklch(37.9% 0.00599 223.46)",
+          "oklch(49.3% 0.00599 223.46)",
+          "oklch(60.7% 0.00599 223.46)",
+          "oklch(72.1% 0.00599 223.46)",
+          "oklch(83.6% 0.00599 223.46)",
+          "oklch(95% 0.00599 223.46)"
+        ]
+      },
+      "operation-line": {
+        "role": "neutral",
+        "displayName": "Operation Line",
+        "tonalRamp": [
+          "oklch(15% 0.01279 228.94)",
+          "oklch(26.4% 0.01279 228.94)",
+          "oklch(37.9% 0.01279 228.94)",
+          "oklch(49.3% 0.01279 228.94)",
+          "oklch(60.7% 0.01279 228.94)",
+          "oklch(72.1% 0.01279 228.94)",
+          "oklch(83.6% 0.01279 228.94)",
+          "oklch(95% 0.01279 228.94)"
+        ]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Success",
+        "tonalRamp": [
+          "oklch(15% 0.09077 159.81)",
+          "oklch(26.4% 0.09077 159.81)",
+          "oklch(37.9% 0.09077 159.81)",
+          "oklch(49.3% 0.09077 159.81)",
+          "oklch(60.7% 0.09077 159.81)",
+          "oklch(72.1% 0.09077 159.81)",
+          "oklch(83.6% 0.09077 159.81)",
+          "oklch(95% 0.09077 159.81)"
+        ]
+      },
+      "success-bg": {
+        "role": "semantic",
+        "displayName": "Success Bg",
+        "tonalRamp": [
+          "oklch(15% 0.02067 161.47)",
+          "oklch(26.4% 0.02067 161.47)",
+          "oklch(37.9% 0.02067 161.47)",
+          "oklch(49.3% 0.02067 161.47)",
+          "oklch(60.7% 0.02067 161.47)",
+          "oklch(72.1% 0.02067 161.47)",
+          "oklch(83.6% 0.02067 161.47)",
+          "oklch(95% 0.02067 161.47)"
+        ]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Warning",
+        "tonalRamp": [
+          "oklch(15% 0.09919 71.69)",
+          "oklch(26.4% 0.09919 71.69)",
+          "oklch(37.9% 0.09919 71.69)",
+          "oklch(49.3% 0.09919 71.69)",
+          "oklch(60.7% 0.09919 71.69)",
+          "oklch(72.1% 0.09919 71.69)",
+          "oklch(83.6% 0.09919 71.69)",
+          "oklch(95% 0.09919 71.69)"
+        ]
+      },
+      "warning-bg": {
+        "role": "semantic",
+        "displayName": "Warning Bg",
+        "tonalRamp": [
+          "oklch(15% 0.03760 86.89)",
+          "oklch(26.4% 0.03760 86.89)",
+          "oklch(37.9% 0.03760 86.89)",
+          "oklch(49.3% 0.03760 86.89)",
+          "oklch(60.7% 0.03760 86.89)",
+          "oklch(72.1% 0.03760 86.89)",
+          "oklch(83.6% 0.03760 86.89)",
+          "oklch(95% 0.03760 86.89)"
+        ]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Danger",
+        "tonalRamp": [
+          "oklch(15% 0.16870 22.20)",
+          "oklch(26.4% 0.16870 22.20)",
+          "oklch(37.9% 0.16870 22.20)",
+          "oklch(49.3% 0.16870 22.20)",
+          "oklch(60.7% 0.16870 22.20)",
+          "oklch(72.1% 0.16870 22.20)",
+          "oklch(83.6% 0.16870 22.20)",
+          "oklch(95% 0.16870 22.20)"
+        ]
+      },
+      "danger-bg": {
+        "role": "semantic",
+        "displayName": "Danger Bg",
+        "tonalRamp": [
+          "oklch(15% 0.02085 10.21)",
+          "oklch(26.4% 0.02085 10.21)",
+          "oklch(37.9% 0.02085 10.21)",
+          "oklch(49.3% 0.02085 10.21)",
+          "oklch(60.7% 0.02085 10.21)",
+          "oklch(72.1% 0.02085 10.21)",
+          "oklch(83.6% 0.02085 10.21)",
+          "oklch(95% 0.02085 10.21)"
+        ]
+      },
+      "registration-bg": {
+        "role": "semantic",
+        "displayName": "Registration Bg",
+        "tonalRamp": [
+          "oklch(15% 0.02694 211.06)",
+          "oklch(26.4% 0.02694 211.06)",
+          "oklch(37.9% 0.02694 211.06)",
+          "oklch(49.3% 0.02694 211.06)",
+          "oklch(60.7% 0.02694 211.06)",
+          "oklch(72.1% 0.02694 211.06)",
+          "oklch(83.6% 0.02694 211.06)",
+          "oklch(95% 0.02694 211.06)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Identidade na abertura."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos públicos."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de seção."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descrições públicas."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Ações e controles."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Tabelas com números tabulares."
+      }
+    },
+    "shadows": [
+      {
+        "name": "operation-soft",
+        "value": "0 16px 48px #14242d12",
+        "purpose": "Token --shadow; painéis principais removem a sombra explicitamente."
+      },
+      {
+        "name": "category-selected",
+        "value": "inset 0 0 0 1px var(--cinema-cyan-deep)",
+        "purpose": "Contorno interno da categoria selecionada."
+      }
+    ],
+    "motion": [
+      {
+        "name": "cinema-ease",
+        "value": "cubic-bezier(0.2, 0.7, 0.3, 1)",
+        "purpose": "Curva --cinema-ease existente."
+      },
+      {
+        "name": "control-transition",
+        "value": "background 0.18s, color 0.18s, border-color 0.18s",
+        "purpose": "Estados de botão."
+      },
+      {
+        "name": "menu-transition",
+        "value": "opacity 0.2s, visibility 0.2s",
+        "purpose": "Abertura e fechamento do menu."
+      },
+      {
+        "name": "photo-transition",
+        "value": "transform 0.4s",
+        "purpose": "Resposta de fotografia em cartões de piloto."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important",
+        "purpose": "prefers-reduced-motion: reduce também remove scroll suave."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-desktop",
+        "value": "1200px"
+      },
+      {
+        "name": "public-navigation",
+        "value": "1000px"
+      },
+      {
+        "name": "operation-sidebar",
+        "value": "980px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ação principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação ciano do portal.",
+      "html": "<button class=\"ds-primary\">Inscreva-se <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></button>",
+      "css": ".ds-primary{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:13px 22px;border:1px solid transparent;border-radius:4px;font-size:.875rem;font-weight:600;line-height:1.4;text-align:center;transition:background .18s,color .18s,border-color .18s;background:var(--cinema-cyan,#28cce5);color:var(--cinema-black,#081116)}.ds-primary:hover{background:var(--cinema-cyan-strong,#69e9ff)}.ds-primary:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}.ds-primary[aria-disabled=\"true\"]{pointer-events:none;opacity:.6}"
+    },
+    {
+      "name": "Ação secundária",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Ação com contorno na cor de texto.",
+      "html": "<button class=\"ds-outline\">Ler regulamento</button>",
+      "css": ".ds-outline{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:13px 22px;border:1px solid transparent;border-radius:4px;font-size:.875rem;font-weight:600;line-height:1.4;text-align:center;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--cinema-ink,#14242d);border-color:currentColor}.ds-outline:hover{background:#718b9912}.ds-outline:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+    },
+    {
+      "name": "Busca pública",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Campo de busca com rótulo acessível e SVG.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"search\" aria-label=\"Buscar piloto\" placeholder=\"Buscar piloto\"></label>",
+      "css": ".ds-search{display:grid;position:relative;max-width:480px;min-width:0}.ds-search svg{position:absolute;left:14px;bottom:15px;color:var(--cinema-muted-dark,#526772)}.ds-search input{font-family:var(--font-archivo,Archivo),Arial,sans-serif;width:100%;background:var(--surface,#ffffff);color:var(--cinema-ink,#14242d);border:1px solid var(--cinema-line-dark,#14242d26);min-height:48px;padding:12px 14px 12px 42px;font-size:.875rem;border-radius:4px;caret-color:var(--cinema-cyan-deep,#006577)}.ds-search input:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+    },
+    {
+      "name": "Categoria",
+      "kind": "chip",
+      "refersTo": "category-tab",
+      "description": "Seleção de categoria com estado ativo.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Categoria\"><a href=\"#\" aria-current=\"page\">Ultras Insanos</a><a href=\"#\">Ultras Rápidos</a></nav>",
+      "css": ".ds-tabs{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--font-archivo,Archivo),Arial,sans-serif;}.ds-tabs a{display:inline-flex;align-items:center;padding:12px 20px;min-height:44px;border:1px solid var(--cinema-line-dark,#14242d26);border-radius:4px;font-size:.8rem;font-weight:600;color:var(--cinema-ink,#14242d);text-decoration:none}.ds-tabs a[aria-current]{background:var(--cinema-black-soft,#101e26);color:var(--cinema-white,#f7fafb);border-color:var(--cinema-black-soft,#101e26)}.ds-tabs a:hover{border-color:var(--cinema-cyan-deep,#006577)}.ds-tabs a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+    },
+    {
+      "name": "Status oficial",
+      "kind": "chip",
+      "refersTo": "status-official",
+      "description": "Badge semântico para publicação oficial.",
+      "html": "<span class=\"ds-status\">Oficial</span>",
+      "css": ".ds-status{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid currentColor;border-radius:3px;font-size:.6rem;font-weight:600;white-space:nowrap;color:#176342;background:#e4f4eb}"
+    },
+    {
+      "name": "Resumo de inscrição",
+      "kind": "card",
+      "refersTo": "card-summary",
+      "description": "Container claro do resumo.",
+      "html": "<aside class=\"ds-summary\"><h2>Temporada 2026</h2><div><span>Campeonato</span><b>Ultras do Kart</b></div></aside>",
+      "css": ".ds-summary{font-family:var(--font-archivo,Archivo),Arial,sans-serif;padding:28px;background:var(--surface,#ffffff);color:var(--cinema-ink,#14242d);border:1px solid var(--cinema-line-dark,#14242d26);border-radius:6px}.ds-summary h2{font-size:2.5rem;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin:14px 0 20px}.ds-summary>div{display:grid;gap:8px;padding-block:18px;border-top:1px solid var(--cinema-line-dark,#14242d26)}.ds-summary span{font-size:.65rem;color:var(--cinema-muted-dark,#526772)}.ds-summary b{font-size:.85rem;font-weight:600}"
+    },
+    {
+      "name": "Navegação principal",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Links de desktop com página ativa e foco.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><a href=\"#\">Calendário</a><a href=\"#\" aria-current=\"page\">Classificação</a><a href=\"#\">Resultados</a></nav>",
+      "css": ".ds-nav{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:flex;align-items:center;gap:28px;min-height:80px;padding-inline:20px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-nav a{position:relative;display:flex;align-items:center;min-height:48px;font-size:.8rem;font-weight:600;text-decoration:none;color:inherit}.ds-nav a[aria-current]::after{content:\"\";position:absolute;bottom:0;inset-inline:0;height:2px;background:var(--cinema-cyan,#28cce5)}.ds-nav a:hover{color:var(--cinema-cyan,#28cce5)}.ds-nav a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+    },
+    {
+      "name": "Ticket de corrida",
+      "kind": "custom",
+      "refersTo": "race-ticket",
+      "description": "Bloco retangular de ação, sem dados esportivos fabricados.",
+      "html": "<section class=\"ds-ticket\"><h2>Próxima etapa</h2><a href=\"#\">Ver calendário <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></section>",
+      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;padding:24px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-ticket h2{font-size:.875rem;font-weight:600;color:var(--cinema-cyan,#28cce5);margin:0 0 18px}.ds-ticket a{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:.75rem;font-weight:600;color:inherit;text-decoration:none}.ds-ticket a:hover{color:var(--cinema-cyan,#28cce5)}.ds-ticket a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Equipe UDK",
+    "overview": "Equipe UDK combina identidade de equipe, fotografia oficial e informação de corrida. Ciano amplo, letras pesadas e blocos escuros dão presença; superfícies claras sustentam calendário, resultados, classificação e formulários.\n\nA expressão muda com a tarefa: títulos grandes identificam o campeonato; tabelas, campos e navegação usam a mesma família com densidade menor. A marca oficial permanece íntegra, e o conteúdo visual usa material existente do campeonato.",
+    "keyCharacteristics": [
+      "Ciano reconhecível sobre uma base azul escura e papel frio.",
+      "Archivo variável para títulos, leitura, controles e números.",
+      "Blocos retangulares, cantos discretos e divisores finos.",
+      "Fotografia oficial, dados reais e textos curtos em português brasileiro."
+    ],
+    "rules": [
+      {
+        "name": "The Contrast Rule",
+        "body": "Use ciano vivo com tinta azul escura; sobre papel claro, links e indicadores de interação usam ciano profundo.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Font Rule",
+        "body": "Mantenha Archivo em todos os papéis; diferencie identidade, leitura e operação com tamanho, peso, entreletra e espaço.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "Separe blocos por fundo e divisores; não aplique sombras novas a painéis que a implementação mantém planos.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar os tokens do frontmatter e os equivalentes existentes no CSS; race.css prevalece sobre globals.css.",
+      "Do preservar a marca oficial e usar fotografias existentes com legenda e recorte apropriado ao espaço.",
+      "Do dar aos controles rótulos acessíveis, foco visível e estados de seleção explícitos.",
+      "Do usar números tabulares em classificação, pontos, datas e horários.",
+      "Do adaptar tabelas para listas e detalhes no celular e respeitar prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't substituir Archivo por uma fonte de display do sistema.",
+      "Don't inventar slogans, métricas, resultados, retratos ou fatos esportivos para preencher a interface.",
+      "Don't transformar metadados de conteúdo em chamadas decorativas repetidas acima de títulos.",
+      "Don't tratar ciano vivo como cor de texto corrido sobre papel claro; links e estados nesse contexto usam ciano profundo.",
+      "Don't promover exceções de uma página a regras para todo o produto."
+    ]
+  }
+}

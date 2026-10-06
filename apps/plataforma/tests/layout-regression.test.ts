@@ -13,9 +13,9 @@ describe("responsive layout safeguards", () => {
     expect(layout.indexOf("race.css")).toBeGreaterThan(layout.indexOf("pilot-crud.css"));
   });
 
-  it("keeps podium values and calendar links on readable lines", () => {
+  it("keeps ranking points and calendar links on readable lines", () => {
     const css = read("app/race.css");
-    expect(css).toContain(".cinema-podium-card small");
+    expect(css).toContain(".udk-leader-points small");
     expect(css).toContain(".tg-calendar-stage > a");
     expect(css).toContain("grid-column: 1/-1");
   });
@@ -30,7 +30,7 @@ describe("responsive layout safeguards", () => {
   it("prevents the registration summary and mobile auth heading from clipping", () => {
     const css = read("app/race.css");
     expect(css).toContain(".race-registration-summary");
-    expect(css).toContain(".race-auth-copy h1");
+    expect(css).toContain(".race-auth-copy h2");
     expect(css).toContain("grid-template-columns: 1fr");
     expect(css).toContain("@media (max-width: 760px)");
   });

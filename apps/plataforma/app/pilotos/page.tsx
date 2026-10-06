@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Download, Users } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 import { DriverPoster, EditorialEmpty } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
@@ -128,19 +128,6 @@ export default async function DriversPage({
                 </a>
               </div>
             </section>
-          </div>
-        </section>
-
-        <section className="tg-inline-cta is-dark">
-          <div className="race-container">
-            <Users aria-hidden="true" />
-            <div>
-              <span>O próximo perfil</span>
-              <h2>Faça parte do grid UDK.</h2>
-            </div>
-            <Link href="/inscricao" className="race-button race-button-primary">
-              Entrar no campeonato <ArrowRight aria-hidden="true" />
-            </Link>
           </div>
         </section>
       </main>
