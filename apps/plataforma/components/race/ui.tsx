@@ -2,13 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronRight, Flag, Timer, Trophy } from "lucide-react";
 import type { PageMeta, PublicDriver, PublicStage } from "../../lib/public-data";
-import { driverVisual, pageHeroVisual, resolveVisualSource } from "../../lib/visual-assets";
+import { driverVisual, resolveVisualSource } from "../../lib/visual-assets";
 import { DriverPlaceholder } from "./driver-placeholder";
 
 export function PageHero({
   title,
   description,
-  index = "UDK",
   compact = false,
   action,
 }: {
@@ -19,21 +18,8 @@ export function PageHero({
   compact?: boolean;
   action?: { href: string; label: string };
 }) {
-  const visual = pageHeroVisual(index);
-
   return (
     <section className={`udk-page-hero tg-page-hero${compact ? " is-compact" : ""}`}>
-      <div className="udk-page-hero-media" aria-hidden="true">
-        <Image
-          src={visual.src}
-          alt=""
-          fill
-          priority
-          quality={90}
-          sizes="(max-width: 760px) 100vw, 48vw"
-          style={{ objectPosition: visual.position }}
-        />
-      </div>
       <div className="race-container udk-page-hero-inner">
         <div className="udk-page-hero-copy">
           <h1>{title}</h1>

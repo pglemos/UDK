@@ -1,4 +1,4 @@
-import { isGenericMediaSource } from "./media-policy";
+import { sanitizePublicMediaSource } from "./media-policy";
 
 export type PremiumVisual = {
   src: string;
@@ -35,7 +35,7 @@ export const premiumVisuals = {
     position: "50% center",
   },
   news: {
-    src: "/media/official/news/news-01.webp",
+    src: homeHeroMedia.poster,
     alt: "Karts do UDK em disputa durante uma prova noturna",
     position: "50% center",
   },
@@ -67,7 +67,7 @@ export const menuVisuals = [
 
 const stageVisuals = [
   {
-    src: "/media/official/stages/stage-01.webp",
+    src: homeHeroMedia.poster,
     alt: "Karts do UDK cruzando a linha de chegada",
     position: "50% center",
   },
@@ -82,12 +82,12 @@ const stageVisuals = [
     position: "50% center",
   },
   {
-    src: "/media/official/stages/stage-04.webp",
+    src: "/media/official/stages/stage-02.webp",
     alt: "Disputa de kart em uma etapa do UDK",
     position: "50% center",
   },
   {
-    src: "/media/official/stages/stage-05.webp",
+    src: homeHeroMedia.poster,
     alt: "Pelotão de karts do UDK em pista",
     position: "50% center",
   },
@@ -113,13 +113,13 @@ const driverVisuals = [
 
 const newsVisuals = [
   {
-    src: "/media/official/news/news-01.webp",
+    src: homeHeroMedia.poster,
     alt: "Disputa noturna entre karts do UDK",
     position: "50% center",
   },
   {
-    src: "/media/official/news/news-02.webp",
-    alt: "Briefing oficial com pilotos do UDK",
+    src: "/media/official/stages/stage-02.webp",
+    alt: "Kart do UDK na pista em Betim",
     position: "50% center",
   },
   {
@@ -176,8 +176,8 @@ export function resolveVisualSource(
   source: string | null | undefined,
   fallback: PremiumVisual,
 ): string {
-  const normalized = source?.trim();
-  if (!normalized || isGenericMediaSource(normalized)) {
+  const normalized = sanitizePublicMediaSource(source);
+  if (!normalized) {
     return fallback.src;
   }
   return normalized;

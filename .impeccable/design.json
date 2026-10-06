@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-06T14:17:38.090995+00:00",
+  "generatedAt": "2026-10-06T22:41:12.610730+00:00",
   "title": "Design System: Ultras do Kart",
   "extensions": {
     "colorMeta": {
@@ -362,7 +362,7 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Títulos públicos."
+        "purpose": "Cabeçalhos públicos internos compactos."
       },
       "title": {
         "displayName": "Title",
@@ -379,6 +379,19 @@
       "data": {
         "displayName": "Data",
         "purpose": "Tabelas com números tabulares."
+      },
+      "legacy-counter": {
+        "displayName": "Contadores legados",
+        "fontFamily": "ui-monospace, SFMono-Regular, Menlo, monospace",
+        "purpose": "Somente contadores numéricos de navegação; métricas do painel usam Archivo por override."
+      },
+      "operation-title": {
+        "displayName": "Título operacional",
+        "purpose": "Títulos de tarefa no painel; máximo 2.75rem, 2rem no celular."
+      },
+      "metadata": {
+        "displayName": "Metadados",
+        "purpose": "Rótulos, publicação, cabeçalhos de tabela e status; mínimo 0.75rem."
       }
     },
     "shadows": [
@@ -470,7 +483,7 @@
       "refersTo": "category-tab",
       "description": "Seleção de categoria com estado ativo.",
       "html": "<nav class=\"ds-tabs\" aria-label=\"Categoria\"><a href=\"#\" aria-current=\"page\">Ultras Insanos</a><a href=\"#\">Ultras Rápidos</a></nav>",
-      "css": ".ds-tabs{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--font-archivo,Archivo),Arial,sans-serif;}.ds-tabs a{display:inline-flex;align-items:center;padding:12px 20px;min-height:44px;border:1px solid var(--cinema-line-dark,#14242d26);border-radius:4px;font-size:.8rem;font-weight:600;color:var(--cinema-ink,#14242d);text-decoration:none}.ds-tabs a[aria-current]{background:var(--cinema-black-soft,#101e26);color:var(--cinema-white,#f7fafb);border-color:var(--cinema-black-soft,#101e26)}.ds-tabs a:hover{border-color:var(--cinema-cyan-deep,#006577)}.ds-tabs a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+      "css": ".ds-tabs{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--font-archivo,Archivo),Arial,sans-serif;}.ds-tabs a{display:inline-flex;align-items:center;padding:12px 20px;min-height:44px;border:1px solid var(--cinema-line-dark,#14242d26);border-radius:4px;font-size:.875rem;font-weight:600;color:var(--cinema-ink,#14242d);text-decoration:none}.ds-tabs a[aria-current]{background:var(--cinema-black-soft,#101e26);color:var(--cinema-white,#f7fafb);border-color:var(--cinema-black-soft,#101e26)}.ds-tabs a:hover{border-color:var(--cinema-cyan-deep,#006577)}.ds-tabs a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
     },
     {
       "name": "Status oficial",
@@ -478,7 +491,7 @@
       "refersTo": "status-official",
       "description": "Badge semântico para publicação oficial.",
       "html": "<span class=\"ds-status\">Oficial</span>",
-      "css": ".ds-status{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid currentColor;border-radius:3px;font-size:.6rem;font-weight:600;white-space:nowrap;color:#176342;background:#e4f4eb}"
+      "css": ".ds-status{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid currentColor;border-radius:3px;font-size:.75rem;font-weight:600;white-space:nowrap;color:#176342;background:#e4f4eb}"
     },
     {
       "name": "Resumo de inscrição",
@@ -486,7 +499,7 @@
       "refersTo": "card-summary",
       "description": "Container claro do resumo.",
       "html": "<aside class=\"ds-summary\"><h2>Temporada 2026</h2><div><span>Campeonato</span><b>Ultras do Kart</b></div></aside>",
-      "css": ".ds-summary{font-family:var(--font-archivo,Archivo),Arial,sans-serif;padding:28px;background:var(--surface,#ffffff);color:var(--cinema-ink,#14242d);border:1px solid var(--cinema-line-dark,#14242d26);border-radius:6px}.ds-summary h2{font-size:2.5rem;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin:14px 0 20px}.ds-summary>div{display:grid;gap:8px;padding-block:18px;border-top:1px solid var(--cinema-line-dark,#14242d26)}.ds-summary span{font-size:.65rem;color:var(--cinema-muted-dark,#526772)}.ds-summary b{font-size:.85rem;font-weight:600}"
+      "css": ".ds-summary{font-family:var(--font-archivo,Archivo),Arial,sans-serif;padding:28px;background:var(--surface,#ffffff);color:var(--cinema-ink,#14242d);border:1px solid var(--cinema-line-dark,#14242d26);border-radius:6px}.ds-summary h2{font-size:2.5rem;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin:14px 0 20px}.ds-summary>div{display:grid;gap:8px;padding-block:18px;border-top:1px solid var(--cinema-line-dark,#14242d26)}.ds-summary span{font-size:.75rem;color:var(--cinema-muted-dark,#526772)}.ds-summary b{font-size:.875rem;font-weight:600}"
     },
     {
       "name": "Navegação principal",
@@ -494,25 +507,25 @@
       "refersTo": "navigation",
       "description": "Links de desktop com página ativa e foco.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><a href=\"#\">Calendário</a><a href=\"#\" aria-current=\"page\">Classificação</a><a href=\"#\">Resultados</a></nav>",
-      "css": ".ds-nav{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:flex;align-items:center;gap:28px;min-height:80px;padding-inline:20px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-nav a{position:relative;display:flex;align-items:center;min-height:48px;font-size:.8rem;font-weight:600;text-decoration:none;color:inherit}.ds-nav a[aria-current]::after{content:\"\";position:absolute;bottom:0;inset-inline:0;height:2px;background:var(--cinema-cyan,#28cce5)}.ds-nav a:hover{color:var(--cinema-cyan,#28cce5)}.ds-nav a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+      "css": ".ds-nav{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:flex;align-items:center;gap:28px;min-height:80px;padding-inline:20px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-nav a{position:relative;display:flex;align-items:center;min-height:48px;font-size:.875rem;font-weight:600;text-decoration:none;color:inherit}.ds-nav a[aria-current]::after{content:\"\";position:absolute;bottom:0;inset-inline:0;height:2px;background:var(--cinema-cyan,#28cce5)}.ds-nav a:hover{color:var(--cinema-cyan,#28cce5)}.ds-nav a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
     },
     {
       "name": "Ticket de corrida",
       "kind": "custom",
       "refersTo": "race-ticket",
-      "description": "Bloco retangular de ação, sem dados esportivos fabricados.",
-      "html": "<section class=\"ds-ticket\"><h2>Próxima etapa</h2><a href=\"#\">Ver calendário <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></section>",
-      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;padding:24px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-ticket h2{font-size:.875rem;font-weight:600;color:var(--cinema-cyan,#28cce5);margin:0 0 18px}.ds-ticket a{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:.75rem;font-weight:600;color:inherit;text-decoration:none}.ds-ticket a:hover{color:var(--cinema-cyan,#28cce5)}.ds-ticket a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+      "description": "Faixa escura com etapa, data e contexto reais.",
+      "html": "<section class=\"ds-ticket\"><div><h2>Próxima etapa</h2><h3>Etapa do campeonato</h3></div><p>Data, horário e local vêm do calendário oficial.</p></section>",
+      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:grid;gap:32px;padding-block:28px;background:var(--cinema-black-soft,#101e26);color:var(--cinema-white,#f7fafb);border-top:1px solid var(--cinema-line,#ffffff26)}.ds-ticket h2{font-size:.875rem;font-weight:500;color:var(--cinema-muted,#aabdc7);margin:0 0 8px}.ds-ticket h3{font-size:1.125rem;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin:0}.ds-ticket p{font-size:.875rem;line-height:1.6;color:var(--cinema-muted,#aabdc7);margin:0}"
     }
   ],
   "narrative": {
-    "northStar": "Equipe UDK",
-    "overview": "Equipe UDK combina identidade de equipe, fotografia oficial e informação de corrida. Ciano amplo, letras pesadas e blocos escuros dão presença; superfícies claras sustentam calendário, resultados, classificação e formulários.\n\nA expressão muda com a tarefa: títulos grandes identificam o campeonato; tabelas, campos e navegação usam a mesma família com densidade menor. A marca oficial permanece íntegra, e o conteúdo visual usa material existente do campeonato.",
+    "northStar": "Ultras do Kart",
+    "overview": "Azul muito escuro organiza a abertura e a navegação; ciano identifica ações e estados ativos. Fotografia e filmagem reais do campeonato dão contexto, enquanto superfícies claras sustentam calendário, classificação, resultados, formulários e operação.\n\nA composição Equipe UDK foi rejeitada pelo usuário. Este documento registra a recuperação code-led efetivamente implementada, sem novo roll, seed ou comp aprovado corroborado. Azul/ciano é a preferência confirmada; os demais padrões aqui registrados vêm do código, sem atribuir aprovação humana a eles.",
     "keyCharacteristics": [
-      "Ciano reconhecível sobre uma base azul escura e papel frio.",
+      "Azul escuro na abertura e navegação, ciano em ações e estados ativos.",
       "Archivo variável para títulos, leitura, controles e números.",
-      "Blocos retangulares, cantos discretos e divisores finos.",
-      "Fotografia oficial, dados reais e textos curtos em português brasileiro."
+      "Consultas claras, cabeçalhos internos compactos e divisores finos.",
+      "Fotografias e vídeo reais, dados oficiais e textos curtos em português brasileiro."
     ],
     "rules": [
       {
@@ -522,7 +535,7 @@
       },
       {
         "name": "The One Font Rule",
-        "body": "Mantenha Archivo em todos os papéis; diferencie identidade, leitura e operação com tamanho, peso, entreletra e espaço.",
+        "body": "Mantenha Archivo em identidade, leitura e operação; diferencie esses papéis com tamanho, peso, entreletra e espaço. A pilha nativa `ui-monospace, SFMono-Regular, Menlo, monospace` fica restrita aos contadores numéricos legados da navegação. As métricas do painel recebem Archivo por `.shell .metrics b` em race.css.",
         "section": "typography"
       },
       {

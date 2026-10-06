@@ -728,8 +728,7 @@ export function PilotCrud({
         >
           <div className="pilot-editor-head">
             <div>
-              <small>{editing ? "Editar cadastro" : "Novo cadastro"}</small>
-              <h2 id="pilot-editor-title">Dados do piloto</h2>
+              <h2 id="pilot-editor-title">{editing ? "Editar piloto" : "Novo piloto"}</h2>
               <p>
                 Preencha o perfil operacional do piloto. O kart é definido por sorteio em cada
                 sessão.
@@ -746,17 +745,8 @@ export function PilotCrud({
             </button>
           </div>
           <form onSubmit={(event) => void save(event)}>
-            <div className="pilot-form-intro">
-              <ShieldCheck size={20} />
-              <p>
-                Cadastro oficial para organização das baterias, comunicação, lastro e segurança. O
-                kart será sorteado por sessão.
-              </p>
-            </div>
-
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>01</span>
                 <div>
                   <h3>Identificação e foto</h3>
                   <p>Dados usados para localizar e reconhecer o piloto.</p>
@@ -809,7 +799,6 @@ export function PilotCrud({
 
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>02</span>
                 <div>
                   <h3>Dados do piloto</h3>
                   <p>Informações pessoais e de contato.</p>
@@ -944,7 +933,6 @@ export function PilotCrud({
 
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>03</span>
                 <div>
                   <h3>Dados físicos</h3>
                   <p>Informações para orientar lastro e organização das baterias.</p>
@@ -999,7 +987,6 @@ export function PilotCrud({
 
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>04</span>
                 <div>
                   <h3>Segurança e saúde</h3>
                   <p>Dados restritos à operação do campeonato e ao atendimento necessário.</p>
@@ -1070,7 +1057,6 @@ export function PilotCrud({
 
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>05</span>
                 <div>
                   <h3>Confirmações obrigatórias</h3>
                   <p>O cadastro só pode ser salvo depois que todos os itens forem confirmados.</p>
@@ -1093,7 +1079,6 @@ export function PilotCrud({
 
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
-                <span>06</span>
                 <div>
                   <h3>Publicação e situação</h3>
                   <p>Controle interno do cadastro e da exibição pública.</p>

@@ -9,7 +9,7 @@ export const fallbackNews: PublicContent[] = [
     content:
       "A temporada UDK 2026 reúne etapas regulares e provas de resistência no Kartódromo Internacional de Betim.",
     category: "Notícia",
-    coverImageUrl: "/media/official/news/news-01.webp",
+    coverImageUrl: "/media/official/home/hero-desktop.webp",
     publishedAt: "2026-07-30T12:00:00-03:00",
     readingMinutes: 2,
   },
@@ -21,7 +21,7 @@ export const fallbackNews: PublicContent[] = [
     content:
       "O portal organiza a temporada por categoria e mantém classificação, pilotos e calendário em consulta pública.",
     category: "Campeonato",
-    coverImageUrl: "/media/official/news/news-02.webp",
+    coverImageUrl: "/media/official/stages/stage-02.webp",
     publishedAt: "2026-07-28T12:00:00-03:00",
     readingMinutes: 2,
   },
@@ -45,7 +45,7 @@ export const fallbackNews: PublicContent[] = [
     content:
       "A próxima etapa prevista no calendário é uma prova de resistência no traçado 01 invertido com chicane.",
     category: "Etapa",
-    coverImageUrl: "/media/official/stages/stage-05.webp",
+    coverImageUrl: "/media/official/home/hero-desktop.webp",
     publishedAt: "2026-07-25T12:00:00-03:00",
     readingMinutes: 2,
   },

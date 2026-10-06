@@ -1,20 +1,16 @@
-# Portal UDK
+# Portal UDK — revisão após rejeição
 
-Mode: Persuade on Home; Read/Operate on public data and account access.
-Scope: Home, shared navigation/footer, public headings, copy and account presentation. Existing official data, scoring, permissions and forms stay functional.
+Mode: Persuade na Home; Read/Operate nas consultas e acesso.
+Scope: todas as páginas públicas, autenticação e apresentação compartilhada do painel. Preservar dados, pontuação, permissões e mutações.
 
-## Direction contract
+THESIS: Apresentar o campeonato real de Betim, com imagem de corrida e informação útil. A composição Equipe UDK anterior foi rejeitada pelo usuário em 6 de outubro de 2026. Não usá-la como critério de aprovação.
 
-THESIS: Equipe UDK presents a kart championship through its identity, official paddock photograph and upcoming race. Eliminate repetitive slogans, manifesto and ornamental metrics.
+OWN-WORLD: Azul muito escuro na abertura e navegação, ciano em marcação e ações. Archivo variável. Superfícies claras para dados e formulários, divisores finos, controles acessíveis.
 
-OWN-WORLD: A broad cyan field, heavy Archivo lettering, dark rectangular race ticket, intact official photograph, light season board with useful ranking rows. Dark navigation and clear cyan actions.
+STORY: Identificar o campeonato de Betim; encontrar a próxima etapa e iniciar inscrição; consultar classificação, resultados e perfil de piloto com controles claros.
 
-STORY: Identify Ultras do Kart in Betim; find the next race date, time and track; enter registration or consult standings, results and calendar.
+FIRST VIEWPORT: Desktop 1440×1000: cabeçalho de 80px, filmagem real de corrida em abertura de 580px com nome Ultras do Kart, temporada/local e ações de inscrição/resultados. Próxima etapa em faixa independente. Mobile 390×844: fotografia estática real, título e ações, faixa da etapa compacta. Nas consultas, título compacto e controles antes da lista. No acesso móvel, marca e formulário aparecem cedo.
 
-FIRST VIEWPORT: At desktop 1440×1000, dark 80px header; cyan opening split between two-line name/race ticket on left and official kart photograph on right. Classification and future dates begin immediately below. At 390×844, name and ticket lead, photograph follows edge-to-edge. Primary action stays inside the ticket.
+FORM: Recuperação code-led após rejeição, sem novo roll ou seed corroborada e sem novo comp aprovado. Preferência confirmada pelo usuário: azul/ciano. Demais decisões são correções do agente; não registrar aprovação humana inexistente. Filtros ao digitar, detalhes móveis expansíveis, menu com foco e Escape. Filmagem pausável apenas no desktop; reduced motion mantém poster.
 
-FORM: Human chose Equipe UDK/model-pick, direction seed 15c8477c, decision 68d74b66. Ordered origin: grafismo de equipe/livery. Image generation failed 401; schematic equipe.png is the critique reference for a code-led build, not a generated comp with measurable reproduction gates. Signature interaction is direct race action and live data/category filtering; motion is limited by reduced-motion preferences.
-
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
-
-No unresolved palette/direction questions. All facts come from the existing public data and official assets. Acceptance: readable desktop/mobile, useful first viewport, existing registration/filter/menu controls, no horizontal overflow, independent finish review and current checks.
+ACCEPTANCE: validar desktop/mobile/320px, filtros/menu/categorias/links e dados oficiais. Sem overflow de documento ou imagens quebradas. Corpo 14–16px, metadados mínimo12px. Revisão independente antes de publicar. Painel sem sessão autenticada: correções de CSS/código verificadas, sem alegar teste funcional de abas autenticadas.

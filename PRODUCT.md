@@ -28,6 +28,10 @@ Site e plataforma do campeonato Ultras do Kart. O pedido do usuário é refazer 
 
 Reaproveitar os fluxos e integrações existentes. Uma mudança visual não autoriza inventar depoimentos, fotos de pilotos, preços, posições, estatísticas ou regras. Não alterar dados oficiais, permissões ou autenticação durante o redesenho.
 
-## Approved Direction
+## Direction Status
 
-Equipe UDK / model-pick foi escolhida pelo usuário (decisão 68d74b66, direção 15c8477c). A abertura apresenta marca, foto oficial e próxima etapa; classificação e calendário seguem no resumo da temporada. Azul/ciano permanece. O contrato de execução é code-led, com o esquema aprovado como referência de crítica.
+O usuário rejeitou a composição Equipe UDK em 6 de outubro de 2026. Ela não é uma referência aprovada para o estado atual.
+
+A implementação passou por uma recuperação code-led, sem novo roll, seed ou comp aprovado corroborado. Azul/ciano é a preferência visual confirmada pelo usuário; Archivo, mídia real, divisores finos, consultas claras e cabeçalhos internos compactos descrevem as correções implementadas pelo agente. Este registro não atribui aprovação humana a essas decisões.
+
+O contrato atual está em `.impeccable/team-contract.md`; `DESIGN.md` descreve os padrões reutilizados no código final.

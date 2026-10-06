@@ -167,7 +167,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
     return (
       <div className="dashboard-loading">
         <LoaderCircle className="spin" />
-        Consolidando a operação autorizada...
+        Carregando resumo...
       </div>
     );
   }
@@ -232,7 +232,6 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           <article className="dashboard-panel next-stage-panel">
             <div className="panel-title">
               <div>
-                <span>Próxima operação</span>
                 <h2>{state.nextStage?.title ?? "Nenhuma etapa futura"}</h2>
               </div>
               <CalendarDays />
@@ -267,8 +266,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           <article className="dashboard-panel">
             <div className="panel-title">
               <div>
-                <span>Central de pendências</span>
-                <h2>O que exige atenção</h2>
+                <h2>Pendências</h2>
               </div>
               <AlertTriangle />
             </div>

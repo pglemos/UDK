@@ -40,11 +40,11 @@ describe("responsive layout safeguards", () => {
     const calendar = read("app/calendario/page.tsx");
     const primitives = read("components/race/editorial-primitives.tsx");
 
-    expect(assets).toContain("/media/official/stages/stage-01.webp");
-    expect(assets).toContain("/media/official/stages/stage-05.webp");
+    expect(assets).toContain("/media/official/stages/stage-02.webp");
+    expect(assets).toContain("/media/official/home/hero-desktop.webp");
     expect(assets).toContain("/media/official/heroes/calendario.webp");
     expect(assets).toContain("/media/official/drivers/fallback-01.webp");
-    expect(assets).toContain("/media/official/news/news-01.webp");
+    expect(assets).toContain("/media/official/news/news-03.webp");
     expect(assets).not.toContain("images.unsplash.com");
     expect(calendar).toContain("resolveVisualSource");
     // A10 — só o hero da rota carrega com prioridade; o resto é lazy.

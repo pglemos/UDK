@@ -87,8 +87,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
         {related.length ? (
           <section className="tg-related-news">
             <div className="race-container">
-              <span>Continue no paddock</span>
-              <h2>Outras histórias da temporada.</h2>
+              <h2>Outras notícias</h2>
               <div>
                 {related.map((news) => (
                   <Link href={`/noticias/${news.slug}`} key={news.slug}>

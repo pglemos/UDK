@@ -36,7 +36,7 @@ describe("UDK visual quality regressions", () => {
     expect(assets.match(/\/media\/official\//g)?.length ?? 0).toBeGreaterThanOrEqual(20);
     expect(assets).toContain("/media/official/home/hero-desktop.webp");
     expect(assets).toContain("/media/official/drivers/fallback-01.webp");
-    expect(assets).toContain("/media/official/stages/stage-05.webp");
+    expect(assets).toContain("/media/official/stages/stage-02.webp");
     expect(assets).toContain("/media/official/news/news-03.webp");
     expect(manifest.assets).toHaveLength(24);
     expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(24);
@@ -46,8 +46,8 @@ describe("UDK visual quality regressions", () => {
           Math.max(asset.width, asset.height) >= 960 && Math.min(asset.width, asset.height) >= 720,
       ),
     ).toBe(true);
-    expect(home).toContain("premiumVisuals");
-    expect(header).toContain("menuVisuals");
+    expect(home).toContain("HomeHeroMediaLayer");
+    expect(header).toContain("premiumVisuals.hero");
     expect(primitives).toContain("stageVisual");
     expect(home).not.toContain('src="/media/udk-race-hero.webp"');
   });

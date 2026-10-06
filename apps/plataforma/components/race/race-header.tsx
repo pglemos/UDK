@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
-import { menuVisuals } from "../../lib/visual-assets";
+import { premiumVisuals } from "../../lib/visual-assets";
 import { OfficialLogo } from "./official-logo";
 
 const navigation = [
@@ -45,7 +45,7 @@ export function RaceHeader() {
   const restoreFocusTimerRef = useRef<number | null>(null);
   const home = pathname === "/";
   const previewItem = navigation[preview] ?? navigation[0];
-  const previewVisual = menuVisuals[preview] ?? menuVisuals[0];
+  const previewVisual = premiumVisuals.hero;
 
   const handleSkipToContent = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
     const target = document.getElementById("conteudo");

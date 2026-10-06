@@ -178,8 +178,7 @@ export default async function DriverProfilePage({
         <section className="tg-profile-story">
           <div className="race-container tg-profile-story-grid">
             <Reveal className="tg-profile-bio">
-              <span>01 / Perfil</span>
-              <h2>Sobre o piloto.</h2>
+              <h2>Sobre o piloto</h2>
               <p>
                 {driver.bio ??
                   `${driver.name} compete na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}
@@ -344,8 +343,7 @@ export default async function DriverProfilePage({
           <div className="race-container">
             <Flag aria-hidden="true" />
             <div>
-              <span>Próxima disputa</span>
-              <h2>A temporada continua.</h2>
+              <h2>Próximas etapas</h2>
             </div>
             <Link href="/calendario" className="race-button race-button-primary">
               Ver calendário <ArrowRight aria-hidden="true" />

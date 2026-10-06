@@ -1,6 +1,6 @@
 ---
 name: "Ultras do Kart"
-description: "Sistema visual Equipe UDK para portal, acesso e operação do campeonato."
+description: "Azul escuro, ações ciano e consultas claras para o campeonato Ultras do Kart."
 colors:
   cyan: "#28cce5"
   cyan-hover: "#69e9ff"
@@ -30,13 +30,13 @@ colors:
 typography:
   display:
     fontFamily: "Archivo, Arial, sans-serif"
-    fontSize: "clamp(3rem, 6.5vw, 6rem)"
-    fontWeight: 800
+    fontSize: "clamp(4rem, 7vw, 6rem)"
+    fontWeight: 850
     lineHeight: 0.96
     letterSpacing: "-0.035em"
   headline:
     fontFamily: "Archivo, Arial, sans-serif"
-    fontSize: "clamp(2.8rem, 5vw, 5rem)"
+    fontSize: "clamp(2.5rem, 4vw, 3.5rem)"
     fontWeight: 700
     lineHeight: 1.04
     letterSpacing: "-0.02em"
@@ -46,6 +46,15 @@ typography:
     fontWeight: 700
     lineHeight: 1.04
     letterSpacing: "-0.02em"
+  operation-title:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "clamp(2rem, 3vw, 2.75rem)"
+    fontWeight: 700
+    lineHeight: 1.08
+    letterSpacing: "-0.02em"
+  metadata:
+    fontFamily: "Archivo, Arial, sans-serif"
+    fontSize: "0.75rem"
   body:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "0.875rem"
@@ -57,7 +66,7 @@ typography:
     lineHeight: 1.4
   data:
     fontFamily: "Archivo, Arial, sans-serif"
-    fontSize: "0.8rem"
+    fontSize: "0.875rem"
 rounded:
   sharp: "0px"
   status: "3px"
@@ -103,7 +112,7 @@ components:
     padding: "12px 14px 12px 42px"
     height: "48px"
   category-tab:
-    typography: "{typography.data}"
+    typography: "{typography.label}"
     rounded: "{rounded.control}"
     padding: "12px 20px"
     height: "44px"
@@ -113,6 +122,7 @@ components:
   status-official:
     backgroundColor: "{colors.success-bg}"
     textColor: "{colors.success}"
+    typography: "{typography.metadata}"
     rounded: "{rounded.status}"
     padding: "5px 9px"
     height: "28px"
@@ -126,38 +136,38 @@ components:
     textColor: "{colors.white}"
     height: "80px"
   race-ticket:
-    backgroundColor: "{colors.black}"
+    backgroundColor: "{colors.black-soft}"
     textColor: "{colors.white}"
     rounded: "{rounded.sharp}"
-    padding: "24px"
+    padding: "28px 0"
 ---
 
 # Design System: Ultras do Kart
 
 ## Overview
 
-**Creative North Star: "Equipe UDK"**
+**Creative North Star: "Ultras do Kart"**
 
-Equipe UDK combina identidade de equipe, fotografia oficial e informação de corrida. Ciano amplo, letras pesadas e blocos escuros dão presença; superfícies claras sustentam calendário, resultados, classificação e formulários.
+Azul muito escuro organiza a abertura e a navegação; ciano identifica ações e estados ativos. Fotografia e filmagem reais do campeonato dão contexto, enquanto superfícies claras sustentam calendário, classificação, resultados, formulários e operação.
 
-A expressão muda com a tarefa: títulos grandes identificam o campeonato; tabelas, campos e navegação usam a mesma família com densidade menor. A marca oficial permanece íntegra, e o conteúdo visual usa material existente do campeonato.
+A composição Equipe UDK foi rejeitada pelo usuário. Este documento registra a recuperação code-led efetivamente implementada, sem novo roll, seed ou comp aprovado corroborado. Azul/ciano é a preferência confirmada; os demais padrões aqui registrados vêm do código, sem atribuir aprovação humana a eles.
 
 **Key Characteristics:**
 
-- Ciano reconhecível sobre uma base azul escura e papel frio.
+- Azul escuro na abertura e navegação, ciano em ações e estados ativos.
 - Archivo variável para títulos, leitura, controles e números.
-- Blocos retangulares, cantos discretos e divisores finos.
-- Fotografia oficial, dados reais e textos curtos em português brasileiro.
+- Consultas claras, cabeçalhos internos compactos e divisores finos.
+- Fotografias e vídeo reais, dados oficiais e textos curtos em português brasileiro.
 
-A fonte normativa é a implementação de `apps/plataforma/app/race.css`, carregada após `globals.css` e `pilot-crud.css` por `app/layout.tsx`. O frontmatter registra valores reutilizados; a composição específica da Home permanece no seu surface brief.
+A fonte normativa é `apps/plataforma/app/race.css`, carregada após `globals.css` e `pilot-crud.css` por `app/layout.tsx`. O frontmatter registra padrões reutilizados; a composição específica da Home permanece no seu surface brief.
 
 ## Colors
 
-A paleta une ciano vivo de equipe, azul quase preto e neutros frios para leitura.
+A paleta une azul quase preto, ciano nas ações e neutros frios para leitura.
 
 ### Primary
 
-- **Ciano de equipe** (`cyan`): ações principais, seleção, marcação ativa e campos amplos de identidade.
+- **Ciano de ação** (`cyan`): ações públicas principais, marcação ativa e destaque na abertura.
 - **Ciano luminoso** (`cyan-hover`): resposta ao hover de ações principais.
 - **Ciano profundo** (`cyan-deep`): links sobre fundos claros, foco, controles selecionados e números destacados.
 
@@ -184,26 +194,28 @@ Estados usam pares próprios: `success`/`success-bg` para publicação e confirm
 
 ### Hierarchy
 
-- **Display**: peso 800, entreletra compacta e altura curta para títulos de identidade; os valores estão em `typography.display`.
-- **Headline**: peso 700 para títulos públicos; `typography.headline`.
-- **Title**: peso 700 para títulos de seção; `typography.title`. O quadro de temporada usa uma variante compacta de 1.8rem.
-- **Body**: descrições públicas e explicações de controle; `typography.body`. Parágrafos públicos têm limite de 70ch; descrições editoriais, 58ch.
-- **Label**: ações principais e controles; `typography.label`. A navegação de desktop usa 0.8rem, peso 600, e os rótulos de campos usam 0.75rem.
-- **Data**: tabelas públicas; `typography.data`, com números tabulares. Pontos e datas aumentam de tamanho sem mudar de família.
+- **Display**: identidade na abertura, com peso 850 e limite de 6rem; `typography.display`. No celular, usa `clamp(3.25rem, 14vw, 4.5rem)`.
+- **Headline**: cabeçalhos públicos internos, com peso 700; `typography.headline`. Dados e controles seguem próximos ao título.
+- **Title**: títulos públicos de seção, com peso 700; `typography.title`. A operação usa títulos de painel menores, em geral 1.7–2rem.
+- **Operation title**: título de tarefa no painel, com peso 700 e limite de 2.75rem; `typography.operation-title`. No celular, passa a 2rem.
+- **Body**: descrições e conteúdo de tabelas usam 0.875rem; leitura editorial e descrições mais amplas chegam a 1rem. Parágrafos públicos têm limite de 70ch; introduções internas, 65ch.
+- **Label**: ações principais, navegação de desktop e categorias usam `typography.label`, com peso 600.
+- **Metadata**: rótulos, contexto de publicação, cabeçalhos de tabela e status usam `typography.metadata`; o mínimo é 0.75rem.
+- **Data**: tabelas públicas usam `typography.data`, com números tabulares. Datas, pontos e métricas aumentam de tamanho conforme a informação, sem criar uma escala para cada exceção.
 
-No celular (até 760px), títulos públicos passam para 2.7rem e títulos de seção para 2rem; a abertura de identidade preserva seu clamp próprio (`clamp(2.8rem, 12vw, 5rem)`). A Home usa título em duas linhas; isso é composição da superfície, não obrigação para títulos de outras telas.
+No celular (até 760px), cabeçalhos públicos internos ficam em 2.5–2.7rem e títulos de seção em 2rem. Identidade, artigo, perfil de piloto e acesso têm hierarquias próprias; seus valores não são regras para títulos operacionais.
 
-**The One Font Rule.** Mantenha Archivo em todos os papéis; diferencie identidade, leitura e operação com tamanho, peso, entreletra e espaço.
+**The One Font Rule.** Mantenha Archivo em identidade, leitura e operação; diferencie esses papéis com tamanho, peso, entreletra e espaço. A pilha nativa `ui-monospace, SFMono-Regular, Menlo, monospace` fica restrita aos contadores numéricos legados da navegação. As métricas do painel recebem Archivo por `.shell .metrics b` em race.css.
 
 ## Layout
 
-O container público tem largura `min(100% - gutter * 2, 1312px)` e gutter `clamp(20px, 4vw, 64px)`. O cabeçalho é sticky, com 80px no desktop e 76px a partir de 1000px. A grade admite colunas `minmax(0, 1fr)` e quebra explícita em telas menores.
+O container público tem largura `min(100% - gutter * 2, 1312px)` e gutter `clamp(20px, 4vw, 64px)`. O cabeçalho é sticky, com 80px no desktop e 70px até 760px. A grade admite colunas `minmax(0, 1fr)` e quebra explícita em telas menores.
 
-A abertura e o quadro de temporada usam duas colunas no desktop e uma abaixo de 760px. A fotografia da abertura ocupa as bordas do viewport no celular. Diretórios passam de quatro para três colunas a 1200px e se reorganizam abaixo de 760px. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu abaixo de 1000px.
+A abertura usa mídia real de fundo com texto sobreposto; o quadro de temporada tem duas colunas no desktop e uma abaixo de 760px. No celular, a abertura usa fotografia estática nas bordas do viewport; no desktop, o vídeo tem controle de pausa e respeita reduced motion. Diretórios passam de quatro para três colunas a 1200px e duas até 760px; listas sem retratos reais podem ocupar uma coluna. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu abaixo de 1000px.
 
 Classificação e resultados usam tabela no desktop e listas com detalhes no celular, sem apertar as colunas. Cadastro usa grade 1.6fr/1fr; autenticação usa 1fr/1fr e formulário com máximo de 480px. Ambas tornam-se uma coluna abaixo de 760px. A operação limita o conteúdo a 1500px e transforma a sidebar em painel móvel abaixo de 980px.
 
-O ritmo reutiliza os passos de `spacing`: controles e linhas usam intervalos menores; seções usam espaços de 48 a 80px. Alvos interativos têm altura mínima de 44px; botões e campos públicos, 48px; campos de autenticação, 52px.
+O ritmo reutiliza os passos de `spacing`: controles e linhas usam intervalos menores; seções usam espaços de 48 a 80px. Botões e controles principais têm alvo mínimo de 44px; botões e campos públicos, 48px; campos de autenticação, 52px.
 
 ## Elevation & Depth
 
@@ -215,13 +227,13 @@ Transições de cor/borda duram 0.18s, menu 0.2s e resposta de fotografia 0.4s. 
 
 ## Shapes
 
-Blocos de identidade e fotografia principal são retangulares. Controles usam o raio `control`; badges, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Círculos se restringem a indicadores de etapa e placeholders de avatar. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
+Blocos de identidade e fotografia principal são retangulares. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. Badges operacionais legados e o editor de pilotos conservam variantes locais de raio, sem ampliá-las a todos os containers. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
 
 ## Components
 
 ### Buttons
 
-Ações diretas com peso 600, rótulo legível e ícone SVG opcional. A variante principal combina ciano e fundo azul quase preto; hover usa ciano luminoso. Ghost e outline preservam o fundo, com borda na cor corrente e hover translúcido. No ticket de corrida, a ação principal usa branco frio e passa a ciano no hover. Foco global é um outline de 3px em ciano profundo com offset de 4px. `aria-disabled` reduz opacidade e bloqueia interação.
+Ações diretas com peso 600, rótulo legível e ícone SVG opcional. A variante pública principal combina fundo ciano e texto azul quase preto; hover usa ciano luminoso. No painel, o botão principal usa azul escuro e texto branco, com hover ciano profundo. Ghost e outline preservam o fundo, com borda na cor corrente e hover translúcido. Foco global é um outline de 3px em ciano profundo com offset de 4px. `aria-disabled` reduz opacidade e bloqueia interação.
 
 ### Chips
 
@@ -241,7 +253,7 @@ Cabeçalho e menu usam azul quase preto, marca negativa oficial e links em Archi
 
 ### Ticket de corrida e linhas de temporada
 
-O ticket é um bloco escuro de canto reto com data, horário, etapa e ações relacionadas. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. É um padrão de conteúdo real: nenhuma métrica ornamental é necessária para preencher o espaço.
+O ticket é uma faixa azul escura de canto reto, com divisor fino, data, horário, etapa e ações relacionadas. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. É um padrão de conteúdo real: nenhuma métrica ornamental é necessária para preencher o espaço.
 
 ## Do's and Don'ts
 

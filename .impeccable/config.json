@@ -1,0 +1,15 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "sfmono-regular",
+        "files": ["apps/plataforma/app/globals.css"],
+        "createdAt": "2026-10-06T14:24:38.957Z",
+        "reason": "Agente: pilha monospace nativa restrita a contadores numericos legados .nav-group a > .count; .metrics b recebe Archivo por .shell .metrics b em race.css. CSS legado confirmado anterior ao redesign."
+      }
+    ]
+  }
+}

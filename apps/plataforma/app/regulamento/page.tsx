@@ -71,9 +71,8 @@ export default async function RegulationPage() {
                 ))}
               </nav>
               <article>
-                {sections.map((section, index) => (
+                {sections.map((section) => (
                   <section id={section.id} key={section.id}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
                     <h2>{section.heading}</h2>
                     <p>{section.body}</p>
                   </section>

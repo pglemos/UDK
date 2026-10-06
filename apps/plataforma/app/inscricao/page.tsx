@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RegistrationPage() {
   return (
-    <RaceShell>
+    <RaceShell showFooterCallout={false}>
       <main id="conteudo" tabIndex={-1} className="tg-registration-page">
         <PageHero
           index="07"
@@ -20,15 +20,6 @@ export default function RegistrationPage() {
           title="Inscrição"
           description="Escolha sua categoria e comece sua inscrição na temporada 2026."
         />
-        <section className="tg-registration-intro">
-          <div className="race-container">
-            <h2>Escolha sua categoria</h2>
-            <p>
-              Escolha sua categoria de interesse e continue dentro da plataforma oficial para
-              completar dados, documentos, termos e pagamento.
-            </p>
-          </div>
-        </section>
         <section className="tg-registration-shell">
           <div className="race-container">
             <RegistrationEntry />

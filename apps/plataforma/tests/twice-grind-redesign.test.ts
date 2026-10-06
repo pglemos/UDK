@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
-describe("UDK Equipe direction contracts", () => {
+describe("UDK public surface contracts", () => {
   it("keeps the immersive global shell and official brand", () => {
     const header = read("components/race/race-header.tsx");
     const shell = read("components/race/race-shell.tsx");
@@ -18,11 +18,11 @@ describe("UDK Equipe direction contracts", () => {
     expect(shell).toContain("OfficialLogo");
   });
 
-  it("builds the approved team opening and season board", () => {
+  it("keeps the race opening and season data available", () => {
     const home = read("app/page.tsx");
     for (const marker of [
       "cinema-home-hero",
-      "udk-team-opening",
+      "udk-home-opening",
       "udk-race-ticket",
       "udk-season-board",
       "cinema-season",

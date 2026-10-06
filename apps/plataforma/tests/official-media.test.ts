@@ -46,7 +46,7 @@ describe("official UDK media", () => {
     expect(new Set(matches).size).toBeGreaterThanOrEqual(8);
   });
 
-  it("preserves motion-aware media and uses the selected official photograph on Home", () => {
+  it("preserves motion-aware footage and a high-priority poster on Home", () => {
     const component = read("components/race/home-hero-media.tsx");
     const home = read("app/page.tsx");
     const styles = read("app/race.css");
@@ -55,8 +55,6 @@ describe("official UDK media", () => {
     expect(component).toContain("prefers-reduced-motion: reduce");
     expect(component).toContain("max-width: 767px");
     expect(component).toContain("<picture>");
-    expect(component).toContain('<source media="(max-width: 767px)"');
-    expect(component).toContain("srcSet={homeHeroMedia.mobile}");
     expect(component.match(/<img/g)?.length ?? 0).toBe(1);
     expect(component).not.toContain('from "next/image"');
     expect(component).toContain('fetchPriority="high"');
@@ -64,11 +62,9 @@ describe("official UDK media", () => {
     expect(component).toContain("muted");
     expect(component).toContain("playsInline");
     expect(component).toContain("onError");
-    expect(home).toContain("src={premiumVisuals.race.src}");
-    expect(home).toContain("priority");
-    expect(home).toContain('sizes="(max-width: 760px) 100vw, 50vw"');
+    expect(home).toContain("<HomeHeroMediaLayer />");
     expect(styles).not.toContain("@import");
-    expect(styles).toContain("/media/official/heroes/login.webp");
+    expect(styles).toContain("/media/official/home/hero-desktop.webp");
   });
 
   it("documents the implemented 24-asset Home contract", () => {

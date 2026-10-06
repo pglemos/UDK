@@ -9,12 +9,11 @@ const readRepositoryFile = (file: string) =>
   fs.readFileSync(path.join(repositoryRoot, file), "utf8");
 
 describe("third visual audit safeguards", () => {
-  it("assigns contextual hero artwork instead of repeating one image on every route", () => {
-    const assets = read("lib/visual-assets.ts");
+  it("keeps data page headings focused on the page content", () => {
     const ui = read("components/race/ui.tsx");
 
-    expect(assets).toContain("export function pageHeroVisual");
-    expect(ui).toContain("pageHeroVisual(index)");
+    expect(ui).not.toContain("pageHeroVisual(index)");
+    expect(ui).toContain("<h1>{title}</h1>");
     expect(ui).not.toContain("src={premiumVisuals.race.src}");
   });
 

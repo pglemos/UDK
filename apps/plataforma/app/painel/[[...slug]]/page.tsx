@@ -581,7 +581,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         <div className="loading-line">
           <span />
         </div>
-        <p>Validando conta e permissões...</p>
+        <p>Carregando sua conta...</p>
       </main>
     );
   }
@@ -590,8 +590,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     return (
       <main className="configuration-screen">
         <OfficialLogo variant="dark" width={140} />
-        <span className="eyebrow">Configuração necessária</span>
-        <h1>Conecte o Supabase</h1>
+        <h1>Acesso indisponível</h1>
         <p>{authError}</p>
         <Link href="/login">Voltar para o acesso</Link>
       </main>
@@ -626,9 +625,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         </div>
 
         <div className="context">
-          <small>Contexto ativo</small>
           <b>UDK • Temporada 2026</b>
-          <span>Operação oficial</span>
         </div>
 
         <nav className="sidebar-navigation" aria-label="Módulos da plataforma">
@@ -702,13 +699,12 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         <section className="content" data-module={activeKey}>
           <div className="page-heading">
             <div>
-              <span className="eyebrow">Temporada 2026</span>
               <h1>{activeNavigationItem?.label ?? "Operação"}</h1>
               <p>
                 {activeKey === "dashboard"
-                  ? "Visão consolidada do campeonato, prazos e pendências críticas."
+                  ? "Acompanhe a próxima etapa e as pendências do campeonato."
                   : activeKey === "relatorios"
-                    ? "Exportações respeitam o escopo e as permissões do usuário autenticado."
+                    ? "Baixe os registros do campeonato em planilhas."
                     : (config?.description ?? "Módulo operacional do campeonato UDK.")}
               </p>
             </div>

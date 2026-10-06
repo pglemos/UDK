@@ -29,11 +29,11 @@ describe("UDK cinematic public experience", () => {
     expect(motion).toContain("cinema-route-curtain");
   });
 
-  it("builds the approved team opening and season board", () => {
+  it("keeps the race opening and season data available", () => {
     const home = read("app/page.tsx");
     for (const marker of [
       "cinema-home-hero",
-      "udk-team-opening",
+      "udk-home-opening",
       "udk-race-ticket",
       "udk-season-board",
       "cinema-season",

@@ -14,6 +14,15 @@ const genericMediaMarkers = [
   "photo-1560990816-bb30289c6611",
 ] as const;
 
+// Retire collages with reserved black space and generated race illustrations.
+const replacementMedia: Record<string, string> = {
+  "/media/official/news/news-01.webp": "/media/official/home/hero-desktop.webp",
+  "/media/official/news/news-02.webp": "/media/official/stages/stage-02.webp",
+  "/media/official/stages/stage-01.webp": "/media/official/home/hero-desktop.webp",
+  "/media/official/stages/stage-04.webp": "/media/official/stages/stage-02.webp",
+  "/media/official/stages/stage-05.webp": "/media/official/home/hero-desktop.webp",
+};
+
 export function isGenericMediaSource(source: string | null | undefined): boolean {
   const normalized = source?.trim().toLocaleLowerCase("en-US");
   if (!normalized) return false;
@@ -23,7 +32,7 @@ export function isGenericMediaSource(source: string | null | undefined): boolean
 export function sanitizePublicMediaSource(source: string | null | undefined): string | null {
   const normalized = source?.trim();
   if (!normalized || isGenericMediaSource(normalized)) return null;
-  return normalized;
+  return replacementMedia[normalized] ?? normalized;
 }
 
 export const genericMediaHosts = genericMediaMarkers;

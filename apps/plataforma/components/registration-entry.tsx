@@ -52,11 +52,8 @@ export function RegistrationEntry() {
         </div>
 
         <div className="race-registration-copy">
-          <h2>Iniciar inscrição</h2>
-          <p>
-            Escolha a categoria de interesse e avance para a plataforma oficial. Perfil, documentos,
-            termos e confirmação ficam reunidos na sua conta para acompanhar cada passo.
-          </p>
+          <h2>Qual é sua categoria?</h2>
+          <p>Depois da escolha, entre ou crie uma conta para completar a inscrição.</p>
         </div>
 
         <div className="race-category-choice" role="group" aria-label="Categoria de interesse">
@@ -67,9 +64,7 @@ export function RegistrationEntry() {
             onClick={() => setCategory("insanos")}
           >
             <strong>Ultras Insanos</strong>
-            <span>
-              Categoria para quem está entrando no campeonato e quer evoluir em um grid equilibrado.
-            </span>
+            <span>Para pilotos que estão começando no campeonato.</span>
           </button>
           <button
             className={category === "rapidos" ? "is-selected" : ""}
@@ -78,15 +73,12 @@ export function RegistrationEntry() {
             onClick={() => setCategory("rapidos")}
           >
             <strong>Ultras Rápidos</strong>
-            <span>
-              Categoria de maior ritmo, voltada a pilotos com experiência e desempenho consolidado.
-            </span>
+            <span>Para pilotos com experiência e desempenho consolidado.</span>
           </button>
         </div>
 
         <div className="race-alert race-alert-warning">
-          A categoria escolhida nesta tela é uma intenção inicial. A homologação continua obedecendo
-          aos critérios esportivos e ao regulamento vigente.
+          A organização confirma a categoria conforme os critérios do regulamento.
         </div>
 
         <div className="race-registration-actions">
