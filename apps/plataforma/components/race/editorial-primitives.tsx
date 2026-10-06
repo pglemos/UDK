@@ -7,7 +7,6 @@ import { DriverPlaceholder } from "./driver-placeholder";
 import { localizeRaceText, StatusBadge } from "./ui";
 
 export function EditorialHeading({
-  index,
   title,
   description,
   action,
@@ -23,7 +22,6 @@ export function EditorialHeading({
     <header
       className={`cinema-editorial-heading tg-editorial-heading${inverse ? " is-inverse" : ""}`}
     >
-      <span>{index}</span>
       <div>
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
@@ -64,7 +62,6 @@ export function StageProject({
           sizes={featured ? "(max-width: 900px) 100vw, 62vw" : "(max-width: 900px) 100vw, 38vw"}
           style={{ objectPosition: stage.heroImageUrl ? "50% center" : visual.position }}
         />
-        <span>{String(index + 1).padStart(2, "0")}</span>
       </div>
       <div className="cinema-stage-copy">
         <div className="cinema-stage-topline">
@@ -135,7 +132,6 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
 }
 
 export function EditorialEmpty({
-  index,
   title,
   description,
   action,
@@ -147,7 +143,6 @@ export function EditorialEmpty({
 }) {
   return (
     <section className="cinema-empty tg-editorial-empty">
-      <span>{index}</span>
       <div>
         <Flag aria-hidden="true" />
         <h2>{title}</h2>

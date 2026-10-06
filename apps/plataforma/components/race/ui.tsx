@@ -6,7 +6,6 @@ import { driverVisual, pageHeroVisual, resolveVisualSource } from "../../lib/vis
 import { DriverPlaceholder } from "./driver-placeholder";
 
 export function PageHero({
-  eyebrow = "Temporada 2026",
   title,
   description,
   index = "UDK",
@@ -37,7 +36,6 @@ export function PageHero({
       </div>
       <div className="race-container udk-page-hero-inner">
         <div className="udk-page-hero-copy">
-          <span>{eyebrow}</span>
           <h1>{title}</h1>
           <p>{description}</p>
           {action ? (

@@ -42,7 +42,12 @@ export default async function HomePage() {
   const topDrivers = [...drivers]
     .sort((a, b) => b.points - a.points || (a.position ?? 999) - (b.position ?? 999))
     .slice(0, 5);
-  const stagePreview = stages.filter((stage) => stage.id !== nextStage?.id).slice(0, 2);
+  const remainingStages = stages.filter((stage) => stage.id !== nextStage?.id);
+  const followingStage = getNextUpcomingStage(remainingStages);
+  const stagePreview = [
+    followingStage,
+    getNextUpcomingStage(remainingStages.filter((stage) => stage.id !== followingStage?.id)),
+  ].filter((stage) => stage !== null);
   const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 4);
   const featuredNews = news[0] ?? null;
   const secondaryNews = news.slice(1, 4);
@@ -79,46 +84,45 @@ export default async function HomePage() {
                 Crie sua conta, escolha a categoria e continue pela plataforma oficial.
               </small>
             </Reveal>
-
-            <Reveal className="cinema-next-stage" delay={120}>
-              <div className="cinema-next-stage-head">
-                <span>Próxima etapa</span>
-                <b>
-                  {registrationOpen
-                    ? "Inscrições abertas"
-                    : nextStage
-                      ? "Próxima etapa"
-                      : "Calendário atualizado"}
-                </b>
-              </div>
-              <time>{nextStage?.date ?? "Data a definir"}</time>
-              <h2>{nextStage?.title ?? "Calendário oficial"}</h2>
-              <p>{nextStage?.track ?? "Traçado oficial"}</p>
-              <div className="cinema-next-stage-location">
-                <MapPin aria-hidden="true" />
-                <span>
-                  {nextStage?.location ?? "Kartódromo Internacional de Betim"}
-                  <b>{nextStage?.city ?? "Betim/MG"}</b>
-                </span>
-              </div>
-              <div className="cinema-next-stage-countdown">
-                <span>Até a largada</span>
-                {nextStage?.startsAt ? (
-                  <RaceCountdown target={nextStage.startsAt} />
-                ) : (
-                  <b>Em breve</b>
-                )}
-              </div>
-              <Link href={nextStageAction.href} className="cinema-arrow-link">
-                {nextStageAction.label} <ArrowRight aria-hidden="true" />
-              </Link>
-            </Reveal>
           </div>
 
           <div className="race-container cinema-hero-foot">
             <span>Campeonato Ultras do Kart</span>
             <ArrowDownRight aria-hidden="true" />
-            <b>UDK / 2026</b>
+          </div>
+        </section>
+
+        <section className="cinema-next-race" aria-label="Próxima etapa">
+          <div className="race-container cinema-next-stage">
+            <div className="cinema-next-stage-main">
+              <time>{nextStage?.date ?? "Em breve"}</time>
+              <div>
+                <div className="cinema-next-stage-head">
+                  <span>Próxima etapa</span>
+                  <b>{registrationOpen ? "Inscrições abertas" : "Calendário atualizado"}</b>
+                </div>
+                <h2>{nextStage?.title ?? "Calendário oficial"}</h2>
+                <p>{nextStage?.track ?? "Traçado oficial"}</p>
+                <div className="cinema-next-stage-location">
+                  <MapPin aria-hidden="true" />
+                  <span>
+                    {nextStage?.location ?? "Kartódromo Internacional de Betim"} ·{" "}
+                    {nextStage?.time ?? "Horário a definir"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="cinema-next-stage-countdown">
+              <span>Até a largada</span>
+              {nextStage?.startsAt ? (
+                <RaceCountdown target={nextStage.startsAt} />
+              ) : (
+                <b>Em breve</b>
+              )}
+            </div>
+            <Link href={nextStageAction.href} className="race-button race-button-primary">
+              {nextStageAction.label} <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
 
@@ -151,35 +155,9 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="cinema-motion-strip" aria-label="Identidade do campeonato">
-          <div>
-            <span>Ultras do Kart</span>
-            <i />
-            <span>Performance em pista</span>
-            <i />
-            <span>Comunidade além da volta</span>
-            <i />
-            <span>Temporada 2026</span>
-            <i />
-            <span>Kartódromo de Betim</span>
-            <i />
-            <span>Ultras do Kart</span>
-            <i />
-            <span>Performance em pista</span>
-            <i />
-            <span>Comunidade além da volta</span>
-            <i />
-            <span>Temporada 2026</span>
-            <i />
-            <span>Kartódromo de Betim</span>
-            <i />
-          </div>
-        </section>
-
         <section className="cinema-manifesto">
           <div className="race-container cinema-manifesto-grid">
             <Reveal className="cinema-manifesto-copy">
-              <span>01 / Manifesto Ultras</span>
               <h2>O kart é só o começo.</h2>
               <p>
                 Um grid que se encontra para competir e voltar melhor. Conheça o campeonato, suas
@@ -215,25 +193,27 @@ export default async function HomePage() {
               inverse
             />
 
-            {nextStage ? (
-              <StageProject stage={nextStage} index={0} featured />
-            ) : (
-              <EditorialEmpty
-                index="02"
-                title="O calendário oficial ainda não foi publicado."
-                description="As etapas aparecerão aqui assim que a organização disponibilizar os dados da temporada."
-              />
-            )}
+            <div className="cinema-season-grid">
+              {nextStage ? (
+                <StageProject stage={nextStage} index={0} featured />
+              ) : (
+                <EditorialEmpty
+                  index="02"
+                  title="O calendário oficial ainda não foi publicado."
+                  description="As etapas aparecerão aqui assim que a organização disponibilizar os dados da temporada."
+                />
+              )}
 
-            {stagePreview.length > 0 ? (
-              <div className="cinema-stage-rail" aria-label="Outras etapas da temporada">
-                {stagePreview.map((stage, index) => (
-                  <Reveal key={stage.id} delay={index * 55}>
-                    <StageProject stage={stage} index={index + 1} />
-                  </Reveal>
-                ))}
-              </div>
-            ) : null}
+              {stagePreview.length > 0 ? (
+                <div className="cinema-stage-rail" aria-label="Outras etapas da temporada">
+                  {stagePreview.map((stage, index) => (
+                    <Reveal key={stage.id} delay={index * 55}>
+                      <StageProject stage={stage} index={index + 1} />
+                    </Reveal>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </section>
 
@@ -302,9 +282,9 @@ export default async function HomePage() {
                 </div>
 
                 <div className="cinema-ranking-list">
-                  {topDrivers.map((driver, index) => (
+                  {topDrivers.slice(3).map((driver, index) => (
                     <Link href={`/pilotos/${driver.slug}`} key={driver.slug}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span>{String(index + 4).padStart(2, "0")}</span>
                       <div>
                         <strong>{driver.name}</strong>
                         <small>{driver.category}</small>
@@ -363,7 +343,6 @@ export default async function HomePage() {
             />
           </div>
           <div className="race-container cinema-community-copy">
-            <span>05 / Cultura Ultras</span>
             <h2>Rivais na pista. Ultras em todo lugar.</h2>
             <p>
               Do briefing à bandeirada, a comunidade faz parte de cada volta. Respeito, troca de
@@ -509,7 +488,6 @@ export default async function HomePage() {
 
         <section className="cinema-final-cta">
           <div className="race-container">
-            <span>Seu lugar no grid</span>
             <h2>A próxima largada pode ser sua.</h2>
             <p>
               Crie sua conta, escolha a categoria e acompanhe cada etapa pela plataforma oficial.

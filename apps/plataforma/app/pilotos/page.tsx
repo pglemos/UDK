@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Download, Users } from "lucide-react";
-import {
-  DriverPoster,
-  EditorialEmpty,
-  EditorialHeading,
-} from "../../components/race/editorial-primitives";
+import { DriverPoster, EditorialEmpty } from "../../components/race/editorial-primitives";
 import { RaceShell } from "../../components/race/race-shell";
 import { PageHero, RacePagination, SearchField } from "../../components/race/ui";
 import { getCategories, getDriversPage, parsePositiveInt } from "../../lib/public-data";
@@ -50,35 +46,7 @@ export default async function DriversPage({
 
         <section className="tg-drivers-directory">
           <div className="race-container">
-            <EditorialHeading
-              index="04"
-              title="Encontre seu piloto."
-              description="Busque pilotos, filtre categorias e acompanhe a evolução de quem está na temporada."
-            />
-
-            <div className="tg-official-pdf-links" aria-label="PDFs oficiais por corrida">
-              <a
-                className="race-button race-button-outline is-light"
-                href={officialResultPdf.endurance}
-                download
-              >
-                Resultado Endurance <Download aria-hidden="true" />
-              </a>
-              <a
-                className="race-button race-button-outline is-light"
-                href={officialResultPdf.corrida1}
-                download
-              >
-                Resultado Corrida 1 <Download aria-hidden="true" />
-              </a>
-              <a
-                className="race-button race-button-outline is-light"
-                href={officialResultPdf.corrida2}
-                download
-              >
-                Resultado Corrida 2 <Download aria-hidden="true" />
-              </a>
-            </div>
+            <h2 className="sr-only">Encontre seu piloto</h2>
 
             <p className="tg-directory-count" aria-live="polite">
               {drivers.meta.totalItems}{" "}
@@ -134,6 +102,32 @@ export default async function DriversPage({
                 page: String(page),
               }}
             />
+            <section className="tg-driver-documents" aria-label="Documentos oficiais">
+              <h2>Documentos oficiais</h2>
+              <div className="tg-official-pdf-links" aria-label="PDFs oficiais por corrida">
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.endurance}
+                  download
+                >
+                  Resultado Endurance <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.corrida1}
+                  download
+                >
+                  Resultado Corrida 1 <Download aria-hidden="true" />
+                </a>
+                <a
+                  className="race-button race-button-outline is-light"
+                  href={officialResultPdf.corrida2}
+                  download
+                >
+                  Resultado Corrida 2 <Download aria-hidden="true" />
+                </a>
+              </div>
+            </section>
           </div>
         </section>
 
