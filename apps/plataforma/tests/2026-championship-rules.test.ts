@@ -65,18 +65,13 @@ describe("UDK 2026 official championship rules", () => {
     );
   });
 
-  it("loads the suit-inspired racing texture as a secondary identity layer without collapsing hero media", () => {
+  it("preserves official cyan and photo surfaces in the redesigned identity", () => {
     const layout = readApp("app/layout.tsx");
-    const texture = readApp("app/brand-racing-texture.css");
-
-    expect(layout).toContain('import "./brand-racing-texture.css";');
-    expect(texture).toContain("--udk-suit-teal");
-    expect(texture).toContain("repeating-linear-gradient");
-    expect(texture).toContain("mask-image");
-    expect(texture).toContain(".tg-page-hero::after");
-    expect(texture).toContain(".dashboard-grid::before");
-    expect(texture).toContain(".tg-page-hero > .race-container");
-    expect(texture).toContain("color: #59656a");
-    expect(texture).not.toContain(".tg-page-hero > *,");
+    const styles = readApp("app/race.css");
+    expect(layout).toContain('import "./race.css";');
+    expect(styles).toContain("--cinema-cyan: #00d9ff");
+    expect(styles).toContain(".udk-page-hero-media");
+    expect(styles).toContain(".cinema-home-hero-media");
+    expect(styles).not.toContain("mask-image");
   });
 });

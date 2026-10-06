@@ -2,6 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { OfficialLogo } from "../../../components/race/official-logo";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -308,6 +309,39 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   const [roleGrants, setRoleGrants] = useState<RoleGrant[]>([]);
   const [permissions, setPermissions] = useState<RolePermission[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const navigation = document.getElementById("operations-navigation");
+    const content = document.querySelector<HTMLElement>(".operations-main");
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    if (content) content.inert = true;
+    navigation?.querySelector<HTMLElement>(".mobile-close")?.focus();
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSidebarOpen(false);
+      if (event.key !== "Tab") return;
+      const controls = navigation?.querySelectorAll<HTMLElement>("a[href], button");
+      const first = controls?.[0];
+      const last = controls?.[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = previousOverflow;
+      if (content) content.inert = false;
+      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    };
+  }, [sidebarOpen]);
   const [online, setOnline] = useState(true);
   const [offlineCount, setOfflineCount] = useState(0);
   const [moduleCounts, setModuleCounts] = useState<Record<string, ModuleCount>>({});
@@ -543,7 +577,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   if (!ready) {
     return (
       <main className="loading-screen">
-        <img src="/udk.svg" alt="UDK" />
+        <OfficialLogo variant="dark" width={140} />
         <div className="loading-line">
           <span />
         </div>
@@ -555,7 +589,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   if (!client || !user) {
     return (
       <main className="configuration-screen">
-        <img src="/udk.svg" alt="UDK" />
+        <OfficialLogo variant="dark" width={140} />
         <span className="eyebrow">Configuração necessária</span>
         <h1>Conecte o Supabase</h1>
         <p>{authError}</p>
@@ -573,10 +607,20 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           onClick={() => setSidebarOpen(false)}
         />
       ) : null}
-      <aside className={sidebarOpen ? "sidebar sidebar-open" : "sidebar"}>
+      <aside
+        id="operations-navigation"
+        className={sidebarOpen ? "sidebar sidebar-open" : "sidebar"}
+      >
         <div className="sidebar-brand">
-          <img src="/udk.svg" alt="UDK" />
-          <button className="mobile-close" type="button" onClick={() => setSidebarOpen(false)}>
+          <Link href="/" aria-label="Voltar ao portal UDK">
+            <OfficialLogo variant="negative" width={128} />
+          </Link>
+          <button
+            className="mobile-close"
+            type="button"
+            aria-label="Fechar navegação"
+            onClick={() => setSidebarOpen(false)}
+          >
             <X />
           </button>
         </div>
@@ -587,7 +631,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           <span>Operação oficial</span>
         </div>
 
-        <nav className="sidebar-navigation">
+        <nav className="sidebar-navigation" aria-label="Módulos da plataforma">
           {visibleGroups.map((group) => (
             <div className="nav-group" key={group.label}>
               <span>{group.label}</span>
@@ -629,7 +673,14 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
 
       <main className="operations-main">
         <header className="operations-header">
-          <button className="mobile-menu" type="button" onClick={() => setSidebarOpen(true)}>
+          <button
+            className="mobile-menu"
+            type="button"
+            aria-label="Abrir navegação"
+            aria-expanded={sidebarOpen}
+            aria-controls="operations-navigation"
+            onClick={() => setSidebarOpen(true)}
+          >
             <Menu />
           </button>
           <div>

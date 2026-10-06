@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 function param(value: string | string[] | undefined, fallback = ""): string {
-  return Array.isArray(value) ? value[0] ?? fallback : value ?? fallback;
+  return Array.isArray(value) ? (value[0] ?? fallback) : (value ?? fallback);
 }
 
 export default async function NewsPage({
@@ -46,13 +46,15 @@ export default async function NewsPage({
           <div className="race-container">
             <EditorialHeading
               index="05"
-              title="A temporada também acontece fora da pista."
+              title="As últimas do campeonato."
               description="Busque comunicados e conteúdos publicados pela organização."
             />
 
             <form className="udk-toolbar tg-toolbar is-compact" action="/noticias">
               <SearchField defaultValue={query} placeholder="Buscar notícia" />
-              <button className="race-button race-button-primary" type="submit">Buscar</button>
+              <button className="race-button race-button-primary" type="submit">
+                Buscar
+              </button>
             </form>
 
             {featured ? (
@@ -74,8 +76,16 @@ export default async function NewsPage({
                       <span>{featured.category}</span>
                       <h2>{featured.title}</h2>
                       <p>{featured.summary}</p>
-                      <time>{new Date(featured.publishedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</time>
-                      <b className="tg-arrow-link">Ler matéria <ArrowRight aria-hidden="true" /></b>
+                      <time>
+                        {new Date(featured.publishedAt).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </time>
+                      <b className="tg-arrow-link">
+                        Ler matéria <ArrowRight aria-hidden="true" />
+                      </b>
                     </div>
                   </Link>
                 </section>
@@ -84,14 +94,22 @@ export default async function NewsPage({
                   {list.map((item, index) => {
                     const visual = newsVisual(index + 1);
                     return (
-                      <Link href={`/noticias/${item.slug}`} key={item.slug} className={index === 0 ? "is-wide" : ""}>
+                      <Link
+                        href={`/noticias/${item.slug}`}
+                        key={item.slug}
+                        className={index === 0 ? "is-wide" : ""}
+                      >
                         <div>
                           <Image
                             src={item.coverImageUrl ?? visual.src}
                             alt={`Capa da notícia: ${item.title}`}
                             fill
                             quality={84}
-                            sizes={index === 0 ? "(max-width: 760px) 100vw, 58vw" : "(max-width: 760px) 100vw, 29vw"}
+                            sizes={
+                              index === 0
+                                ? "(max-width: 760px) 100vw, 58vw"
+                                : "(max-width: 760px) 100vw, 29vw"
+                            }
                             style={{ objectPosition: visual.position }}
                           />
                         </div>
@@ -113,7 +131,11 @@ export default async function NewsPage({
               />
             )}
 
-            <RacePagination meta={news.meta} basePath="/noticias" params={{ q: query || undefined, page: String(page) }} />
+            <RacePagination
+              meta={news.meta}
+              basePath="/noticias"
+              params={{ q: query || undefined, page: String(page) }}
+            />
           </div>
         </section>
       </main>

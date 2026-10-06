@@ -45,44 +45,28 @@ describe("third visual audit safeguards", () => {
     expect(standings).not.toContain('import Image from "next/image"');
   });
 
-  it("locks poster media dimensions after every earlier visual override", () => {
-    const race = read("app/race.css");
-    const css = read("app/audit-round-three.css");
-
-    expect(race).toContain('@import "./audit-round-three.css";');
-    expect(race.indexOf("audit-round-three.css")).toBeGreaterThan(
-      race.indexOf("audit-round-two.css"),
-    );
-    expect(css).toContain(".cinema-driver-poster-media,");
-    expect(css).toContain("position: absolute !important");
-    expect(css).toContain("inset: 0 !important");
-    expect(css).toContain("height: 100% !important");
-    expect(css).toContain("min-height: 100% !important");
-    expect(css).toContain(".tg-standing-podium-fallback img");
-    expect(css).toContain(".race-driver-visual.is-fallback img");
+  it("reserves real dimensions for portraits and their honest placeholders", () => {
+    const css = read("app/race.css");
+    expect(css).toContain(".cinema-driver-poster-media");
+    expect(css).toContain("height: 230px");
+    expect(css).toContain("height: 170px");
+    expect(css).toContain(".race-driver-visual");
   });
 
   it("locks the profile hero fill surface and shared touch targets", () => {
-    const css = read("app/audit-round-three.css");
+    const css = read("app/race.css");
     expect(css).toContain(".tg-driver-profile-media");
-    expect(css).toContain("position: absolute !important");
-    expect(css).toContain(".tg-driver-profile-media > img");
-    expect(css).toContain("min-height: 44px");
     expect(css).toContain(".race-password-toggle");
-    expect(css).toContain("width: 44px");
-    expect(css).toContain("min-height: 52px");
-    expect(css).toContain(".udk-data-table td:last-child > a");
+    expect(css).toContain("min-height: 44px");
     expect(css).toContain("min-width: 44px");
+    expect(css).toContain(".udk-data-table td:last-child > a");
   });
 
   it("gives the cinematic news cover a deterministic fill containing block", () => {
-    const css = read("app/audit-round-three.css");
-
+    const css = read("app/race.css");
     expect(css).toContain(".tg-article-cover");
-    expect(css).toContain("position: relative !important");
-    expect(css).toContain("height: min(760px, 72vw) !important");
-    expect(css).toContain("min-height: 320px !important");
-    expect(css).toContain("height: min(520px, 78vw) !important");
+    expect(css).toContain("position: relative");
+    expect(css).toContain("height: clamp(250px, 40vw, 550px)");
   });
 
   it("keeps the mobile menu out of the accessibility tree while closed", () => {
@@ -102,12 +86,10 @@ describe("third visual audit safeguards", () => {
   });
 
   it("does not block the initial route with a long cinematic curtain", () => {
-    const motion = read("components/race/cinematic-motion.tsx");
-    const css = read("app/cinema-core.css");
-    expect(motion).toContain("firstRender");
-    expect(motion).toContain('pathname !== "/"');
-    expect(motion).toContain("680");
-    expect(css).toContain("cinema-intro-wipe 680ms");
+    const shell = read("components/race/race-shell.tsx");
+    expect(shell).not.toContain("CinematicIntro");
+    expect(shell).not.toContain("CinematicRouteCurtain");
+    expect(shell).not.toContain("CinematicPointer");
   });
 
   it("renders a deterministic countdown shell before the client clock starts", () => {

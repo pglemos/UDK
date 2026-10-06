@@ -6,28 +6,26 @@ const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
 describe("second full visual audit safeguards", () => {
-  it("loads the second audit stylesheet after every previous visual layer", () => {
+  it("consolidates previously competing visual layers", () => {
     const race = read("app/race.css");
-    expect(race).toContain('@import "./audit-round-two.css";');
-    expect(race.indexOf("audit-round-two.css")).toBeGreaterThan(race.indexOf("final-audit-overrides.css"));
+    expect(race).not.toContain("@import");
+    expect(race).toContain(".race-search-field");
   });
 
   it("prevents the featured news title from overflowing its desktop column", () => {
-    const css = read("app/audit-round-two.css");
+    const css = read("app/race.css");
     expect(css).toContain(".tg-news-directory-feature > a");
-    expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(430px, 0.82fr)");
-    expect(css).toContain(".tg-news-directory-feature a > div:last-child");
+    expect(css).toContain("grid-template-columns: 1.2fr 1fr");
     expect(css).toContain("min-width: 0");
-    expect(css).toContain(".tg-news-directory-feature h2");
-    expect(css).toContain("max-width: 100%");
+    expect(css).toContain("overflow-wrap: break-word");
   });
 
   it("keeps category tabs and the regulation index readable on small screens", () => {
-    const css = read("app/audit-round-two.css");
-    expect(css).toContain(".tg-category-tabs");
-    expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
-    expect(css).toContain(".tg-regulation-layout > nav");
-    expect(css).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
+    const css = read("app/race.css");
+    expect(css).toContain(".udk-category-tabs");
+    expect(css).toContain(".tg-regulation-layout nav");
+    expect(css).toContain("white-space: nowrap");
+    expect(css).toContain("position: static");
   });
 
   it("uses the attached official UDK wordmarks instead of the legacy repository logo", () => {
@@ -39,8 +37,8 @@ describe("second full visual audit safeguards", () => {
     expect(logo).toContain("officialBrandAssets");
     expect(assets).toContain("/brand/udk-wordmark-white.svg");
     expect(assets).toContain("/brand/udk-wordmark-dark.svg");
-    expect(white).toContain("viewBox=\"0 0 2000 402\"");
-    expect(dark).toContain("viewBox=\"0 0 2000 402\"");
+    expect(white).toContain('viewBox="0 0 2000 402"');
+    expect(dark).toContain('viewBox="0 0 2000 402"');
     expect(logo).not.toContain("/brand/udk-logo-negativa.png");
   });
 
@@ -52,12 +50,11 @@ describe("second full visual audit safeguards", () => {
     expect(header).not.toContain("<strong>ULTRAS</strong>");
   });
 
-  it("pins the official logo and reserves clearance inside the authentication artwork", () => {
-    const css = read("app/audit-round-two.css");
-    expect(css).toContain(".race-auth-visual > a:first-child");
-    expect(css).toContain("position: absolute");
-    expect(css).toContain("z-index: 5");
+  it("keeps the access logo in the layout flow above the heading", () => {
+    const css = read("app/race.css");
+    expect(css).toContain(".race-auth-visual > a:first-child img");
     expect(css).toContain(".race-auth-copy");
-    expect(css).toContain("padding-top: clamp(92px, 9vw, 126px)");
+    expect(css).toContain("flex-direction: column");
+    expect(css).toContain("justify-content: space-between");
   });
 });

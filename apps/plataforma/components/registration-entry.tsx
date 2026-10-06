@@ -56,8 +56,7 @@ export function RegistrationEntry() {
           <h2>Prepare sua entrada no grid</h2>
           <p>
             Escolha a categoria de interesse e avance para a plataforma oficial. Perfil, documentos,
-            termos e confirmação ficam vinculados ao mesmo protocolo para evitar aquele ritual
-            humano de preencher a mesma informação em oito telas diferentes.
+            termos e confirmação ficam reunidos na sua conta para acompanhar cada passo.
           </p>
         </div>
 
@@ -116,7 +115,7 @@ export function RegistrationEntry() {
       </section>
 
       <aside className="race-registration-summary">
-        <span className="race-kicker">Resumo em tempo real</span>
+        <span className="race-kicker">Sua inscrição</span>
         <h2>Temporada 2026</h2>
         <div className="race-summary-list">
           <div>

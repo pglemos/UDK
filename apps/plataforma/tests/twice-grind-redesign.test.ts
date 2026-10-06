@@ -11,10 +11,10 @@ describe("UDK Twice + The Grind direction contracts", () => {
     const shell = read("components/race/race-shell.tsx");
 
     expect(header).toContain("cinema-menu-media");
-    expect(header).toContain("aria-label=\"Abrir menu\"");
+    expect(header).toContain('aria-label="Abrir menu"');
     expect(header).toContain("Começar inscrição");
-    expect(shell).toContain("CinematicRouteCurtain");
-    expect(shell).toContain("CinematicPointer");
+    expect(shell).not.toContain("CinematicRouteCurtain");
+    expect(shell).not.toContain("CinematicPointer");
     expect(shell).toContain("OfficialLogo");
   });
 
@@ -68,10 +68,10 @@ describe("UDK Twice + The Grind direction contracts", () => {
   });
 
   it("ships responsive and reduced-motion coverage", () => {
-    const responsive = read("app/cinema-responsive.css");
-    expect(responsive).toContain("@media (max-width: 1180px)");
-    expect(responsive).toContain("@media (max-width: 900px)");
-    expect(responsive).toContain("@media (max-width: 640px)");
+    const responsive = read("app/race.css");
+    expect(responsive).toContain("@media (max-width: 1200px)");
+    expect(responsive).toContain("@media (max-width: 1000px)");
+    expect(responsive).toContain("@media (max-width: 760px)");
     expect(responsive).toContain("prefers-reduced-motion: reduce");
   });
 });

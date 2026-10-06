@@ -90,9 +90,7 @@ export default async function DriverProfilePage({
     laps,
     requestedResultId,
   );
-  const selectedRaceLabel = selectedResult
-    ? resultHeadingLabel(selectedResult)
-    : null;
+  const selectedRaceLabel = selectedResult ? resultHeadingLabel(selectedResult) : null;
   const selectedPdf = selectedResult
     ? officialResultPdfForResult(selectedResult.sessionName, selectedResult.title)
     : null;
@@ -122,7 +120,7 @@ export default async function DriverProfilePage({
                 fill
                 priority
                 quality={90}
-                sizes="100vw"
+                sizes="(max-width: 760px) 100vw, 45vw"
                 style={{ objectPosition: "50% center" }}
               />
             ) : (
@@ -181,7 +179,7 @@ export default async function DriverProfilePage({
           <div className="race-container tg-profile-story-grid">
             <Reveal className="tg-profile-bio">
               <span>01 / Perfil</span>
-              <h2>Quem está por trás do capacete.</h2>
+              <h2>Sobre o piloto.</h2>
               <p>
                 {driver.bio ??
                   `${driver.name} compete na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}
@@ -216,7 +214,7 @@ export default async function DriverProfilePage({
           <div className="race-container">
             <EditorialHeading
               index="02"
-              title="Sessão por sessão, a evolução ganha forma."
+              title="Histórico de corridas."
               description="Histórico esportivo publicado pela organização."
               inverse
             />
@@ -250,9 +248,7 @@ export default async function DriverProfilePage({
               <EditorialHeading
                 index="03"
                 title={
-                  selectedRaceLabel
-                    ? `Volta a volta: ${selectedRaceLabel}`
-                    : "Volta a volta, sem perder nenhum detalhe."
+                  selectedRaceLabel ? `Volta a volta: ${selectedRaceLabel}` : "Tempos por volta."
                 }
                 description="Tempos, velocidade e tempo acumulado conforme o relatório oficial do sistema de cronometragem."
                 {...(requestedResultId !== undefined

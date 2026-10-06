@@ -2,14 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-const publicCss = [
-  "../app/cinema-core.css",
-  "../app/cinema-home.css",
-  "../app/cinema-pages.css",
-  "../app/cinema-responsive.css",
-]
-  .map((file) => readFileSync(new URL(file, import.meta.url), "utf8"))
-  .join("\n");
+const publicCss = readFileSync(new URL("../app/race.css", import.meta.url), "utf8");
 
 function relativeLuminance(hex: string): number {
   const value = hex.replace("#", "");
@@ -26,8 +19,10 @@ function relativeLuminance(hex: string): number {
 function contrast(first: string, second: string): number {
   const firstLuminance = relativeLuminance(first);
   const secondLuminance = relativeLuminance(second);
-  return (Math.max(firstLuminance, secondLuminance) + 0.05) /
-    (Math.min(firstLuminance, secondLuminance) + 0.05);
+  return (
+    (Math.max(firstLuminance, secondLuminance) + 0.05) /
+    (Math.min(firstLuminance, secondLuminance) + 0.05)
+  );
 }
 
 describe("UDK cinematic brand theme", () => {
@@ -40,16 +35,16 @@ describe("UDK cinematic brand theme", () => {
   });
 
   it("defines the approved cinematic palette and official cyan accent", () => {
-    expect(publicCss).toContain("--cinema-black: #050607;");
-    expect(publicCss).toContain("--cinema-white: #ffffff;");
-    expect(publicCss).toContain("--cinema-paper: #f3f0e8;");
+    expect(publicCss).toContain("--cinema-black: #081116;");
+    expect(publicCss).toContain("--cinema-white: #f7fafb;");
+    expect(publicCss).toContain("--cinema-paper: #f4f7f8;");
     expect(publicCss).toContain("--cinema-cyan: #00d9ff;");
-    expect(publicCss).toContain("--cinema-cyan-deep: #006f82;");
+    expect(publicCss).toContain("--cinema-cyan-deep: #006577;");
   });
 
   it("keeps accessible contrast for primary and editorial surfaces", () => {
-    expect(contrast("#00d9ff", "#050607")).toBeGreaterThanOrEqual(4.5);
-    expect(contrast("#111315", "#f3f0e8")).toBeGreaterThanOrEqual(4.5);
-    expect(contrast("#006f82", "#ffffff")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#00d9ff", "#081116")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#14242d", "#f4f7f8")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#006577", "#f7fafb")).toBeGreaterThanOrEqual(4.5);
   });
 });

@@ -71,13 +71,23 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
 
       const now = new Date().toISOString();
       const driversPromise = allowedKeys.has("pilotos")
-        ? client.from("drivers").select("id", { count: "exact", head: true }).eq("status", "approved").is("deleted_at", null)
+        ? client
+            .from("drivers")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "approved")
+            .is("deleted_at", null)
         : emptyCount();
       const registrationsPromise = allowedKeys.has("inscricoes")
         ? client
             .from("registrations")
             .select("id", { count: "exact", head: true })
-            .in("status", ["submitted", "documents_pending", "payment_pending", "analysis", "approved"])
+            .in("status", [
+              "submitted",
+              "documents_pending",
+              "payment_pending",
+              "analysis",
+              "approved",
+            ])
             .is("deleted_at", null)
         : emptyCount();
       const paymentsPromise = allowedKeys.has("financeiro")
@@ -162,31 +172,57 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
     );
   }
 
-  const hasPendingItems = ["documentos", "financeiro", "resultados"].some((key) => allowedKeys.has(key));
+  const hasPendingItems = ["documentos", "financeiro", "resultados"].some((key) =>
+    allowedKeys.has(key),
+  );
 
   return (
     <div className="dashboard-grid">
-      {error ? <div className="alert alert-error dashboard-alert" role="alert">{error}</div> : null}
+      {error ? (
+        <div className="alert alert-error dashboard-alert" role="alert">
+          {error}
+        </div>
+      ) : null}
 
       <div className="metrics">
         {allowedKeys.has("pilotos") ? (
           <Link href="/painel/pilotos">
-            <article><Users /><span>Pilotos homologados</span><b>{state.drivers}</b><small>Perfis esportivos ativos</small></article>
+            <article>
+              <Users />
+              <span>Pilotos homologados</span>
+              <b>{state.drivers}</b>
+              <small>Perfis esportivos ativos</small>
+            </article>
           </Link>
         ) : null}
         {allowedKeys.has("inscricoes") ? (
           <Link href="/painel/inscricoes">
-            <article><Flag /><span>Inscrições em fluxo</span><b>{state.registrations}</b><small>Temporada e etapas</small></article>
+            <article>
+              <Flag />
+              <span>Inscrições em fluxo</span>
+              <b>{state.registrations}</b>
+              <small>Temporada e etapas</small>
+            </article>
           </Link>
         ) : null}
         {allowedKeys.has("financeiro") ? (
           <Link href="/painel/financeiro">
-            <article><CircleDollarSign /><span>Comprovantes pendentes</span><b>{state.pendingPayments}</b><small>Análise financeira</small></article>
+            <article>
+              <CircleDollarSign />
+              <span>Comprovantes pendentes</span>
+              <b>{state.pendingPayments}</b>
+              <small>Análise financeira</small>
+            </article>
           </Link>
         ) : null}
         {allowedKeys.has("resultados") ? (
           <Link href="/painel/resultados">
-            <article><Trophy /><span>Resultados em análise</span><b>{state.provisionalResults}</b><small>Provisórios e pendências</small></article>
+            <article>
+              <Trophy />
+              <span>Resultados em análise</span>
+              <b>{state.provisionalResults}</b>
+              <small>Provisórios e pendências</small>
+            </article>
           </Link>
         ) : null}
       </div>
@@ -195,7 +231,10 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
         {allowedKeys.has("calendario") ? (
           <article className="dashboard-panel next-stage-panel">
             <div className="panel-title">
-              <div><span>Próxima operação</span><h2>{state.nextStage?.title ?? "Nenhuma etapa futura"}</h2></div>
+              <div>
+                <span>Próxima operação</span>
+                <h2>{state.nextStage?.title ?? "Nenhuma etapa futura"}</h2>
+              </div>
               <CalendarDays />
             </div>
             {state.nextStage ? (
@@ -204,13 +243,15 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                   {new Date(state.nextStage.starts_at).toLocaleString("pt-BR", {
                     dateStyle: "full",
                     timeStyle: "short",
+                    timeZone: "America/Sao_Paulo",
                   })}
                 </strong>
                 <p>{state.nextStage.track}</p>
-                <div className="stage-progress"><span /></div>
                 <div className="stage-actions">
                   <Link href="/painel/calendario">Configurar etapa</Link>
-                  {allowedKeys.has("inscricoes") ? <Link href="/painel/inscricoes">Revisar inscrições</Link> : null}
+                  {allowedKeys.has("inscricoes") ? (
+                    <Link href="/painel/inscricoes">Revisar inscrições</Link>
+                  ) : null}
                   {allowedKeys.has("endurance") ? (
                     <Link href="/painel/endurance">Equipes de resistência</Link>
                   ) : null}
@@ -225,18 +266,42 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
         {hasPendingItems ? (
           <article className="dashboard-panel">
             <div className="panel-title">
-              <div><span>Central de pendências</span><h2>O que exige atenção</h2></div>
+              <div>
+                <span>Central de pendências</span>
+                <h2>O que exige atenção</h2>
+              </div>
               <AlertTriangle />
             </div>
             <ul className="pending-list">
               {allowedKeys.has("documentos") ? (
-                <li><FileCheck2 /><div><b>{state.pendingDocuments} documento(s)</b><span>Aguardando análise ou correção</span></div><Link href="/painel/documentos">Abrir</Link></li>
+                <li>
+                  <FileCheck2 />
+                  <div>
+                    <b>{state.pendingDocuments} documento(s)</b>
+                    <span>Aguardando análise ou correção</span>
+                  </div>
+                  <Link href="/painel/documentos">Abrir</Link>
+                </li>
               ) : null}
               {allowedKeys.has("financeiro") ? (
-                <li><CircleDollarSign /><div><b>{state.pendingPayments} pagamento(s)</b><span>Comprovante enviado ou em análise</span></div><Link href="/painel/financeiro">Abrir</Link></li>
+                <li>
+                  <CircleDollarSign />
+                  <div>
+                    <b>{state.pendingPayments} pagamento(s)</b>
+                    <span>Comprovante enviado ou em análise</span>
+                  </div>
+                  <Link href="/painel/financeiro">Abrir</Link>
+                </li>
               ) : null}
               {allowedKeys.has("resultados") ? (
-                <li><Trophy /><div><b>{state.provisionalResults} resultado(s)</b><span>Aguardando homologação esportiva</span></div><Link href="/painel/resultados">Abrir</Link></li>
+                <li>
+                  <Trophy />
+                  <div>
+                    <b>{state.provisionalResults} resultado(s)</b>
+                    <span>Aguardando homologação esportiva</span>
+                  </div>
+                  <Link href="/painel/resultados">Abrir</Link>
+                </li>
               ) : null}
             </ul>
           </article>

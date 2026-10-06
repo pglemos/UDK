@@ -42,7 +42,7 @@ export default async function HomePage() {
   const topDrivers = [...drivers]
     .sort((a, b) => b.points - a.points || (a.position ?? 999) - (b.position ?? 999))
     .slice(0, 5);
-  const stagePreview = stages.slice(0, 3);
+  const stagePreview = stages.filter((stage) => stage.id !== nextStage?.id).slice(0, 2);
   const driverPreview = [...drivers].sort((a, b) => b.points - a.points).slice(0, 4);
   const featuredNews = news[0] ?? null;
   const secondaryNews = news.slice(1, 4);
@@ -64,8 +64,8 @@ export default async function HomePage() {
                 <span>A pista</span> <em>não espera.</em>
               </h1>
               <p>
-                Um campeonato construído por quem entende que velocidade sem evolução é apenas
-                ruído. Disputa intensa, respeito no grid e comunidade além da bandeirada.
+                O campeonato Ultras do Kart. Disputa de verdade, evolução a cada volta e uma
+                comunidade que vive a pista em Betim.
               </p>
               <div className="cinema-home-actions">
                 <Link href="/inscricao" className="race-button race-button-primary">
@@ -116,7 +116,7 @@ export default async function HomePage() {
           </div>
 
           <div className="race-container cinema-hero-foot">
-            <span>Role para acompanhar a temporada</span>
+            <span>Campeonato Ultras do Kart</span>
             <ArrowDownRight aria-hidden="true" />
             <b>UDK / 2026</b>
           </div>
@@ -180,11 +180,10 @@ export default async function HomePage() {
           <div className="race-container cinema-manifesto-grid">
             <Reveal className="cinema-manifesto-copy">
               <span>01 / Manifesto Ultras</span>
-              <h2>O cronômetro mede a volta. A pista revela o piloto.</h2>
+              <h2>O kart é só o começo.</h2>
               <p>
-                O UDK transforma competição em evolução coletiva. O resultado importa, mas
-                constância, respeito e coragem para voltar melhor são o que fazem uma temporada
-                permanecer na memória.
+                Um grid que se encontra para competir e voltar melhor. Conheça o campeonato, suas
+                categorias e as regras que fazem a disputa acontecer.
               </p>
               <Link href="/regulamento" className="cinema-arrow-link">
                 Ler o regulamento <ArrowRight aria-hidden="true" />
@@ -210,8 +209,8 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="02"
-              title="Uma temporada contada como grandes capítulos."
-              description="Cada etapa tem traçado, tensão e contexto próprios. O calendário deixa de ser uma lista e passa a mostrar a jornada inteira."
+              title="O próximo encontro é na pista."
+              description="Datas, traçados e tudo que você precisa para acompanhar a temporada 2026."
               action={{ href: "/calendario", label: "Calendário completo" }}
               inverse
             />
@@ -226,9 +225,9 @@ export default async function HomePage() {
               />
             )}
 
-            {stagePreview.length > 1 ? (
+            {stagePreview.length > 0 ? (
               <div className="cinema-stage-rail" aria-label="Outras etapas da temporada">
-                {stagePreview.slice(1).map((stage, index) => (
+                {stagePreview.map((stage, index) => (
                   <Reveal key={stage.id} delay={index * 55}>
                     <StageProject stage={stage} index={index + 1} />
                   </Reveal>
@@ -277,8 +276,8 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="03"
-              title="A pista fala. A classificação registra."
-              description="Pontos reais, desempenho acumulado e nenhuma estatística inventada para preencher espaço."
+              title="A disputa pelo topo."
+              description="Confira quem lidera a temporada. Pontuação oficial atualizada a cada etapa."
               action={{ href: "/classificacao", label: "Ver classificação" }}
             />
 
@@ -330,8 +329,8 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="04"
-              title="Pessoas antes da pista. Pilotos quando a luz apaga."
-              description="Conheça quem constrói o grid e transforma cada encontro em uma história diferente."
+              title="Conheça o grid."
+              description="Os pilotos, os pontos e as histórias por trás de cada capacete."
               action={{ href: "/pilotos", label: "Todos os pilotos" }}
               inverse
             />
@@ -365,11 +364,10 @@ export default async function HomePage() {
           </div>
           <div className="race-container cinema-community-copy">
             <span>05 / Cultura Ultras</span>
-            <h2>Competir sozinho é possível. Evoluir junto é outra história.</h2>
+            <h2>Rivais na pista. Ultras em todo lugar.</h2>
             <p>
-              O UDK conecta pilotos que entendem que rivalidade e respeito podem dividir o mesmo
-              grid. A comunidade existe no box, na preparação, no pós-corrida e em cada conselho que
-              reduz décimos.
+              Do briefing à bandeirada, a comunidade faz parte de cada volta. Respeito, troca de
+              experiência e vontade de acelerar juntos.
             </p>
             <div className="cinema-community-values">
               <span>Respeito</span>
@@ -384,7 +382,7 @@ export default async function HomePage() {
           <div className="race-container">
             <EditorialHeading
               index="06"
-              title="Do paddock para quem acompanha cada volta."
+              title="Direto do paddock."
               description="Comunicados, bastidores e decisões oficiais do campeonato."
               action={{ href: "/noticias", label: "Todas as notícias" }}
             />
@@ -511,8 +509,8 @@ export default async function HomePage() {
 
         <section className="cinema-final-cta">
           <div className="race-container">
-            <span>07 / Próxima largada</span>
-            <h2>O grid não precisa continuar sem o seu nome.</h2>
+            <span>Seu lugar no grid</span>
+            <h2>A próxima largada pode ser sua.</h2>
             <p>
               Crie sua conta, escolha a categoria e acompanhe cada etapa pela plataforma oficial.
             </p>

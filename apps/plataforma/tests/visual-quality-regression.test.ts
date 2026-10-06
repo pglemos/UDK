@@ -16,17 +16,13 @@ type MediaManifest = {
 describe("UDK visual quality regressions", () => {
   it("loads the editorial type system through next/font", () => {
     const layout = read("app/layout.tsx");
-    const entry = read("app/race.css");
-    const refinement = read("app/visual-quality.css");
-
+    const styles = read("app/race.css");
     expect(layout).toContain('from "next/font/google"');
-    expect(layout).toContain("Syne");
-    expect(layout).toContain("Manrope");
-    expect(layout).toContain('data-scroll-behavior="smooth"');
-    expect(layout).toContain("className={`${display.variable} ${body.variable}`}");
-    expect(entry).toContain('@import "./visual-quality.css";');
-    expect(refinement).toContain("var(--font-display)");
-    expect(refinement).toContain("var(--font-body)");
+    expect(layout).toContain("Barlow_Condensed");
+    expect(layout).toContain("Inter");
+    expect(layout).not.toMatch(/Manrope|Syne/);
+    expect(styles).toContain("var(--font-barlow)");
+    expect(styles).toContain("var(--font-inter)");
   });
 
   it("uses multiple optimized official visual sources instead of a repeated fallback", () => {
@@ -79,15 +75,12 @@ describe("UDK visual quality regressions", () => {
   });
 
   it("prevents headline and component clipping across viewports", () => {
-    const refinement = read("app/visual-quality.css");
-
-    expect(refinement).toContain("overflow-wrap: anywhere");
-    expect(refinement).toContain("overflow-wrap: break-word");
-    expect(refinement).toContain("text-wrap: balance");
-    expect(refinement).toContain("min-width: 0");
-    expect(refinement).toContain("@media (max-width: 1120px)");
-    expect(refinement).toContain("@media (max-width: 760px)");
-    expect(refinement).toContain("@media (max-width: 460px)");
-    expect(refinement).not.toContain("white-space: nowrap");
+    const styles = read("app/race.css");
+    expect(styles).toContain("overflow-wrap: break-word");
+    expect(styles).toContain("text-wrap: balance");
+    expect(styles).toContain("min-width: 0");
+    expect(styles).toContain("@media (max-width: 1200px)");
+    expect(styles).toContain("@media (max-width: 1000px)");
+    expect(styles).toContain("@media (max-width: 760px)");
   });
 });

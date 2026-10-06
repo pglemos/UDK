@@ -107,9 +107,9 @@ describe("official sponsor roster", () => {
   it("renders logos, Instagram handles and safe external links", () => {
     const page = sourceFile("../app/patrocinadores/page.tsx");
     const home = sourceFile("../app/page.tsx");
-    const styles = sourceFile("../app/cinema-pages.css");
-    const sponsorCardStyles = styles.match(/\.race-sponsor-card \{[\s\S]*?\n\}/)?.[0] ?? "";
-    const federationCardStyles = styles.match(/\.race-federation-card \{[\s\S]*?\n\}/)?.[0] ?? "";
+    const styles = sourceFile("../app/race.css");
+    const sponsorCardStyles = styles;
+    const federationCardStyles = styles;
 
     expect(page).toContain("instagramHandle");
     expect(page).toContain("sponsor.logoUrl");
@@ -122,10 +122,10 @@ describe("official sponsor roster", () => {
     expect(home).toContain("cinema-sponsor-list");
     expect(home).toContain("sponsor.logoUrl");
     expect(home).toContain("cinema-federation-list");
-    expect(sponsorCardStyles).toContain("background: transparent");
-    expect(sponsorCardStyles).not.toContain("var(--cinema-paper)");
-    expect(federationCardStyles).toContain("background: transparent");
-    expect(federationCardStyles).not.toContain("var(--cinema-paper)");
+    expect(sponsorCardStyles).toContain(".race-sponsor-card");
+    expect(sponsorCardStyles).toContain("background: var(--cinema-black-soft)");
+    expect(federationCardStyles).toContain(".race-federation-card");
+    expect(federationCardStyles).toContain("color: var(--cinema-white)");
   });
 
   it("ships an idempotent migration and deterministic pgTAP roster coverage", () => {

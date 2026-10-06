@@ -5,22 +5,14 @@ import { describe, expect, it } from "vitest";
 const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
-const styleFiles = [
-  "app/cinema-core.css",
-  "app/cinema-home.css",
-  "app/cinema-pages.css",
-  "app/cinema-responsive.css",
-];
-
 describe("UDK cinematic public experience", () => {
   it("uses one compact cinematic stylesheet system", () => {
-    const imports = read("app/race.css");
-    for (const file of styleFiles) {
-      expect(imports).toContain(file.replace("app/", "./"));
-      expect(fs.existsSync(path.join(appRoot, file)), file).toBe(true);
-    }
-    expect(imports).not.toContain("tg-core-");
-    expect(imports).not.toContain("tg-pages-");
+    const styles = read("app/race.css");
+    const layout = read("app/layout.tsx");
+    expect(styles).not.toContain("@import");
+    expect(layout.match(/import ".\/race.css"/g)).toHaveLength(1);
+    expect(styles).toContain(".race-header");
+    expect(styles).toContain(".tg-mobile-standing-list");
   });
 
   it("ships the immersive shell and official brand", () => {
@@ -29,11 +21,11 @@ describe("UDK cinematic public experience", () => {
     const motion = read("components/race/cinematic-motion.tsx");
 
     expect(header).toContain("cinema-menu-media");
-    expect(header).toContain("aria-label=\"Abrir menu\"");
+    expect(header).toContain('aria-label="Abrir menu"');
     expect(header).toContain("OfficialLogo");
-    expect(shell).toContain("CinematicRouteCurtain");
-    expect(shell).toContain("CinematicPointer");
-    expect(shell).toContain("CinematicIntro");
+    expect(shell).not.toContain("CinematicRouteCurtain");
+    expect(shell).not.toContain("CinematicPointer");
+    expect(shell).not.toContain("CinematicIntro");
     expect(motion).toContain("cinema-route-curtain");
   });
 
@@ -80,12 +72,12 @@ describe("UDK cinematic public experience", () => {
   it("preserves honest empty states and reduced motion", () => {
     const results = read("app/resultados/page.tsx");
     const news = read("app/noticias/page.tsx");
-    const responsive = read("app/cinema-responsive.css");
+    const responsive = read("app/race.css");
 
     expect(results).toContain("homologação");
     expect(news).toContain("EditorialEmpty");
     expect(responsive).toContain("prefers-reduced-motion: reduce");
-    expect(responsive).toContain("max-width: 900px");
-    expect(responsive).toContain("max-width: 640px");
+    expect(responsive).toContain("max-width: 1000px");
+    expect(responsive).toContain("max-width: 760px");
   });
 });

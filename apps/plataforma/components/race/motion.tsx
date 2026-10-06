@@ -18,7 +18,10 @@ export function Reveal({
     const node = ref.current;
     if (!node) return;
 
-    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       setVisible(true);
       return;
     }
@@ -60,55 +63,9 @@ export function CountUp({
   minimumFractionDigits?: number;
   minimumIntegerDigits?: number;
 }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  // Começa no valor final: assim o número existe no HTML do servidor e
-  // continua legível sem JavaScript. A animação zera e conta na hidratação.
-  const [display, setDisplay] = useState(value);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || value <= 0) {
-      setDisplay(Math.max(0, value));
-      return;
-    }
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setDisplay(value);
-      return;
-    }
-
-    setDisplay(0);
-    let frame = 0;
-    let started = false;
-    let start = 0;
-
-    const run = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const progress = Math.min(1, (timestamp - start) / 900);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(value * eased);
-      if (progress < 1) frame = requestAnimationFrame(run);
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (entry?.isIntersecting && !started) {
-        started = true;
-        frame = requestAnimationFrame(run);
-        observer.disconnect();
-      }
-    }, { threshold: 0.6 });
-
-    observer.observe(node);
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-    };
-  }, [value]);
-
   return (
-    <span ref={ref}>
-      {display.toLocaleString("pt-BR", {
+    <span>
+      {value.toLocaleString("pt-BR", {
         minimumFractionDigits,
         maximumFractionDigits: minimumFractionDigits,
         minimumIntegerDigits,

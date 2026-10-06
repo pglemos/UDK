@@ -44,7 +44,7 @@ export default async function DriversPage({
           index="04"
           eyebrow="Quem constrói o grid"
           title="Pilotos"
-          description="Antes da pista, pessoas. Quando a luz apaga, competidores."
+          description="Conheça os pilotos e acompanhe o desempenho na temporada."
           compact
         />
 
@@ -52,7 +52,7 @@ export default async function DriversPage({
           <div className="race-container">
             <EditorialHeading
               index="04"
-              title="Cada piloto carrega uma história diferente."
+              title="Encontre seu piloto."
               description="Busque pilotos, filtre categorias e acompanhe a evolução de quem está na temporada."
             />
 
@@ -142,7 +142,7 @@ export default async function DriversPage({
             <Users aria-hidden="true" />
             <div>
               <span>O próximo perfil</span>
-              <h2>Seu nome também pode ocupar este grid.</h2>
+              <h2>Faça parte do grid UDK.</h2>
             </div>
             <Link href="/inscricao" className="race-button race-button-primary">
               Entrar no campeonato <ArrowRight aria-hidden="true" />

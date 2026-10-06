@@ -15,6 +15,7 @@ const navigation = [
   { href: "/pilotos", label: "Pilotos", index: "04" },
   { href: "/noticias", label: "Notícias", index: "05" },
   { href: "/regulamento", label: "Regulamento", index: "06" },
+  { href: "/patrocinadores", label: "Patrocinadores", index: "07" },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
@@ -200,7 +201,7 @@ export function RaceHeader() {
             onPointerDown={(event) => event.preventDefault()}
             onClick={() => setOpen(true)}
           >
-            <span className="sr-only">Menu</span>
+            <span>Menu</span>
             <Menu aria-hidden="true" size={24} />
           </button>
         </div>
@@ -257,7 +258,7 @@ export function RaceHeader() {
           </button>
         </div>
 
-        <nav aria-label="Navegação imersiva">
+        <nav aria-label="Todas as páginas">
           {navigation.map(({ href, label, index }, itemIndex) => (
             <Link
               key={href}

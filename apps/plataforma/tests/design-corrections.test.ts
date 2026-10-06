@@ -6,16 +6,13 @@ const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
 describe("design audit corrections", () => {
-  it("loads the production fixes stylesheet last (C1-C6, A4, A6-A15, D1-D15)", () => {
+  it("ships one responsive visual system without a patch cascade", () => {
     const layout = read("app/layout.tsx");
-    const fixes = read("app/udk-production-fixes.css");
-
-    expect(layout).toContain('import "./udk-production-fixes.css";');
-    expect(layout.indexOf("udk-production-fixes.css")).toBeGreaterThan(
-      layout.indexOf("brand-racing-texture.css"),
-    );
-    expect(fixes).toContain(".udk-mobile-cta");
-    expect(fixes).toContain("prefers-reduced-motion: reduce");
+    const styles = read("app/race.css");
+    expect(layout).toContain('import "./race.css";');
+    expect(layout).not.toContain("udk-production-fixes.css");
+    expect(styles).not.toContain("@import");
+    expect(styles).toContain("prefers-reduced-motion: reduce");
   });
 
   it("self-hosts the display and body fonts instead of fetching Google Fonts (A3)", () => {
@@ -25,26 +22,26 @@ describe("design audit corrections", () => {
     expect(layout).toContain('variable: "--font-barlow"');
     expect(layout).toContain('variable: "--font-inter"');
 
-    for (const sheet of ["app/globals.css", "app/cinema-core.css"]) {
+    for (const sheet of ["app/globals.css", "app/race.css"]) {
       expect(read(sheet)).not.toContain("fonts.googleapis.com");
     }
-    expect(read("app/cinema-core.css")).toContain("--cinema-display: var(--font-barlow)");
+    expect(read("app/race.css")).toContain("--cinema-display: var(--font-barlow)");
     expect(read("app/globals.css")).toContain("font-family: var(--font-inter)");
   });
 
-  it("keeps the hamburger label accessible without showing the word (C3)", () => {
+  it("keeps the menu button named on desktop and mobile", () => {
     const header = read("components/race/race-header.tsx");
-
-    expect(header).toContain('<span className="sr-only">Menu</span>');
-    expect(header).toContain('<Menu aria-hidden="true" size={24} />');
+    expect(header).toContain('aria-label={open ? "Fechar menu" : "Abrir menu"}');
+    expect(header).toContain("<span>Menu</span>");
+    expect(read("app/race.css")).toContain(".race-menu-trigger > span");
   });
 
-  it("gives mobile a permanent path into the grid (C1)", () => {
-    const shell = read("components/race/race-shell.tsx");
-
-    expect(shell).toContain('className="udk-mobile-cta"');
-    expect(shell).toContain('href="/inscricao"');
-    expect(shell.indexOf("udk-mobile-cta")).toBeGreaterThan(shell.indexOf("</footer>"));
+  it("keeps registration reachable in the menu and home", () => {
+    const header = read("components/race/race-header.tsx");
+    const home = read("app/page.tsx");
+    expect(header).toContain('href="/inscricao"');
+    expect(header).toContain("race-mobile-menu-actions");
+    expect(home).toContain('href="/inscricao"');
   });
 
   it("filters instantly with a debounced search field (C6)", () => {
@@ -69,35 +66,26 @@ describe("design audit corrections", () => {
     expect(motion).toContain("SKEW_REFRESH_MS = 60_000");
     expect(motion).toContain("calculateCountdown(target, skewRef.current)");
     expect(motion).toContain("udk-countdown-live");
-    expect(read("app/udk-production-fixes.css")).toContain(".udk-countdown-live");
+    expect(read("app/race.css")).toContain(".udk-countdown-live");
   });
 
-  it("animates the championship numbers on scroll and gives podiums context (D14, A14)", () => {
+  it("publishes championship numbers immediately instead of showing temporary zeroes", () => {
     const home = read("app/page.tsx");
-
-    expect(home).toContain("CountUp");
+    const motion = read("components/race/motion.tsx");
     expect(home).toContain("<CountUp value={totalPodiums} />");
     expect(home).toContain("pódios entre {drivers.length}");
-    expect(home).not.toContain("pódios acumulados");
-    expect(read("components/race/motion.tsx")).toContain("IntersectionObserver");
+    expect(motion).toContain("value.toLocaleString");
+    expect(motion).not.toContain("setDisplay(0)");
   });
 
-  it("leaves the existing responsive table treatment alone (C5)", () => {
-    const fixes = read("app/udk-production-fixes.css");
-    const responsive = read("app/cinema-responsive.css");
-
-    // O tratamento de cards rótulo/valor é do cinema-responsive.css. Competir
-    // com ele sobrepunha as células e deixava texto branco sobre fundo claro.
-    expect(responsive).toContain("content: attr(data-label)");
-    expect(fixes).not.toContain(".udk-data-table thead");
-    expect(fixes).not.toContain("grid-template-columns: 34px 1fr auto");
-    expect(fixes).not.toContain(".udk-data-table td:nth-child(2)");
-
-    // A posição continua explícita pela cor do indicador, sem faixas laterais
-    // que façam cada linha parecer um cartão genérico.
-    expect(fixes).toContain(".udk-rank.rank-1 { color: var(--udk-p1); }");
-    expect(fixes).not.toContain("box-shadow: inset 3px 0 0 var(--udk-p1)");
-    expect(fixes).not.toContain("background: rgba(255, 198, 75, .08)");
+  it("provides compact mobile results with expandable details", () => {
+    const styles = read("app/race.css");
+    const results = read("app/resultados/page.tsx");
+    expect(styles).toContain(".tg-mobile-standing-list");
+    expect(styles).toContain(".tg-desktop-standing-table-wrap");
+    expect(styles).toContain(".tg-mobile-detail-grid");
+    expect(results).toContain("tg-mobile-result-list");
+    expect(results).toContain("<details>");
   });
 
   it("drops the stylesheets no route imports (A2, first step)", () => {

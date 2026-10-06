@@ -1,27 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Inter, Manrope, Syne } from "next/font/google";
+import { Barlow_Condensed, Inter } from "next/font/google";
 import { PwaRegister } from "../components/pwa-register";
 import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
-import "./race.css";
-import "./brand-racing-texture.css";
-import "./udk-production-fixes.css";
 import "./pilot-crud.css";
-import "./public-race-data.css";
-
-const display = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const body = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body",
-  display: "swap",
-});
+import "./race.css";
 
 const barlow = Barlow_Condensed({
   subsets: ["latin"],
@@ -29,7 +12,6 @@ const barlow = Barlow_Condensed({
   style: ["normal", "italic"],
   variable: "--font-barlow",
   display: "swap",
-  preload: false,
 });
 
 const inter = Inter({
@@ -37,10 +19,9 @@ const inter = Inter({
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-inter",
   display: "swap",
-  preload: false,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udkkart.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ultrasdokart.com.br";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -79,7 +60,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#07090b",
-  colorScheme: "dark",
+  colorScheme: "light dark",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -89,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${barlow.variable} ${inter.variable}`}
     >
-      <body className={`${display.variable} ${body.variable}`}>
+      <body>
         <PwaRegister />
         {children}
       </body>

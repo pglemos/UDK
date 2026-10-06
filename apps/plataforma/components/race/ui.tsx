@@ -31,7 +31,7 @@ export function PageHero({
           fill
           priority
           quality={90}
-          sizes="100vw"
+          sizes="(max-width: 760px) 100vw, 48vw"
           style={{ objectPosition: visual.position }}
         />
       </div>

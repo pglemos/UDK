@@ -9,15 +9,7 @@ const required = [
 ];
 
 function readPublicStyles(): string {
-  return [
-    "app/cinema-core.css",
-    "app/cinema-home.css",
-    "app/cinema-pages.css",
-    "app/cinema-responsive.css",
-    "app/audit-round-two.css",
-  ]
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n");
+  return readFileSync("app/race.css", "utf8");
 }
 
 describe("official UDK identity", () => {

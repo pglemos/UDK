@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Camera, MapPin } from "lucide-react";
-import { CinematicIntro, CinematicPointer, CinematicRouteCurtain } from "./cinematic-motion";
 import { OfficialLogo } from "./official-logo";
 import { RaceHeader } from "./race-header";
-import { ScrollProgress } from "./motion";
 
 const footerNavigation = [
   ["/calendario", "Calendário"],
@@ -25,10 +23,6 @@ export function RaceShell({
 }) {
   return (
     <div className={`race-site udk-site cinema-site${showMobileCta ? "" : " no-mobile-cta"}`}>
-      <CinematicIntro />
-      <ScrollProgress />
-      <CinematicRouteCurtain />
-      <CinematicPointer />
       <RaceHeader />
       {children}
 
@@ -37,7 +31,7 @@ export function RaceShell({
           <div className="cinema-footer-callout">
             <div className="race-container">
               <span>Temporada 2026</span>
-              <h2>O próximo capítulo pode começar com o seu nome.</h2>
+              <h2>Faça parte do próximo grid.</h2>
               <Link className="race-button race-button-primary" href="/inscricao">
                 Começar inscrição <ArrowUpRight aria-hidden="true" />
               </Link>
@@ -49,15 +43,19 @@ export function RaceShell({
           <div className="udk-footer-brand">
             <OfficialLogo variant="negative" width={190} />
             <p>
-              Competição, evolução e respeito. Um campeonato construído por quem vive o kart no box,
-              na pista e depois da bandeirada.
+              O campeonato de quem vive o kart. Competição, evolução e respeito no Kartódromo de
+              Betim.
             </p>
           </div>
 
           <div className="udk-footer-column">
             <span>Campeonato</span>
             <nav aria-label="Navegação do rodapé">
-              {footerNavigation.map(([href, label]) => <Link href={href} key={href}>{label}</Link>)}
+              {footerNavigation.map(([href, label]) => (
+                <Link href={href} key={href}>
+                  {label}
+                </Link>
+              ))}
             </nav>
           </div>
 
@@ -72,11 +70,12 @@ export function RaceShell({
           </div>
 
           <div className="udk-footer-column udk-footer-contact">
-            <span>Onde a pista chama</span>
+            <span>Nos encontre</span>
             <p>
               <MapPin aria-hidden="true" />
               <span>
-                Kartódromo Internacional de Betim<br /> {" "}Betim, Minas Gerais
+                Kartódromo Internacional de Betim
+                <br /> Betim, Minas Gerais
               </span>
             </p>
             <a href="https://www.instagram.com/ultrasdokart" target="_blank" rel="noreferrer">

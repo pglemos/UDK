@@ -6,31 +6,32 @@ const appRoot = path.resolve(import.meta.dirname, "..");
 const read = (file: string) => fs.readFileSync(path.join(appRoot, file), "utf8");
 
 describe("responsive layout safeguards", () => {
-  it("loads the browser-audit stylesheets in final order", () => {
+  it("loads one authoritative public stylesheet after the operation controls", () => {
     const entry = read("app/race.css");
-    expect(entry).toContain('@import "./audit-fixes.css";');
-    expect(entry).toContain('@import "./final-audit-overrides.css";');
-    expect(entry.indexOf("final-audit-overrides.css")).toBeGreaterThan(entry.indexOf("audit-fixes.css"));
+    const layout = read("app/layout.tsx");
+    expect(entry).not.toContain("@import");
+    expect(layout.indexOf("race.css")).toBeGreaterThan(layout.indexOf("pilot-crud.css"));
   });
 
   it("keeps podium values and calendar links on readable lines", () => {
-    const css = read("app/audit-fixes.css");
-    expect(css).toContain(".tg-standing-podium-card > b");
-    expect(css).toContain("white-space: nowrap");
-    expect(css).toContain(".tg-calendar-stage > .tg-arrow-link");
+    const css = read("app/race.css");
+    expect(css).toContain(".cinema-podium-card small");
+    expect(css).toContain(".tg-calendar-stage > a");
+    expect(css).toContain("grid-column: 1/-1");
   });
 
   it("keeps driver cards readable on dark media", () => {
-    const css = read("app/audit-fixes.css");
-    expect(css).toContain(".tg-driver-poster");
-    expect(css).toContain("color: var(--cinema-white)");
+    const css = read("app/race.css");
+    expect(css).toContain(".cinema-driver-poster");
+    expect(css).toContain(".cinema-driver-poster-copy");
+    expect(css).toContain("color: var(--cinema-ink)");
   });
 
   it("prevents the registration summary and mobile auth heading from clipping", () => {
-    const css = read("app/final-audit-overrides.css");
-    expect(css).toContain(".race-registration-summary h2");
+    const css = read("app/race.css");
+    expect(css).toContain(".race-registration-summary");
     expect(css).toContain(".race-auth-copy h1");
-    expect(css).toContain("max-width: 100%");
+    expect(css).toContain("grid-template-columns: 1fr");
     expect(css).toContain("@media (max-width: 760px)");
   });
 

@@ -5,7 +5,8 @@ import { PageHero } from "../../components/race/ui";
 
 export const metadata: Metadata = {
   title: "Inscrição",
-  description: "Inicie sua inscrição na temporada UDK 2026 e acompanhe cada etapa pela plataforma oficial.",
+  description:
+    "Inicie sua inscrição na temporada UDK 2026 e acompanhe cada etapa pela plataforma oficial.",
   alternates: { canonical: "/inscricao" },
 };
 
@@ -17,17 +18,22 @@ export default function RegistrationPage() {
           index="07"
           eyebrow="Seu lugar no grid"
           title="Inscrição"
-          description="Uma jornada clara da criação da conta à homologação, sem esconder etapas ou transformar cadastro em labirinto."
+          description="Escolha sua categoria e comece sua inscrição na temporada 2026."
         />
         <section className="tg-registration-intro">
           <div className="race-container">
             <span>01 / Comece por aqui</span>
-            <h2>O primeiro passo precisa ser simples. A preparação pode ser intensa depois.</h2>
-            <p>Escolha sua categoria de interesse e continue dentro da plataforma oficial para completar dados, documentos, termos e pagamento.</p>
+            <h2>Seu próximo passo: entrar no grid.</h2>
+            <p>
+              Escolha sua categoria de interesse e continue dentro da plataforma oficial para
+              completar dados, documentos, termos e pagamento.
+            </p>
           </div>
         </section>
         <section className="tg-registration-shell">
-          <div className="race-container"><RegistrationEntry /></div>
+          <div className="race-container">
+            <RegistrationEntry />
+          </div>
         </section>
       </main>
     </RaceShell>

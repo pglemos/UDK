@@ -50,7 +50,7 @@ export default async function CalendarPage({
           <div className="race-container">
             <EditorialHeading
               index="01"
-              title="Cada etapa muda o ritmo da história."
+              title="Todas as etapas, em um só lugar."
               description="Filtre o calendário, conheça os traçados e acompanhe quando o grid volta a acelerar."
             />
             <form className="udk-toolbar tg-toolbar" action="/calendario">
