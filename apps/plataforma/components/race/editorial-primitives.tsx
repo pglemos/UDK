@@ -117,8 +117,8 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
         )}
       </div>
       <div className="cinema-driver-poster-copy tg-driver-poster-copy">
-        <span>{driver.category}</span>
         <h3>{driver.name}</h3>
+        <span>{driver.category}</span>
         <div>
           <b>{driver.points} pts</b>
           <em>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarDays } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
 import { EditorialEmpty, EditorialHeading } from "../components/race/editorial-primitives";
 import { RaceShell } from "../components/race/race-shell";
@@ -41,52 +41,50 @@ export default async function HomePage() {
     <RaceShell showFooterCallout={false}>
       <main id="conteudo" tabIndex={-1} className="cinema-home">
         <section className="cinema-home-hero">
-          <HomeHeroMediaLayer />
-          <div className="race-container udk-home-opening">
-            <div className="udk-home-copy">
-              <h1>
-                <span>ULTRAS</span>
-                <span>DO KART</span>
-              </h1>
-              <p>
-                Campeonato 2026 no Kartódromo de Betim.
-                <br /> Duas categorias. Uma temporada inteira de corrida.
-              </p>
-              <div className="udk-home-actions">
-                <Link href="/inscricao" className="race-button race-button-primary">
-                  Inscreva-se <ArrowRight aria-hidden="true" />
-                </Link>
-                <Link href="/resultados" className="race-button race-button-outline">
-                  Ver resultados
-                </Link>
+          <div className="race-container">
+            <div className="udk-home-opening">
+              <div className="udk-home-copy">
+                <h1>
+                  <span>ULTRAS</span>
+                  <span>DO KART</span>
+                </h1>
+                <p>Campeonato 2026 no Kartódromo de Betim.</p>
+                <div className="udk-home-actions">
+                  <Link href="/inscricao" className="race-button race-button-primary">
+                    Inscreva-se <ArrowRight aria-hidden="true" />
+                  </Link>
+                  <Link href="/resultados" className="race-button race-button-outline">
+                    Ver resultados <ArrowRight aria-hidden="true" />
+                  </Link>
+                </div>
+                <div className="udk-home-location">
+                  <span>Temporada 2026</span>
+                  <span>Betim, MG</span>
+                </div>
+              </div>
+              <div className="udk-home-race">
+                <HomeHeroMediaLayer />
+                <section className="udk-race-ticket" aria-label="Próxima etapa">
+                  <div className="udk-ticket-date">
+                    <h2>Próxima etapa</h2>
+                    <time dateTime={nextStage?.startsAt ?? undefined}>
+                      {nextStage?.date ?? "Em breve"}
+                    </time>
+                  </div>
+                  <p>
+                    {nextStage?.time ?? "Horário a definir"} ·{" "}
+                    {nextStage?.title ?? "Calendário oficial"}
+                    <br />
+                    {nextStage?.track ?? "Traçado a definir"}
+                  </p>
+                  <Link href={nextStageAction.href} className="race-button race-button-outline">
+                    {nextStageAction.label} <ArrowRight aria-hidden="true" />
+                  </Link>
+                </section>
               </div>
             </div>
-          </div>
-        </section>
-        <section className="udk-next-race" aria-label="Próxima etapa">
-          <div className="race-container udk-race-ticket">
-            <div className="udk-ticket-heading">
-              <CalendarDays aria-hidden="true" />
-              <div>
-                <h2>Próxima etapa</h2>
-                <h3>{nextStage?.title ?? "Calendário oficial"}</h3>
-              </div>
-            </div>
-            <div className="udk-ticket-date">
-              <time dateTime={nextStage?.startsAt ?? undefined}>
-                {nextStage?.date ?? "Em breve"}
-              </time>
-              <span>{nextStage?.time ?? "Horário a definir"}</span>
-            </div>
-            <p>
-              {nextStage?.track ?? "Traçado a definir"}
-              <br />
-              {nextStage?.city ?? "Betim, MG"}
-            </p>
-            <div className="udk-ticket-actions">
-              <Link href={nextStageAction.href} className="race-button race-button-primary">
-                {nextStageAction.label} <ArrowRight aria-hidden="true" />
-              </Link>
+            <div className="udk-home-foot">
+              <span>Ultras Insanos e Ultras Rápidos</span>
               <Link href="/calendario" className="cinema-arrow-link">
                 Ver calendário <ArrowRight aria-hidden="true" />
               </Link>
@@ -138,7 +136,7 @@ export default async function HomePage() {
               <EditorialHeading
                 index=""
                 title="Próximas etapas"
-                action={{ href: "/calendario", label: "Todas as datas" }}
+                action={{ href: "/calendario", label: "Calendário" }}
               />
               {stagePreview.length ? (
                 <div className="udk-next-dates">

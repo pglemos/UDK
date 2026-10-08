@@ -31,10 +31,10 @@ colors:
 typography:
   display:
     fontFamily: "Archivo, Arial, sans-serif"
-    fontSize: "clamp(4rem, 7vw, 6rem)"
+    fontSize: "clamp(4rem, 6.5vw, 6rem)"
     fontWeight: 850
-    lineHeight: 0.96
-    letterSpacing: "-0.035em"
+    lineHeight: 1.04
+    letterSpacing: "-0.03em"
   headline:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "clamp(2.8rem, 5vw, 5rem)"
@@ -69,8 +69,8 @@ typography:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "clamp(3.25rem, 14vw, 4.5rem)"
     fontWeight: 850
-    lineHeight: 0.96
-    letterSpacing: "-0.035em"
+    lineHeight: 1.04
+    letterSpacing: "-0.03em"
   operation-title:
     fontFamily: "Archivo, Arial, sans-serif"
     fontSize: "clamp(2rem, 3vw, 2.75rem)"
@@ -191,12 +191,12 @@ components:
   navigation:
     backgroundColor: "{colors.black}"
     textColor: "{colors.white}"
-    height: "80px"
+    height: "88px"
   race-ticket:
-    backgroundColor: "{colors.black-soft}"
-    textColor: "{colors.white}"
+    backgroundColor: "{colors.cyan}"
+    textColor: "{colors.black}"
     rounded: "{rounded.sharp}"
-    padding: "28px 0"
+    padding: "24px 28px"
 ---
 
 # Design System: Ultras do Kart
@@ -205,16 +205,16 @@ components:
 
 **Creative North Star: "Ultras do Kart"**
 
-Azul muito escuro organiza a abertura e a navegação; ciano identifica ações e estados ativos. Fotografia e filmagem reais do campeonato dão contexto, enquanto superfícies claras sustentam calendário, classificação, resultados, formulários e operação.
+Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Fotografia real do campeonato ocupa seu próprio campo, sem texto ou gradiente sobreposto. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.
 
-A composição Equipe UDK foi rejeitada pelo usuário. Este documento registra a recuperação code-led efetivamente implementada, sem novo roll, seed ou comp aprovado corroborado. Azul/ciano é a preferência confirmada; os demais padrões aqui registrados vêm do código, sem atribuir aprovação humana a eles.
+A direção Corrida em destaque corresponde à proposta A aprovada pelo usuário no painel de decisão. Este registro deriva dos padrões implementados nessa direção: Archivo, mídia real, divisores finos e hierarquia de informação. A composição específica e a evidência de aprovação permanecem no surface brief da Home.
 
 **Key Characteristics:**
 
-- Azul escuro na abertura e navegação, ciano em ações e estados ativos.
+- Azul quase preto na identidade e navegação, ciano em ações, seleção e ticket da etapa.
 - Archivo variável para títulos, leitura, controles e números.
 - Consultas claras, cabeçalhos internos compactos e divisores finos.
-- Fotografias e vídeo reais, dados oficiais e textos curtos em português brasileiro.
+- Fotografia real em campo próprio, dados oficiais e textos curtos em português brasileiro.
 
 A fonte normativa é `apps/plataforma/app/race.css`, carregada após `globals.css` e `pilot-crud.css` por `app/layout.tsx`. O frontmatter registra padrões reutilizados; a composição específica da Home permanece no seu surface brief.
 
@@ -291,9 +291,9 @@ No celular (até 760px), cabeçalhos públicos internos ficam em 2.5–2.7rem e 
 
 ## Layout
 
-O container público tem largura `min(100% - gutter * 2, 1312px)` e gutter `clamp(20px, 4vw, 64px)`. O cabeçalho é sticky, com 80px no desktop e 70px até 760px. A grade admite colunas `minmax(0, 1fr)` e quebra explícita em telas menores.
+O container público tem largura `min(1320px, calc(100% - 96px))`: 96px de margens laterais totais no desktop, 48px até 1100px e 40px até 760px. O cabeçalho é sticky, com 88px no desktop e 72px até 760px. A grade admite colunas `minmax(0, 1fr)` e quebra explícita em telas menores.
 
-A abertura usa mídia real de fundo com texto sobreposto; o quadro de temporada tem duas colunas no desktop e uma abaixo de 760px. No celular, a abertura usa fotografia estática nas bordas do viewport; no desktop, o vídeo tem controle de pausa e respeita reduced motion. Diretórios passam de quatro para três colunas a 1200px e duas até 760px; listas sem retratos reais podem ocupar uma coluna. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu abaixo de 1000px.
+A abertura separa identidade e fotografia real; proporção, enquadramento e ordem responsiva estão no surface brief da Home. A mídia da abertura é estática, sem autoplay nem componente cliente para controlar reprodução. O quadro de temporada tem duas colunas no desktop e uma até 760px. Diretórios passam de quatro para três colunas a 1200px e duas até 760px; listas sem retratos reais podem ocupar uma coluna. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu até 1000px.
 
 Classificação e resultados usam tabela no desktop e listas com detalhes no celular, sem apertar as colunas. Cadastro usa grade 1.6fr/1fr; autenticação usa 1fr/1fr e formulário com máximo de 480px. Ambas tornam-se uma coluna abaixo de 760px. A operação limita o conteúdo a 1500px e transforma a sidebar em painel móvel abaixo de 980px.
 
@@ -309,7 +309,7 @@ Transições de cor/borda duram 0.18s, menu 0.2s e resposta de fotografia 0.4s. 
 
 ## Shapes
 
-Blocos de identidade e fotografia principal são retangulares. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. O editor de pilotos e seu cabeçalho usam `editor`; badges de status e identificadores operacionais arredondados usam `pill`. Esses raios permanecem nesses papéis e não substituem os raios de controles e painéis. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
+Blocos de identidade, fotografia principal e ticket ciano são retangulares; o ticket não tem raio nem borda lateral de acento. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. O editor de pilotos e seu cabeçalho usam `editor`; badges de status e identificadores operacionais arredondados usam `pill`. Esses raios permanecem nesses papéis e não substituem os raios de controles e painéis. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
 
 ## Components
 
@@ -335,7 +335,7 @@ Cabeçalho e menu usam azul quase preto, marca negativa oficial e links em Archi
 
 ### Ticket de corrida e linhas de temporada
 
-O ticket é uma faixa azul escura de canto reto, com divisor fino, data, horário, etapa e ações relacionadas. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. É um padrão de conteúdo real: nenhuma métrica ornamental é necessária para preencher o espaço.
+O ticket é uma faixa ciano de canto reto, com texto azul quase preto, data, horário, etapa, traçado e ação vinculados ao calendário. A faixa se conecta à fotografia sem se tornar um cartão sobreposto. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. Categorias de pilotos e metadados editoriais ficam abaixo dos nomes ou títulos que contextualizam, sem chamadas decorativas acima deles.
 
 ## Do's and Don'ts
 

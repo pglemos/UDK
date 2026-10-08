@@ -7,7 +7,11 @@ import { RaceShell } from "../../../components/race/race-shell";
 import { getNewsBySlug, getNewsPage } from "../../../lib/public-content";
 import { premiumVisuals } from "../../../lib/visual-assets";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const item = await getNewsBySlug(slug);
   // Ver comentário equivalente em pilotos/[slug]: sem isto a resposta sai 200.
@@ -28,12 +32,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function paragraphs(content: string, summary: string): string[] {
   const source = content.trim() || summary.trim();
-  return source.split(/\n{2,}/).map((item) => item.trim()).filter(Boolean);
+  return source
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 export default async function NewsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [item, relatedPage] = await Promise.all([getNewsBySlug(slug), getNewsPage({ pageSize: 4 })]);
+  const [item, relatedPage] = await Promise.all([
+    getNewsBySlug(slug),
+    getNewsPage({ pageSize: 4 }),
+  ]);
   if (!item) notFound();
 
   const body = paragraphs(item.content, item.summary);
@@ -55,14 +65,24 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
         <article className="tg-article">
           <header className="tg-article-header">
             <div className="race-container">
-              <Link className="tg-arrow-link" href="/noticias"><ArrowLeft aria-hidden="true" /> Voltar às notícias</Link>
-              <div className="tg-article-meta">
-                <span>{item.category}</span>
-                <time>{item.publishedAt ? new Date(item.publishedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) : "Publicação oficial"}</time>
-                <span>{item.readingMinutes} min de leitura</span>
-              </div>
+              <Link className="tg-arrow-link" href="/noticias">
+                <ArrowLeft aria-hidden="true" /> Voltar às notícias
+              </Link>
               <h1>{item.title}</h1>
               <p>{item.summary}</p>
+              <div className="tg-article-meta">
+                <span>{item.category}</span>
+                <time>
+                  {item.publishedAt
+                    ? new Date(item.publishedAt).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "Publicação oficial"}
+                </time>
+                <span>{item.readingMinutes} min de leitura</span>
+              </div>
             </div>
           </header>
 
@@ -79,8 +99,15 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
           </div>
 
           <div className="race-container tg-article-body">
-            <aside><span>UDK / 2026</span><b>Conteúdo oficial do campeonato.</b></aside>
-            <div>{body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
+            <aside>
+              <span>UDK / 2026</span>
+              <b>Conteúdo oficial do campeonato.</b>
+            </aside>
+            <div>
+              {body.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
           </div>
         </article>
 
@@ -91,10 +118,12 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
               <div>
                 {related.map((news) => (
                   <Link href={`/noticias/${news.slug}`} key={news.slug}>
-                    <span>{news.category}</span>
                     <h3>{news.title}</h3>
+                    <span>{news.category}</span>
                     <p>{news.summary}</p>
-                    <b className="tg-arrow-link">Ler notícia <ArrowRight aria-hidden="true" /></b>
+                    <b className="tg-arrow-link">
+                      Ler notícia <ArrowRight aria-hidden="true" />
+                    </b>
                   </Link>
                 ))}
               </div>
@@ -102,7 +131,10 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
           </section>
         ) : null}
 
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </main>
     </RaceShell>
   );

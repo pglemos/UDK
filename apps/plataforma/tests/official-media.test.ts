@@ -9,6 +9,7 @@ const readRepositoryFile = (file: string) =>
   fs.readFileSync(path.join(repositoryRoot, file), "utf8");
 
 const requiredAssets = [
+  "public/media/official/home/race-original.png",
   "public/media/official/home/hero-desktop.webp",
   "public/media/official/home/hero-mobile.webp",
   "public/media/official/home/hero-loop.mp4",
@@ -46,25 +47,19 @@ describe("official UDK media", () => {
     expect(new Set(matches).size).toBeGreaterThanOrEqual(8);
   });
 
-  it("preserves motion-aware footage and a high-priority poster on Home", () => {
-    const component = read("components/race/home-hero-media.tsx");
-    const home = read("app/page.tsx");
-    const styles = read("app/race.css");
+  it("traces the Home photograph to the original UDK source", () => {
+    const manifest = JSON.parse(read("public/media/official/source-manifest.json"));
+    const asset = manifest.assets.find(
+      (entry: { path: string }) => entry.path === "/media/official/home/race-original.png",
+    );
+    const png = fs.readFileSync(path.join(appRoot, "public/media/official/home/race-original.png"));
 
-    expect(component).toContain('"use client"');
-    expect(component).toContain("prefers-reduced-motion: reduce");
-    expect(component).toContain("max-width: 767px");
-    expect(component).toContain("<picture>");
-    expect(component.match(/<img/g)?.length ?? 0).toBe(1);
-    expect(component).not.toContain('from "next/image"');
-    expect(component).toContain('fetchPriority="high"');
-    expect(component).toContain("poster={homeHeroMedia.poster}");
-    expect(component).toContain("muted");
-    expect(component).toContain("playsInline");
-    expect(component).toContain("onError");
-    expect(home).toContain("<HomeHeroMediaLayer />");
-    expect(styles).not.toContain("@import");
-    expect(styles).toContain("/media/official/home/hero-desktop.webp");
+    expect(asset.source).toBe("255A.mp4 @ 1.40s");
+    expect(asset.sourceCommit).toBe("b85be62");
+    expect(asset.transform).toContain("no AI generation");
+    expect(png.subarray(1, 4).toString()).toBe("PNG");
+    expect(png.readUInt32BE(16)).toBe(asset.width);
+    expect(png.readUInt32BE(20)).toBe(asset.height);
   });
 
   it("documents the implemented 24-asset Home contract", () => {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-06T23:01:37.505838+00:00",
+  "generatedAt": "2026-10-08T14:51:15.185042Z",
   "title": "Design System: Ultras do Kart",
   "extensions": {
     "colorMeta": {
@@ -530,6 +530,10 @@
         "value": "1200px"
       },
       {
+        "name": "home-compact",
+        "value": "1100px"
+      },
+      {
         "name": "public-navigation",
         "value": "1000px"
       },
@@ -540,6 +544,10 @@
       {
         "name": "mobile",
         "value": "760px"
+      },
+      {
+        "name": "narrow-ticket",
+        "value": "380px"
       }
     ]
   },
@@ -598,25 +606,25 @@
       "refersTo": "navigation",
       "description": "Links de desktop com página ativa e foco.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><a href=\"#\">Calendário</a><a href=\"#\" aria-current=\"page\">Classificação</a><a href=\"#\">Resultados</a></nav>",
-      "css": ".ds-nav{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:flex;align-items:center;gap:28px;min-height:80px;padding-inline:20px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-nav a{position:relative;display:flex;align-items:center;min-height:48px;font-size:.875rem;font-weight:600;text-decoration:none;color:inherit}.ds-nav a[aria-current]::after{content:\"\";position:absolute;bottom:0;inset-inline:0;height:2px;background:var(--cinema-cyan,#28cce5)}.ds-nav a:hover{color:var(--cinema-cyan,#28cce5)}.ds-nav a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}"
+      "css": ".ds-nav{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:flex;align-items:center;gap:28px;min-height:88px;padding-inline:20px;background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-nav a{position:relative;display:flex;align-items:center;min-height:48px;font-size:.875rem;font-weight:600;text-decoration:none;color:inherit}.ds-nav a[aria-current]::after{content:\"\";position:absolute;bottom:0;inset-inline:0;height:2px;background:var(--cinema-cyan,#28cce5)}.ds-nav a:hover{color:var(--cinema-cyan,#28cce5)}.ds-nav a:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px;}@media(max-width:760px){.ds-nav{min-height:72px}}"
     },
     {
       "name": "Ticket de corrida",
       "kind": "custom",
       "refersTo": "race-ticket",
-      "description": "Faixa escura com etapa, data e contexto reais.",
-      "html": "<section class=\"ds-ticket\"><div><h2>Próxima etapa</h2><h3>Etapa do campeonato</h3></div><p>Data, horário e local vêm do calendário oficial.</p></section>",
-      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:grid;gap:32px;padding-block:28px;background:var(--cinema-black-soft,#101e26);color:var(--cinema-white,#f7fafb);border-top:1px solid var(--cinema-line,#ffffff26)}.ds-ticket h2{font-size:.875rem;font-weight:500;color:var(--cinema-muted,#aabdc7);margin:0 0 8px}.ds-ticket h3{font-size:1.125rem;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin:0}.ds-ticket p{font-size:.875rem;line-height:1.6;color:var(--cinema-muted,#aabdc7);margin:0}"
+      "description": "Faixa ciano contínua sob a fotografia, com informação real da etapa e ação de inscrição.",
+      "html": "<section class=\"ds-ticket\" aria-label=\"Próxima etapa\"><div><h2>Próxima etapa</h2><time>13 OUT</time></div><p>21h · Etapa do campeonato<br>Traçado 05 normal e invertido</p><a href=\"#\" class=\"ds-ticket-action\">Começar inscrição <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></section>",
+      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center;gap:24px;padding:24px 28px;background:var(--cinema-cyan,#28cce5);color:var(--cinema-black,#081116);border:0;border-radius:0}.ds-ticket h2{font-size:1rem;font-weight:700;line-height:1.5;margin:0 0 4px}.ds-ticket time{display:block;font-size:2.5rem;font-weight:800;letter-spacing:-.03em;line-height:1.6;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-ticket p{font-size:.875rem;line-height:1.6;margin:0}.ds-ticket-action{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:48px;padding:13px 22px;border:1px solid currentColor;border-radius:4px;color:inherit;text-decoration:none;font-size:.875rem;font-weight:600;line-height:1.4;transition:background .18s,color .18s,border-color .18s;text-align:center}.ds-ticket-action:hover{background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-ticket-action:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px}@media(max-width:1100px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:20px}.ds-ticket-action{grid-column:1/-1}}@media(max-width:760px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}.ds-ticket h2{font-size:.875rem}.ds-ticket time{font-size:2rem}.ds-ticket p{font-size:.75rem}.ds-ticket-action{gap:12px}}@media(max-width:380px){.ds-ticket{grid-template-columns:minmax(0,1fr);gap:12px}}"
     }
   ],
   "narrative": {
     "northStar": "Ultras do Kart",
-    "overview": "Azul muito escuro organiza a abertura e a navegação; ciano identifica ações e estados ativos. Fotografia e filmagem reais do campeonato dão contexto, enquanto superfícies claras sustentam calendário, classificação, resultados, formulários e operação.\n\nA composição Equipe UDK foi rejeitada pelo usuário. Este documento registra a recuperação code-led efetivamente implementada, sem novo roll, seed ou comp aprovado corroborado. Azul/ciano é a preferência confirmada; os demais padrões aqui registrados vêm do código, sem atribuir aprovação humana a eles.",
+    "overview": "Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Fotografia real do campeonato ocupa seu próprio campo, sem texto ou gradiente sobreposto. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.\n\nA direção Corrida em destaque corresponde à proposta A aprovada pelo usuário no painel de decisão. Este registro deriva dos padrões implementados nessa direção: Archivo, mídia real, divisores finos e hierarquia de informação. A composição específica e a evidência de aprovação permanecem no surface brief da Home.",
     "keyCharacteristics": [
-      "Azul escuro na abertura e navegação, ciano em ações e estados ativos.",
+      "Azul quase preto na identidade e navegação, ciano em ações, seleção e ticket da etapa.",
       "Archivo variável para títulos, leitura, controles e números.",
       "Consultas claras, cabeçalhos internos compactos e divisores finos.",
-      "Fotografias e vídeo reais, dados oficiais e textos curtos em português brasileiro."
+      "Fotografia real em campo próprio, dados oficiais e textos curtos em português brasileiro."
     ],
     "rules": [
       {

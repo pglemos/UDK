@@ -19,6 +19,11 @@ export const homeHeroMedia: HomeHeroMedia = {
 };
 
 export const premiumVisuals = {
+  opening: {
+    src: "/media/official/home/race-original.png",
+    alt: "Dois karts na pista do Kartódromo de Betim à noite",
+    position: "50% center",
+  },
   hero: {
     src: homeHeroMedia.poster,
     alt: "Karts do UDK cruzando a linha de chegada no Kartódromo de Betim",

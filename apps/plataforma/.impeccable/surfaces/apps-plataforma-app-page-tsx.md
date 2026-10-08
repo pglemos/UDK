@@ -5,23 +5,27 @@ primary_target: "apps/plataforma/app/page.tsx"
 related_targets: ["apps/plataforma/app/race.css","apps/plataforma/components/race/race-header.tsx","apps/plataforma/components/race/race-shell.tsx"]
 ---
 
-# Portal UDK
+# Portal UDK — Corrida em destaque
 
-Mode: Persuade on Home; Read/Operate on public data and account access.
-Scope: Home, shared navigation/footer, public headings, copy and account presentation. Existing official data, scoring, permissions and forms stay functional.
+Mode: Persuade na Home; Read/Operate em consultas e acesso.
+Scope: composição da Home, navegação e ritmo das páginas internas, preservando dados e fluxos.
 
 ## Direction contract
 
-THESIS: Equipe UDK presents a kart championship through its identity, official paddock photograph and upcoming race. Eliminate repetitive slogans, manifesto and ornamental metrics.
+THESIS: A corrida real apresenta o campeonato; a próxima etapa conduz à inscrição.
 
-OWN-WORLD: A broad cyan field, heavy Archivo lettering, dark rectangular race ticket, intact official photograph, light season board with useful ranking rows. Dark navigation and clear cyan actions.
+OWN-WORLD: Azul quase preto, ciano, Archivo e imagem real sem texto sobreposto. Consultas claras com divisores finos.
 
-STORY: Identify Ultras do Kart in Betim; find the next race date, time and track; enter registration or consult standings, results and calendar.
+STORY: Identificar UDK em Betim, localizar data/horário/traçado, participar ou consultar resultados.
 
-FIRST VIEWPORT: At desktop 1440×1000, dark 80px header; cyan opening split between two-line name/race ticket on left and official kart photograph on right. Classification and future dates begin immediately below. At 390×844, name and ticket lead, photograph follows edge-to-edge. Primary action stays inside the ticket.
+FIRST VIEWPORT: Desktop 1440×1100: cabeçalho de 88px; abertura em 42/58%, nome e ações à esquerda, foto de 500px e ticket ciano à direita. Resumo da temporada abaixo. Até 1100px, split 44/56% e margens laterais totais de 48px. Até 760px, cabeçalho de 72px, margens totais de 40px e uma coluna. Mobile 390×844: título, ações, ticket e foto de 240px; informação da etapa aparece cedo. Até 380px, data e detalhes do ticket empilham para manter leitura em 320px.
 
-FORM: Human chose Equipe UDK/model-pick, direction seed 15c8477c, decision 68d74b66. Ordered origin: grafismo de equipe/livery. Image generation failed 401; schematic equipe.png is the critique reference for a code-led build, not a generated comp with measurable reproduction gates. Signature interaction is direct race action and live data/category filtering; motion is limited by reduced-motion preferences.
+FORM: Proposta A, seed d4dff423, comp .impeccable/mocks/beauty-20261006/a.png. Painel de decisão retornou optionId a; usuário também mandou continuar. Comps são capturas HTML; geração nativa falhou. Filtros/menu mantêm os fluxos existentes; abertura estática com Next Image, sem autoplay ou componente cliente de reprodução. A foto `/media/official/home/race-original.png` é um recorte da fonte histórica, com procedência no manifesto e no PNG; o poster anterior continua em outras superfícies.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
-No unresolved palette/direction questions. All facts come from the existing public data and official assets. Acceptance: readable desktop/mobile, useful first viewport, existing registration/filter/menu controls, no horizontal overflow, independent finish review and current checks.
+## Evidence and procedural status
+
+A captura `.impeccable/build/hero-repro.png` tem 1440×1100. A medição `.impeccable/review/beauty-20261008/diff-current/report.json` registra match global de 94.57% e da fotografia de 98.35%. A revisão independente corroborou a origem histórica da foto e distinguiu fidelidade visual de encerramento do workflow. Esses números descrevem essa captura; não substituem a revisão das correções seguintes.
+
+O estado `.impeccable/build/state.json` mantém `plates` aberto por um falso positivo do gate de geração: comp HTML e implementação usam a mesma fotografia real. `.impeccable/build/source-photo-exception.md` documenta a limitação. Nenhum `--force` foi usado; esta evidência não fecha o gate nem afirma validação de todas as abas autenticadas.

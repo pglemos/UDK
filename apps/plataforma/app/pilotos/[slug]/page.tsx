@@ -132,8 +132,8 @@ export default async function DriverProfilePage({
               <ArrowLeft aria-hidden="true" /> Voltar ao grid
             </Link>
             <div className="tg-driver-profile-copy">
-              <span>{driver.category}</span>
               <h1>{driver.name}</h1>
+              <span>{driver.category}</span>
               <p>{[driver.teamName, driver.city].filter(Boolean).join(" • ")}</p>
               <div className="tg-hero-actions">
                 <Link className="race-button race-button-primary" href="#volta-a-volta">

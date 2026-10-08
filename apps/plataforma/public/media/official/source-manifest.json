@@ -224,6 +224,17 @@
       "sizeBytes": 1385022,
       "crop": "1920x1080 center crop",
       "transform": "H.264 High profile, 24 fps, CRF 28, audio removed, faststart"
+    },
+    {
+      "path": "/media/official/home/race-original.png",
+      "source": "255A.mp4 @ 1.40s",
+      "purpose": "Home race photograph",
+      "width": 1532,
+      "height": 1000,
+      "crop": "Original 720x960 frame, x0 y304 width720 height470",
+      "transform": "PNG from historical original, Lanczos resize; original source resolution remains 720x960, no AI generation",
+      "sourceCommit": "b85be62",
+      "sourceSha256": "7a1a99ffa7eeed2267d852787fc4ff384885302f70b944f779f284c947226f5a"
     }
   ]
 }

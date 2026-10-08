@@ -25,7 +25,7 @@
   --font-inter: var(--font-archivo);
   --cinema-display: var(--font-archivo), Arial, sans-serif;
   --cinema-body: var(--font-archivo), Arial, sans-serif;
-  --cinema-header: 80px;
+  --cinema-header: 88px;
   --cinema-gutter: clamp(20px, 4vw, 64px);
   --cinema-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --graphite: var(--cinema-ink);
@@ -91,7 +91,7 @@ svg {
   color: var(--cinema-ink);
 }
 .race-container {
-  width: min(100% - var(--cinema-gutter) * 2, 1312px);
+  width: min(1320px, calc(100% - 96px));
   margin-inline: auto;
 }
 .race-site h1,
@@ -200,7 +200,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 32px;
-  padding-inline: var(--cinema-gutter);
+  padding-inline: max(48px, calc((100% - 1320px) / 2));
   position: sticky;
   top: 0;
   z-index: 50;
@@ -212,7 +212,7 @@ svg {
   flex: 0 0 auto;
 }
 .race-brand img {
-  width: 120px;
+  width: 100px;
   height: auto;
 }
 .race-nav {
@@ -378,58 +378,29 @@ svg {
   font-size: 0.75rem;
   margin: 0;
 }
-/* Race footage leads the opening; the next stage stays outside the image. */
+/* Home: identity, real race media and the upcoming stage. */
 .cinema-home-hero {
-  position: relative;
-  isolation: isolate;
+  padding: 40px 8px 8px;
   background: var(--cinema-black);
   color: var(--cinema-white);
 }
-.cinema-home-hero-media {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  overflow: hidden;
-}
-.official-home-hero-media picture,
-.official-home-hero-poster,
-.official-home-hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 70% center;
-}
-.official-home-hero-video {
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-.official-home-hero-video.is-ready {
-  opacity: 1;
-}
-.cinema-home-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(90deg, #081116f5 0%, #081116d9 28%, #08111644 70%, #08111626 100%);
-}
 .udk-home-opening {
-  min-height: 580px;
-  display: flex;
-  align-items: center;
-  padding-block: 72px;
+  display: grid;
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
 }
 .udk-home-copy {
-  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 36px 48px 0;
+  min-width: 0;
 }
 .cinema-home-hero .udk-home-copy h1 {
-  font-size: clamp(4rem, 7vw, 6rem);
+  font-size: clamp(4rem, 6.5vw, 6rem);
   font-weight: 850;
-  line-height: 0.96;
-  letter-spacing: -0.035em;
-  margin: 0 0 28px;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin: 0;
 }
 .udk-home-copy h1 span {
   display: block;
@@ -439,107 +410,137 @@ svg {
 }
 .udk-home-copy p {
   font-size: 1rem;
-  color: #d2dce1;
-  line-height: 1.7;
-  margin: 0 0 32px;
+  color: var(--cinema-muted);
+  line-height: 1.65;
+  margin: 24px 0 0;
 }
 .udk-home-actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
+  margin-top: 32px;
   flex-wrap: wrap;
 }
+.udk-home-actions .race-button {
+  gap: 24px;
+}
 .udk-home-actions .race-button-outline {
-  border-color: var(--cinema-line);
+  border-color: currentColor;
 }
 .udk-home-actions .race-button-outline:hover {
   background: var(--cinema-surface);
 }
-.cinema-video-control {
-  position: absolute;
-  right: var(--cinema-gutter);
-  bottom: 24px;
+.udk-home-location {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 1px solid var(--cinema-line);
-  border-radius: 4px;
-  color: var(--cinema-white);
-  background: var(--cinema-black-soft);
-  font: 500 0.75rem var(--cinema-body);
+  gap: 20px;
+  margin-top: 40px;
+  color: var(--cinema-muted);
+  font-size: 0.875rem;
 }
-.udk-next-race {
-  background: var(--cinema-black-soft);
-  color: var(--cinema-white);
-  border-top: 1px solid var(--cinema-line);
+.udk-home-location span + span {
+  border-left: 1px solid var(--cinema-line);
+  padding-left: 20px;
+}
+.udk-home-race {
+  min-width: 0;
+}
+.cinema-home-hero-media {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+}
+.official-home-hero-poster {
+  object-fit: cover;
+  object-position: center;
 }
 .udk-race-ticket {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr) auto;
-  gap: 32px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
   align-items: center;
-  padding-block: 28px;
+  gap: 24px;
+  padding: 24px 28px;
+  background: var(--cinema-cyan);
+  color: var(--cinema-black);
 }
-.udk-ticket-heading {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.udk-ticket-heading svg {
-  width: 24px;
-  color: var(--cinema-cyan);
-}
-.udk-race-ticket .udk-ticket-heading h2 {
-  font: 500 0.875rem var(--cinema-body);
-  color: var(--cinema-muted);
-  margin: 0 0 8px;
-}
-.udk-race-ticket h3 {
-  font-size: 1.125rem;
-  margin: 0;
-}
-.udk-ticket-date {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  font-variant-numeric: tabular-nums;
+.cinema-home-hero .udk-race-ticket h2 {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 4px;
 }
 .udk-ticket-date time {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-}
-.udk-ticket-date > span {
-  font-size: 1rem;
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .udk-race-ticket p {
   margin: 0;
-  color: var(--cinema-muted);
   font-size: 0.875rem;
   line-height: 1.6;
 }
-.udk-ticket-actions {
-  display: grid;
-  gap: 4px;
-  justify-items: start;
+.udk-race-ticket .race-button {
+  gap: 24px;
 }
-.udk-ticket-actions .cinema-arrow-link {
-  font-size: 0.75rem;
-  min-height: 32px;
+.udk-race-ticket .race-button:hover {
+  background: var(--cinema-black);
+  color: var(--cinema-white);
 }
-.udk-ticket-actions .cinema-arrow-link:hover {
+.udk-home-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 28px;
+  font-size: 0.875rem;
+  color: var(--cinema-muted);
+}
+.udk-home-foot .cinema-arrow-link {
+  color: var(--cinema-white);
+  min-height: 28px;
+}
+.udk-home-foot .cinema-arrow-link:hover {
   color: var(--cinema-cyan);
 }
+@media (min-width: 1001px) {
+  .race-menu-trigger {
+    display: none;
+  }
+}
+@media (max-width: 1100px) {
+  .race-container {
+    width: calc(100% - 48px);
+  }
+  .race-header {
+    padding-inline: 24px;
+    gap: 24px;
+  }
+  .race-nav {
+    gap: 18px;
+  }
+  .udk-home-opening {
+    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  }
+  .cinema-home-hero .udk-home-copy h1 {
+    font-size: 4rem;
+  }
+  .udk-race-ticket {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding: 20px;
+  }
+  .udk-race-ticket > a {
+    grid-column: 1/-1;
+  }
+}
 .udk-season-board {
-  padding-block: 54px 64px;
+  padding-block: 72px;
 }
 .udk-season-board-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: clamp(40px, 7vw, 100px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 80px;
 }
 .udk-season-board .cinema-ranking,
 .udk-season-board .cinema-season {
@@ -549,13 +550,13 @@ svg {
 }
 .udk-season-board .cinema-editorial-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 22px;
 }
 .udk-season-board .cinema-editorial-heading h2 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin: 0;
 }
 .udk-season-board .cinema-editorial-heading > a {
@@ -2089,7 +2090,7 @@ race index and expandable panels. */
   color: var(--cinema-cyan-deep);
 }
 .tg-related-news h3 {
-  margin-top: 12px;
+  margin-block: 0 12px;
   font-size: 1.8rem;
 }
 .tg-related-news p {
@@ -2282,7 +2283,7 @@ race index and expandable panels. */
   font-size: 0.75rem;
 }
 .tg-driver-profile-copy h1 {
-  margin-block: 20px;
+  margin-block: 0 20px;
 }
 .tg-driver-profile-copy p {
   font-size: 0.875rem;
@@ -2940,45 +2941,81 @@ race index and expandable panels. */
   }
 }
 @media (max-width: 760px) {
+  .race-container {
+    width: calc(100% - 40px);
+  }
+  .race-header {
+    height: 72px;
+    padding-inline: 20px;
+  }
+  .race-brand img {
+    width: 86px;
+  }
+  .cinema-home-hero {
+    padding-top: 24px;
+  }
   .udk-home-opening {
-    min-height: 480px;
-    padding-block: 48px;
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .udk-home-copy {
+    padding: 12px 0 24px;
   }
   .cinema-home-hero .udk-home-copy h1 {
     font-size: clamp(3.25rem, 14vw, 4.5rem);
   }
   .udk-home-copy p {
     font-size: 0.875rem;
+    margin-top: 20px;
   }
-  .cinema-home-hero::after {
-    background: linear-gradient(0deg, #081116 0%, #081116b3 55%, #08111644 100%);
+  .udk-home-actions {
+    gap: 12px;
+    margin-top: 24px;
   }
-  .official-home-hero-poster {
-    object-position: 64% center;
+  .udk-home-actions .race-button {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .udk-home-location {
+    margin-top: 24px;
+    font-size: 0.75rem;
+    gap: 14px;
+  }
+  .udk-home-location span + span {
+    padding-left: 14px;
+  }
+  .udk-home-race {
+    display: flex;
+    flex-direction: column;
+  }
+  .cinema-home-hero-media {
+    height: 240px;
   }
   .udk-race-ticket {
-    grid-template-columns: 1fr auto;
-    gap: 24px 16px;
-    padding-block: 24px;
+    order: -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 18px;
+    padding: 20px;
   }
-  .udk-ticket-date {
-    flex-direction: column;
-    gap: 8px;
-    align-items: end;
+  .cinema-home-hero .udk-race-ticket h2 {
+    font-size: 0.875rem;
   }
   .udk-ticket-date time {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
-  .udk-ticket-actions {
-    grid-column: 1/-1;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px 24px;
+  .udk-race-ticket p {
+    font-size: 0.75rem;
   }
-  .udk-race-ticket > p {
-    grid-column: 1/-1;
+  .udk-race-ticket .race-button {
+    gap: 12px;
+  }
+  .udk-home-foot {
+    font-size: 0.75rem;
+    gap: 20px;
+    padding-block: 22px;
+  }
+  .udk-home-foot .cinema-arrow-link {
+    font-size: 0.75rem;
+    gap: 12px;
   }
   .udk-season-board {
     padding-block: 36px 48px;
@@ -3037,7 +3074,7 @@ race index and expandable panels. */
     gap: 16px;
   }
   .race-brand img {
-    width: 100px;
+    width: 86px;
   }
   .race-header-actions {
     gap: 12px;
@@ -4053,6 +4090,13 @@ race index and expandable panels. */
   }
   .shell .modal {
     max-height: calc(100svh - 24px);
+  }
+}
+
+@media (max-width: 380px) {
+  .udk-race-ticket {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 }
 

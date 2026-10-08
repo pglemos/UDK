@@ -38,8 +38,8 @@ describe("UDK visual quality regressions", () => {
     expect(assets).toContain("/media/official/drivers/fallback-01.webp");
     expect(assets).toContain("/media/official/stages/stage-02.webp");
     expect(assets).toContain("/media/official/news/news-03.webp");
-    expect(manifest.assets).toHaveLength(24);
-    expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(24);
+    expect(manifest.assets.length).toBeGreaterThanOrEqual(24);
+    expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(manifest.assets.length);
     expect(
       manifest.assets.every(
         (asset) =>
