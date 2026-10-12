@@ -19,7 +19,7 @@ declare
   v_target_points numeric;
   v_moved integer;
 begin
-  -- Clean local resets have no imported UDK season data to correct.
+  -- Local fixtures omit the imported roster this production correction needs.
   if not exists (
     select 1
     from public.seasons season
@@ -28,6 +28,20 @@ begin
       and season.year = 2026
       and season.deleted_at is null
       and championship.deleted_at is null
+      and exists (
+        select 1
+        from public.drivers driver
+        where driver.season_id = season.id
+          and driver.slug = 'pedro-henrique'
+          and driver.deleted_at is null
+      )
+      and exists (
+        select 1
+        from public.drivers driver
+        where driver.season_id = season.id
+          and driver.slug = 'pedro-horta'
+          and driver.deleted_at is null
+      )
   ) then
     return;
   end if;
