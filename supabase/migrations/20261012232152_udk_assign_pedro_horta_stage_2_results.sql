@@ -19,6 +19,19 @@ declare
   v_target_points numeric;
   v_moved integer;
 begin
+  -- Clean local resets have no imported UDK season data to correct.
+  if not exists (
+    select 1
+    from public.seasons season
+    join public.championships championship on championship.id = season.championship_id
+    where championship.slug = 'udk'
+      and season.year = 2026
+      and season.deleted_at is null
+      and championship.deleted_at is null
+  ) then
+    return;
+  end if;
+
   select season.id
   into strict v_season_id
   from public.seasons season
