@@ -116,6 +116,7 @@ export default async function DriverProfilePage({
             {hasPublishedHero ? (
               <Image
                 src={heroSource}
+                unoptimized={heroSource.startsWith("/media/official/drivers/uniforme/")}
                 alt=""
                 fill
                 priority
@@ -196,6 +197,7 @@ export default async function DriverProfilePage({
               {hasPublishedPortrait ? (
                 <Image
                   src={portraitSource}
+                  unoptimized={portraitSource.startsWith("/media/official/drivers/uniforme/")}
                   alt={`Retrato de ${driver.name}`}
                   fill
                   quality={88}

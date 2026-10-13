@@ -1,0 +1,52 @@
+-- Official supplied portraits, lossless at original resolution.
+with portraits(slug, src) as (
+ values
+  ('agenor-jr', '/media/official/drivers/uniforme/agenor-jr.webp'),
+  ('alexandre-janotti', '/media/official/drivers/uniforme/alexandre-janotti.webp'),
+  ('anderson-silveira', '/media/official/drivers/uniforme/anderson-silveira.webp'),
+  ('andre-felisberto', '/media/official/drivers/uniforme/andre-felisberto.webp'),
+  ('arthur-henrique', '/media/official/drivers/uniforme/arthur-henrique.webp'),
+  ('bernardo-thadeu', '/media/official/drivers/uniforme/bernardo-thadeu.webp'),
+  ('bernardo', '/media/official/drivers/uniforme/bernardo.webp'),
+  ('braulio-bonoto', '/media/official/drivers/uniforme/braulio-bonoto.webp'),
+  ('enzo-camara', '/media/official/drivers/uniforme/enzo-camara.webp'),
+  ('fernando-godoy', '/media/official/drivers/uniforme/fernando-godoy.webp'),
+  ('flavio-camara', '/media/official/drivers/uniforme/flavio-camara.webp'),
+  ('francisco-biuchi', '/media/official/drivers/uniforme/francisco-biuchi.webp'),
+  ('fabio-filho', '/media/official/drivers/uniforme/fabio-filho.webp'),
+  ('gabriel-fernandes', '/media/official/drivers/uniforme/gabriel-fernandes.webp'),
+  ('gegela', '/media/official/drivers/uniforme/gegela.webp'),
+  ('guilherme-faria', '/media/official/drivers/uniforme/guilherme-faria.webp'),
+  ('lucas-godoy', '/media/official/drivers/uniforme/lucas-godoy.webp'),
+  ('lucas-guimaraes', '/media/official/drivers/uniforme/lucas-guimaraes.webp'),
+  ('lucas-rabelo', '/media/official/drivers/uniforme/lucas-rabelo.webp'),
+  ('lucca-dambros', '/media/official/drivers/uniforme/lucca-dambros.webp'),
+  ('marcelo-augusto', '/media/official/drivers/uniforme/marcelo-augusto.webp'),
+  ('marcelo-marques', '/media/official/drivers/uniforme/marcelo-marques.webp'),
+  ('marcos-felipe', '/media/official/drivers/uniforme/marcos-felipe.webp'),
+  ('matteo-rinoldi', '/media/official/drivers/uniforme/matteo-rinoldi.webp'),
+  ('maxmiiler-frantiscoly', '/media/official/drivers/uniforme/maxmiiler-frantiscoly.webp'),
+  ('newton', '/media/official/drivers/uniforme/newton.webp'),
+  ('pablo-fonseca', '/media/official/drivers/uniforme/pablo-fonseca.webp'),
+  ('pedro-guilherme', '/media/official/drivers/uniforme/pedro-guilherme.webp'),
+  ('pedro-horta', '/media/official/drivers/uniforme/pedro-horta.webp'),
+  ('pedro-teles', '/media/official/drivers/uniforme/pedro-teles.webp'),
+  ('rafael-cantoni', '/media/official/drivers/uniforme/rafael-cantoni.webp'),
+  ('rafael-morais', '/media/official/drivers/uniforme/rafael-morais.webp'),
+  ('rafael-soares', '/media/official/drivers/uniforme/rafael-soares.webp'),
+  ('raphael-werner', '/media/official/drivers/uniforme/raphael-werner.webp'),
+  ('reinaldo-teles', '/media/official/drivers/uniforme/reinaldo-teles.webp'),
+  ('renato-oliveira', '/media/official/drivers/uniforme/renato-oliveira.webp'),
+  ('rodrigo-boris', '/media/official/drivers/uniforme/rodrigo-boris.webp'),
+  ('rodrigo-salvador', '/media/official/drivers/uniforme/rodrigo-salvador.webp'),
+  ('samael', '/media/official/drivers/uniforme/samael.webp'),
+  ('saulo-vieira', '/media/official/drivers/uniforme/saulo-vieira.webp'),
+  ('theodoro', '/media/official/drivers/uniforme/theodoro.webp'),
+  ('toninho-da-prata', '/media/official/drivers/uniforme/toninho-da-prata.webp'),
+  ('vitor-hugo', '/media/official/drivers/uniforme/vitor-hugo.webp'),
+  ('wesley-cardoso', '/media/official/drivers/uniforme/wesley-cardoso.webp')
+)
+update public.drivers d
+set avatar_url = p.src, hero_image_url = p.src
+from portraits p
+where d.slug = p.slug and d.deleted_at is null;

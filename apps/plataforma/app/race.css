@@ -4106,3 +4106,14 @@ race index and expandable panels. */
 html {
   scrollbar-color: var(--cinema-cyan-deep) var(--cinema-paper-2);
 }
+
+/* Preserve the complete supplied portrait, including its name and category. */
+.cinema-driver-poster-media:has(img[src^="/media/official/drivers/uniforme/"]),
+.tg-profile-portrait:has(img[src^="/media/official/drivers/uniforme/"]) {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 3 / 4;
+}
+img[src^="/media/official/drivers/uniforme/"] {
+  object-fit: contain;
+}

@@ -104,6 +104,7 @@ export function DriverPoster({ driver, index = 0 }: { driver: PublicDriver; inde
         {hasPublishedPortrait ? (
           <Image
             src={source}
+            unoptimized={source.startsWith("/media/official/drivers/uniforme/")}
             alt={`Retrato de ${driver.name}`}
             fill
             priority={index === 0}

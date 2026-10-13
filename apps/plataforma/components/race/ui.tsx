@@ -116,6 +116,7 @@ export function DriverVisual({ driver, large = false }: { driver: PublicDriver; 
       {hasPublishedPortrait ? (
         <Image
           src={source}
+          unoptimized={source.startsWith("/media/official/drivers/uniforme/")}
           alt={`Retrato de ${driver.name}`}
           fill
           quality={86}
