@@ -17,6 +17,33 @@ const categories = [
   { slug: "insanos", name: "Ultras Insanos" },
 ];
 
+const FILM_SRC = "/media/official/home/ultras-opening.mp4";
+const FILM_SEEN_KEY = "udk-filme-visto";
+
+/**
+ * O filme abre sozinho na primeira visita da sessão (pedido do organizador, 14/10).
+ * Fica de fora quem pediu menos movimento no sistema ou economia de dados (19 MB).
+ */
+export function shouldAutoOpenFilm({
+  reducedMotion,
+  saveData,
+  alreadySeen,
+}: {
+  reducedMotion: boolean;
+  saveData: boolean;
+  alreadySeen: boolean;
+}) {
+  return !reducedMotion && !saveData && !alreadySeen;
+}
+
+function playFilm(dialog: HTMLDialogElement | null, film: HTMLVideoElement | null, muted: boolean) {
+  if (dialog && !dialog.open) dialog.showModal();
+  if (!film) return;
+  film.muted = muted;
+  if (!film.getAttribute("src")) film.src = FILM_SRC;
+  void film.play().catch(() => {});
+}
+
 export function HomeRaceOpening({ drivers }: { drivers: OpeningDriver[] }) {
   const [category, setCategory] = useState("rapidos");
   const [page, setPage] = useState(0);
@@ -53,13 +80,29 @@ export function HomeRaceOpening({ drivers }: { drivers: OpeningDriver[] }) {
     return () => window.clearTimeout(timer);
   }, [page, category, pages, stopped]);
 
+  useEffect(() => {
+    let alreadySeen = false;
+    try {
+      alreadySeen = window.sessionStorage.getItem(FILM_SEEN_KEY) === "1";
+      window.sessionStorage.setItem(FILM_SEEN_KEY, "1");
+    } catch {
+      // sessionStorage bloqueado (navegação privada): abre mesmo assim
+    }
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const open = shouldAutoOpenFilm({
+      reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      saveData: connection?.saveData === true,
+      alreadySeen,
+    });
+    if (!open) return;
+    setFilmOpen(true);
+    // o navegador só deixa tocar sozinho sem som; o som fica no controle do vídeo
+    playFilm(dialog.current, film.current, true);
+  }, []);
+
   function openFilm() {
     setFilmOpen(true);
-    dialog.current?.showModal();
-    if (film.current) {
-      film.current.src = "/media/official/home/ultras-opening.mp4";
-      void film.current.play().catch(() => {});
-    }
+    playFilm(dialog.current, film.current, false);
   }
 
   return (
