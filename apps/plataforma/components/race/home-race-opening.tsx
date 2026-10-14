@@ -100,9 +100,33 @@ export function HomeRaceOpening({ drivers }: { drivers: OpeningDriver[] }) {
     playFilm(dialog.current, film.current, true);
   }, []);
 
+  useEffect(() => {
+    // Esc fecha o diálogo pelo navegador: para o filme junto (o X e o clique fora usam closeFilm)
+    const element = dialog.current;
+    if (!element) return;
+    const stopFilm = () => {
+      film.current?.pause();
+      setFilmOpen(false);
+    };
+    element.addEventListener("cancel", stopFilm);
+    element.addEventListener("close", stopFilm);
+    return () => {
+      element.removeEventListener("cancel", stopFilm);
+      element.removeEventListener("close", stopFilm);
+    };
+  }, []);
+
   function openFilm() {
     setFilmOpen(true);
     playFilm(dialog.current, film.current, false);
+  }
+
+  // fechar tem que parar o vídeo na hora: só com o evento "close" o áudio seguia tocando com o
+  // diálogo fechado (visto em produção em 14/10)
+  function closeFilm() {
+    film.current?.pause();
+    dialog.current?.close();
+    setFilmOpen(false);
   }
 
   return (
@@ -212,17 +236,13 @@ export function HomeRaceOpening({ drivers }: { drivers: OpeningDriver[] }) {
         ref={dialog}
         className="udk-film-dialog"
         aria-label="Filme oficial Ultras do Kart"
-        onClose={() => {
-          film.current?.pause();
-          setFilmOpen(false);
-        }}
         onClick={(event) => {
-          if (event.target === event.currentTarget) dialog.current?.close();
+          if (event.target === event.currentTarget) closeFilm();
         }}
       >
         <div className="udk-film-dialog-heading">
           <h2>Ultras do Kart</h2>
-          <button type="button" aria-label="Fechar filme" onClick={() => dialog.current?.close()}>
+          <button type="button" aria-label="Fechar filme" onClick={closeFilm}>
             <X aria-hidden="true" />
           </button>
         </div>
