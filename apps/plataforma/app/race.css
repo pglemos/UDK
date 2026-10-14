@@ -379,6 +379,26 @@ svg {
   margin: 0;
 }
 /* Home: identity, real race media and the upcoming stage. */
+.udk-opening-video {
+  position: relative;
+  margin-bottom: 24px;
+  background: var(--cinema-black);
+}
+.udk-opening-video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 1;
+  object-fit: contain;
+}
+.udk-opening-skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  color: var(--cinema-white);
+  text-decoration: underline;
+}
 .cinema-home-hero {
   padding: 40px 8px 8px;
   background: var(--cinema-black);

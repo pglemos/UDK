@@ -41,9 +41,11 @@ describe("UDK visual quality regressions", () => {
     expect(manifest.assets.length).toBeGreaterThanOrEqual(24);
     expect(new Set(manifest.assets.map((asset) => asset.path)).size).toBe(manifest.assets.length);
     expect(
-      manifest.assets.every(
-        (asset) =>
-          Math.max(asset.width, asset.height) >= 960 && Math.min(asset.width, asset.height) >= 720,
+      manifest.assets.every((asset) =>
+        asset.path.startsWith("/media/official/home/ultras-opening.")
+          ? asset.width === 2048 && asset.height === 512
+          : Math.max(asset.width, asset.height) >= 960 &&
+            Math.min(asset.width, asset.height) >= 720,
       ),
     ).toBe(true);
     expect(home).toContain("HomeHeroMediaLayer");

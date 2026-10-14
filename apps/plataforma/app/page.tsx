@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
+import { HomeOpeningVideo } from "../components/race/home-opening-video";
 import { EditorialEmpty, EditorialHeading } from "../components/race/editorial-primitives";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
@@ -42,7 +43,8 @@ export default async function HomePage() {
       <main id="conteudo" tabIndex={-1} className="cinema-home">
         <section className="cinema-home-hero">
           <div className="race-container">
-            <div className="udk-home-opening">
+            <HomeOpeningVideo />
+            <div id="apresentacao" className="udk-home-opening">
               <div className="udk-home-copy">
                 <h1>
                   <span>ULTRAS</span>

@@ -105,6 +105,18 @@ export default async function DriversPage({
             <section className="tg-driver-documents" aria-label="Documentos oficiais">
               <h2>Documentos oficiais</h2>
               <div className="tg-official-pdf-links" aria-label="PDFs oficiais por corrida">
+                {[officialResultPdf.etapa3Corrida1, officialResultPdf.etapa3Corrida2].map(
+                  (href, index) => (
+                    <a
+                      className="race-button race-button-outline is-light"
+                      href={href}
+                      download
+                      key={href}
+                    >
+                      3ª etapa · Corrida {index + 1} <Download aria-hidden="true" />
+                    </a>
+                  ),
+                )}
                 <a
                   className="race-button race-button-outline is-light"
                   href={officialResultPdf.endurance}

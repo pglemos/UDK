@@ -42,6 +42,18 @@ class ResultSpec:
 
 RESULTS = (
     ResultSpec(
+        "Resultado oficial - 3a etapa - Corrida 1 - Geral",
+        "udk-2026-3a-etapa-corrida-1-geral.pdf",
+        "3a etapa - Corrida 1",
+        "regular",
+    ),
+    ResultSpec(
+        "Resultado oficial - 3a etapa - Corrida 2 - Geral",
+        "udk-2026-3a-etapa-corrida-2-geral.pdf",
+        "3a etapa - Corrida 2",
+        "regular",
+    ),
+    ResultSpec(
         "Resultado oficial - 1a etapa - Endurance - Geral",
         "udk-2026-1a-etapa-endurance-geral.pdf",
         "1a etapa - Endurance",
@@ -426,6 +438,9 @@ def build_pdf(result: dict[str, object], entries: list[dict[str, object]], spec:
         Spacer(1, 9),
         build_table(entries, styles_by_name),
     ]
+    for entry in entries:
+        if entry.get("sporting_note"):
+            story.extend([Spacer(1, 6), p(f"{entry.get('driver_name')}: {entry['sporting_note']}", styles_by_name["meta"])])
     document = SimpleDocTemplate(
         str(destination),
         pagesize=PAGE_SIZE,
@@ -462,7 +477,7 @@ def load_results(base_url: str, anon_key: str) -> dict[ResultSpec, tuple[dict[st
             anon_key,
             "public_portal_result_entries",
             {
-                "select": "position,driver_name,category,category_slug,laps,total_time_ms,best_lap_ms,points,pole,fastest_lap,best_pit,penalty_ms,penalty_points,status",
+                "select": "position,driver_name,category,category_slug,laps,total_time_ms,best_lap_ms,points,pole,fastest_lap,best_pit,penalty_ms,penalty_points,status,sporting_note",
                 "result_id": f"eq.{text(result.get('id'))}",
                 "order": "position.asc",
             },

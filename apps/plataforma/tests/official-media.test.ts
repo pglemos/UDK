@@ -13,6 +13,8 @@ const requiredAssets = [
   "public/media/official/home/hero-desktop.webp",
   "public/media/official/home/hero-mobile.webp",
   "public/media/official/home/hero-loop.mp4",
+  "public/media/official/home/ultras-opening.mp4",
+  "public/media/official/home/ultras-opening.webp",
   "public/media/official/heroes/calendario.webp",
   "public/media/official/heroes/classificacao.webp",
   "public/media/official/heroes/resultados.webp",
