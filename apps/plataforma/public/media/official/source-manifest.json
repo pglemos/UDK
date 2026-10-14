@@ -239,7 +239,7 @@
     {
       "path": "/media/official/home/ultras-opening.mp4",
       "source": "Ultras-do-Kart-LED-2048x512-v2.mp4",
-      "purpose": "Autoplay Home opening with native pause controls and reduced-motion preference",
+      "purpose": "Original official film, opened on demand from the responsive Home lineup",
       "width": 2048,
       "height": 512,
       "durationSeconds": 43.8,
@@ -248,7 +248,7 @@
     {
       "path": "/media/official/home/ultras-opening.webp",
       "source": "Ultras-do-Kart-LED-2048x512-v2.mp4 @ 4.00s",
-      "purpose": "Static Home opening poster",
+      "purpose": "Poster for the on-demand official film",
       "width": 2048,
       "height": 512,
       "transform": "WebP quality 90, no crop"

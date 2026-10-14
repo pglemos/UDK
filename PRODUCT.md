@@ -31,11 +31,17 @@ Reaproveitar os fluxos e integrações existentes. Uma mudança visual não auto
 
 ## Direction Status
 
+Em 14 de outubro de 2026, o usuário rejeitou a faixa de vídeo e pediu uma abertura que adapte o layout, o design e o movimento do filme oficial fornecido. A implementação atual usa Archivo inclinado, quadriculado, pares de retratos oficiais navegáveis e filme aberto por ação explícita. A próxima etapa aparece em faixa transparente com divisores, data ciano e texto branco. Dados, integrações e destinos permanecem existentes.
+
+O contrato vigente está em `apps/plataforma/.impeccable/surfaces/apps-plataforma-app-page-tsx.md`; as capturas e a revisão atual estão em `.impeccable/review/film-opening-20261014`. `DESIGN.md` e `.impeccable/design.json` registram os padrões reutilizados.
+
+### Histórico da composição anterior
+
 O usuário rejeitou a composição Equipe UDK em 6 de outubro de 2026. Ela não é uma referência aprovada para o estado atual.
 
-A proposta A, Corrida em destaque, foi aprovada no painel de decisão em 8 de outubro de 2026: `optionId a`, `buildPath comp`, seed `d4dff423`, comp `.impeccable/mocks/beauty-20261006/a.png`. A confirmação e a procedência estão em `a.json` no mesmo diretório. O comp é uma captura de HTML com fotografia real; a geração nativa falhou e nenhuma imagem gerada foi usada. Essa escolha substitui a recuperação anterior como referência visual da Home.
+A proposta A, Corrida em destaque, foi aprovada no painel de decisão em 8 de outubro de 2026: `optionId a`, `buildPath comp`, seed `d4dff423`, comp `.impeccable/mocks/beauty-20261006/a.png`. A confirmação e a procedência estão em `a.json` no mesmo diretório. O comp é uma captura de HTML com fotografia real; a geração nativa falhou e nenhuma imagem gerada foi usada. Essa escolha foi a referência da Home até a adaptação do filme de 14 de outubro.
 
-A implementação separa título e ações da foto estática e une foto e ticket ciano da próxima etapa. Preserva dados, integrações e destinos dos fluxos existentes. O poster anterior continua usado em outras superfícies; o novo recorte da Home tem fonte histórica, transformação e hash registrados no manifesto de mídia e na procedência do PNG.
+A implementação anterior separava título e ações da foto estática e une foto e ticket ciano da próxima etapa. Preserva dados, integrações e destinos dos fluxos existentes. O poster anterior continua usado em outras superfícies; o novo recorte da Home tem fonte histórica, transformação e hash registrados no manifesto de mídia e na procedência do PNG.
 
 A evidência visual e o encerramento procedural são distintos: o gate `plates` permanece aberto por identificar a foto real, também usada no comp HTML, como recorte do comp. `.impeccable/build/source-photo-exception.md` registra a limitação; não houve `--force`, regeneração de pessoas ou aprovação forjada. Capturas e comparação visual apoiam a fidelidade da composição, sem provar todas as abas autenticadas ou a conclusão dos fluxos de inscrição e recuperação de senha.
 

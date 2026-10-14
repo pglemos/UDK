@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T14:51:15.185042Z",
+  "generatedAt": "2026-10-14T19:33:47.630216Z",
   "title": "Design System: Ultras do Kart",
   "extensions": {
     "colorMeta": {
@@ -612,19 +612,19 @@
       "name": "Ticket de corrida",
       "kind": "custom",
       "refersTo": "race-ticket",
-      "description": "Faixa ciano contínua sob a fotografia, com informação real da etapa e ação de inscrição.",
+      "description": "Faixa transparente com divisores finos, texto branco e data ciano, com informação real da próxima etapa e ação do calendário.",
       "html": "<section class=\"ds-ticket\" aria-label=\"Próxima etapa\"><div><h2>Próxima etapa</h2><time>13 OUT</time></div><p>21h · Etapa do campeonato<br>Traçado 05 normal e invertido</p><a href=\"#\" class=\"ds-ticket-action\">Começar inscrição <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></section>",
-      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center;gap:24px;padding:24px 28px;background:var(--cinema-cyan,#28cce5);color:var(--cinema-black,#081116);border:0;border-radius:0}.ds-ticket h2{font-size:1rem;font-weight:700;line-height:1.5;margin:0 0 4px}.ds-ticket time{display:block;font-size:2.5rem;font-weight:800;letter-spacing:-.03em;line-height:1.6;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-ticket p{font-size:.875rem;line-height:1.6;margin:0}.ds-ticket-action{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:48px;padding:13px 22px;border:1px solid currentColor;border-radius:4px;color:inherit;text-decoration:none;font-size:.875rem;font-weight:600;line-height:1.4;transition:background .18s,color .18s,border-color .18s;text-align:center}.ds-ticket-action:hover{background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-ticket-action:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px}@media(max-width:1100px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:20px}.ds-ticket-action{grid-column:1/-1}}@media(max-width:760px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}.ds-ticket h2{font-size:.875rem}.ds-ticket time{font-size:2rem}.ds-ticket p{font-size:.75rem}.ds-ticket-action{gap:12px}}@media(max-width:380px){.ds-ticket{grid-template-columns:minmax(0,1fr);gap:12px}}"
+      "css": ".ds-ticket{font-family:var(--font-archivo,Archivo),Arial,sans-serif;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center;gap:24px;padding:28px 0;background:transparent;color:var(--cinema-white,#f7fafb);border-block:1px solid var(--cinema-line,#f7fafb26);border-radius:0}.ds-ticket h2{font-size:1rem;font-weight:700;line-height:1.5;margin:0 0 4px}.ds-ticket time{display:block;color:var(--cinema-cyan,#28cce5);font-size:2.5rem;font-weight:800;letter-spacing:-.03em;line-height:1.6;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-ticket p{font-size:.875rem;line-height:1.6;margin:0}.ds-ticket-action{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:48px;padding:13px 22px;border:1px solid currentColor;border-radius:4px;color:inherit;text-decoration:none;font-size:.875rem;font-weight:600;line-height:1.4;transition:background .18s,color .18s,border-color .18s;text-align:center}.ds-ticket-action:hover{background:var(--cinema-black,#081116);color:var(--cinema-white,#f7fafb)}.ds-ticket-action:focus-visible{outline:3px solid var(--cinema-cyan-deep,#006577);outline-offset:4px}@media(max-width:1100px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:20px}.ds-ticket-action{grid-column:1/-1}}@media(max-width:760px){.ds-ticket{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}.ds-ticket h2{font-size:.875rem}.ds-ticket time{font-size:2rem}.ds-ticket p{font-size:.75rem}.ds-ticket-action{gap:12px}}@media(max-width:380px){.ds-ticket{grid-template-columns:minmax(0,1fr);gap:12px}}"
     }
   ],
   "narrative": {
     "northStar": "Ultras do Kart",
-    "overview": "Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Fotografia real do campeonato ocupa seu próprio campo, sem texto ou gradiente sobreposto. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.\n\nA direção Corrida em destaque corresponde à proposta A aprovada pelo usuário no painel de decisão. Este registro deriva dos padrões implementados nessa direção: Archivo, mídia real, divisores finos e hierarquia de informação. A composição específica e a evidência de aprovação permanecem no surface brief da Home.",
+    "overview": "Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Mídia real do campeonato ocupa campos próprios, com nomes e ações fora dos retratos. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.\n\nEste registro preserva os padrões reutilizados do produto: Archivo, mídia real, divisores finos e hierarquia de informação. A adaptação local da abertura da Home ao filme oficial mantém essa identidade; composição, movimento e estado de revisão permanecem no seu surface brief.",
     "keyCharacteristics": [
       "Azul quase preto na identidade e navegação, ciano em ações, seleção e ticket da etapa.",
       "Archivo variável para títulos, leitura, controles e números.",
       "Consultas claras, cabeçalhos internos compactos e divisores finos.",
-      "Fotografia real em campo próprio, dados oficiais e textos curtos em português brasileiro."
+      "Mídia real em campos próprios, dados oficiais e textos curtos em português brasileiro."
     ],
     "rules": [
       {

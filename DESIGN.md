@@ -193,10 +193,10 @@ components:
     textColor: "{colors.white}"
     height: "88px"
   race-ticket:
-    backgroundColor: "{colors.cyan}"
-    textColor: "{colors.black}"
+    backgroundColor: "transparent"
+    textColor: "{colors.white}"
     rounded: "{rounded.sharp}"
-    padding: "24px 28px"
+    padding: "28px 0"
 ---
 
 # Design System: Ultras do Kart
@@ -205,16 +205,16 @@ components:
 
 **Creative North Star: "Ultras do Kart"**
 
-Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Fotografia real do campeonato ocupa seu próprio campo, sem texto ou gradiente sobreposto. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.
+Azul quase preto organiza identidade e navegação; ciano marca ações, seleção e o ticket da próxima etapa. Mídia real do campeonato ocupa campos próprios, com nomes e ações fora dos retratos. Superfícies claras sustentam calendário, classificação, resultados, formulários e operação.
 
-A direção Corrida em destaque corresponde à proposta A aprovada pelo usuário no painel de decisão. Este registro deriva dos padrões implementados nessa direção: Archivo, mídia real, divisores finos e hierarquia de informação. A composição específica e a evidência de aprovação permanecem no surface brief da Home.
+Este registro preserva os padrões reutilizados do produto: Archivo, mídia real, divisores finos e hierarquia de informação. A adaptação local da abertura da Home ao filme oficial mantém essa identidade; composição, movimento e estado de revisão permanecem no seu surface brief.
 
 **Key Characteristics:**
 
 - Azul quase preto na identidade e navegação, ciano em ações, seleção e ticket da etapa.
 - Archivo variável para títulos, leitura, controles e números.
 - Consultas claras, cabeçalhos internos compactos e divisores finos.
-- Fotografia real em campo próprio, dados oficiais e textos curtos em português brasileiro.
+- Mídia real em campos próprios, dados oficiais e textos curtos em português brasileiro.
 
 A fonte normativa é `apps/plataforma/app/race.css`, carregada após `globals.css` e `pilot-crud.css` por `app/layout.tsx`. O frontmatter registra padrões reutilizados; a composição específica da Home permanece no seu surface brief.
 
@@ -293,7 +293,7 @@ No celular (até 760px), cabeçalhos públicos internos ficam em 2.5–2.7rem e 
 
 O container público tem largura `min(1320px, calc(100% - 96px))`: 96px de margens laterais totais no desktop, 48px até 1100px e 40px até 760px. O cabeçalho é sticky, com 88px no desktop e 72px até 760px. A grade admite colunas `minmax(0, 1fr)` e quebra explícita em telas menores.
 
-A abertura separa identidade e fotografia real; proporção, enquadramento e ordem responsiva estão no surface brief da Home. A mídia da abertura é estática, sem autoplay nem componente cliente para controlar reprodução. O quadro de temporada tem duas colunas no desktop e uma até 760px. Diretórios passam de quatro para três colunas a 1200px e duas até 760px; listas sem retratos reais podem ocupar uma coluna. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu até 1000px.
+A abertura separa identidade, retratos oficiais e ticket da etapa; composição responsiva, navegação dos retratos e reprodução voluntária do filme estão no surface brief da Home. Esses comportamentos são locais à Home e não alteram as outras superfícies. O quadro de temporada tem duas colunas no desktop e uma até 760px. Diretórios passam de quatro para três colunas a 1200px e duas até 760px; listas sem retratos reais podem ocupar uma coluna. Rodapé passa para duas colunas a 1000px. Navegação direta dá lugar ao menu até 1000px.
 
 Classificação e resultados usam tabela no desktop e listas com detalhes no celular, sem apertar as colunas. Cadastro usa grade 1.6fr/1fr; autenticação usa 1fr/1fr e formulário com máximo de 480px. Ambas tornam-se uma coluna abaixo de 760px. A operação limita o conteúdo a 1500px e transforma a sidebar em painel móvel abaixo de 980px.
 
@@ -309,7 +309,7 @@ Transições de cor/borda duram 0.18s, menu 0.2s e resposta de fotografia 0.4s. 
 
 ## Shapes
 
-Blocos de identidade, fotografia principal e ticket ciano são retangulares; o ticket não tem raio nem borda lateral de acento. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. O editor de pilotos e seu cabeçalho usam `editor`; badges de status e identificadores operacionais arredondados usam `pill`. Esses raios permanecem nesses papéis e não substituem os raios de controles e painéis. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
+Blocos de identidade, retratos oficiais e ticket da etapa são retangulares; o ticket não tem raio nem borda lateral de acento. Controles usam o raio `control`; status públicos, `status`; resumos e containers públicos, `panel`; painéis operacionais, `operation`; modais, `modal`. Avatares e indicadores de etapa usam círculos. O editor de pilotos e seu cabeçalho usam `editor`; badges de status e identificadores operacionais arredondados usam `pill`. Esses raios permanecem nesses papéis e não substituem os raios de controles e painéis. Bordas de 1px e cantos discretos deixam a informação dominar o contorno.
 
 ## Components
 
@@ -335,7 +335,7 @@ Cabeçalho e menu usam azul quase preto, marca negativa oficial e links em Archi
 
 ### Ticket de corrida e linhas de temporada
 
-O ticket é uma faixa ciano de canto reto, com texto azul quase preto, data, horário, etapa, traçado e ação vinculados ao calendário. A faixa se conecta à fotografia sem se tornar um cartão sobreposto. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. Categorias de pilotos e metadados editoriais ficam abaixo dos nomes ou títulos que contextualizam, sem chamadas decorativas acima deles.
+O ticket é uma faixa transparente com divisores finos, texto branco e data ciano; horário, etapa, traçado e ação permanecem vinculados ao calendário. A faixa encerra a abertura da Home sem se tornar um cartão sobreposto. Datas e pontos usam números tabulares. Linhas de classificação e calendário separam informação por divisores finos; hover muda para ciano profundo. Categorias de pilotos e metadados editoriais ficam abaixo dos nomes ou títulos que contextualizam, sem chamadas decorativas acima deles.
 
 ## Do's and Don'ts
 

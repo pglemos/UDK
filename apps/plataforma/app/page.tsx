@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { HomeHeroMediaLayer } from "../components/race/home-hero-media";
-import { HomeOpeningVideo } from "../components/race/home-opening-video";
+import { HomeRaceOpening } from "../components/race/home-race-opening";
 import { EditorialEmpty, EditorialHeading } from "../components/race/editorial-primitives";
 import { RaceShell } from "../components/race/race-shell";
 import { getPublicContentBundle } from "../lib/public-content";
@@ -16,6 +15,8 @@ export const metadata: Metadata = {
   description: "Portal oficial do campeonato Ultras do Kart.",
   alternates: { canonical: "/" },
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [{ drivers, stages }, { news, sponsors }] = await Promise.all([
@@ -41,9 +42,9 @@ export default async function HomePage() {
   return (
     <RaceShell showFooterCallout={false}>
       <main id="conteudo" tabIndex={-1} className="cinema-home">
-        <section className="cinema-home-hero">
+        <section className="cinema-home-hero udk-film-opening">
+          <div className="udk-film-ground" aria-hidden="true" />
           <div className="race-container">
-            <HomeOpeningVideo />
             <div id="apresentacao" className="udk-home-opening">
               <div className="udk-home-copy">
                 <h1>
@@ -65,26 +66,36 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="udk-home-race">
-                <HomeHeroMediaLayer />
-                <section className="udk-race-ticket" aria-label="Próxima etapa">
-                  <div className="udk-ticket-date">
-                    <h2>Próxima etapa</h2>
-                    <time dateTime={nextStage?.startsAt ?? undefined}>
-                      {nextStage?.date ?? "Em breve"}
-                    </time>
-                  </div>
-                  <p>
-                    {nextStage?.time ?? "Horário a definir"} ·{" "}
-                    {nextStage?.title ?? "Calendário oficial"}
-                    <br />
-                    {nextStage?.track ?? "Traçado a definir"}
-                  </p>
-                  <Link href={nextStageAction.href} className="race-button race-button-outline">
-                    {nextStageAction.label} <ArrowRight aria-hidden="true" />
-                  </Link>
-                </section>
+                <HomeRaceOpening
+                  drivers={drivers
+                    .filter(({ avatarUrl, heroImageUrl }) => avatarUrl || heroImageUrl)
+                    .map(({ slug, name, categorySlug, avatarUrl, heroImageUrl }) => ({
+                      slug,
+                      name,
+                      categorySlug,
+                      avatarUrl,
+                      heroImageUrl,
+                    }))}
+                />
               </div>
             </div>
+            <section className="udk-race-ticket" aria-label="Próxima etapa">
+              <div className="udk-ticket-date">
+                <h2>Próxima etapa</h2>
+                <time dateTime={nextStage?.startsAt ?? undefined}>
+                  {nextStage?.date ?? "Em breve"}
+                </time>
+              </div>
+              <p>
+                {nextStage?.time ?? "Horário a definir"} ·{" "}
+                {nextStage?.title ?? "Calendário oficial"}
+                <br />
+                {nextStage?.track ?? "Traçado a definir"}
+              </p>
+              <Link href={nextStageAction.href} className="race-button race-button-outline">
+                {nextStageAction.label} <ArrowRight aria-hidden="true" />
+              </Link>
+            </section>
             <div className="udk-home-foot">
               <span>Ultras Insanos e Ultras Rápidos</span>
               <Link href="/calendario" className="cinema-arrow-link">

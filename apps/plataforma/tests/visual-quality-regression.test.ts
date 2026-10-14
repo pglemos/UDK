@@ -48,7 +48,7 @@ describe("UDK visual quality regressions", () => {
             Math.min(asset.width, asset.height) >= 720,
       ),
     ).toBe(true);
-    expect(home).toContain("HomeHeroMediaLayer");
+    expect(home).toContain("HomeRaceOpening");
     expect(header).toContain("premiumVisuals.hero");
     expect(primitives).toContain("stageVisual");
     expect(home).not.toContain('src="/media/udk-race-hero.webp"');
