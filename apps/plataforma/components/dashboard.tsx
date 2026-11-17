@@ -201,7 +201,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
         ) : null}
         {allowedKeys.has("inscricoes") ? (
           <Link href={moduleHref("inscricoes")}>
-            <article>
+            <article data-tone={state.registrations ? "info" : undefined}>
               <Flag />
               <span>Inscrições em fluxo</span>
               <b>{state.registrations}</b>
@@ -211,7 +211,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
         ) : null}
         {allowedKeys.has("financeiro") ? (
           <Link href={moduleHref("financeiro")}>
-            <article>
+            <article data-tone={state.pendingPayments ? "warning" : undefined}>
               <CircleDollarSign />
               <span>Comprovantes pendentes</span>
               <b>{state.pendingPayments}</b>
@@ -221,7 +221,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
         ) : null}
         {allowedKeys.has("resultados") ? (
           <Link href={moduleHref("resultados")}>
-            <article>
+            <article data-tone={state.provisionalResults ? "warning" : undefined}>
               <Trophy />
               <span>Resultados em análise</span>
               <b>{state.provisionalResults}</b>
