@@ -6837,3 +6837,31 @@ img[src^="/media/official/drivers/uniforme/"] {
     min-height: 44px;
   }
 }
+
+/* caixa de seleção desenhada: igual em todos os navegadores */
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
+  appearance: none;
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  place-content: center;
+  border: 2px solid #8a9aa3;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: background-color 120ms var(--cinema-ease), border-color 120ms var(--cinema-ease);
+}
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:hover {
+  border-color: var(--op-accent);
+}
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:checked {
+  border-color: var(--op-accent);
+  background: var(--op-accent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 14px no-repeat;
+}
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 2px;
+}
