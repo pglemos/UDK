@@ -153,7 +153,7 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
         ))}
         {editor ? (
           <details className="pv-details">
-            <summary>Corrigir dados de um resultado (uso da organização)</summary>
+            <summary>Corrigir um resultado à mão (abre o formulário de edição)</summary>
             {editor}
           </details>
         ) : null}

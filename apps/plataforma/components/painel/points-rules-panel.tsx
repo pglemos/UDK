@@ -165,7 +165,7 @@ export function PointsRulesPanel({ client, editor }: { client: SupabaseClient; e
 
         {editor ? (
           <details className="pv-details">
-            <summary>Editar regras (uso da organização)</summary>
+            <summary>Editar a tabela de pontos (abre o formulário de edição)</summary>
             {editor}
           </details>
         ) : null}

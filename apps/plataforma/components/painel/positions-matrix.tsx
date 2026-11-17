@@ -240,7 +240,7 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
         </section>
         {editor ? (
           <details className="pv-details">
-            <summary>Corrigir uma posição (uso da organização)</summary>
+            <summary>Corrigir uma posição à mão (abre o formulário de edição)</summary>
             {editor}
           </details>
         ) : null}

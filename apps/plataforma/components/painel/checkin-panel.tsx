@@ -354,10 +354,10 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                             onClick={() => void cycleCell(row, stage)}
                             disabled={readOnly || saving === key}
                             aria-label={`${row.name}, ${stage.ordinal} etapa: ${info?.label ?? "sem registro"}`}
-                            title={info?.label ?? "Sem registro"}
+                            title={info?.label ?? (new Date(stage.startsAt).getTime() <= now ? "Sem registro" : "Etapa ainda não realizada")}
                           >
                             <StatusIcon status={status} />
-                            <span>{info?.short ?? (new Date(stage.startsAt).getTime() <= now ? "A marcar" : "—")}</span>
+                            <span>{info?.short ?? (new Date(stage.startsAt).getTime() <= now ? "A marcar" : "Em breve")}</span>
                           </button>
                         </td>
                       );

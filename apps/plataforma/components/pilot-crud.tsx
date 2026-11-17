@@ -568,7 +568,7 @@ export function PilotCrud({
           <RefreshCw size={17} className={loading ? "spin" : ""} /> Atualizar
         </button>
         {!readOnly ? (
-          <button className="button-primary" type="button" onClick={openCreate}>
+          <button className="button-primary" type="button" onClick={openCreate} aria-keyshortcuts="N" title="Atalho: N">
             <Plus size={18} /> Novo piloto
           </button>
         ) : null}
@@ -656,7 +656,7 @@ export function PilotCrud({
                         <small>{text(record, "email") || "E-mail não informado"}</small>
                       </td>
                       <td className="pv-nowrap">{text(record, "whatsapp") || "—"}</td>
-                      <td>{cityState}</td>
+                      <td className="pv-nowrap">{cityState}</td>
                       <td className="pv-nowrap">{physical}</td>
                       <td>
                         <span className={statusClass(record.status)}>

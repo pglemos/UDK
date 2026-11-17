@@ -448,6 +448,31 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     router.replace("/login");
   }
 
+  // atalhos do painel: "/" vai para a busca da tela, "N" abre o cadastro novo
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+      if (document.querySelector("dialog[open], .modal-backdrop, .pilot-editor")) return;
+      const content = document.querySelector(".content");
+      if (!content) return;
+      if (event.key === "/") {
+        const search = content.querySelector<HTMLInputElement>(".search-box input");
+        if (!search) return;
+        event.preventDefault();
+        search.focus();
+      } else if (event.key === "n" || event.key === "N") {
+        const create = content.querySelector<HTMLButtonElement>('[aria-keyshortcuts="N"]:not(:disabled)');
+        if (!create) return;
+        event.preventDefault();
+        create.click();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   if (!ready) {
     return (
       <main className="loading-screen">

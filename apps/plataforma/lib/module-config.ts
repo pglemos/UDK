@@ -1343,6 +1343,7 @@ export const moduleConfigs: ModuleConfig[] = [
     titleColumn: "evidence_type",
     orderBy: "created_at",
     ascending: false,
+    emptyHint: "Evidências ficam ligadas a uma ocorrência. Registre a ocorrência primeiro (aba Ocorrências) e depois use “Nova evidência”.",
     fields: [
       {
         key: "incident_id",

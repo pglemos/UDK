@@ -6729,3 +6729,12 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .table-scroll {
   position: relative;
 }
+
+/* caixas de seleção nativas, brancas quando desmarcadas */
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
+  appearance: auto;
+  border: 0;
+  background: #fff;
+  box-shadow: none;
+  padding: 0;
+}

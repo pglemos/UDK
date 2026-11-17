@@ -271,8 +271,6 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [lastArchived, setLastArchived] = useState<string[]>([]);
-  const searchRef = useRef<HTMLInputElement>(null);
-  const openCreateRef = useRef<() => void>(() => undefined);
   const [statusFilter, setStatusFilter] = useState("");
   const [pageSize, setPageSize] = useState(50);
   const statusField = config.fields.find((field) => field.key === "status" && field.kind === "select");
@@ -303,24 +301,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }, [config.fields, records, relationOptions, search, statusFilter]);
   const shown = useMemo(() => filteredRecords.slice(0, pageSize), [filteredRecords, pageSize]);
 
-  // atalhos: "/" vai para a busca, "N" abre o cadastro novo
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      const target = event.target as HTMLElement | null;
-      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
-      if (document.querySelector("dialog[open], .modal-backdrop")) return;
-      if (event.key === "/") {
-        event.preventDefault();
-        searchRef.current?.focus();
-      } else if ((event.key === "n" || event.key === "N") && !config.readOnly) {
-        event.preventDefault();
-        openCreateRef.current();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [config.readOnly]);
+
 
   useEffect(() => {
     savingRef.current = saving;
@@ -480,7 +461,6 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
     };
   }, [loadRecords, owner, syncOffline]);
 
-  openCreateRef.current = () => openCreate();
   function openCreate() {
     setEditing(undefined);
     setValues(initialValues(config));
@@ -818,7 +798,6 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         <div className="search-box">
           <Search size={18} />
           <input
-            ref={searchRef}
             aria-keyshortcuts="/"
             aria-label={`Buscar em ${config.label}`}
             placeholder={`Buscar em ${config.label.toLowerCase()}`}
@@ -996,7 +975,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                                 : record[field.key],
                             );
                       return (
-                        <td key={field.key} title={completo || formatted}>
+                        <td key={field.key} title={completo || formatted} className={field.kind === "select" || field.kind === "date" || field.kind === "datetime" ? "pv-nowrap" : undefined}>
                           {field.key === "status" ? (
                             <span className={statusClass(record[field.key])}>{formatted}</span>
                           ) : field.key === "color" && /^#[0-9a-f]{3,8}$/i.test(formatted) ? (
