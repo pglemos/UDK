@@ -312,16 +312,29 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
               onDragLeave={() => setDragging(false)}
               onDrop={onDrop}
             >
-              <div className="pv-sponsor-mark is-large">
-                {shownLogo ? (
-                        <img src={shownLogo} alt="Prévia da logo" />
-                ) : (
+              {shownLogo ? (
+                <div className="pv-preview-pair">
+                  <figure>
+                    <div className="pv-sponsor-mark is-large">
+                      <img src={shownLogo} alt="Prévia da logo no fundo escuro" />
+                    </div>
+                    <figcaption>Página de patrocinadores</figcaption>
+                  </figure>
+                  <figure>
+                    <div className="pv-sponsor-mark is-large is-light">
+                      <img src={shownLogo} alt="Prévia da logo no fundo claro" />
+                    </div>
+                    <figcaption>Home do site</figcaption>
+                  </figure>
+                </div>
+              ) : (
+                <div className="pv-sponsor-mark is-large">
                   <span className="pv-sponsor-missing">
                     <ImagePlus aria-hidden="true" />
                     Arraste a logo aqui
                   </span>
-                )}
-              </div>
+                </div>
+              )}
               <div className="pv-dropzone-actions">
                 <button type="button" className="button-secondary" onClick={() => fileInput.current?.click()}>
                   <Upload aria-hidden="true" /> {shownLogo ? "Trocar logo" : "Escolher arquivo"}
@@ -338,7 +351,7 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
                     Remover logo
                   </button>
                 ) : null}
-                <small>SVG ou PNG com fundo transparente, até 10 MB. A prévia mostra como fica no site.</small>
+                <small>SVG ou PNG com fundo transparente, até 10 MB. A prévia mostra a logo nos dois fundos em que ela aparece no site.</small>
               </div>
               <input
                 ref={fileInput}
