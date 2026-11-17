@@ -4,6 +4,8 @@ export const officialResultPdf = {
   corrida2: "/resultados/udk-2026-2a-etapa-corrida-2-geral.pdf",
   etapa3Corrida1: "/resultados/udk-2026-3a-etapa-corrida-1-geral.pdf",
   etapa3Corrida2: "/resultados/udk-2026-3a-etapa-corrida-2-geral.pdf",
+  etapa4Corrida1: "/resultados/udk-2026-4a-etapa-corrida-1-geral.pdf",
+  etapa4Corrida2: "/resultados/udk-2026-4a-etapa-corrida-2-geral.pdf",
 } as const;
 
 export type OfficialResultKey = keyof typeof officialResultPdf;
@@ -11,6 +13,11 @@ export type OfficialResultKey = keyof typeof officialResultPdf;
 export function officialResultPdfForResult(sessionName: string, title = ""): string | null {
   const source = `${sessionName} ${title}`.toLocaleLowerCase("pt-BR");
   if (source.includes("endurance")) return officialResultPdf.endurance;
+  if (/4[ªa]?\s*etapa/.test(source)) {
+    if (source.includes("corrida 1")) return officialResultPdf.etapa4Corrida1;
+    if (source.includes("corrida 2")) return officialResultPdf.etapa4Corrida2;
+    return null;
+  }
   if (/3[ªa]?\s*etapa/.test(source)) {
     if (source.includes("corrida 1")) return officialResultPdf.etapa3Corrida1;
     if (source.includes("corrida 2")) return officialResultPdf.etapa3Corrida2;

@@ -402,22 +402,25 @@ export default async function StandingsPage({
                 role="group"
                 aria-label="PDFs oficiais por corrida"
               >
-                {[officialResultPdf.etapa3Corrida1, officialResultPdf.etapa3Corrida2].map(
-                  (href, index) => (
-                    <a
-                      className="race-button race-button-outline is-light tg-pdf-link"
-                      href={href}
-                      download
-                      key={href}
-                    >
-                      <span>
-                        <strong>3ª etapa · Corrida {index + 1}</strong>
-                        <small>PDF oficial</small>
-                      </span>
-                      <Download aria-hidden="true" />
-                    </a>
-                  ),
-                )}
+                {[
+                  { href: officialResultPdf.etapa4Corrida1, label: "4ª etapa · Corrida 1" },
+                  { href: officialResultPdf.etapa4Corrida2, label: "4ª etapa · Corrida 2" },
+                  { href: officialResultPdf.etapa3Corrida1, label: "3ª etapa · Corrida 1" },
+                  { href: officialResultPdf.etapa3Corrida2, label: "3ª etapa · Corrida 2" },
+                ].map(({ href, label }) => (
+                  <a
+                    className="race-button race-button-outline is-light tg-pdf-link"
+                    href={href}
+                    download
+                    key={href}
+                  >
+                    <span>
+                      <strong>{label}</strong>
+                      <small>PDF oficial</small>
+                    </span>
+                    <Download aria-hidden="true" />
+                  </a>
+                ))}
                 <a
                   className="race-button race-button-outline is-light tg-pdf-link"
                   aria-label="Endurance · PDF oficial (baixar)"

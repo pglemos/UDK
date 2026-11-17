@@ -42,6 +42,18 @@ class ResultSpec:
 
 RESULTS = (
     ResultSpec(
+        "Resultado oficial - 4a etapa - Corrida 1 - Geral",
+        "udk-2026-4a-etapa-corrida-1-geral.pdf",
+        "4a etapa - Corrida 1",
+        "regular",
+    ),
+    ResultSpec(
+        "Resultado oficial - 4a etapa - Corrida 2 - Geral",
+        "udk-2026-4a-etapa-corrida-2-geral.pdf",
+        "4a etapa - Corrida 2",
+        "regular",
+    ),
+    ResultSpec(
         "Resultado oficial - 3a etapa - Corrida 1 - Geral",
         "udk-2026-3a-etapa-corrida-1-geral.pdf",
         "3a etapa - Corrida 1",

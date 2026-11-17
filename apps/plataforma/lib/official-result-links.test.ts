@@ -24,4 +24,19 @@ describe("official result PDFs", () => {
     ).toBe(officialResultPdf.etapa3Corrida2);
     expect(officialResultPdfForResult("Super Pole", "3ª etapa")).toBeNull();
   });
+
+  it("maps the fourth stage PDFs", () => {
+    expect(
+      officialResultPdfForResult(
+        "Corrida 1 - Horário",
+        "Resultado oficial - 4a etapa - Corrida 1 - Geral",
+      ),
+    ).toBe(officialResultPdf.etapa4Corrida1);
+    expect(
+      officialResultPdfForResult(
+        "Corrida 2 - Anti-horário",
+        "Resultado oficial - 4ª etapa - Corrida 2 - Geral",
+      ),
+    ).toBe(officialResultPdf.etapa4Corrida2);
+  });
 });
