@@ -471,7 +471,14 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     );
   }
 
-  const heading = route?.section.key === "inicio" ? "Início" : (route?.section.label ?? "Página não encontrada");
+  // a primeira aba leva o nome da seção; as demais, o nome da própria aba
+  const heading = !route
+    ? "Página não encontrada"
+    : route.section.key === "inicio"
+      ? "Início"
+      : route.tab.slug
+        ? route.tab.label
+        : route.section.label;
   const description = route
     ? (customTabDescriptions[route.tab.module] ??
       (route.section.tabs.length > 1 ? getModuleConfig(route.tab.module)?.description : undefined) ??

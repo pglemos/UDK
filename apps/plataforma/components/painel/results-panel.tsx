@@ -139,10 +139,10 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
                     </span>
                     <span className="pv-result-actions">
                       <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "resultado")}>
-                        <Download aria-hidden="true" /> Resultado
+                        <Download aria-hidden="true" /> PDF do resultado
                       </button>
                       <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "voltas")}>
-                        <Download aria-hidden="true" /> Volta a volta
+                        <Download aria-hidden="true" /> PDF volta a volta
                       </button>
                       <Link className="button-secondary pv-small" href={moduleHref("voltas")}>
                         <Timer aria-hidden="true" /> Ver voltas

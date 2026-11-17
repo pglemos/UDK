@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Check, Minus, RefreshCw, Search, X } from "lucide-react";
@@ -172,6 +173,11 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
     if (readOnly) return;
     const missing = rows.filter((row) => !cells.get(`${row.id}|${stage.id}`));
     if (!missing.length) return;
+    const ok = await confirmAction(
+      `Marcar ${missing.length} piloto(s) como presentes na ${stage.ordinal} etapa? Quem já tem registro não muda.`,
+      "Marcar presentes",
+    );
+    if (!ok) return;
     setSaving(`todos|${stage.id}`);
     setError("");
     try {
@@ -190,8 +196,32 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
       const nextCells = new Map(cells);
       for (const row of data ?? []) nextCells.set(`${row.driver_id}|${stage.id}`, { id: String(row.id), status: "present" });
       setCells(nextCells);
+      setLastBulk({ stageId: stage.id, label: `${stage.ordinal} etapa`, ids: (data ?? []).map((row) => String(row.id)), drivers: (data ?? []).map((row) => String(row.driver_id)) });
     } catch (saveError) {
       setError(errorMessage(saveError));
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  const [lastBulk, setLastBulk] = useState<{ stageId: string; label: string; ids: string[]; drivers: string[] } | null>(null);
+
+  async function undoBulk() {
+    if (!lastBulk) return;
+    setSaving("desfazer");
+    setError("");
+    try {
+      const { error: undoError } = await client
+        .from("checkins")
+        .update({ deleted_at: new Date().toISOString() })
+        .in("id", lastBulk.ids);
+      if (undoError) throw undoError;
+      const nextCells = new Map(cells);
+      for (const driver of lastBulk.drivers) nextCells.delete(`${driver}|${lastBulk.stageId}`);
+      setCells(nextCells);
+      setLastBulk(null);
+    } catch (undoFailure) {
+      setError(errorMessage(undoFailure));
     } finally {
       setSaving(null);
     }
@@ -239,6 +269,20 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
       {error && !loading ? (
         <div className="alert alert-error" role="alert">
           {error}
+        </div>
+      ) : null}
+
+      {lastBulk ? (
+        <div className="alert pv-undo" role="status">
+          <span>
+            {lastBulk.ids.length} piloto(s) marcados como presentes na {lastBulk.label}.
+          </span>
+          <button type="button" className="button-secondary pv-small" onClick={() => void undoBulk()} disabled={saving !== null}>
+            Desfazer
+          </button>
+          <button type="button" className="pv-link-button" onClick={() => setLastBulk(null)}>
+            Fechar
+          </button>
         </div>
       ) : null}
 

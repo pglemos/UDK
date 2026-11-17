@@ -604,6 +604,7 @@ export const moduleConfigs: ModuleConfig[] = [
     singular: "etapa",
     titleColumn: "title",
     orderBy: "starts_at",
+    tableColumns: ["title", "format", "track", "starts_at", "status"],
     fields: [
       relation("season_id", "Temporada", "seasons", "name"),
       { key: "title", label: "Título", kind: "text", required: true },
@@ -1101,6 +1102,7 @@ export const moduleConfigs: ModuleConfig[] = [
     titleColumn: "title",
     orderBy: "created_at",
     ascending: false,
+    tableColumns: ["kind", "title", "version", "status", "effective_at"],
     fields: [
       relation("season_id", "Temporada", "seasons", "name"),
       {

@@ -6369,3 +6369,137 @@ img[src^="/media/official/drivers/uniforme/"] {
   outline: 3px solid var(--cinema-cyan-deep);
   outline-offset: 2px;
 }
+
+/* listas genéricas: texto quebra em até ~38 caracteres em vez de cortar */
+.shell .admin-table:not(.pv-table) td {
+  max-width: 38ch;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.shell .admin-table:not(.pv-table) td.row-actions {
+  max-width: none;
+  white-space: nowrap;
+}
+
+/* ações de linha com texto: editar em destaque leve, arquivar discreto */
+.shell .row-action {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 12px;
+  color: var(--cinema-ink);
+  font: 600 var(--op-meta) var(--cinema-body);
+  cursor: pointer;
+  transition: border-color 160ms var(--cinema-ease), color 160ms var(--cinema-ease);
+}
+.shell .row-action:hover:not(:disabled) {
+  border-color: var(--op-accent);
+  color: var(--op-accent);
+}
+.shell .row-action.is-quiet {
+  border-color: transparent;
+  color: var(--cinema-muted-dark);
+}
+.shell .row-action.is-quiet:hover:not(:disabled) {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.shell .row-action:focus-visible {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 2px;
+}
+.shell .row-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* papéis: matriz cabe na largura; cabeçalhos quebram em duas linhas */
+.shell .pv-table.pv-roles {
+  min-width: 0;
+  table-layout: fixed;
+}
+.shell .pv-roles thead th {
+  white-space: normal;
+  line-height: 1.25;
+  vertical-align: bottom;
+  padding: 12px 6px;
+}
+.shell .pv-roles thead th:first-child,
+.shell .pv-roles tbody th.pv-row-head {
+  width: 190px;
+}
+.shell .pv-roles td {
+  padding: 8px 4px;
+}
+.shell .pv-legend .pv-level {
+  padding: 2px 6px;
+}
+
+/* início: pendências zeradas ficam discretas */
+.shell .panel-title svg.is-ok {
+  color: var(--success);
+}
+.shell .pending-list li.is-clear {
+  opacity: 0.75;
+}
+.shell .pending-list li.is-clear > svg {
+  color: var(--success);
+}
+.shell .pv-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.shell .pv-swatch i {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--cinema-line-dark);
+  border-radius: 4px;
+}
+.shell .pv-undo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
+  border-radius: 8px;
+  background: var(--success-bg);
+  padding: 10px 16px;
+  color: var(--success);
+  font-weight: 600;
+}
+.shell .pv-undo span {
+  flex: 1 1 auto;
+}
+.shell .pv-select {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 4px 0 12px;
+}
+.shell .pv-select span {
+  color: var(--op-head);
+  font: 600 var(--op-meta) var(--cinema-body);
+}
+.shell .pv-select select {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--cinema-ink);
+  font: 500 var(--op-body) var(--cinema-body);
+}
+.shell .pv-more {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--line);
+  padding: 16px;
+}

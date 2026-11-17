@@ -189,6 +189,8 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                 <tr>
                   <SortHeader label="Piloto" column="name" sort={sort} onSort={toggle} />
                   <SortHeader label="Categoria" column="category" sort={sort} onSort={toggle} />
+                  <SortHeader label="Provas" column="races" sort={sort} onSort={toggle} align="end" firstDirection="desc" />
+                  <SortHeader label="Total" column="total" sort={sort} onSort={toggle} align="end" firstDirection="desc" />
                   {races.map((race) => (
                     <SortHeader
                       key={race.id}
@@ -201,8 +203,6 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                       title={race.title}
                     />
                   ))}
-                  <SortHeader label="Provas" column="races" sort={sort} onSort={toggle} align="end" firstDirection="desc" />
-                  <SortHeader label="Total" column="total" sort={sort} onSort={toggle} align="end" firstDirection="desc" />
                 </tr>
               </thead>
               <tbody>
@@ -212,6 +212,8 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                       {row.name}
                     </th>
                     <td>{row.category}</td>
+                    <td className="pv-num">{row.races}</td>
+                    <td className="pv-num pv-strong">{formatPoints(row.total)}</td>
                     {races.map((race) => {
                       const cell = row.cells[race.id];
                       if (!cell) return <td key={race.id} className="pv-num pv-muted">—</td>;
@@ -230,8 +232,6 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                         </td>
                       );
                     })}
-                    <td className="pv-num">{row.races}</td>
-                    <td className="pv-num pv-strong">{formatPoints(row.total)}</td>
                   </tr>
                 ))}
               </tbody>

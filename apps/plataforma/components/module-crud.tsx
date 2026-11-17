@@ -4,6 +4,7 @@ import { confirmAction } from "../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  Archive,
   Check,
   CloudOff,
   Inbox,
@@ -13,7 +14,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Trash2,
   X,
 } from "lucide-react";
 import type { ModuleAction, ModuleConfig, ModuleField } from "../lib/module-config";
@@ -268,6 +268,9 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [fileValues, setFileValues] = useState<Record<string, File | undefined>>({});
   const [editing, setEditing] = useState<RecordRow>();
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [pageSize, setPageSize] = useState(50);
+  const statusField = config.fields.find((field) => field.key === "status" && field.kind === "select");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -285,13 +288,14 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }, [config.fields, config.tableColumns]);
   const filteredRecords = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return records;
-    return records.filter((record) =>
+    const byStatus = statusFilter ? records.filter((record) => String(record.status ?? "") === statusFilter) : records;
+    if (!term) return byStatus;
+    return byStatus.filter((record) =>
       config.fields.some((field) =>
         formatValue(record[field.key], field, relationOptions).toLowerCase().includes(term),
       ),
     );
-  }, [config.fields, records, relationOptions, search]);
+  }, [config.fields, records, relationOptions, search, statusFilter]);
 
   useEffect(() => {
     savingRef.current = saving;
@@ -742,11 +746,35 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
           <Search size={18} />
           <input
             aria-label={`Buscar em ${config.label}`}
-            placeholder="Buscar registros"
+            placeholder={`Buscar em ${config.label.toLowerCase()}`}
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPageSize(50);
+            }}
           />
         </div>
+        {statusField?.options?.length ? (
+          <label className="pv-select">
+            <span>Situação</span>
+            <select
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                setPageSize(50);
+              }}
+            >
+              <option value="">Todas</option>
+              {statusField.options
+                .filter((option) => records.some((record) => String(record.status ?? "") === option.value))
+                .map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+            </select>
+          </label>
+        ) : null}
         <button
           className="button-secondary"
           type="button"
@@ -788,7 +816,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         <div className="data-card-head">
           <div>
             <strong>{filteredRecords.length}</strong>
-            <span>registro(s)</span>
+            <span>
+              {filteredRecords.length === 1 ? "registro" : "registros"}
+              {filteredRecords.length > pageSize ? ` · mostrando ${pageSize}` : ""}
+            </span>
           </div>
         </div>
         {loading ? (
@@ -808,8 +839,9 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
               <Inbox aria-hidden="true" />
               <h3>Ainda não há {emptyNoun(config.label)}</h3>
               <p>
-                {config.description}
-                {config.readOnly ? "" : ` Use “${newLabel(config.singular)}” para cadastrar.`}
+                {config.readOnly
+                  ? "Os registros aparecem aqui assim que forem feitos."
+                  : `Use “${newLabel(config.singular)}” para cadastrar o primeiro.`}
               </p>
             </div>
           )
@@ -821,12 +853,12 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                   {visibleFields.map((field) => (
                     <th key={field.key}>{field.label}</th>
                   ))}
-                  <th>Atualizado</th>
-                  <th className="actions-column">Ações</th>
+                  {config.tableColumns ? null : <th>Atualizado</th>}
+                  {config.readOnly ? null : <th className="actions-column">Ações</th>}
                 </tr>
               </thead>
               <tbody>
-                {filteredRecords.map((record) => (
+                {filteredRecords.slice(0, pageSize).map((record) => (
                   <tr key={record.id}>
                     {visibleFields.map((field) => {
                       const formatted = formatValue(record[field.key], field, relationOptions);
@@ -842,17 +874,25 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                         <td key={field.key} title={completo || formatted}>
                           {field.key === "status" ? (
                             <span className={statusClass(record[field.key])}>{formatted}</span>
+                          ) : field.key === "color" && /^#[0-9a-f]{3,8}$/i.test(formatted) ? (
+                            <span className="pv-swatch">
+                              <i style={{ background: formatted }} aria-hidden="true" />
+                              {formatted.toUpperCase()}
+                            </span>
                           ) : (
                             formatted
                           )}
                         </td>
                       );
                     })}
-                    <td>
-                      {record.updated_at
-                        ? new Date(String(record.updated_at)).toLocaleString("pt-BR")
-                        : "—"}
-                    </td>
+                    {config.tableColumns ? null : (
+                      <td>
+                        {record.updated_at
+                          ? new Date(String(record.updated_at)).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+                          : "—"}
+                      </td>
+                    )}
+                    {config.readOnly ? null : (
                     <td className="row-actions">
                       {!config.readOnly
                         ? config.actions?.map((action) => (
@@ -871,31 +911,27 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                         : null}
                       {!config.readOnly && !config.createOnly ? (
                         <>
-                          <button
-                            type="button"
-                            className="icon-button"
-                            title="Editar"
-                            aria-label="Editar registro"
-                            onClick={() => openEdit(record)}
-                          >
-                            <Pencil size={16} />
+                          <button type="button" className="row-action" onClick={() => openEdit(record)}>
+                            <Pencil size={15} aria-hidden="true" /> Editar
                           </button>
-                          <button
-                            type="button"
-                            className="icon-button danger"
-                            title="Arquivar"
-                            aria-label="Arquivar registro"
-                            onClick={() => void deleteRecord(record)}
-                          >
-                            <Trash2 size={16} />
+                          <button type="button" className="row-action is-quiet" onClick={() => void deleteRecord(record)}>
+                            <Archive size={15} aria-hidden="true" /> Arquivar
                           </button>
                         </>
                       ) : null}
                     </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
+            {filteredRecords.length > pageSize ? (
+              <div className="pv-more">
+                <button type="button" className="button-secondary" onClick={() => setPageSize((size) => size + 50)}>
+                  Mostrar mais {Math.min(50, filteredRecords.length - pageSize)} de {filteredRecords.length - pageSize} restantes
+                </button>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

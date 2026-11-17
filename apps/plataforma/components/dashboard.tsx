@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import {
   AlertTriangle,
+  CheckCircle2,
   CalendarDays,
   CircleDollarSign,
   FileCheck2,
@@ -179,6 +180,13 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
     allowedKeys.has(key),
   );
 
+  const pendingItems = [
+    { key: "documentos", Icon: FileCheck2, count: state.pendingDocuments, title: (n: number) => `${n} documento(s) para analisar`, clear: "Nenhum documento esperando", detail: "Enviados pelos pilotos" },
+    { key: "financeiro", Icon: CircleDollarSign, count: state.pendingPayments, title: (n: number) => `${n} pagamento(s) para conferir`, clear: "Nenhum pagamento esperando", detail: "Comprovantes de inscrição" },
+    { key: "resultados", Icon: Trophy, count: state.provisionalResults, title: (n: number) => `${n} resultado(s) para homologar`, clear: "Nenhum resultado provisório", detail: "Tomadas e corridas" },
+  ].filter((item) => allowedKeys.has(item.key));
+  const pendingTotal = pendingItems.reduce((sum, item) => sum + item.count, 0);
+
   return (
     <div className="dashboard-grid">
       <SetupGuide client={client} allowedKeys={allowedKeys} />
@@ -267,41 +275,21 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           <article className="dashboard-panel">
             <div className="panel-title">
               <div>
-                <h2>Pendências</h2>
+                <h2>{pendingTotal ? "Pendências" : "Tudo em dia"}</h2>
               </div>
-              <AlertTriangle />
+              {pendingTotal ? <AlertTriangle aria-hidden="true" /> : <CheckCircle2 aria-hidden="true" className="is-ok" />}
             </div>
             <ul className="pending-list">
-              {allowedKeys.has("documentos") ? (
-                <li>
-                  <FileCheck2 />
+              {pendingItems.map((item) => (
+                <li key={item.key} className={item.count ? undefined : "is-clear"}>
+                  <item.Icon aria-hidden="true" />
                   <div>
-                    <b>{state.pendingDocuments} documento(s)</b>
-                    <span>Aguardando análise ou correção</span>
+                    <b>{item.count ? item.title(item.count) : item.clear}</b>
+                    <span>{item.detail}</span>
                   </div>
-                  <Link href={moduleHref("documentos")}>Abrir</Link>
+                  {item.count ? <Link href={moduleHref(item.key)}>Abrir</Link> : null}
                 </li>
-              ) : null}
-              {allowedKeys.has("financeiro") ? (
-                <li>
-                  <CircleDollarSign />
-                  <div>
-                    <b>{state.pendingPayments} pagamento(s)</b>
-                    <span>Comprovante enviado ou em análise</span>
-                  </div>
-                  <Link href={moduleHref("financeiro")}>Abrir</Link>
-                </li>
-              ) : null}
-              {allowedKeys.has("resultados") ? (
-                <li>
-                  <Trophy />
-                  <div>
-                    <b>{state.provisionalResults} resultado(s)</b>
-                    <span>Aguardando homologação esportiva</span>
-                  </div>
-                  <Link href={moduleHref("resultados")}>Abrir</Link>
-                </li>
-              ) : null}
+              ))}
             </ul>
           </article>
         ) : null}

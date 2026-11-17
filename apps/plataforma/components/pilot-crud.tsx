@@ -21,7 +21,7 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
-  Trash2,
+  Archive,
   UserRound,
   X,
 } from "lucide-react";
@@ -591,7 +591,7 @@ export function PilotCrud({
                     [text(record, "city"), text(record, "state")].filter(Boolean).join("/") || "—";
                   const physical =
                     [
-                      record.weight_kg ? `${record.weight_kg} kg` : "",
+                      record.weight_kg ? `${String(record.weight_kg).replace(".", ",")} kg` : "",
                       record.height_cm ? `${record.height_cm} cm` : "",
                       record.gender ? genderLabel(record.gender) : "",
                     ]
@@ -622,24 +622,17 @@ export function PilotCrud({
                       </td>
                       {!readOnly ? (
                         <td className="row-actions">
-                          <button
-                            type="button"
-                            className="icon-button"
-                            title="Editar piloto"
-                            aria-label={`Editar ${name}`}
-                            onClick={() => openEdit(record)}
-                          >
-                            <Pencil size={16} />
+                          <button type="button" className="row-action" aria-label={`Editar ${name}`} onClick={() => openEdit(record)}>
+                            <Pencil size={15} aria-hidden="true" /> Editar
                           </button>
                           <button
                             type="button"
-                            className="icon-button danger"
-                            title="Arquivar piloto"
+                            className="row-action is-quiet"
                             aria-label={`Arquivar ${name}`}
                             onClick={() => void archive(record)}
                             disabled={saving}
                           >
-                            <Trash2 size={16} />
+                            <Archive size={15} aria-hidden="true" /> Arquivar
                           </button>
                         </td>
                       ) : null}
@@ -655,7 +648,7 @@ export function PilotCrud({
                   [text(record, "city"), text(record, "state")].filter(Boolean).join("/") || "—";
                 const physical =
                   [
-                    record.weight_kg ? `${record.weight_kg} kg` : "",
+                    record.weight_kg ? `${String(record.weight_kg).replace(".", ",")} kg` : "",
                     record.height_cm ? `${record.height_cm} cm` : "",
                     record.gender ? genderLabel(record.gender) : "",
                   ]
@@ -704,11 +697,11 @@ export function PilotCrud({
                         </button>
                         <button
                           type="button"
-                          className="button-secondary danger-action"
+                          className="button-secondary"
                           onClick={() => void archive(record)}
                           disabled={saving}
                         >
-                          <Trash2 size={16} /> Arquivar
+                          <Archive size={16} aria-hidden="true" /> Arquivar
                         </button>
                       </div>
                     ) : null}

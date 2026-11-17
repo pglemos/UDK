@@ -40,6 +40,13 @@ export function RolesMatrix() {
       </ul>
 
       <section className="data-card">
+        <div className="data-card-head">
+          <ul className="pv-legend" aria-label="Legenda">
+            <li><span className="pv-level is-edit"><Check aria-hidden="true" /></span> Edita</li>
+            <li><span className="pv-level is-view"><Eye aria-hidden="true" /></span> Só vê</li>
+            <li><span className="pv-level is-none"><Minus aria-hidden="true" /></span> Sem acesso</li>
+          </ul>
+        </div>
         <div className="table-scroll">
           <table className="admin-table pv-table pv-matrix pv-roles">
             <caption className="pv-visually-hidden">Permissões por papel e área do painel</caption>
@@ -71,7 +78,7 @@ export function RolesMatrix() {
                         <td key={role} className="pv-center">
                           <span className={`pv-level is-${level}`} title={`${roleLabels[role]}: ${levelText[level]}`}>
                             {level === "edit" ? <Check aria-hidden="true" /> : level === "view" ? <Eye aria-hidden="true" /> : <Minus aria-hidden="true" />}
-                            <span>{levelText[level]}</span>
+                            <span className={level === "none" ? "pv-visually-hidden" : undefined}>{levelText[level]}</span>
                           </span>
                         </td>
                       );
