@@ -162,7 +162,7 @@ function dateLine(iso: string | null): string {
 }
 
 const css = `@page{size:A4;margin:12mm 11mm 14mm;@bottom-left{content:"UDK · Ultras do Kart · cronometragem oficial do Kartódromo Internacional de Betim";font:7pt system-ui,'Segoe UI',sans-serif;color:#555}@bottom-right{content:"Página " counter(page) " de " counter(pages);font:7pt system-ui,'Segoe UI',sans-serif;color:#555}}
-*{box-sizing:border-box}html,body{margin:0}body{font:8.4pt/1.3 system-ui,-apple-system,'Segoe UI',sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+:root{color-scheme:light}*{box-sizing:border-box}html,body{margin:0;background:#fff}body{font:8.4pt/1.3 system-ui,-apple-system,'Segoe UI',sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 header{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;border-bottom:2px solid ${ACCENT};padding-bottom:9px;margin-bottom:12px}
 header img{height:40px;display:block}.kicker{color:${ACCENT};font-size:7.5pt;font-weight:700;letter-spacing:.08em}
 h1{font-size:18pt;margin:1px 0 2px;line-height:1.1}.meta{font-size:9pt}.meta2{font-size:8pt;color:#444}
@@ -289,6 +289,6 @@ export function openPdf(html: string, fileName: string) {
 export function pdfFileName(...parts: (string | number | null | undefined)[]): string {
   return parts
     .filter((part) => part !== null && part !== undefined && part !== "")
-    .map((part) => String(part).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_|_$/g, ""))
+    .map((part) => String(part).replace(/ª/g, "a").replace(/º/g, "o").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_|_$/g, ""))
     .join("_");
 }
