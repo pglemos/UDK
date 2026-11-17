@@ -975,7 +975,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                                 : record[field.key],
                             );
                       return (
-                        <td key={field.key} title={completo || formatted} className={field.kind === "select" || field.kind === "date" || field.kind === "datetime" ? "pv-nowrap" : undefined}>
+                        <td key={field.key} data-label={field.label} title={completo || formatted} className={field.kind === "select" || field.kind === "relation" || field.kind === "date" || field.kind === "datetime" ? "pv-nowrap" : undefined}>
                           {field.key === "status" ? (
                             <span className={statusClass(record[field.key])}>{formatted}</span>
                           ) : field.key === "color" && /^#[0-9a-f]{3,8}$/i.test(formatted) ? (
@@ -1002,14 +1002,12 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                         ? config.actions?.map((action) => (
                             <button
                               type="button"
-                              className="icon-button action-button"
-                              title={action.label}
-                              aria-label={action.label}
+                              className="row-action"
                               onClick={() => void runAction(record, action)}
                               key={action.key}
                               disabled={saving}
                             >
-                              <RefreshCw size={16} />
+                              <RefreshCw size={15} aria-hidden="true" /> {action.label}
                             </button>
                           ))
                         : null}

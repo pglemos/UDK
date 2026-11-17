@@ -256,7 +256,7 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
     <div className="pv-workspace">
       <div className="pv-toolbar">
         <p className="pv-lede">
-          {published.length} publicada(s) no site{drafts.length ? ` · ${drafts.length} rascunho(s)` : ""}. As notícias aparecem na home e
+          {published.length === 1 ? "1 notícia publicada" : `${published.length} notícias publicadas`}{drafts.length ? ` e ${drafts.length} em rascunho` : ""}. As notícias aparecem na home e
           em Notícias.
         </p>
         <button type="button" className="button-secondary" onClick={() => void load()}>

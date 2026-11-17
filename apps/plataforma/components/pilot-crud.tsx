@@ -381,7 +381,8 @@ export function PilotCrud({
     if (readOnly) return;
     setEditing(undefined);
     setError("");
-    setValues(emptyForm());
+    // uma temporada só (ou a mais recente) já vem escolhida
+    setValues({ ...emptyForm(), season_id: seasons[0]?.id ?? "" });
     setPhotoFile(undefined);
     setPhotoPreview(undefined);
     setRemovePhoto(false);

@@ -183,7 +183,7 @@ export function ChampionshipSettings({ client, readOnly }: { client: SupabaseCli
                   </span>
                 </label>
                 <label>
-                  Situação
+                  Situação do campeonato
                   <select value={championship.status} onChange={(event) => setChampionship({ ...championship, status: event.target.value })}>
                     {championshipStatus.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                   </select>
@@ -212,7 +212,7 @@ export function ChampionshipSettings({ client, readOnly }: { client: SupabaseCli
                   <input type="date" value={season.endsAt} onChange={(event) => setSeason({ ...season, endsAt: event.target.value })} />
                 </label>
                 <label className="form-wide">
-                  Situação
+                  Situação da temporada
                   <select value={season.status} onChange={(event) => setSeason({ ...season, status: event.target.value })}>
                     {seasonStatus.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                   </select>

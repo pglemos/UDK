@@ -6738,3 +6738,102 @@ img[src^="/media/official/drivers/uniforme/"] {
   box-shadow: none;
   padding: 0;
 }
+
+/* ===== Crítica, rodada 7 ===== */
+/* coluna de ações sempre visível à direita das listas */
+.shell .admin-table :is(td.row-actions, th.actions-column) {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: #fff;
+  box-shadow: -1px 0 0 var(--line);
+}
+.shell .admin-table thead th.actions-column {
+  z-index: 3;
+  background: var(--cinema-paper-2);
+}
+.shell .admin-table tr:hover td.row-actions {
+  background: #f2fafc;
+}
+
+/* configurações: salvar sempre à mão */
+.shell .pv-editor-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  border-top: 1px solid var(--line);
+  background: #fff;
+  padding: 12px 0;
+}
+
+/* papéis: ícones maiores e com mais contraste */
+.shell .pv-roles .pv-level svg {
+  width: 18px;
+  height: 18px;
+}
+.shell .pv-level.is-none svg {
+  color: #8a9aa3;
+}
+.shell .pv-roles + .pv-legend,
+.shell .data-card-head .pv-legend {
+  font-size: var(--op-body);
+}
+
+/* listas genéricas no celular: um cartão por registro, rótulo acima do valor */
+@media (max-width: 760px) {
+  .shell .module-workspace .table-scroll {
+    max-height: none;
+    overflow: visible;
+    mask-image: none;
+    animation: none;
+  }
+  .shell .module-workspace .admin-table,
+  .shell .module-workspace .admin-table tbody {
+    display: block;
+    min-width: 0;
+  }
+  .shell .module-workspace .admin-table thead {
+    display: none;
+  }
+  .shell .module-workspace .admin-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .shell .module-workspace .admin-table tbody td {
+    position: static;
+    display: block;
+    max-width: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    white-space: normal;
+  }
+  .shell .module-workspace .admin-table tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--op-head);
+    font: 600 var(--op-meta) var(--cinema-body);
+  }
+  .shell .module-workspace .admin-table tbody td.pv-check {
+    grid-column: 1 / -1;
+    width: auto;
+    text-align: left;
+  }
+  .shell .module-workspace .admin-table tbody td.row-actions {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .shell .module-workspace .admin-table tbody td.row-actions > * + * {
+    margin-left: 0;
+  }
+  .shell .module-workspace .row-action {
+    min-height: 44px;
+  }
+}
