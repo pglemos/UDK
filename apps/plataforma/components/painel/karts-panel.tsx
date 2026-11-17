@@ -68,7 +68,7 @@ export function KartsPanel({ client }: { client: SupabaseClient }) {
       const { data, error: entriesError } = await client
         .from("result_entries")
         .select(
-          "id,kart_number,laps,best_lap_ms,position,driver:drivers(sport_name,full_name,category:categories(name)),result:results!inner(stage_id,deleted_at,session:sessions(name))",
+          "id,kart_number,laps,best_lap_ms,position,driver:drivers(sport_name,full_name,category:categories(name)),result:results!inner(stage_id,deleted_at,session:sessions!results_session_id_fkey(name))",
         )
         .is("deleted_at", null)
         .is("result.deleted_at", null)
