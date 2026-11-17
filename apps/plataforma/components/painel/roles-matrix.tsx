@@ -78,7 +78,7 @@ export function RolesMatrix() {
                         <td key={role} className="pv-center">
                           <span className={`pv-level is-${level}`} title={`${roleLabels[role]}: ${levelText[level]}`}>
                             {level === "edit" ? <Check aria-hidden="true" /> : level === "view" ? <Eye aria-hidden="true" /> : <Minus aria-hidden="true" />}
-                            <span className={level === "none" ? "pv-visually-hidden" : undefined}>{levelText[level]}</span>
+                            <span className="pv-visually-hidden">{levelText[level]}</span>
                           </span>
                         </td>
                       );

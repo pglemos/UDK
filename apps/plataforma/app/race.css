@@ -6503,3 +6503,14 @@ img[src^="/media/official/drivers/uniforme/"] {
   border-top: 1px solid var(--line);
   padding: 16px;
 }
+.shell .pv-roles thead th {
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  font-size: var(--op-meta);
+}
+.shell .pv-roles .pv-level {
+  justify-content: center;
+  min-width: 28px;
+}
