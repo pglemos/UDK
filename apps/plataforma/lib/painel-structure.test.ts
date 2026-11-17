@@ -62,8 +62,8 @@ describe("estrutura do painel", () => {
   it("quem edita também vê, e todo módulo citado existe", () => {
     const known = new Set(allModuleKeys);
     for (const role of roleOrder) {
-      for (const module of writableModulesByRole[role]) expect(roleAccess[role]).toContain(module);
-      for (const module of roleAccess[role]) expect(known.has(module), `${role}: ${module}`).toBe(true);
+      for (const key of writableModulesByRole[role]) expect(roleAccess[role]).toContain(key);
+      for (const key of roleAccess[role]) expect(known.has(key), `${role}: ${key}`).toBe(true);
     }
   });
 });
