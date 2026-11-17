@@ -52,6 +52,8 @@ import { CheckinPanel } from "../../../components/painel/checkin-panel";
 import { SponsorsPanel } from "../../../components/painel/sponsors-panel";
 import { StandingsPanel } from "../../../components/painel/standings-panel";
 import { PointsRulesPanel } from "../../../components/painel/points-rules-panel";
+import { LapsPanel } from "../../../components/painel/laps-panel";
+import { NewsPanel } from "../../../components/painel/news-panel";
 
 type Role =
   | "admin"
@@ -528,7 +530,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
 
       const [pilotos, inscricoes, documentos, pagamentos, resultados, recursos] = await Promise.all(
         [
-          contar("drivers"),
+          contar("drivers", "status", ["pending", "approved", "suspended"]),
           contar("registrations", "status", ["submitted", "under_review"]),
           contar("documents", "status", ["pending"]),
           contar("payments", "status", ["pending", "under_review"]),
@@ -769,6 +771,13 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
             <SponsorsPanel client={client} readOnly={!canMutate} />
           ) : activeKey === "classificacao" ? (
             <StandingsPanel client={client} />
+          ) : activeKey === "voltas" ? (
+            <LapsPanel client={client} />
+          ) : activeKey === "conteudo" ? (
+            <>
+              <NewsPanel client={client} readOnly={!canMutate} />
+              {embedded("versoes-conteudo", "Versões do conteúdo", "Histórico de revisões das páginas publicadas.")}
+            </>
           ) : activeKey === "pontuacao" ? (
             <PointsRulesPanel
               client={client}
@@ -785,9 +794,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
                 ? embedded("aceites", "Aceites dos pilotos", "Quem aceitou cada versão do regulamento e dos termos.")
                 : activeKey === "calendario"
                   ? embedded("sessoes", "Sessões das etapas", "Corridas e sessões de cada etapa, com horário de largada.")
-                  : activeKey === "conteudo"
-                    ? embedded("versoes-conteudo", "Versões do conteúdo", "Histórico de revisões das páginas publicadas.")
-                    : null}
+                  : null}
             </>
           ) : (
             <div className="access-denied">

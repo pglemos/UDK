@@ -42,12 +42,33 @@ function normalizeDateValue(value: unknown, kind: ModuleField["kind"]): string {
   return value;
 }
 
+/** "Resultado oficial - 4a etapa - Corrida 1 - Geral" vira "4ª etapa · Corrida 1" nas listas. */
+function shortRelationLabel(table: string, label: string): string {
+  if (table !== "results") return label;
+  return label
+    .replace(/^Resultado oficial\s*-\s*/i, "")
+    .replace(/\s*-\s*Geral$/i, "")
+    .replace(/(\d)a etapa/i, "$1ª etapa")
+    .replace(/\s+-\s+/g, " · ");
+}
+
+const LAP_TIME_KEYS = new Set(["best_lap_ms", "lap_time_ms", "fastest_lap_ms", "total_time_ms"]);
+
+function formatLapTime(ms: number): string {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  const millis = Math.round(ms % 1000);
+  return `${minutes}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+}
+
 function formatValue(
   value: unknown,
   field: ModuleField,
   relationOptions: Record<string, RelationOption[]>,
 ): string {
   if (value === null || value === undefined || value === "") return "—";
+  if (LAP_TIME_KEYS.has(field.key) && Number.isFinite(Number(value)) && Number(value) > 0)
+    return formatLapTime(Number(value));
   if (field.kind === "relation") {
     return (
       relationOptions[field.key]?.find((option) => option.value === String(value))?.label ??
@@ -229,7 +250,11 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const savingRef = useRef(false);
 
-  const visibleFields = useMemo(() => config.fields.slice(0, 5), [config.fields]);
+  const visibleFields = useMemo(() => {
+    if (!config.tableColumns?.length) return config.fields.slice(0, 5);
+    const byKey = new Map(config.fields.map((field) => [field.key, field]));
+    return config.tableColumns.map((key) => byKey.get(key)).filter((field): field is ModuleField => Boolean(field));
+  }, [config.fields, config.tableColumns]);
   const filteredRecords = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return records;
@@ -316,7 +341,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         if (relationError) throw relationError;
         const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
           value: String(row[valueColumn]),
-          label: String(row[relation.labelColumn] ?? row[valueColumn]),
+          label: shortRelationLabel(relation.table, String(row[relation.labelColumn] ?? row[valueColumn])),
           ...(relation.dependsOn ? { pai: String(row[relation.dependsOn.column] ?? "") } : {}),
         }));
         return [field.key, options] as const;
@@ -730,7 +755,6 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             <strong>{filteredRecords.length}</strong>
             <span>registro(s)</span>
           </div>
-          <small>Dados protegidos pelas políticas RLS do Supabase</small>
         </div>
         {loading ? (
           <div className="empty-state">

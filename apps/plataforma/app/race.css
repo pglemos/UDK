@@ -4963,3 +4963,133 @@ img[src^="/media/official/drivers/uniforme/"] {
     transition: none;
   }
 }
+
+/* voltas: lista de pilotos + volta a volta */
+.shell .pv-split {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+.shell .pv-entry-list {
+  max-height: 70vh;
+  margin: 0;
+  overflow-y: auto;
+  padding: 6px;
+  list-style: none;
+}
+.shell .pv-entry-list button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  padding: 8px 10px;
+  color: var(--cinema-ink);
+  font: 400 0.875rem var(--cinema-body);
+  text-align: left;
+  cursor: pointer;
+}
+.shell .pv-entry-list button:hover {
+  background: var(--cinema-paper);
+}
+.shell .pv-entry-list button.is-active {
+  border-color: var(--cinema-ink);
+  background: #f0fbfd;
+}
+.shell .pv-entry-list button:focus-visible {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 1px;
+}
+.shell .pv-entry-list .pv-num {
+  font-variant-numeric: tabular-nums;
+}
+.shell .pv-fastest {
+  color: var(--cinema-cyan-deep);
+  font-weight: 600;
+}
+.shell .pv-laps tr.is-best td {
+  background: color-mix(in srgb, var(--cinema-success) 10%, #fff);
+  color: #17583d;
+  font-weight: 600;
+}
+
+/* notícias */
+.shell .pv-news-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--cinema-line-dark);
+  border-radius: 4px;
+  background: #fff;
+}
+.shell .pv-news {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--cinema-line-dark);
+  padding: 14px 16px;
+}
+.shell .pv-news:last-child {
+  border-bottom: 0;
+}
+.shell .pv-news-cover {
+  display: grid;
+  aspect-ratio: 16 / 10;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--cinema-paper-2);
+  color: var(--cinema-muted-dark);
+}
+.shell .pv-news-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shell .pv-news .pv-stack p {
+  max-width: 70ch;
+  margin: 4px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.shell .pv-news-actions {
+  display: flex;
+  gap: 6px;
+}
+.shell .pv-cover-preview {
+  display: grid;
+  aspect-ratio: 16 / 9;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--cinema-paper-2);
+}
+.shell .pv-cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shell .pv-editor-fields .form-wide {
+  grid-column: 1 / -1;
+}
+@media (max-width: 980px) {
+  .shell .pv-split {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .shell .pv-news {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .shell .pv-news-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}

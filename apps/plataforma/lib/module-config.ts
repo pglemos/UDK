@@ -69,10 +69,28 @@ export type ModuleConfig = {
   readOnly?: boolean;
   createOnly?: boolean;
   actions?: ModuleAction[];
+  /** Colunas da listagem, em ordem; sem isso a tabela mostra os 5 primeiros campos. */
+  tableColumns?: string[];
 };
 
 const statusLabels: Record<string, string> = {
   active: "Ativo",
+  absent: "Faltou",
+  blocked: "Bloqueado",
+  changed: "Alterado",
+  excused: "Falta justificada",
+  expected: "Esperado",
+  guardian_authorization: "Autorização do responsável",
+  inactive: "Inativo",
+  late: "Atrasado",
+  official: "Oficial",
+  present: "Presente",
+  privacy: "Privacidade",
+  qualifying: "Tomada de tempo",
+  race: "Corrida",
+  regulation: "Regulamento",
+  returned: "Devolvido",
+  superseded: "Substituído",
   analysis: "Em análise",
   annulled: "Anulado",
   appealed: "Recorrido",
@@ -592,12 +610,14 @@ export const moduleConfigs: ModuleConfig[] = [
     singular: "entrada",
     titleColumn: "position",
     orderBy: "position",
+    tableColumns: ["result_id", "position", "driver_id", "kart_number", "laps", "best_lap_ms", "points"],
     fields: [
       relation("result_id", "Resultado", "results", "title"),
       relation("driver_id", "Piloto", "drivers", "sport_name"),
       { key: "position", label: "Posição", kind: "number", required: true },
       { key: "kart_number", label: "Número do kart", kind: "number" },
       { key: "laps", label: "Voltas completadas", kind: "number", required: true },
+      { key: "points", label: "Pontos", kind: "number", readOnly: true },
       { key: "total_time_ms", label: "Tempo total (ms)", kind: "number" },
       { key: "best_lap_ms", label: "Melhor volta (ms)", kind: "number" },
       { key: "penalty_ms", label: "Penalidade (ms)", kind: "number" },
@@ -862,7 +882,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "conteudo",
     label: "Conteúdo",
-    description: "Páginas estruturadas, revisão, agendamento e publicação.",
+    description: "Notícias do site: texto, capa e publicação.",
     table: "cms_pages",
     singular: "página",
     titleColumn: "title",
@@ -930,7 +950,13 @@ export const moduleConfigs: ModuleConfig[] = [
       { key: "slug", label: "Slug", kind: "text", required: true },
       { key: "name", label: "Nome", kind: "text", required: true },
       { key: "color", label: "Cor", kind: "text", required: true },
-      { key: "status", label: "Situação", kind: "text", required: true },
+      {
+        key: "status",
+        label: "Situação",
+        kind: "select",
+        required: true,
+        options: statusOptions("active", "inactive"),
+      },
     ],
   },
   {
@@ -1174,7 +1200,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "voltas",
     label: "Voltas",
-    description: "Volta a volta, tempo, velocidade, posição e validade.",
+    description: "Volta a volta de cada piloto em cada corrida.",
     table: "laps",
     singular: "volta",
     titleColumn: "lap_number",
