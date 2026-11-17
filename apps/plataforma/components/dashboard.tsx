@@ -1,5 +1,8 @@
 "use client";
 
+import { moduleHref } from "../lib/painel-structure";
+import { SetupGuide, StageRunbook } from "./painel/setup-guide";
+
 import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
@@ -178,6 +181,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
 
   return (
     <div className="dashboard-grid">
+      <SetupGuide client={client} allowedKeys={allowedKeys} />
       {error ? (
         <div className="alert alert-error dashboard-alert" role="alert">
           {error}
@@ -186,7 +190,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
 
       <div className="metrics">
         {allowedKeys.has("pilotos") ? (
-          <Link href="/painel/pilotos">
+          <Link href={moduleHref("pilotos")}>
             <article>
               <Users />
               <span>Pilotos homologados</span>
@@ -196,7 +200,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           </Link>
         ) : null}
         {allowedKeys.has("inscricoes") ? (
-          <Link href="/painel/inscricoes">
+          <Link href={moduleHref("inscricoes")}>
             <article>
               <Flag />
               <span>Inscrições em fluxo</span>
@@ -206,7 +210,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           </Link>
         ) : null}
         {allowedKeys.has("financeiro") ? (
-          <Link href="/painel/financeiro">
+          <Link href={moduleHref("financeiro")}>
             <article>
               <CircleDollarSign />
               <span>Comprovantes pendentes</span>
@@ -216,7 +220,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
           </Link>
         ) : null}
         {allowedKeys.has("resultados") ? (
-          <Link href="/painel/resultados">
+          <Link href={moduleHref("resultados")}>
             <article>
               <Trophy />
               <span>Resultados em análise</span>
@@ -247,9 +251,9 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                 </strong>
                 <p>{state.nextStage.track}</p>
                 <div className="stage-actions">
-                  <Link href="/painel/calendario">Configurar etapa</Link>
+                  <Link href={moduleHref("calendario")}>Configurar etapa</Link>
                   {allowedKeys.has("inscricoes") ? (
-                    <Link href="/painel/inscricoes">Revisar inscrições</Link>
+                    <Link href={moduleHref("inscricoes")}>Revisar inscrições</Link>
                   ) : null}
                 </div>
               </>
@@ -275,7 +279,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                     <b>{state.pendingDocuments} documento(s)</b>
                     <span>Aguardando análise ou correção</span>
                   </div>
-                  <Link href="/painel/documentos">Abrir</Link>
+                  <Link href={moduleHref("documentos")}>Abrir</Link>
                 </li>
               ) : null}
               {allowedKeys.has("financeiro") ? (
@@ -285,7 +289,7 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                     <b>{state.pendingPayments} pagamento(s)</b>
                     <span>Comprovante enviado ou em análise</span>
                   </div>
-                  <Link href="/painel/financeiro">Abrir</Link>
+                  <Link href={moduleHref("financeiro")}>Abrir</Link>
                 </li>
               ) : null}
               {allowedKeys.has("resultados") ? (
@@ -295,13 +299,14 @@ export function Dashboard({ client, allowedKeys }: DashboardProps) {
                     <b>{state.provisionalResults} resultado(s)</b>
                     <span>Aguardando homologação esportiva</span>
                   </div>
-                  <Link href="/painel/resultados">Abrir</Link>
+                  <Link href={moduleHref("resultados")}>Abrir</Link>
                 </li>
               ) : null}
             </ul>
           </article>
         ) : null}
       </div>
+      <StageRunbook allowedKeys={allowedKeys} />
     </div>
   );
 }

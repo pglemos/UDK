@@ -14,5 +14,5 @@ export function passwordRecoveryRedirect(origin: string): string {
 }
 
 export function registrationDestination(hasSession: boolean): string {
-  return hasSession ? "/painel/inscricoes" : "/login?cadastro=1";
+  return hasSession ? "/painel/pilotos/inscricoes" : "/login?cadastro=1";
 }

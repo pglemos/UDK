@@ -1,39 +1,29 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { OfficialLogo } from "../../../components/race/official-logo";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
-  Bell,
-  BookOpenText,
   CalendarDays,
   ChevronRight,
   CircleDollarSign,
-  ClipboardCheck,
   Cloud,
   CloudOff,
-  FileCheck2,
-  FileInput,
-  FileSpreadsheet,
   Flag,
-  Gauge,
   Gavel,
-  HandCoins,
-  LayoutGrid,
+  Globe,
+  House,
   LogOut,
   Menu,
   Settings,
-  ShieldAlert,
-  Sparkles,
-  Timer,
+  ShieldCheck,
   Trophy,
   Users,
-  UsersRound,
   X,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { OfficialLogo } from "../../../components/race/official-logo";
 import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";
 import { getModuleConfig } from "../../../lib/module-config";
 import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";
@@ -43,6 +33,15 @@ import {
   type RoleGrant,
   type RolePermission,
 } from "../../../lib/access-control";
+import {
+  panelSections,
+  resolveRoute,
+  roleAccess,
+  roleLabels,
+  writableModulesByRole,
+  type PanelSection,
+  type Role,
+} from "../../../lib/painel-structure";
 import { ModuleCrud } from "../../../components/module-crud";
 import { PilotCrud } from "../../../components/pilot-crud";
 import { Dashboard } from "../../../components/dashboard";
@@ -54,220 +53,21 @@ import { StandingsPanel } from "../../../components/painel/standings-panel";
 import { PointsRulesPanel } from "../../../components/painel/points-rules-panel";
 import { LapsPanel } from "../../../components/painel/laps-panel";
 import { NewsPanel } from "../../../components/painel/news-panel";
+import { ChampionshipSettings } from "../../../components/painel/championship-settings";
+import { TeamAccessPanel } from "../../../components/painel/team-access-panel";
+import { RolesMatrix } from "../../../components/painel/roles-matrix";
 
-type Role =
-  | "admin"
-  | "organization"
-  | "judge"
-  | "marshal"
-  | "finance"
-  | "editor"
-  | "sponsor"
-  | "driver"
-  | "guardian";
-
-type NavigationItem = {
-  key: string;
-  label: string;
-  icon: LucideIcon;
-};
-
-type NavigationGroup = {
-  label: string;
-  items: NavigationItem[];
-};
-
-const navigationGroups: NavigationGroup[] = [
-  {
-    label: "Visão geral",
-    items: [{ key: "dashboard", label: "Painel", icon: Gauge }],
-  },
-  {
-    label: "Campeonato",
-    items: [
-      { key: "pilotos", label: "Pilotos", icon: Users },
-      { key: "inscricoes", label: "Inscrições", icon: ClipboardCheck },
-      { key: "documentos", label: "Documentos", icon: FileCheck2 },
-      { key: "termos", label: "Termos", icon: BookOpenText },
-      { key: "mudancas-categoria", label: "Mudanças de categoria", icon: ClipboardCheck },
-      { key: "calendario", label: "Calendário", icon: CalendarDays },
-      { key: "checkin", label: "Credenciamento", icon: ClipboardCheck },
-      { key: "karts", label: "Karts", icon: Flag },
-      { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },
-      { key: "creditos", label: "Créditos", icon: HandCoins },
-    ],
-  },
-  {
-    label: "Esportivo",
-    items: [
-      { key: "resultados", label: "Resultados", icon: Flag },
-      { key: "entradas-resultado", label: "Entradas", icon: Flag },
-      { key: "classificacao", label: "Classificação", icon: Trophy },
-      { key: "pontuacao", label: "Pontuação", icon: Trophy },
-      { key: "importacoes", label: "Importações", icon: FileInput },
-      { key: "voltas", label: "Voltas", icon: Timer },
-      { key: "ocorrencias", label: "Ocorrências", icon: ShieldAlert },
-      { key: "evidencias", label: "Evidências", icon: ShieldAlert },
-      { key: "julgamentos", label: "Penalidades", icon: Gavel },
-      { key: "recursos", label: "Recursos", icon: BookOpenText },
-    ],
-  },
-  {
-    label: "Comunicação",
-    items: [
-      { key: "conteudo", label: "Conteúdo", icon: LayoutGrid },
-      { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },
-      { key: "usuarios-patrocinador", label: "Usuários de patrocinadores", icon: UsersRound },
-      { key: "campanhas", label: "Campanhas", icon: Sparkles },
-      { key: "notificacoes", label: "Notificações", icon: Bell },
-      { key: "relatorios", label: "Relatórios", icon: FileSpreadsheet },
-      { key: "configuracoes", label: "Configurações", icon: Settings },
-      { key: "permissoes", label: "Permissões", icon: Settings },
-    ],
-  },
-];
-
-/** Módulos sem item próprio no menu: aparecem dentro da tela que os usa. */
-const embeddedModules: Record<string, string> = {
-  responsaveis: "pilotos",
-  aceites: "termos",
-  sessoes: "calendario",
-  "versoes-conteudo": "conteudo",
-};
-/** Rotas antigas que deixaram de existir: o campeonato não tem equipes nem trocas de piloto. */
-const retiredRoutes: Record<string, string> = {
-  ...embeddedModules,
-  endurance: "dashboard",
-  "membros-endurance": "dashboard",
-  stints: "dashboard",
-};
-const allModuleKeys = [
-  ...navigationGroups.flatMap((group) => group.items.map((item) => item.key)),
-  ...Object.keys(embeddedModules),
-];
-
-const roleAccess: Record<Role, string[]> = {
-  admin: allModuleKeys,
-  organization: allModuleKeys,
-  judge: [
-    "dashboard",
-    "pilotos",
-    "calendario",
-    "sessoes",
-    "resultados",
-    "entradas-resultado",
-    "classificacao",
-    "pontuacao",
-    "importacoes",
-    "voltas",
-    "ocorrencias",
-    "evidencias",
-    "julgamentos",
-    "recursos",
-    "relatorios",
-    "notificacoes",
-  ],
-  marshal: [
-    "dashboard",
-    "calendario",
-    "sessoes",
-    "pilotos",
-    "checkin",
-    "karts",
-    "ocorrencias",
-    "evidencias",
-    "notificacoes",
-  ],
-  finance: ["dashboard", "inscricoes", "financeiro", "creditos", "relatorios", "notificacoes"],
-  editor: [
-    "dashboard",
-    "conteudo",
-    "versoes-conteudo",
-    "patrocinadores",
-    "usuarios-patrocinador",
-    "campanhas",
-    "notificacoes",
-  ],
-  sponsor: ["dashboard", "patrocinadores", "usuarios-patrocinador", "campanhas", "notificacoes"],
-  driver: [
-    "dashboard",
-    "inscricoes",
-    "documentos",
-    "termos",
-    "aceites",
-    "mudancas-categoria",
-    "financeiro",
-    "creditos",
-    "calendario",
-    "sessoes",
-    "checkin",
-    "karts",
-    "resultados",
-    "entradas-resultado",
-    "classificacao",
-    "voltas",
-    "recursos",
-    "notificacoes",
-  ],
-  guardian: [
-    "dashboard",
-    "pilotos",
-    "responsaveis",
-    "inscricoes",
-    "documentos",
-    "termos",
-    "aceites",
-    "mudancas-categoria",
-    "financeiro",
-    "creditos",
-    "calendario",
-    "sessoes",
-    "checkin",
-    "karts",
-    "resultados",
-    "entradas-resultado",
-    "classificacao",
-    "voltas",
-    "julgamentos",
-    "recursos",
-    "notificacoes",
-  ],
-};
-
-const writableModulesByRole: Record<Role, string[]> = {
-  admin: allModuleKeys,
-  organization: allModuleKeys,
-  judge: [
-    "resultados",
-    "entradas-resultado",
-    "classificacao",
-    "pontuacao",
-    "importacoes",
-    "voltas",
-    "ocorrencias",
-    "evidencias",
-    "julgamentos",
-    "recursos",
-  ],
-  marshal: [
-    "sessoes",
-    "checkin",
-    "karts",
-    "ocorrencias",
-    "evidencias",
-  ],
-  finance: ["financeiro", "creditos"],
-  editor: [
-    "conteudo",
-    "versoes-conteudo",
-    "patrocinadores",
-    "usuarios-patrocinador",
-    "campanhas",
-    "notificacoes",
-  ],
-  sponsor: [],
-  driver: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
-  guardian: ["inscricoes", "documentos", "aceites", "mudancas-categoria", "recursos"],
+const sectionIcons: Record<string, LucideIcon> = {
+  home: House,
+  users: Users,
+  calendar: CalendarDays,
+  flag: Flag,
+  trophy: Trophy,
+  gavel: Gavel,
+  money: CircleDollarSign,
+  site: Globe,
+  settings: Settings,
+  shield: ShieldCheck,
 };
 
 type ModuleCount = { total: number; tom: "quiet" | "normal" | "warning" | "danger" };
@@ -279,18 +79,6 @@ const countClass: Record<ModuleCount["tom"], string> = {
   danger: "count count-danger",
 };
 
-const roleLabels: Record<Role, string> = {
-  admin: "Administrador",
-  organization: "Organização",
-  judge: "Comissão julgadora",
-  marshal: "Fiscal de pista",
-  finance: "Financeiro",
-  editor: "Editor",
-  sponsor: "Patrocinador",
-  driver: "Piloto",
-  guardian: "Responsável legal",
-};
-
 function initials(value: string): string {
   return value
     .split(" ")
@@ -300,14 +88,15 @@ function initials(value: string): string {
     .join("");
 }
 
+function sectionHref(section: PanelSection): string {
+  return section.key === "inicio" ? "/painel" : `/painel/${section.key}`;
+}
+
 export default function OperationsPage({ params }: { params: Promise<{ slug?: string[] }> }) {
   const resolvedParams = use(params);
-  const activeKey = resolvedParams.slug?.[0] ?? "dashboard";
+  const route = resolveRoute(resolvedParams.slug);
+  const activeModule = route?.tab.module ?? "";
   const router = useRouter();
-  const retiredTarget = retiredRoutes[activeKey];
-  useEffect(() => {
-    if (retiredTarget) router.replace(retiredTarget === "dashboard" ? "/painel" : `/painel/${retiredTarget}`);
-  }, [retiredTarget, router]);
   const client = useMemo(() => supabase(), []);
   const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);
   const [ready, setReady] = useState(false);
@@ -317,6 +106,10 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   const [roleGrants, setRoleGrants] = useState<RoleGrant[]>([]);
   const [permissions, setPermissions] = useState<RolePermission[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [online, setOnline] = useState(true);
+  const [offlineCount, setOfflineCount] = useState(0);
+  const [moduleCounts, setModuleCounts] = useState<Record<string, ModuleCount>>({});
+  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     if (!sidebarOpen) return;
@@ -350,10 +143,6 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       if (previousFocus instanceof HTMLElement) previousFocus.focus();
     };
   }, [sidebarOpen]);
-  const [online, setOnline] = useState(true);
-  const [offlineCount, setOfflineCount] = useState(0);
-  const [moduleCounts, setModuleCounts] = useState<Record<string, ModuleCount>>({});
-  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -369,9 +158,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
 
   useEffect(() => {
     if (!client) {
-      setAuthError(
-        "Supabase ainda não conectado. Cadastre as variáveis do projeto antes de acessar o painel.",
-      );
+      setAuthError("Supabase ainda não conectado. Cadastre as variáveis do projeto antes de acessar o painel.");
       setReady(true);
       return;
     }
@@ -382,7 +169,6 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     async function loadIdentity() {
       const { data: sessionData, error: sessionError } = await activeClient.auth.getSession();
       if (!active) return;
-
       if (sessionError || !sessionData.session) {
         router.replace("/login");
         return;
@@ -392,17 +178,9 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       setUser(authenticatedUser);
 
       const [profileResult, rolesResult] = await Promise.all([
-        activeClient
-          .from("profiles")
-          .select("full_name,sport_name")
-          .eq("id", authenticatedUser.id)
-          .maybeSingle(),
-        activeClient
-          .from("user_roles")
-          .select("id,role,expires_at")
-          .eq("user_id", authenticatedUser.id),
+        activeClient.from("profiles").select("full_name,sport_name").eq("id", authenticatedUser.id).maybeSingle(),
+        activeClient.from("user_roles").select("id,role,expires_at").eq("user_id", authenticatedUser.id).is("deleted_at", null),
       ]);
-
       if (!active) return;
 
       if (profileResult.error) setAuthError(profileResult.error.message);
@@ -416,9 +194,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       }
 
       const profile = profileResult.data;
-      setDisplayName(
-        profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK",
-      );
+      setDisplayName(profile?.sport_name || profile?.full_name || authenticatedUser.email || "Usuário UDK");
       const now = Date.now();
       const loadedGrants = (rolesResult.data ?? [])
         .filter((item) => !item.expires_at || new Date(item.expires_at).getTime() > now)
@@ -429,9 +205,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         setRoles([]);
         setRoleGrants([]);
         setPermissions([]);
-        setAuthError(
-          "Esta conta não possui papel ativo. Solicite a vinculação à organização do campeonato.",
-        );
+        setAuthError("Esta conta ainda não tem acesso ao painel. Peça à organização do campeonato para liberar o seu acesso.");
         setReady(true);
         return;
       }
@@ -439,10 +213,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       const { data: permissionRows, error: permissionError } = await activeClient
         .from("role_permissions")
         .select("user_role_id,module,action,allowed,expires_at")
-        .in(
-          "user_role_id",
-          loadedGrants.map((grant) => grant.id),
-        )
+        .in("user_role_id", loadedGrants.map((grant) => grant.id))
         .is("deleted_at", null);
 
       if (!active || permissionError) {
@@ -450,9 +221,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         setRoleGrants([]);
         setPermissions([]);
         setAuthError(
-          permissionError
-            ? `Não foi possível validar permissões granulares: ${permissionError.message}`
-            : "Sessão encerrada.",
+          permissionError ? `Não foi possível validar as permissões: ${permissionError.message}` : "Sessão encerrada.",
         );
         setReady(true);
         return;
@@ -468,17 +237,13 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     const { data: subscription } = activeClient.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") router.replace("/login");
     });
-
     return () => {
       active = false;
       subscription.subscription.unsubscribe();
     };
   }, [client, router]);
 
-  const allowedKeys = useMemo(
-    () => computeAllowedModules(roleAccess, roleGrants, permissions),
-    [permissions, roleGrants],
-  );
+  const allowedKeys = useMemo(() => computeAllowedModules(roleAccess, roleGrants, permissions), [permissions, roleGrants]);
   const writableKeys = useMemo(
     () => computeWritableModules(writableModulesByRole, roleGrants, permissions),
     [permissions, roleGrants],
@@ -506,93 +271,146 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     };
   }, [offlineOwner]);
 
-  // Contadores por módulo na navegação (telas 3a/3b do projeto de design).
-  // A cor comunica a natureza do número: âmbar e vermelho para o que exige
-  // ação, ciano para volume normal.
+  // Pendências por área: âmbar e vermelho pedem ação; cinza é só volume.
   useEffect(() => {
     if (!client || !user) return;
     let active = true;
-
-    const carregar = async () => {
-      const contar = async (
-        tabela: string,
-        coluna?: string,
-        valores?: string[],
-      ): Promise<number> => {
-        let consulta = client
-          .from(tabela)
-          .select("id", { count: "exact", head: true })
-          .is("deleted_at", null);
-        if (coluna && valores) consulta = consulta.in(coluna, valores);
-        const { count } = await consulta;
-        return count ?? 0;
-      };
-
-      const [pilotos, inscricoes, documentos, pagamentos, resultados, recursos] = await Promise.all(
-        [
-          contar("drivers", "status", ["pending", "approved", "suspended"]),
-          contar("registrations", "status", ["submitted", "under_review"]),
-          contar("documents", "status", ["pending"]),
-          contar("payments", "status", ["pending", "under_review"]),
-          contar("results", "status", ["provisional"]),
-          contar("appeals", "status", ["open"]),
-        ],
-      );
-
-      if (!active) return;
-      setModuleCounts({
-        pilotos: { total: pilotos, tom: "quiet" },
-        inscricoes: { total: inscricoes, tom: "normal" },
-        documentos: { total: documentos, tom: "warning" },
-        financeiro: { total: pagamentos, tom: "warning" },
-        resultados: { total: resultados, tom: "danger" },
-        recursos: { total: recursos, tom: "danger" },
-      });
+    const contar = async (tabela: string, coluna?: string, valores?: string[]): Promise<number> => {
+      let consulta = client.from(tabela).select("id", { count: "exact", head: true }).is("deleted_at", null);
+      if (coluna && valores) consulta = consulta.in(coluna, valores);
+      const { count } = await consulta;
+      return count ?? 0;
     };
-
-    void carregar().catch(() => undefined);
+    void Promise.all([
+      contar("drivers", "status", ["pending", "approved", "suspended"]),
+      contar("registrations", "status", ["submitted", "analysis", "documents_pending", "payment_pending"]),
+      contar("documents", "status", ["pending"]),
+      contar("payments", "status", ["pending", "under_review"]),
+      contar("results", "status", ["provisional"]),
+      contar("appeals", "status", ["open", "filed"]),
+    ])
+      .then(([pilotos, inscricoes, documentos, pagamentos, resultados, recursos]) => {
+        if (!active) return;
+        setModuleCounts({
+          pilotos: { total: pilotos, tom: "quiet" },
+          inscricoes: { total: inscricoes, tom: "warning" },
+          documentos: { total: documentos, tom: "warning" },
+          financeiro: { total: pagamentos, tom: "warning" },
+          resultados: { total: resultados, tom: "danger" },
+          recursos: { total: recursos, tom: "danger" },
+        });
+      })
+      .catch(() => undefined);
     return () => {
       active = false;
     };
   }, [client, user]);
 
-  const visibleGroups = useMemo(
+  const visibleSections = useMemo(
     () =>
-      navigationGroups
-        .map((group) => ({
-          ...group,
-          items: group.items.filter((item) => allowedKeys.has(item.key)),
-        }))
-        .filter((group) => group.items.length > 0),
+      panelSections
+        .map((section) => ({ ...section, tabs: section.tabs.filter((tab) => allowedKeys.has(tab.module)) }))
+        .filter((section) => section.tabs.length > 0),
     [allowedKeys],
   );
 
-  const activeNavigationItem = navigationGroups
-    .flatMap((group) => group.items)
-    .find((item) => item.key === activeKey);
-  const config = getModuleConfig(activeKey);
-  const authorized = allowedKeys.has(activeKey);
-  const canMutate = writableKeys.has(activeKey);
-  const effectiveConfig = config
-    ? { ...config, readOnly: config.readOnly || !canMutate }
-    : undefined;
+  function sectionCount(section: PanelSection): ModuleCount | null {
+    // área com pendência mostra a soma das pendências; Pilotos mostra o total de cadastros
+    const counts = section.tabs.map((tab) => moduleCounts[tab.module]).filter(Boolean) as ModuleCount[];
+    const urgent = counts.filter((count) => count.tom !== "quiet" && count.total > 0);
+    if (urgent.length) {
+      const tom = urgent.some((count) => count.tom === "danger") ? "danger" : "warning";
+      return { total: urgent.reduce((sum, count) => sum + count.total, 0), tom };
+    }
+    return counts.find((count) => count.tom === "quiet" && count.total > 0) ?? null;
+  }
 
-  function embedded(key: string, title: string, description: string) {
-    const embeddedConfig = getModuleConfig(key);
-    if (!embeddedConfig || !offlineOwner || !client || !allowedKeys.has(key)) return null;
+  const activeSection = route ? visibleSections.find((section) => section.key === route.section.key) : undefined;
+  const authorized = Boolean(route && allowedKeys.has(activeModule));
+  const canMutate = writableKeys.has(activeModule);
+  const config = getModuleConfig(activeModule);
+  const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;
+
+  function crud(module: string): ReactNode {
+    const moduleConfig = getModuleConfig(module);
+    if (!moduleConfig || !offlineOwner || !client) return null;
     return (
-      <section className="embedded-module" aria-labelledby={`embedded-${key}`}>
+      <ModuleCrud
+        client={client}
+        owner={offlineOwner}
+        config={{ ...moduleConfig, readOnly: moduleConfig.readOnly || !writableKeys.has(module) }}
+      />
+    );
+  }
+
+  function embedded(module: string, title: string, description: string): ReactNode {
+    if (!allowedKeys.has(module)) return null;
+    const body = crud(module);
+    if (!body) return null;
+    return (
+      <section className="embedded-module" aria-labelledby={`embedded-${module}`}>
         <header>
-          <h2 id={`embedded-${key}`}>{title}</h2>
+          <h2 id={`embedded-${module}`}>{title}</h2>
           <p>{description}</p>
         </header>
-        <ModuleCrud
-          client={client}
-          owner={offlineOwner}
-          config={{ ...embeddedConfig, readOnly: embeddedConfig.readOnly || !writableKeys.has(key) }}
-        />
+        {body}
       </section>
     );
+  }
+
+  function renderModule(): ReactNode {
+    if (!client) return null;
+    switch (activeModule) {
+      case "dashboard":
+        return <Dashboard client={client} allowedKeys={allowedKeys} />;
+      case "pilotos":
+        return <PilotCrud client={client} readOnly={!canMutate} />;
+      case "calendario":
+        return (
+          <>
+            {crud("calendario")}
+            {embedded("sessoes", "Corridas de cada etapa", "Corridas, tomadas de tempo e horário de largada.")}
+          </>
+        );
+      case "checkin":
+        return <CheckinPanel client={client} readOnly={!canMutate} />;
+      case "karts":
+        return <KartsPanel client={client} />;
+      case "voltas":
+        return <LapsPanel client={client} />;
+      case "classificacao":
+        return <StandingsPanel client={client} />;
+      case "pontuacao":
+        return <PointsRulesPanel client={client} editor={canMutate ? crud("pontuacao") : null} />;
+      case "conteudo":
+        return (
+          <>
+            <NewsPanel client={client} readOnly={!canMutate} />
+            {embedded("versoes-conteudo", "Histórico de versões", "Revisões salvas das notícias publicadas.")}
+          </>
+        );
+      case "patrocinadores":
+        return <SponsorsPanel client={client} readOnly={!canMutate} />;
+      case "campeonato":
+        return <ChampionshipSettings client={client} readOnly={!canMutate} />;
+      case "termos":
+        return (
+          <>
+            {crud("termos")}
+            {embedded("aceites", "Aceites dos pilotos", "Quem aceitou cada versão do regulamento e dos termos.")}
+          </>
+        );
+      case "relatorios":
+        return <ReportsPanel client={client} />;
+      case "equipe":
+        return <TeamAccessPanel client={client} currentUserId={user?.id ?? ""} isAdmin={roles.includes("admin")} />;
+      case "papeis":
+        return <RolesMatrix />;
+      default:
+        return config && offlineOwner ? (
+          <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
+        ) : null;
+    }
   }
 
   async function signOut() {
@@ -623,29 +441,20 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     );
   }
 
+  const heading = route?.section.key === "inicio" ? "Início" : (route?.section.label ?? "Página não encontrada");
+  const description = route?.section.description ?? "Este endereço não existe mais no painel.";
+
   return (
     <div className="shell">
       {sidebarOpen ? (
-        <button
-          className="mobile-overlay"
-          aria-label="Fechar menu"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <button className="mobile-overlay" aria-label="Fechar menu" onClick={() => setSidebarOpen(false)} />
       ) : null}
-      <aside
-        id="operations-navigation"
-        className={sidebarOpen ? "sidebar sidebar-open" : "sidebar"}
-      >
+      <aside id="operations-navigation" className={sidebarOpen ? "sidebar sidebar-open" : "sidebar"}>
         <div className="sidebar-brand">
           <Link href="/" aria-label="Voltar ao portal UDK">
             <OfficialLogo variant="negative" width={128} />
           </Link>
-          <button
-            className="mobile-close"
-            type="button"
-            aria-label="Fechar navegação"
-            onClick={() => setSidebarOpen(false)}
-          >
+          <button className="mobile-close" type="button" aria-label="Fechar navegação" onClick={() => setSidebarOpen(false)}>
             <X />
           </button>
         </div>
@@ -654,32 +463,26 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           <b>UDK • Temporada 2026</b>
         </div>
 
-        <nav className="sidebar-navigation" aria-label="Módulos da plataforma">
-          {visibleGroups.map((group) => (
-            <div className="nav-group" key={group.label}>
-              <span>{group.label}</span>
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const href = item.key === "dashboard" ? "/painel" : `/painel/${item.key}`;
-                return (
-                  <Link
-                    className={activeKey === item.key ? "active" : ""}
-                    href={href}
-                    key={item.key}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <Icon size={18} />
-                    {item.label}
-                    {(() => {
-                      const contagem = moduleCounts[item.key];
-                      if (!contagem || contagem.total === 0) return <ChevronRight size={15} />;
-                      return <span className={countClass[contagem.tom]}>{contagem.total}</span>;
-                    })()}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+        <nav className="sidebar-navigation" aria-label="Áreas do painel">
+          <div className="nav-group">
+            {visibleSections.map((section) => {
+              const Icon = sectionIcons[section.icon] ?? Settings;
+              const count = sectionCount(section);
+              return (
+                <Link
+                  className={route?.section.key === section.key ? "active" : ""}
+                  aria-current={route?.section.key === section.key ? "page" : undefined}
+                  href={sectionHref(section)}
+                  key={section.key}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon size={18} />
+                  {section.label}
+                  {count ? <span className={countClass[count.tom]}>{count.total}</span> : <ChevronRight size={15} />}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         <div className="sidebar-user">
@@ -688,7 +491,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
             <b>{displayName}</b>
             <small>{roles[0] ? roleLabels[roles[0]] : "Sem papel ativo"}</small>
           </div>
-          <button type="button" title="Sair" onClick={() => void signOut()}>
+          <button type="button" title="Sair" aria-label="Sair" onClick={() => void signOut()}>
             <LogOut size={17} />
           </button>
         </div>
@@ -708,31 +511,23 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           </button>
           <div>
             <small>Ultras do Kart</small>
-            <b>{activeNavigationItem?.label ?? "Operação"}</b>
+            <b>{heading}</b>
           </div>
           <div className="header-status">
             <span className={online ? "connection-online" : "connection-offline"}>
               {online ? <Cloud size={17} /> : <CloudOff size={17} />}
               {online ? "Online" : "Offline"}
             </span>
-            {offlineCount > 0 ? (
-              <span className="queue-count">{offlineCount} pendente(s)</span>
-            ) : null}
+            {offlineCount > 0 ? <span className="queue-count">{offlineCount} pendente(s)</span> : null}
             <span className="avatar header-avatar">{initials(displayName) || "UD"}</span>
           </div>
         </header>
 
-        <section className="content" data-module={activeKey}>
+        <section className="content" data-module={activeModule || "nao-encontrado"}>
           <div className="page-heading">
             <div>
-              <h1>{activeNavigationItem?.label ?? "Operação"}</h1>
-              <p>
-                {activeKey === "dashboard"
-                  ? "Acompanhe a próxima etapa e as pendências do campeonato."
-                  : activeKey === "relatorios"
-                    ? "Baixe os registros do campeonato em planilhas."
-                    : (config?.description ?? "Módulo operacional do campeonato UDK.")}
-              </p>
+              <h1>{heading}</h1>
+              <p>{description}</p>
             </div>
             <div className="role-chips">
               {roles.map((role) => (
@@ -741,68 +536,46 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
             </div>
           </div>
 
+          {activeSection && activeSection.tabs.length > 1 ? (
+            <nav className="pv-tabs" aria-label={`Seções de ${activeSection.label}`}>
+              {activeSection.tabs.map((tab) => {
+                const href = tab.slug ? `/painel/${activeSection.key}/${tab.slug}` : sectionHref(activeSection);
+                const current = tab.module === activeModule;
+                const count = moduleCounts[tab.module];
+                return (
+                  <Link key={tab.module} href={href} className={current ? "is-active" : undefined} aria-current={current ? "page" : undefined}>
+                    {tab.label}
+                    {count && count.total > 0 && count.tom !== "quiet" ? (
+                      <span className={countClass[count.tom]}>{count.total}</span>
+                    ) : null}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : null}
+
           {authError ? (
             <div className="alert alert-warning" role="alert">
               {authError}
             </div>
           ) : null}
 
-          {!authorized ? (
-            <div className="access-denied">
-              <ShieldAlert />
-              <h2>Acesso não autorizado</h2>
-              <p>Seu papel atual não possui permissão para abrir este módulo.</p>
-              <Link href="/painel">Voltar ao painel</Link>
-            </div>
-          ) : activeKey === "dashboard" ? (
-            <Dashboard client={client} allowedKeys={allowedKeys} />
-          ) : activeKey === "relatorios" ? (
-            <ReportsPanel client={client} />
-          ) : activeKey === "pilotos" ? (
-            <>
-              <PilotCrud client={client} readOnly={!canMutate} />
-              {embedded("responsaveis", "Responsáveis legais", "Vínculo de responsável para piloto menor de idade.")}
-            </>
-          ) : activeKey === "karts" ? (
-            <KartsPanel client={client} />
-          ) : activeKey === "checkin" ? (
-            <CheckinPanel client={client} readOnly={!canMutate} />
-          ) : activeKey === "patrocinadores" ? (
-            <SponsorsPanel client={client} readOnly={!canMutate} />
-          ) : activeKey === "classificacao" ? (
-            <StandingsPanel client={client} />
-          ) : activeKey === "voltas" ? (
-            <LapsPanel client={client} />
-          ) : activeKey === "conteudo" ? (
-            <>
-              <NewsPanel client={client} readOnly={!canMutate} />
-              {embedded("versoes-conteudo", "Versões do conteúdo", "Histórico de revisões das páginas publicadas.")}
-            </>
-          ) : activeKey === "pontuacao" ? (
-            <PointsRulesPanel
-              client={client}
-              editor={
-                canMutate && config && offlineOwner ? (
-                  <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
-                ) : null
-              }
-            />
-          ) : config && offlineOwner ? (
-            <>
-              <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
-              {activeKey === "termos"
-                ? embedded("aceites", "Aceites dos pilotos", "Quem aceitou cada versão do regulamento e dos termos.")
-                : activeKey === "calendario"
-                  ? embedded("sessoes", "Sessões das etapas", "Corridas e sessões de cada etapa, com horário de largada.")
-                  : null}
-            </>
-          ) : (
+          {!route ? (
             <div className="access-denied">
               <Settings />
-              <h2>Módulo não encontrado</h2>
-              <p>A rota informada não pertence à plataforma UDK.</p>
-              <Link href="/painel">Voltar ao painel</Link>
+              <h2>Página não encontrada</h2>
+              <p>O painel foi reorganizado em áreas. Use o menu ao lado para chegar ao que precisa.</p>
+              <Link href="/painel">Ir para o início</Link>
             </div>
+          ) : !authorized ? (
+            <div className="access-denied">
+              <ShieldCheck />
+              <h2>Sem acesso a esta área</h2>
+              <p>O seu papel não inclui esta parte do painel. Fale com a organização se precisar dela.</p>
+              <Link href="/painel">Voltar ao início</Link>
+            </div>
+          ) : (
+            renderModule()
           )}
         </section>
       </main>

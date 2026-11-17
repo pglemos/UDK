@@ -15,7 +15,7 @@ describe("unified authentication routes", () => {
   });
 
   it("sends authenticated registration visitors to the panel and guests to signup", () => {
-    expect(registrationDestination(true)).toBe("/painel/inscricoes");
+    expect(registrationDestination(true)).toBe("/painel/pilotos/inscricoes");
     expect(registrationDestination(false)).toBe("/login?cadastro=1");
   });
 });

@@ -59,7 +59,7 @@ describe("cadastro operacional de pilotos", () => {
     const component = read("components/pilot-crud.tsx");
     const styles = read("app/pilot-crud.css");
 
-    expect(page).toContain("data-module={activeKey}");
+    expect(page).toContain('data-module={activeModule || "nao-encontrado"}');
     expect(component).toContain('className="pilot-editor"');
     expect(component).toContain('className="pilot-mobile-list"');
     expect(component).not.toContain('className="modal-backdrop"');
