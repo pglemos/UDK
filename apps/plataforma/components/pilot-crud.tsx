@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../lib/confirm-action";
 import {
   useCallback,
   useEffect,
@@ -493,7 +494,7 @@ export function PilotCrud({
 
   async function archive(record: PilotRecord) {
     if (readOnly) return;
-    if (!window.confirm(`Arquivar o cadastro de ${text(record, "full_name") || "piloto"}?`)) return;
+    if (!(await confirmAction(`Arquivar o cadastro de ${text(record, "full_name") || "piloto"}? Ele sai das listas, mas o histórico fica guardado.`, "Arquivar"))) return;
     setSaving(true);
     setError("");
     const { error: archiveError } = await client

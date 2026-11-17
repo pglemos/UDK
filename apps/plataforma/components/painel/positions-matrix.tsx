@@ -19,7 +19,7 @@ type Cell = { position: number; points: number; pole: boolean; fastest: boolean;
 type Row = { driverId: string; name: string; category: string; categorySlug: string; cells: Record<string, Cell>; total: number; races: number };
 
 function raceShort(session: string, format: string): string {
-  if (format === "endurance" || /endurance/i.test(session)) return "End.";
+  if (format === "endurance" || /endurance/i.test(session)) return "Endurance";
   const match = /corrida\s*(\d)/i.exec(session);
   return match ? `C${match[1]}` : session;
 }
@@ -69,7 +69,7 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
         const session = entry.result.session?.name ?? "Corrida";
         raceMap.set(entry.result.id, {
           id: entry.result.id,
-          label: `${stage?.ordinal ?? "?"} ${raceShort(session, stage?.format ?? "")}`,
+          label: `${stage?.ordinal ?? "?"} · ${raceShort(session, stage?.format ?? "").replace(/^C(\d)$/, "Corrida $1")}`,
           title: `${stage?.title ?? "Etapa"} · ${session}${stage ? ` · ${stage.shortDate}` : ""}`,
           order: `${stage?.startsAt ?? ""}|${entry.result.session?.starts_at ?? session}`,
         });
@@ -176,10 +176,12 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
               <strong>{visible.length}</strong>
               <span>pilotos · {races.length} provas</span>
             </div>
-            <p className="pv-note">
-              Pontos de cada prova pela chegada geral. P = pole · MV = melhor volta · −10 = penalidade. Total sem descartes; os válidos
-              estão em Classificação.
-            </p>
+            <ul className="pv-legend" aria-label="Legenda">
+              <li><b>P</b> pole (+1)</li>
+              <li><b>MV</b> melhor volta (+1)</li>
+              <li><b>−10</b> pontos de penalidade</li>
+              <li>Total sem descartes; os válidos estão em Classificação</li>
+            </ul>
           </div>
           <div className="table-scroll">
             <table className="admin-table pv-table pv-positions">

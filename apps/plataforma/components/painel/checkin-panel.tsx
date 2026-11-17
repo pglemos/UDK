@@ -167,6 +167,36 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
     }
   }
 
+  /** Marca como presente quem ainda não tem registro na etapa (só a lista filtrada). */
+  async function markAllPresent(stage: StageInfo) {
+    if (readOnly) return;
+    const missing = rows.filter((row) => !cells.get(`${row.id}|${stage.id}`));
+    if (!missing.length) return;
+    setSaving(`todos|${stage.id}`);
+    setError("");
+    try {
+      const { data, error: insertError } = await client
+        .from("checkins")
+        .insert(
+          missing.map((row) => ({
+            stage_id: stage.id,
+            driver_id: row.id,
+            status: "present",
+            checked_in_at: new Date(stage.startsAt).toISOString(),
+          })),
+        )
+        .select("id,driver_id");
+      if (insertError) throw insertError;
+      const nextCells = new Map(cells);
+      for (const row of data ?? []) nextCells.set(`${row.driver_id}|${stage.id}`, { id: String(row.id), status: "present" });
+      setCells(nextCells);
+    } catch (saveError) {
+      setError(errorMessage(saveError));
+    } finally {
+      setSaving(null);
+    }
+  }
+
   const totals = useMemo(
     () =>
       stages.map(
@@ -219,11 +249,12 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
               <strong>{rows.length}</strong>
               <span>pilotos</span>
             </div>
-            <p className="pv-note">
-              {readOnly
-                ? "Presença em cada etapa da temporada."
-                : "Clique na etapa para marcar: presente, faltou, justificada ou limpar."}
-            </p>
+            <ul className="pv-legend" aria-label="Legenda">
+              <li><span className="pv-mark is-present"><Check aria-hidden="true" /></span> Presente</li>
+              <li><span className="pv-mark is-absent"><X aria-hidden="true" /></span> Faltou</li>
+              <li><span className="pv-mark is-excused"><Minus aria-hidden="true" /></span> Justificada</li>
+              <li><span className="pv-mark is-empty">·</span> {readOnly ? "Sem registro" : "A marcar (clique para trocar)"}</li>
+            </ul>
           </div>
           <div className="table-scroll">
             <table className="admin-table pv-table pv-matrix">
@@ -236,6 +267,17 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                       <span className="pv-stage-head">
                         <b>{stage.ordinal} etapa</b>
                         <small>{stage.shortDate}</small>
+                        {!readOnly && new Date(stage.startsAt).getTime() <= now ? (
+                          <button
+                            type="button"
+                            className="pv-link-button"
+                            disabled={saving !== null || rows.every((row) => cells.get(`${row.id}|${stage.id}`))}
+                            onClick={() => void markAllPresent(stage)}
+                            title="Marca presente quem ainda está sem registro nesta etapa"
+                          >
+                            Todos presentes
+                          </button>
+                        ) : null}
                       </span>
                     </th>
                   ))}
@@ -271,7 +313,7 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                             title={info?.label ?? "Sem registro"}
                           >
                             <StatusIcon status={status} />
-                            <span>{info?.short ?? "—"}</span>
+                            <span>{info?.short ?? (new Date(stage.startsAt).getTime() <= now ? "A marcar" : "—")}</span>
                           </button>
                         </td>
                       );

@@ -105,7 +105,8 @@ export function StandingsPanel({ client }: { client: SupabaseClient }) {
           position: row.position,
           points,
           gross,
-          discarded: Math.max(0, gross - points),
+          // descartar um resultado negativo aumenta o total: o descarte fica com sinal de +
+          discarded: gross - points,
           wins: row.wins,
           podiums: row.podiums,
           poles: row.poles,
@@ -193,7 +194,7 @@ export function StandingsPanel({ client }: { client: SupabaseClient }) {
             </div>
             <p className="pv-note">
               {current
-                ? `Classificação vigente · versão ${current.version} · recalculada em ${new Date(current.updatedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}. Válidos = brutos menos os 2 piores resultados regulares (Art. 20).`
+                ? `Versão ${current.version} desta categoria, recalculada em ${new Date(current.updatedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}. Válidos = brutos menos os 2 piores resultados regulares (Art. 20); descartar um resultado negativo soma (+).`
                 : "Classificação vigente."}
             </p>
           </div>
@@ -238,7 +239,9 @@ export function StandingsPanel({ client }: { client: SupabaseClient }) {
                       </td>
                     ))}
                     <td className="pv-num">{formatPoints(line.gross)}</td>
-                    <td className="pv-num">{line.discarded ? `−${formatPoints(line.discarded)}` : <span className="pv-muted">—</span>}</td>
+                    <td className="pv-num" title={line.discarded < 0 ? "Descarte de resultado negativo: soma ao total" : undefined}>
+                      {line.discarded > 0 ? `−${formatPoints(line.discarded)}` : line.discarded < 0 ? `+${formatPoints(-line.discarded)}` : <span className="pv-muted">—</span>}
+                    </td>
                     <td className="pv-num pv-strong">{formatPoints(line.points)}</td>
                     <td className="pv-num">{line.wins}</td>
                     <td className="pv-num">{line.podiums}</td>

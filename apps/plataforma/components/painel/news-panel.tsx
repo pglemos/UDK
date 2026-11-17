@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Trash2, Upload, X } from "lucide-react";
@@ -191,7 +192,7 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
   }
 
   async function remove(article: Article) {
-    if (!window.confirm(`Apagar a notícia "${article.title}"? Ela sai do site na hora.`)) return;
+    if (!(await confirmAction(`Apagar a notícia "${article.title}"? Ela sai do site na hora.`, "Apagar"))) return;
     const { error: removeError } = await client
       .from("cms_pages")
       .update({ deleted_at: new Date().toISOString() })
@@ -211,9 +212,12 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
       <li key={article.id} className="pv-news">
         <div className="pv-news-cover">
           {article.coverUrl ? (
-            <img src={article.coverUrl} alt="" loading="lazy" />
+            <img src={article.coverUrl} alt="" decoding="async" />
           ) : (
-            <ImagePlus aria-hidden="true" />
+            <span className="pv-news-nocover">
+              <ImagePlus aria-hidden="true" />
+              Sem capa
+            </span>
           )}
         </div>
         <div className="pv-stack">

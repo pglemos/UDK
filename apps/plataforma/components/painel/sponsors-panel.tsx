@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Trash2, Upload, X } from "lucide-react";
@@ -208,7 +209,7 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
   }
 
   async function remove(sponsor: Sponsor) {
-    if (!window.confirm(`Remover ${sponsor.name} dos patrocinadores? Ele sai do site na hora.`)) return;
+    if (!(await confirmAction(`Remover ${sponsor.name} dos patrocinadores? Ele sai do site na hora.`, "Remover"))) return;
     setError("");
     const { error: removeError } = await client
       .from("sponsors")

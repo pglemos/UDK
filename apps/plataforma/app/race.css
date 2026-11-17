@@ -6137,3 +6137,235 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .report-card h2 {
   font-size: var(--op-section);
 }
+
+/* acessibilidade: rótulos de tabela acima de 4.5:1, alvos de clique mínimos */
+.shell {
+  --op-head: #4c606a;
+}
+.shell .sidebar-brand > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+.shell .content a[target="_blank"] {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 4px;
+}
+
+/* tabelas largas: esmaece a borda direita enquanto houver colunas escondidas */
+@property --op-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes op-fade-scroll {
+  from {
+    --op-fade-end: 40px;
+  }
+  to {
+    --op-fade-end: 0px;
+  }
+}
+@supports (animation-timeline: scroll(self inline)) {
+  .shell .table-scroll {
+    animation: op-fade-scroll linear both;
+    animation-timeline: scroll(self inline);
+    mask-image: linear-gradient(to left, transparent 0, #000 var(--op-fade-end));
+  }
+}
+
+/* ===== Crítica 2026-11-17: correções gerais ===== */
+/* filtros: nome do grupo visível antes das opções */
+.shell .pv-segmented {
+  align-items: center;
+}
+.shell .pv-segmented-label {
+  padding: 0 8px 0 6px;
+  color: var(--op-head);
+  font: 600 var(--op-meta) var(--cinema-body);
+  white-space: nowrap;
+}
+
+/* legendas curtas junto da tabela */
+.shell .pv-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cinema-muted-dark);
+  font-size: var(--op-meta);
+}
+.shell .pv-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.shell .pv-legend b {
+  color: var(--cinema-ink);
+}
+.shell .pv-legend .pv-mark {
+  min-width: 0;
+  min-height: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  justify-content: center;
+}
+.shell .pv-legend .pv-mark svg {
+  width: 13px;
+  height: 13px;
+}
+.shell .pv-stage-head .pv-link-button {
+  min-height: 28px;
+  margin-top: 4px;
+  font-size: var(--op-meta);
+}
+
+/* carregamento: linhas-esqueleto no lugar do texto */
+.shell .pv-skeleton {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px;
+}
+.shell .pv-skeleton i {
+  display: block;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--cinema-paper-2) 0, var(--cinema-paper) 50%, var(--cinema-paper-2) 100%);
+  background-size: 200% 100%;
+  animation: op-skeleton 1.2s linear infinite;
+}
+.shell .pv-skeleton i:nth-of-type(1) {
+  width: 40%;
+  height: 20px;
+}
+.shell .pv-skeleton i:nth-of-type(odd) {
+  width: 92%;
+}
+@keyframes op-skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell .pv-skeleton i {
+    animation: none;
+  }
+}
+
+/* tabelas largas: nome fixo à esquerda, cabeçalho fixo nas matrizes longas */
+.shell .pv-table tbody th.pv-row-head,
+.shell .pv-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.shell .pv-table thead th:first-child {
+  z-index: 2;
+  background: var(--cinema-paper-2);
+}
+.shell .pv-roles thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--cinema-paper-2);
+}
+.shell .pv-roles thead th:first-child {
+  z-index: 3;
+}
+.shell .content[data-module="papeis"] .table-scroll,
+.shell .content[data-module="checkin"] .table-scroll {
+  max-height: 72vh;
+  overflow: auto;
+}
+.shell .content[data-module="checkin"] .pv-matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--cinema-paper-2);
+}
+.shell .content[data-module="checkin"] .pv-matrix thead th:first-child {
+  z-index: 3;
+}
+
+/* ações de linha: separação entre editar e excluir */
+.shell .admin-table td:last-child {
+  white-space: nowrap;
+}
+.shell .admin-table td:last-child > * + * {
+  margin-left: 8px;
+}
+
+/* notícias sem capa */
+.shell .pv-news-nocover {
+  display: grid;
+  gap: 4px;
+  place-items: center;
+  color: var(--op-head);
+  font-size: var(--op-meta);
+}
+
+/* celular: abas com indicação de que continuam */
+@media (max-width: 760px) {
+  .shell .pv-tabs {
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+  .shell .pv-segmented-label {
+    width: 100%;
+    padding: 4px 6px 2px;
+  }
+}
+
+/* confirmação de ações destrutivas (lib/confirm-action.ts) */
+.op-confirm {
+  width: min(440px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--cinema-ink);
+  padding: 24px;
+}
+.op-confirm::backdrop {
+  background: #081116a6;
+}
+.op-confirm p {
+  margin: 0 0 20px;
+  font: 500 1rem/1.5 var(--cinema-body);
+  text-wrap: pretty;
+}
+.op-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.op-confirm-actions button {
+  min-height: 44px;
+  border-radius: 4px;
+  padding: 0 18px;
+  font: 600 0.875rem var(--cinema-body);
+  cursor: pointer;
+}
+.op-confirm .button-secondary {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--cinema-ink);
+}
+.op-confirm .button-danger {
+  border: 1px solid var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+.op-confirm .button-danger:hover {
+  background: #8f1f28;
+}
+.op-confirm button:focus-visible {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 2px;
+}

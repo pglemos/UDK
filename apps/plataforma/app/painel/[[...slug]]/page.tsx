@@ -74,6 +74,24 @@ const sectionIcons: Record<string, LucideIcon> = {
 
 type ModuleCount = { total: number; tom: "quiet" | "normal" | "warning" | "danger" };
 
+/** Subtítulo das abas que não têm cadastro genérico por trás. */
+const customTabDescriptions: Record<string, string> = {
+  calendario: "Datas, formato e traçado de cada etapa da temporada.",
+  karts: "Melhor volta e ritmo de cada kart, por campeonato ou por corrida.",
+  resultados: "Cada tomada de tempo e corrida, com resultado oficial e volta a volta em PDF.",
+  "entradas-resultado": "Pontos de cada piloto em cada corrida, pela chegada geral.",
+  classificacao: "Classificação vigente de cada categoria, com descartes.",
+  pontuacao: "Pontos por posição e bônus de cada formato, conforme o regulamento.",
+  conteudo: "Notícias publicadas no site, com capa e texto.",
+  patrocinadores: "Logos, links e quais marcas aparecem no site.",
+  campeonato: "Nome, cor, temporada e situação do campeonato.",
+  configuracoes: "Categorias da temporada e o que vale para cada uma.",
+  termos: "Regulamento e termos em vigor, e quem já aceitou.",
+  relatorios: "Baixe os dados do campeonato em planilha (CSV).",
+  equipe: "Quem acessa o painel e com qual papel.",
+  papeis: "O que cada papel pode ver e alterar em cada área.",
+};
+
 const countClass: Record<ModuleCount["tom"], string> = {
   quiet: "count count-quiet",
   normal: "count",
@@ -284,7 +302,13 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       return count ?? 0;
     };
     void Promise.all([
-      contar("drivers", "status", ["pending", "approved", "suspended"]),
+      // mesmo critério da lista de pilotos: todo cadastro que não foi arquivado
+      client
+        .from("drivers")
+        .select("id", { count: "exact", head: true })
+        .is("deleted_at", null)
+        .neq("status", "archived")
+        .then(({ count }) => count ?? 0),
       contar("registrations", "status", ["submitted", "analysis", "documents_pending", "payment_pending"]),
       contar("documents", "status", ["pending"]),
       contar("payments", "status", ["pending", "under_review"]),
@@ -448,7 +472,11 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   }
 
   const heading = route?.section.key === "inicio" ? "Início" : (route?.section.label ?? "Página não encontrada");
-  const description = route?.section.description ?? "Este endereço não existe mais no painel.";
+  const description = route
+    ? (customTabDescriptions[route.tab.module] ??
+      (route.section.tabs.length > 1 ? getModuleConfig(route.tab.module)?.description : undefined) ??
+      route.section.description)
+    : "Este endereço não existe mais no painel.";
 
   return (
     <div className="shell">
@@ -484,7 +512,13 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
                 >
                   <Icon size={18} />
                   {section.label}
-                  {count ? <span className={countClass[count.tom]}>{count.total}</span> : <ChevronRight size={15} />}
+                  {count ? (
+                    <span className={countClass[count.tom]} title={count.tom === "quiet" ? `${count.total} no total` : `${count.total} aguardando ação`}>
+                      {count.total}
+                    </span>
+                  ) : (
+                    <ChevronRight size={15} />
+                  )}
                 </Link>
               );
             })}

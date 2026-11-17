@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Mail, Plus, RefreshCw, Search, ShieldCheck, Trash2, UserPlus, X } from "lucide-react";
@@ -229,8 +230,8 @@ export function TeamAccessPanel({
           onChangeExpiry={(grant, expiresAt) =>
             void run(() => call("PATCH", { roleId: grant.id, expiresAt }), `Validade de ${roleLabels[grant.role]} atualizada.`)
           }
-          onRemoveRole={(grant) => {
-            if (!window.confirm(`Tirar o papel ${roleLabels[grant.role]} de ${selected.name}? O acesso termina na hora.`)) return;
+          onRemoveRole={async (grant) => {
+            if (!(await confirmAction(`Tirar o papel ${roleLabels[grant.role]} de ${selected.name}? O acesso termina na hora.`, "Tirar acesso"))) return;
             void run(() => call("DELETE", { roleId: grant.id }), `${roleLabels[grant.role]} retirado de ${selected.name}.`);
           }}
           onAddException={(values) =>

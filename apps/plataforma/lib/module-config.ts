@@ -197,7 +197,8 @@ const statusLabels: Record<string, string> = {
   live: "Ao vivo",
   low: "Baixa",
   maintain: "Manter",
-  manual_csv: "CSV manual",
+  manual_csv: "Arquivo manual",
+  laptime: "Cronometragem (LapTime)",
   manual_pdf: "PDF manual",
   manager: "Gestor",
   medium: "Média",
@@ -302,7 +303,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "pilotos",
     label: "Pilotos",
-    description: "Cadastro completo do piloto, foto, segurança, saúde e homologação.",
+    description: "Ficha de cada piloto: contato, foto, peso, saúde e homologação.",
     table: "drivers",
     singular: "piloto",
     titleColumn: "sport_name",
@@ -423,7 +424,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "inscricoes",
     label: "Inscrições",
-    description: "Temporada, etapas, categoria solicitada e homologação.",
+    description: "Pedidos de inscrição na temporada e nas etapas, com a categoria pedida.",
     table: "registrations",
     singular: "inscrição",
     titleColumn: "protocol",
@@ -464,7 +465,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "documentos",
     label: "Documentos",
-    description: "Arquivos privados, validade, análise e solicitação de correção.",
+    description: "Documentos enviados pelos pilotos para conferência da organização.",
     table: "documents",
     singular: "documento",
     titleColumn: "document_type",
@@ -516,7 +517,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "financeiro",
     label: "Financeiro",
-    description: "Cobranças PIX, comprovantes, análise, aprovação e reembolso.",
+    description: "Pagamentos de inscrição: comprovantes enviados, análise e aprovação.",
     table: "payments",
     singular: "pagamento",
     titleColumn: "status",
@@ -552,7 +553,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "creditos",
     label: "Créditos",
-    description: "Carteira interna, origem, validade e saldo disponível.",
+    description: "Créditos que o piloto tem para usar em inscrições futuras.",
     table: "credits",
     singular: "crédito",
     titleColumn: "origin",
@@ -598,7 +599,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "calendario",
     label: "Calendário",
-    description: "Etapas, formato, traçado, data e situação operacional.",
+    description: "Datas, formato e traçado de cada etapa da temporada.",
     table: "stages",
     singular: "etapa",
     titleColumn: "title",
@@ -634,7 +635,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "resultados",
     label: "Resultados",
-    description: "Sessões, versões, homologação, melhor volta e publicação.",
+    description: "Resultados oficiais de cada tomada e corrida.",
     table: "results",
     singular: "resultado",
     titleColumn: "title",
@@ -735,12 +736,13 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "importacoes",
     label: "Importações",
-    description: "Arquivos de cronometragem, origem, hash e diagnóstico.",
+    description: "Arquivos da cronometragem usados para lançar os resultados.",
     table: "import_batches",
     singular: "importação",
     titleColumn: "original_filename",
     orderBy: "created_at",
     ascending: false,
+    tableColumns: ["stage_id", "source", "original_filename", "status"],
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("result_id", "Resultado", "results", "title", false),
@@ -749,7 +751,7 @@ export const moduleConfigs: ModuleConfig[] = [
         label: "Origem",
         kind: "select",
         required: true,
-        options: statusOptions("email", "forwarded_email", "manual_pdf", "manual_csv"),
+        options: statusOptions("email", "forwarded_email", "manual_pdf", "manual_csv", "laptime", "timing"),
       },
       { key: "original_filename", label: "Arquivo", kind: "text" },
       {
@@ -782,7 +784,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "ocorrencias",
     label: "Ocorrências",
-    description: "Registro de pista, gravidade, volta, cláusula e encaminhamento.",
+    description: "Incidentes registrados em pista, com volta, gravidade e artigo do regulamento.",
     table: "incidents",
     singular: "ocorrência",
     titleColumn: "incident_type",
@@ -836,12 +838,13 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "julgamentos",
     label: "Penalidades",
-    description: "Decisão, efeito esportivo, visibilidade e recursos.",
+    description: "Penalidades aplicadas, com o código do regulamento e o efeito em tempo ou pontos.",
     table: "penalties",
     singular: "penalidade",
     titleColumn: "code",
     orderBy: "created_at",
     ascending: false,
+    tableColumns: ["stage_id", "driver_id", "code", "effect", "status"],
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("driver_id", "Piloto", "drivers", "sport_name", false),
@@ -858,7 +861,7 @@ export const moduleConfigs: ModuleConfig[] = [
         })),
       },
       { key: "summary", label: "Resumo", kind: "textarea", required: true },
-      { key: "effect", label: "Efeito", kind: "text", required: true },
+      { key: "effect", label: "Efeito", kind: "text", required: true, placeholder: "Vem do código escolhido; altere só se a decisão for diferente" },
       {
         key: "status",
         label: "Situação",
@@ -885,7 +888,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "recursos",
     label: "Recursos",
-    description: "Protocolo, manifestação, análise e decisão final.",
+    description: "Recursos dos pilotos contra penalidades e a decisão da organização.",
     table: "appeals",
     singular: "recurso",
     titleColumn: "protocol",
@@ -990,7 +993,7 @@ export const moduleConfigs: ModuleConfig[] = [
     label: "Conteúdo",
     description: "Notícias do site: texto, capa e publicação.",
     table: "cms_pages",
-    singular: "página",
+    singular: "notícia",
     titleColumn: "title",
     orderBy: "updated_at",
     ascending: false,
@@ -1030,9 +1033,9 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "notificacoes",
     label: "Notificações",
-    description: "Avisos críticos e mensagens internas por usuário.",
+    description: "Avisos enviados aos pilotos e à equipe pelo painel.",
     table: "notifications",
-    singular: "notificação",
+    singular: "aviso",
     titleColumn: "title",
     orderBy: "created_at",
     ascending: false,
@@ -1046,7 +1049,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "configuracoes",
     label: "Categorias",
-    description: "Categorias e identidade esportiva da temporada.",
+    description: "Categorias da temporada: Ultras Insanos e Ultras Rápidos.",
     table: "categories",
     singular: "categoria",
     titleColumn: "name",
@@ -1068,9 +1071,9 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "responsaveis",
     label: "Responsáveis legais",
-    description: "Vínculos de responsáveis com pilotos menores e homologação administrativa.",
+    description: "Responsáveis legais dos pilotos menores de idade.",
     table: "guardian_links",
-    singular: "vínculo",
+    singular: "responsável",
     titleColumn: "relationship",
     orderBy: "created_at",
     ascending: false,
@@ -1092,7 +1095,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "termos",
     label: "Termos e regulamentos",
-    description: "Versões oficiais, vigência, obrigatoriedade e publicação.",
+    description: "Versões do regulamento e dos termos que os pilotos precisam aceitar.",
     table: "terms",
     singular: "termo",
     titleColumn: "title",
@@ -1132,8 +1135,9 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "aceites",
     label: "Aceites",
-    description: "Evidência de aceite por usuário, piloto ou responsável legal.",
+    description: "Registro de quem aceitou cada versão. O aceite é feito pelo próprio piloto no cadastro.",
     table: "term_acceptances",
+    readOnly: true,
     singular: "aceite",
     titleColumn: "accepted_at",
     orderBy: "accepted_at",
@@ -1157,9 +1161,9 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "mudancas-categoria",
     label: "Mudanças de categoria",
-    description: "Solicitação, política de pontos, etapa de vigência e decisão.",
+    description: "Pedidos de troca de categoria e a decisão sobre os pontos.",
     table: "category_change_requests",
-    singular: "mudança",
+    singular: "mudança de categoria",
     titleColumn: "status",
     orderBy: "created_at",
     ascending: false,
@@ -1326,7 +1330,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "evidencias",
     label: "Evidências",
-    description: "Fotos, vídeos, relatórios, testemunhos e documentos disciplinares.",
+    description: "Fotos, vídeos e relatos ligados a uma ocorrência.",
     table: "evidence",
     singular: "evidência",
     titleColumn: "evidence_type",
@@ -1400,7 +1404,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "campanhas",
     label: "Campanhas de patrocinadores",
-    description: "Aprovação, cupons, ativações, conteúdo e métricas.",
+    description: "Ações dos patrocinadores no site, como cupons e ativações.",
     table: "sponsor_campaigns",
     singular: "campanha",
     titleColumn: "title",
@@ -1451,8 +1455,9 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "versoes-conteudo",
     label: "Versões de conteúdo",
-    description: "Histórico estruturado para revisão, restauração e publicação.",
+    description: "Versões anteriores das notícias, para conferir ou restaurar.",
     table: "cms_versions",
+    readOnly: true,
     singular: "versão",
     titleColumn: "version",
     orderBy: "version",
@@ -1474,7 +1479,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "usuarios-patrocinador",
     label: "Usuários de patrocinadores",
-    description: "Vínculos, funções e situação dos acessos empresariais.",
+    description: "Quem de cada patrocinador pode entrar no painel.",
     table: "sponsor_users",
     singular: "usuário de patrocinador",
     titleColumn: "member_role",

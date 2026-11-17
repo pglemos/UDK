@@ -35,7 +35,7 @@ export function SetupGuide({ client, allowedKeys }: { client: SupabaseClient; al
       ]);
       if (!active) return;
       const seasonReady = Boolean(season.data?.starts_at && season.data?.ends_at);
-      setSteps([
+      const list: Step[] = [
         { key: "campeonato", module: "campeonato", title: "Campeonato e temporada", done: seasonReady, detail: seasonReady ? "Nome, datas e situação definidos." : "Defina nome, datas e situação da temporada." },
         { key: "categorias", module: "configuracoes", title: "Categorias", done: categories > 0, detail: categories ? `${categories} categoria(s) ativa(s).` : "Crie as categorias do campeonato." },
         { key: "etapas", module: "calendario", title: "Calendário de etapas", done: stages > 0, detail: stages ? `${stages} etapa(s) no calendário.` : "Cadastre as datas e traçados das etapas." },
@@ -44,7 +44,10 @@ export function SetupGuide({ client, allowedKeys }: { client: SupabaseClient; al
         { key: "pilotos", module: "pilotos", title: "Pilotos cadastrados", done: drivers > 0, detail: drivers ? `${drivers} piloto(s) no campeonato.` : "Cadastre ou aprove os pilotos." },
         { key: "equipe", module: "equipe", title: "Equipe com acesso", done: staff > 1, detail: staff > 1 ? `${staff} acesso(s) da equipe.` : "Dê acesso à comissão, direção de prova e financeiro." },
         { key: "patrocinadores", module: "patrocinadores", title: "Patrocinadores no site", done: sponsors > 0, detail: sponsors ? `${sponsors} marca(s) no site.` : "Cadastre as marcas e suas logos." },
-      ]);
+      ];
+      setSteps(list);
+      // configuração completa fica recolhida; só abre sozinha quando falta algo
+      setOpen(list.some((step) => !step.done));
     })().catch(() => undefined);
     return () => {
       active = false;

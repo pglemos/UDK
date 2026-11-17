@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -79,6 +80,10 @@ function formatValue(
   }
   if (field.kind === "select") {
     return field.options?.find((option) => option.value === String(value))?.label ?? String(value);
+  }
+  if (field.suggestions) {
+    const match = field.suggestions.find((item) => item.value === String(value));
+    if (match?.label) return `${String(value)} · ${match.label.split(" — ")[0]}`;
   }
   if (field.kind === "checkbox") return value ? "Sim" : "Não";
   if (field.kind === "currency") {
@@ -245,6 +250,12 @@ const emptyNouns: Record<string, string> = {
   "Karts e sorteio": "karts sorteados",
   "Entradas de resultado": "posições lançadas",
 };
+
+const feminine = /(a|ção|são|ência|ade|agem|ança|equipe)$/;
+
+function newLabel(singular = "registro"): string {
+  return `${feminine.test(singular.split(" ")[0] ?? "") ? "Nova" : "Novo"} ${singular}`;
+}
 
 function emptyNoun(label: string): string {
   return emptyNouns[label] ?? label.toLowerCase();
@@ -658,7 +669,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }
 
   async function deleteRecord(record: RecordRow) {
-    if (!window.confirm(`Arquivar ${String(record[config.titleColumn] ?? config.singular)}?`))
+    if (!(await confirmAction(`Arquivar este registro de ${config.singular ?? "cadastro"}? Ele sai da lista, mas o histórico fica guardado.`, "Arquivar")))
       return;
     setSaving(true);
     setError("");
@@ -690,7 +701,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }
 
   async function runAction(record: RecordRow, action: ModuleAction) {
-    if (!window.confirm(action.confirmation)) return;
+    if (!(await confirmAction(action.confirmation))) return;
     setSaving(true);
     setError("");
     const parameters = Object.fromEntries(
@@ -748,7 +759,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         {!config.readOnly ? (
           <button className="button-primary" type="button" onClick={openCreate}>
             <Plus size={18} />
-            Novo
+            {newLabel(config.singular)}
           </button>
         ) : null}
       </div>
@@ -796,7 +807,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             <div className="empty-state">
               <Inbox aria-hidden="true" />
               <h3>Ainda não há {emptyNoun(config.label)}</h3>
-              <p>Quando houver, eles aparecem aqui. Use “Novo” para cadastrar o primeiro.</p>
+              <p>
+                {config.description}
+                {config.readOnly ? "" : ` Use “${newLabel(config.singular)}” para cadastrar.`}
+              </p>
             </div>
           )
         ) : (

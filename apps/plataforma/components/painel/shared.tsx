@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 export type StageInfo = {
   id: string;
@@ -152,9 +152,11 @@ export function PanelState({
 }) {
   if (loading) {
     return (
-      <div className="pv-state" role="status">
-        <LoaderCircle className="spin" aria-hidden="true" />
-        <span>Carregando…</span>
+      <div className="pv-skeleton" role="status" aria-busy="true">
+        <span className="pv-visually-hidden">Carregando…</span>
+        {Array.from({ length: 6 }, (_, index) => (
+          <i key={index} aria-hidden="true" />
+        ))}
       </div>
     );
   }
@@ -182,6 +184,9 @@ export function Segmented<T extends string>({
 }) {
   return (
     <div className="pv-segmented" role="radiogroup" aria-label={label}>
+      <span className="pv-segmented-label" aria-hidden="true">
+        {label}
+      </span>
       {options.map((option) => (
         <button
           key={option.value}
