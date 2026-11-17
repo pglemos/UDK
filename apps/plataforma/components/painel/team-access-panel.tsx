@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Mail, Plus, RefreshCw, Search, ShieldCheck, Trash2, UserPlus, X } from "lucide-react";
 import { PanelState, Segmented, errorMessage, normalizeSearch } from "./shared";
@@ -93,8 +93,10 @@ export function TeamAccessPanel({
     [client],
   );
 
+  const loadedOnce = useRef(false);
   const load = useCallback(async () => {
-    setLoading(true);
+    // só mostra o carregamento na primeira vez; nas atualizações a lista continua na tela
+    if (!loadedOnce.current) setLoading(true);
     setError("");
     try {
       const payload = await call("GET");
@@ -117,6 +119,7 @@ export function TeamAccessPanel({
     } catch (loadError) {
       setError(errorMessage(loadError));
     } finally {
+      loadedOnce.current = true;
       setLoading(false);
     }
   }, [call, client]);

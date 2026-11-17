@@ -77,8 +77,9 @@ export function ChampionshipSettings({ client, readOnly }: { client: SupabaseCli
         name: String(seasonRow.name ?? ""),
         year: Number(seasonRow.year),
         status: String(seasonRow.status ?? "active"),
-        startsAt: String(seasonRow.starts_at ?? ""),
-        endsAt: String(seasonRow.ends_at ?? ""),
+        // datas no fuso de Brasília (AAAA-MM-DD), como o campo de data mostra e grava
+        startsAt: toDateInput(String(seasonRow.starts_at ?? "")),
+        endsAt: toDateInput(String(seasonRow.ends_at ?? "")),
       });
       setSummary({
         categories: categories.count ?? 0,
@@ -129,8 +130,8 @@ export function ChampionshipSettings({ client, readOnly }: { client: SupabaseCli
           name: season.name.trim(),
           year: season.year,
           status: season.status,
-          starts_at: season.startsAt ? new Date(`${season.startsAt.slice(0, 10)}T00:00:00-03:00`).toISOString() : null,
-          ends_at: season.endsAt ? new Date(`${season.endsAt.slice(0, 10)}T23:59:00-03:00`).toISOString() : null,
+          starts_at: season.startsAt ? new Date(`${season.startsAt}T00:00:00-03:00`).toISOString() : null,
+          ends_at: season.endsAt ? new Date(`${season.endsAt}T23:59:00-03:00`).toISOString() : null,
         })
         .eq("id", season.id);
       if (seasonUpdate.error) throw seasonUpdate.error;
@@ -204,11 +205,11 @@ export function ChampionshipSettings({ client, readOnly }: { client: SupabaseCli
                 </label>
                 <label>
                   Início
-                  <input type="date" value={toDateInput(season.startsAt)} onChange={(event) => setSeason({ ...season, startsAt: event.target.value })} />
+                  <input type="date" value={season.startsAt} onChange={(event) => setSeason({ ...season, startsAt: event.target.value })} />
                 </label>
                 <label>
                   Fim
-                  <input type="date" value={toDateInput(season.endsAt)} onChange={(event) => setSeason({ ...season, endsAt: event.target.value })} />
+                  <input type="date" value={season.endsAt} onChange={(event) => setSeason({ ...season, endsAt: event.target.value })} />
                 </label>
                 <label className="form-wide">
                   Situação
