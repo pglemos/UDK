@@ -1001,7 +1001,7 @@ export const moduleConfigs: ModuleConfig[] = [
     ascending: false,
     fields: [
       relation("championship_id", "Campeonato", "championships", "name"),
-      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
+      { key: "slug", label: "Endereço (URL)", kind: "text", required: true },
       { key: "title", label: "Título", kind: "text", required: true },
       { key: "content", label: "Conteúdo", kind: "json", required: true },
       {
@@ -1025,7 +1025,7 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("championship_id", "Campeonato", "championships", "name"),
       { key: "name", label: "Nome", kind: "text", required: true },
-      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
+      { key: "slug", label: "Endereço (URL)", kind: "text", required: true },
       { key: "logo_url", label: "Logo", kind: "text" },
       { key: "website_url", label: "Site", kind: "text" },
       { key: "tier", label: "Categoria comercial", kind: "text", required: true },
@@ -1058,7 +1058,7 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "name",
     fields: [
       relation("season_id", "Temporada", "seasons", "name"),
-      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
+      { key: "slug", label: "Endereço (URL)", kind: "text", required: true },
       { key: "name", label: "Nome", kind: "text", required: true },
       { key: "color", label: "Cor", kind: "text", required: true },
       {
@@ -1209,6 +1209,7 @@ export const moduleConfigs: ModuleConfig[] = [
     singular: "sessão",
     titleColumn: "name",
     orderBy: "starts_at",
+    tableColumns: ["stage_id", "name", "kind", "starts_at", "status"],
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("category_id", "Categoria", "categories", "name", false),

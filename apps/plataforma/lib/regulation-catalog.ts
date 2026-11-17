@@ -83,6 +83,13 @@ export const penaltyCatalog: PenaltyCatalogItem[] = [
     summary: "Manobra imprudente na largada ou bloqueio antidesportivo (Art. 26).",
     effect: "Punição definida pela Direção de Prova, conforme a gravidade (Art. 22).",
   },
+  {
+    code: "TIME-05",
+    name: "Acréscimo de 5 segundos (Direção de Prova)",
+    article: "Decisão da Direção de Prova",
+    summary: "Penalidade de tempo aplicada pela Direção de Prova.",
+    effect: "+5 segundos no tempo final da prova.",
+  },
 ];
 
 export type IncidentCatalogItem = { type: string; clause: string; severity: "low" | "medium" | "high" | "critical" };

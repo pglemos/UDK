@@ -255,11 +255,11 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
         </div>
         {readOnly ? null : (
           <div className="pv-sponsor-actions">
-            <button type="button" className="icon-button" onClick={() => openEditor(sponsor)} aria-label={`Editar ${sponsor.name}`}>
-              <Pencil aria-hidden="true" />
+            <button type="button" className="row-action" onClick={() => openEditor(sponsor)} aria-label={`Editar ${sponsor.name}`}>
+              <Pencil aria-hidden="true" /> Editar
             </button>
-            <button type="button" className="icon-button danger" onClick={() => void remove(sponsor)} aria-label={`Remover ${sponsor.name}`}>
-              <Trash2 aria-hidden="true" />
+            <button type="button" className="row-action is-quiet" onClick={() => void remove(sponsor)} aria-label={`Remover ${sponsor.name}`}>
+              <Trash2 aria-hidden="true" /> Remover
             </button>
           </div>
         )}

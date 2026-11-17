@@ -269,6 +269,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [fileValues, setFileValues] = useState<Record<string, File | undefined>>({});
   const [editing, setEditing] = useState<RecordRow>();
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [lastArchived, setLastArchived] = useState<string[]>([]);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const openCreateRef = useRef<() => void>(() => undefined);
   const [statusFilter, setStatusFilter] = useState("");
   const [pageSize, setPageSize] = useState(50);
   const statusField = config.fields.find((field) => field.key === "status" && field.kind === "select");
@@ -297,6 +301,26 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       ),
     );
   }, [config.fields, records, relationOptions, search, statusFilter]);
+  const shown = useMemo(() => filteredRecords.slice(0, pageSize), [filteredRecords, pageSize]);
+
+  // atalhos: "/" vai para a busca, "N" abre o cadastro novo
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+      if (document.querySelector("dialog[open], .modal-backdrop")) return;
+      if (event.key === "/") {
+        event.preventDefault();
+        searchRef.current?.focus();
+      } else if ((event.key === "n" || event.key === "N") && !config.readOnly) {
+        event.preventDefault();
+        openCreateRef.current();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [config.readOnly]);
 
   useEffect(() => {
     savingRef.current = saving;
@@ -456,6 +480,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
     };
   }, [loadRecords, owner, syncOffline]);
 
+  openCreateRef.current = () => openCreate();
   function openCreate() {
     setEditing(undefined);
     setValues(initialValues(config));
@@ -614,6 +639,20 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
     let keepUploads = false;
 
     try {
+      // Validação própria: diz quais campos faltam, em vez do balão do navegador num campo só.
+      const missing = config.fields.filter((field) => {
+        if (!field.required || field.readOnly || field.kind === "checkbox") return false;
+        if (field.kind === "file" && editing) return false;
+        const value = values[field.key];
+        return value === "" || value === null || value === undefined;
+      });
+      if (missing.length) {
+        throw new Error(
+          missing.length === 1
+            ? `Preencha o campo ${missing[0]?.label}.`
+            : `Preencha os campos: ${missing.map((field) => field.label).join(", ")}.`,
+        );
+      }
       // Pares mutuamente exclusivos: avisar antes de gastar um round-trip e
       // receber de volta a violação de CHECK do banco.
       for (const field of config.fields) {
@@ -700,8 +739,41 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       setSaving(false);
       return;
     }
-    setNotice("Registro arquivado com exclusão lógica.");
+    setLastArchived([String(record.id)]);
+    setNotice("Registro arquivado.");
     await loadRecords();
+    setSaving(false);
+  }
+
+  async function archiveSelected() {
+    const ids = Array.from(selected);
+    if (!ids.length) return;
+    if (!(await confirmAction(`Arquivar ${ids.length} registro(s) de ${config.label.toLowerCase()}? Eles saem da lista, mas o histórico fica guardado.`, "Arquivar")))
+      return;
+    setSaving(true);
+    setError("");
+    const { error: bulkError } = await client.from(config.table).update({ deleted_at: new Date().toISOString() }).in("id", ids);
+    if (bulkError) setError(bulkError.message);
+    else {
+      setLastArchived(ids);
+      setSelected(new Set());
+      setNotice(`${ids.length} registro(s) arquivado(s).`);
+      await loadRecords();
+    }
+    setSaving(false);
+  }
+
+  async function undoArchive() {
+    if (!lastArchived.length) return;
+    setSaving(true);
+    setError("");
+    const { error: undoError } = await client.from(config.table).update({ deleted_at: null }).in("id", lastArchived);
+    if (undoError) setError(undoError.message);
+    else {
+      setNotice(`${lastArchived.length} registro(s) de volta à lista.`);
+      setLastArchived([]);
+      await loadRecords();
+    }
     setSaving(false);
   }
 
@@ -746,6 +818,8 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         <div className="search-box">
           <Search size={18} />
           <input
+            ref={searchRef}
+            aria-keyshortcuts="/"
             aria-label={`Buscar em ${config.label}`}
             placeholder={`Buscar em ${config.label.toLowerCase()}`}
             value={search}
@@ -786,11 +860,14 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
           Atualizar
         </button>
         {!config.readOnly ? (
-          <button className="button-primary" type="button" onClick={openCreate}>
+          <button className="button-primary" type="button" onClick={openCreate} aria-keyshortcuts="N" title="Atalho: N">
             <Plus size={18} />
             {newLabel(config.singular)}
           </button>
         ) : null}
+        <span className="pv-kbd-hint" aria-hidden="true">
+          <kbd>/</kbd> busca{config.readOnly ? "" : <> · <kbd>N</kbd> novo</>}
+        </span>
       </div>
 
       {pendingOffline > 0 ? (
@@ -808,8 +885,25 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         </div>
       ) : null}
       {notice ? (
-        <div className="alert alert-success" role="status">
-          {notice}
+        <div className="alert alert-success pv-undo" role="status">
+          <span>{notice}</span>
+          {lastArchived.length ? (
+            <button type="button" className="button-secondary pv-small" onClick={() => void undoArchive()} disabled={saving}>
+              Desfazer
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {selected.size ? (
+        <div className="pv-bulk" role="region" aria-label="Ações em lote">
+          <b>{selected.size} selecionado(s)</b>
+          <button type="button" className="row-action is-quiet" onClick={() => void archiveSelected()} disabled={saving}>
+            <Archive size={15} aria-hidden="true" /> Arquivar selecionados
+          </button>
+          <button type="button" className="pv-link-button" onClick={() => setSelected(new Set())}>
+            Limpar seleção
+          </button>
         </div>
       ) : null}
 
@@ -851,6 +945,18 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             <table className="admin-table">
               <thead>
                 <tr>
+                  {config.readOnly || config.createOnly ? null : (
+                    <th className="pv-check">
+                      <input
+                        type="checkbox"
+                        aria-label="Selecionar todos os visíveis"
+                        checked={shown.length > 0 && shown.every((record) => selected.has(String(record.id)))}
+                        onChange={(event) =>
+                          setSelected(event.target.checked ? new Set(shown.map((record) => String(record.id))) : new Set())
+                        }
+                      />
+                    </th>
+                  )}
                   {visibleFields.map((field) => (
                     <th key={field.key}>{field.label}</th>
                   ))}
@@ -859,8 +965,25 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                 </tr>
               </thead>
               <tbody>
-                {filteredRecords.slice(0, pageSize).map((record) => (
-                  <tr key={record.id}>
+                {shown.map((record) => (
+                  <tr key={record.id} className={selected.has(String(record.id)) ? "is-selected" : undefined}>
+                    {config.readOnly || config.createOnly ? null : (
+                      <td className="pv-check">
+                        <input
+                          type="checkbox"
+                          aria-label="Selecionar registro"
+                          checked={selected.has(String(record.id))}
+                          onChange={(event) =>
+                            setSelected((current) => {
+                              const next = new Set(current);
+                              if (event.target.checked) next.add(String(record.id));
+                              else next.delete(String(record.id));
+                              return next;
+                            })
+                          }
+                        />
+                      </td>
+                    )}
                     {visibleFields.map((field) => {
                       const formatted = formatValue(record[field.key], field, relationOptions);
                       const completo =
@@ -969,7 +1092,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                 <X />
               </button>
             </div>
-            <form onSubmit={(event) => void saveRecord(event)}>
+            <form noValidate onSubmit={(event) => void saveRecord(event)}>
               <div className="form-grid">
                 {config.fields.map((field) => {
                   const value = values[field.key];

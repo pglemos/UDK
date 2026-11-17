@@ -6637,3 +6637,90 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .admin-table td.pv-nowrap {
   white-space: nowrap;
 }
+
+/* ===== Crítica, rodada 4 ===== */
+/* seleção em lote */
+.shell .pv-check {
+  width: 44px;
+  text-align: center;
+}
+.shell .pv-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--op-accent);
+  cursor: pointer;
+}
+.shell .admin-table tr.is-selected td {
+  background: var(--op-accent-wash);
+}
+.shell .pv-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid color-mix(in srgb, var(--op-accent) 35%, transparent);
+  border-radius: 8px;
+  background: var(--op-accent-wash);
+  padding: 8px 16px;
+  color: var(--op-accent);
+}
+.shell .pv-bulk b {
+  margin-right: auto;
+}
+
+/* dica de atalhos (só onde há teclado) */
+.shell .pv-kbd-hint {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--op-head);
+  font-size: var(--op-meta);
+  white-space: nowrap;
+}
+@media (hover: hover) and (min-width: 1100px) {
+  .shell .pv-kbd-hint {
+    display: inline-flex;
+  }
+}
+.shell kbd {
+  min-width: 20px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 5px;
+  color: var(--cinema-ink);
+  font: 600 var(--op-meta) / 1.5 var(--cinema-body);
+  text-align: center;
+}
+
+/* mostrar arquivados */
+.shell .pv-toggle {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  color: var(--cinema-muted-dark);
+  font-size: var(--op-body);
+  cursor: pointer;
+}
+.shell .pv-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--op-accent);
+}
+
+/* ações com texto em notícias e patrocinadores */
+.shell .row-action svg {
+  width: 15px;
+  height: 15px;
+}
+.shell .pv-sponsor-actions {
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  padding: 0 14px 14px;
+}
+.shell .pv-news-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}

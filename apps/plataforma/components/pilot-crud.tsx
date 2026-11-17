@@ -236,6 +236,7 @@ export function PilotCrud({
   const [photoPreview, setPhotoPreview] = useState<string>();
   const [removePhoto, setRemovePhoto] = useState(false);
   const [search, setSearch] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -328,10 +329,12 @@ export function PilotCrud({
     return () => URL.revokeObjectURL(url);
   }, [photoFile, values.avatar_url]);
 
+  const archivedCount = useMemo(() => records.filter((record) => record.status === "archived").length, [records]);
   const visibleRecords = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return records;
-    return records.filter((record) =>
+    const base = showArchived ? records : records.filter((record) => record.status !== "archived");
+    if (!term) return base;
+    return base.filter((record) =>
       [
         "full_name",
         "email",
@@ -345,7 +348,7 @@ export function PilotCrud({
         .map((key) => text(record, key).toLowerCase())
         .some((value) => value.includes(term)),
     );
-  }, [records, search]);
+  }, [records, search, showArchived]);
 
   const selectedCategories = useMemo(
     () => categories.filter((category) => category.season_id === String(values.season_id)),
@@ -550,10 +553,15 @@ export function PilotCrud({
       <div className="data-card">
         <div className="data-card-head">
           <div>
-            <strong>{visibleRecords.length}</strong>
-            <span>piloto(s)</span>
+            <strong>{loading ? "…" : visibleRecords.length}</strong>
+            <span>{visibleRecords.length === 1 ? "piloto" : "pilotos"}</span>
           </div>
-          <small>Kart definido por sorteio na sessão. O cadastro não usa número de piloto.</small>
+          {archivedCount ? (
+            <label className="pv-toggle">
+              <input type="checkbox" checked={showArchived} onChange={(event) => setShowArchived(event.target.checked)} />
+              Mostrar arquivados ({archivedCount})
+            </label>
+          ) : null}
         </div>
         {loading ? (
           <div className="empty-state">
@@ -738,7 +746,7 @@ export function PilotCrud({
               <X />
             </button>
           </div>
-          <form onSubmit={(event) => void save(event)}>
+          <form noValidate onSubmit={(event) => void save(event)}>
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
                 <div>

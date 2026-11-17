@@ -233,17 +233,17 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
         </div>
         <div className="pv-news-actions">
           {article.status === "published" ? (
-            <a className="icon-button" href={`/noticias/${article.slug}`} target="_blank" rel="noreferrer" aria-label={`Ver ${article.title} no site`}>
-              <ExternalLink aria-hidden="true" />
+            <a className="row-action" href={`/noticias/${article.slug}`} target="_blank" rel="noreferrer" aria-label={`Ver ${article.title} no site`}>
+              <ExternalLink aria-hidden="true" /> Ver no site
             </a>
           ) : null}
           {readOnly ? null : (
             <>
-              <button type="button" className="icon-button" onClick={() => openEditor(article)} aria-label={`Editar ${article.title}`}>
-                <Pencil aria-hidden="true" />
+              <button type="button" className="row-action" onClick={() => openEditor(article)} aria-label={`Editar ${article.title}`}>
+                <Pencil aria-hidden="true" /> Editar
               </button>
-              <button type="button" className="icon-button danger" onClick={() => void remove(article)} aria-label={`Apagar ${article.title}`}>
-                <Trash2 aria-hidden="true" />
+              <button type="button" className="row-action is-quiet" onClick={() => void remove(article)} aria-label={`Apagar ${article.title}`}>
+                <Trash2 aria-hidden="true" /> Apagar
               </button>
             </>
           )}
