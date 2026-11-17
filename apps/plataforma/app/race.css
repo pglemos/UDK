@@ -6724,3 +6724,8 @@ img[src^="/media/official/drivers/uniforme/"] {
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+
+/* textos só para leitor de tela ficam presos à área de rolagem da tabela */
+.shell .table-scroll {
+  position: relative;
+}

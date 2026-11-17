@@ -201,6 +201,24 @@ function errorMessage(error: unknown): string {
   return "Não foi possível concluir a operação. Tente novamente ou atualize a página.";
 }
 
+function ageFrom(date: string): number | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [year, month, day] = date.split("-").map(Number) as [number, number, number];
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  if (today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day)) age -= 1;
+  return age >= 0 && age < 130 ? age : null;
+}
+
+const fieldOfError: [RegExp, string][] = [
+  [/nome completo/i, "Nome completo"],
+  [/temporada/i, "Temporada"],
+  [/e-mail/i, "E-mail"],
+  [/idade/i, "Idade"],
+  [/peso/i, "Peso"],
+  [/altura/i, "Altura"],
+];
+
 function validate(form: PilotForm): string {
   const name = String(form.full_name).trim();
   if (name.split(/\s+/).length < 2) return "Informe o nome completo e o sobrenome do piloto.";
@@ -362,6 +380,7 @@ export function PilotCrud({
   function openCreate() {
     if (readOnly) return;
     setEditing(undefined);
+    setError("");
     setValues(emptyForm());
     setPhotoFile(undefined);
     setPhotoPreview(undefined);
@@ -372,6 +391,7 @@ export function PilotCrud({
 
   function openEdit(record: PilotRecord) {
     setEditing(record);
+    setError("");
     setValues(editForm(record));
     setPhotoFile(undefined);
     setPhotoPreview(text(record, "avatar_url") || undefined);
@@ -381,7 +401,9 @@ export function PilotCrud({
   }
 
   function closeEditor() {
-    if (!saving) setEditorOpen(false);
+    if (saving) return;
+    setEditorOpen(false);
+    setError("");
   }
 
   function selectPhoto(event: ChangeEvent<HTMLInputElement>) {
@@ -423,9 +445,22 @@ export function PilotCrud({
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (readOnly) return;
+    const form = event.currentTarget;
+    form.querySelectorAll("[aria-invalid]").forEach((element) => element.removeAttribute("aria-invalid"));
     const validationError = validate(values);
     if (validationError) {
       setError(validationError);
+      // marca o campo do erro e leva o foco até ele
+      const label = fieldOfError.find(([pattern]) => pattern.test(validationError))?.[1];
+      const target = label
+        ? Array.from(form.querySelectorAll("label")).find((item) => item.querySelector("span")?.textContent?.trim().startsWith(label))
+        : undefined;
+      const input = target?.querySelector<HTMLElement>("input, select, textarea");
+      if (input) {
+        input.setAttribute("aria-invalid", "true");
+        input.setAttribute("aria-describedby", "pilot-form-error");
+        input.focus();
+      }
       return;
     }
     setSaving(true);
@@ -539,7 +574,7 @@ export function PilotCrud({
         ) : null}
       </div>
 
-      {error ? (
+      {error && !editorOpen ? (
         <div className="alert alert-error" role="alert">
           {error}
         </div>
@@ -880,12 +915,16 @@ export function PilotCrud({
                   <input
                     type="date"
                     value={String(values.birth_date)}
-                    onChange={(event) => update("birth_date", event.target.value)}
+                    onChange={(event) => {
+                      update("birth_date", event.target.value);
+                      const age = ageFrom(event.target.value);
+                      if (age !== null) update("age", String(age));
+                    }}
                     disabled={saving}
                   />
                 </label>
                 <label>
-                  <span>Idade</span>
+                  <span>Idade{values.birth_date ? " (pela data de nascimento)" : ""}</span>
                   <input
                     type="number"
                     min="5"
@@ -893,6 +932,7 @@ export function PilotCrud({
                     placeholder="Ex.: 34"
                     value={String(values.age)}
                     onChange={(event) => update("age", event.target.value)}
+                    readOnly={Boolean(values.birth_date)}
                     disabled={saving}
                   />
                 </label>
@@ -909,7 +949,7 @@ export function PilotCrud({
                 <label>
                   <span>Cidade</span>
                   <input
-                    placeholder="Belo Horizonte"
+                    placeholder="Ex.: Belo Horizonte"
                     value={String(values.city)}
                     onChange={(event) => update("city", event.target.value)}
                     disabled={saving}
@@ -1114,7 +1154,7 @@ export function PilotCrud({
             </section>
 
             {error ? (
-              <div className="alert alert-error" role="alert">
+              <div className="alert alert-error" role="alert" id="pilot-form-error">
                 {error}
               </div>
             ) : null}

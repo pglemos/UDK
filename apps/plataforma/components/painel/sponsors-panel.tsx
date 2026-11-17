@@ -3,7 +3,7 @@
 import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Trash2, Upload, X } from "lucide-react";
+import { Archive, ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Upload, X } from "lucide-react";
 import { PanelState, errorMessage } from "./shared";
 
 type Sponsor = {
@@ -209,7 +209,7 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
   }
 
   async function remove(sponsor: Sponsor) {
-    if (!(await confirmAction(`Remover ${sponsor.name} dos patrocinadores? Ele sai do site na hora.`, "Remover"))) return;
+    if (!(await confirmAction(`Arquivar ${sponsor.name}? A marca sai do site na hora, mas fica guardada no histórico.`, "Arquivar"))) return;
     setError("");
     const { error: removeError } = await client
       .from("sponsors")
@@ -258,8 +258,8 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
             <button type="button" className="row-action" onClick={() => openEditor(sponsor)} aria-label={`Editar ${sponsor.name}`}>
               <Pencil aria-hidden="true" /> Editar
             </button>
-            <button type="button" className="row-action is-quiet" onClick={() => void remove(sponsor)} aria-label={`Remover ${sponsor.name}`}>
-              <Trash2 aria-hidden="true" /> Remover
+            <button type="button" className="row-action is-quiet" onClick={() => void remove(sponsor)} aria-label={`Arquivar ${sponsor.name}`}>
+              <Archive aria-hidden="true" /> Arquivar
             </button>
           </div>
         )}

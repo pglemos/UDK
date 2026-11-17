@@ -136,13 +136,13 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
                       </small>
                     </span>
                     <span className="pv-result-actions">
-                      <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "resultado")}>
+                      <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "resultado")} aria-label={`PDF do resultado: ${sessionTitle(row.session, row.kind)}, ${row.stage.title}`}>
                         <Download aria-hidden="true" /> PDF do resultado
                       </button>
-                      <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "voltas")}>
+                      <button type="button" className="button-secondary pv-small" disabled={Boolean(busy)} onClick={() => void pdf(row, "voltas")} aria-label={`PDF volta a volta: ${sessionTitle(row.session, row.kind)}, ${row.stage.title}`}>
                         <Download aria-hidden="true" /> PDF volta a volta
                       </button>
-                      <Link className="button-secondary pv-small" href={moduleHref("voltas")}>
+                      <Link className="button-secondary pv-small" href={moduleHref("voltas")} aria-label={`Ver voltas: ${sessionTitle(row.session, row.kind)}, ${row.stage.title}`}>
                         <Timer aria-hidden="true" /> Ver voltas
                       </Link>
                     </span>

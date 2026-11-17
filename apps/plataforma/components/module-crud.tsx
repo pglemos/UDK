@@ -934,9 +934,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
               <Inbox aria-hidden="true" />
               <h3>Ainda não há {emptyNoun(config.label)}</h3>
               <p>
-                {config.readOnly
+                {config.emptyHint ??
+                  (config.readOnly
                   ? "Os registros aparecem aqui assim que forem feitos."
-                  : `Use “${newLabel(config.singular)}” para cadastrar o primeiro.`}
+                  : `Use “${newLabel(config.singular)}” para cadastrar o primeiro.`)}
               </p>
             </div>
           )

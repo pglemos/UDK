@@ -194,7 +194,7 @@ export function StandingsPanel({ client }: { client: SupabaseClient }) {
             </div>
             <p className="pv-note">
               {current
-                ? `Versão ${current.version} desta categoria, recalculada em ${new Date(current.updatedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}. Válidos = brutos menos os 2 piores resultados regulares (Art. 20); descartar um resultado negativo soma (+).`
+                ? `Versão ${current.version} desta categoria, recalculada em ${new Date(current.updatedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}. Válidos = brutos menos os 2 piores resultados regulares (Art. 20). Descartes: − tira pontos; + quando o resultado descartado era negativo.`
                 : "Classificação vigente."}
             </p>
           </div>

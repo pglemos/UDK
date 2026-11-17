@@ -3,7 +3,7 @@
 import { confirmAction } from "../../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Trash2, Upload, X } from "lucide-react";
+import { Archive, ExternalLink, ImagePlus, Pencil, Plus, RefreshCw, Upload, X } from "lucide-react";
 import { PanelState, errorMessage } from "./shared";
 
 type Article = {
@@ -192,7 +192,7 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
   }
 
   async function remove(article: Article) {
-    if (!(await confirmAction(`Apagar a notícia "${article.title}"? Ela sai do site na hora.`, "Apagar"))) return;
+    if (!(await confirmAction(`Arquivar a notícia "${article.title}"? Ela sai do site na hora, mas fica guardada no histórico.`, "Arquivar"))) return;
     const { error: removeError } = await client
       .from("cms_pages")
       .update({ deleted_at: new Date().toISOString() })
@@ -201,7 +201,7 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
       setError(errorMessage(removeError));
       return;
     }
-    setNotice(`"${article.title}" apagada.`);
+    setNotice(`"${article.title}" arquivada.`);
     await load();
   }
 
@@ -242,8 +242,8 @@ export function NewsPanel({ client, readOnly }: { client: SupabaseClient; readOn
               <button type="button" className="row-action" onClick={() => openEditor(article)} aria-label={`Editar ${article.title}`}>
                 <Pencil aria-hidden="true" /> Editar
               </button>
-              <button type="button" className="row-action is-quiet" onClick={() => void remove(article)} aria-label={`Apagar ${article.title}`}>
-                <Trash2 aria-hidden="true" /> Apagar
+              <button type="button" className="row-action is-quiet" onClick={() => void remove(article)} aria-label={`Arquivar ${article.title}`}>
+                <Archive aria-hidden="true" /> Arquivar
               </button>
             </>
           )}

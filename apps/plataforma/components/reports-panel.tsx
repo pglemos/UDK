@@ -150,6 +150,7 @@ export function ReportsPanel({ client }: ReportsPanelProps) {
               type="button"
               onClick={() => void exportReport(report.key, report.label)}
               disabled={Boolean(loading)}
+              aria-label={`Exportar ${report.label} em CSV`}
             >
               {loading === report.key ? <LoaderCircle className="spin" size={17} /> : <Download size={17} />}
               Exportar CSV

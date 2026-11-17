@@ -86,6 +86,8 @@ export type ModuleConfig = {
   actions?: ModuleAction[];
   /** Colunas da listagem, em ordem; sem isso a tabela mostra os 5 primeiros campos. */
   tableColumns?: string[];
+  /** Texto do estado vazio quando os registros não são criados pela organização. */
+  emptyHint?: string;
 };
 
 const statusLabels: Record<string, string> = {
@@ -333,7 +335,7 @@ export const moduleConfigs: ModuleConfig[] = [
       { key: "birth_date", label: "Data de nascimento", kind: "date" },
       { key: "age", label: "Idade", kind: "number", placeholder: "Ex.: 34" },
       { key: "email", label: "E-mail", kind: "text", placeholder: "piloto@email.com" },
-      { key: "city", label: "Cidade", kind: "text", placeholder: "Belo Horizonte" },
+      { key: "city", label: "Cidade", kind: "text", placeholder: "Ex.: Belo Horizonte" },
       { key: "state", label: "Estado (UF)", kind: "select" },
       {
         key: "weight_kg",
@@ -472,6 +474,7 @@ export const moduleConfigs: ModuleConfig[] = [
     titleColumn: "document_type",
     orderBy: "created_at",
     ascending: false,
+    emptyHint: "Os documentos chegam aqui quando os pilotos enviam pelo próprio cadastro.",
     fields: [
       relation("driver_id", "Piloto", "drivers", "sport_name"),
       {
