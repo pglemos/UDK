@@ -6092,3 +6092,48 @@ img[src^="/media/official/drivers/uniforme/"] {
     transition: none;
   }
 }
+
+/* estados vazios: ícone neutro, título no tamanho de seção */
+.shell .empty-state {
+  min-height: 220px;
+  gap: 6px;
+  padding: 32px 24px;
+}
+.shell .empty-state svg {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 6px;
+  color: var(--op-head);
+}
+.shell .empty-state h3 {
+  margin: 0;
+  font-size: var(--op-section);
+  text-wrap: balance;
+}
+.shell .empty-state p {
+  max-width: 48ch;
+  margin: 0;
+}
+
+/* voltas: tabela cabe na coluna, atualizar no fim da linha, seleção em ciano */
+.shell .pv-table.pv-laps {
+  min-width: 0;
+}
+.shell .pv-laps :where(td, th) {
+  white-space: nowrap;
+}
+.shell .pv-toolbar > .button-secondary:last-child {
+  margin-left: auto;
+}
+.shell .pv-entry-list button.is-active {
+  border-color: var(--op-accent);
+  background: var(--op-accent-wash);
+}
+.shell .pv-split .data-card-head strong {
+  font-size: var(--op-section);
+}
+
+/* exportar: cartões com título de seção, não de página */
+.shell .report-card h2 {
+  font-size: var(--op-section);
+}

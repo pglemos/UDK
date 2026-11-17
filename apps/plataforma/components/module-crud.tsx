@@ -5,6 +5,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   Check,
   CloudOff,
+  Inbox,
+  SearchX,
   LoaderCircle,
   Pencil,
   Plus,
@@ -231,6 +233,21 @@ function isNetworkError(error: unknown): boolean {
     message.includes("network") ||
     message.includes("timeout")
   );
+}
+
+const emptyNouns: Record<string, string> = {
+  Financeiro: "pagamentos",
+  Calendário: "etapas",
+  Classificação: "classificações",
+  Conteúdo: "notícias",
+  Notificações: "avisos",
+  Credenciamento: "credenciamentos",
+  "Karts e sorteio": "karts sorteados",
+  "Entradas de resultado": "posições lançadas",
+};
+
+function emptyNoun(label: string): string {
+  return emptyNouns[label] ?? label.toLowerCase();
 }
 
 export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
@@ -769,11 +786,19 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             <p>Carregando {config.label.toLowerCase()}...</p>
           </div>
         ) : filteredRecords.length === 0 ? (
-          <div className="empty-state">
-            <Check />
-            <h3>Nenhum registro encontrado</h3>
-            <p>Altere a busca ou crie o primeiro registro deste módulo.</p>
-          </div>
+          search.trim() ? (
+            <div className="empty-state">
+              <SearchX aria-hidden="true" />
+              <h3>Nada encontrado para “{search.trim()}”</h3>
+              <p>Confira a grafia ou limpe a busca para ver todos.</p>
+            </div>
+          ) : (
+            <div className="empty-state">
+              <Inbox aria-hidden="true" />
+              <h3>Ainda não há {emptyNoun(config.label)}</h3>
+              <p>Quando houver, eles aparecem aqui. Use “Novo” para cadastrar o primeiro.</p>
+            </div>
+          )
         ) : (
           <div className="table-scroll">
             <table className="admin-table">

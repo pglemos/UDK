@@ -230,7 +230,7 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
       <li key={sponsor.id} className={`pv-sponsor${sponsor.status === "active" ? "" : " is-off"}`}>
         <div className="pv-sponsor-mark">
           {sponsor.logoUrl ? (
-            <img src={sponsor.logoUrl} alt={`Logo ${sponsor.name}`} loading="lazy" />
+            <img src={sponsor.logoUrl} alt={`Logo ${sponsor.name}`} decoding="async" />
           ) : (
             <span className="pv-sponsor-missing">
               <ImagePlus aria-hidden="true" />
