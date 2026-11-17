@@ -5996,7 +5996,6 @@ img[src^="/media/official/drivers/uniforme/"] {
 /* início: métricas planas, ícone com tom, sem salto no hover */
 .shell .metrics article {
   border: 1px solid var(--line);
-  border-top: 3px solid var(--line);
   border-radius: 8px;
   padding: 20px 22px;
   gap: 8px;
@@ -6014,14 +6013,14 @@ img[src^="/media/official/drivers/uniforme/"] {
   color: var(--op-accent);
 }
 .shell .metrics article[data-tone="warning"] {
-  border-top-color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 45%, var(--line));
 }
 .shell .metrics article[data-tone="warning"] > svg {
   background: var(--warning-bg);
   color: var(--warning);
 }
 .shell .metrics article[data-tone="info"] {
-  border-top-color: var(--op-info);
+  border-color: color-mix(in srgb, var(--op-info) 35%, var(--line));
 }
 .shell .metrics article[data-tone="info"] > svg {
   background: var(--op-info-bg);
