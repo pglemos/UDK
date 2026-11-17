@@ -270,8 +270,8 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
     <div className="pv-workspace">
       <div className="pv-toolbar">
         <p className="pv-lede">
-          {active.length} no site{inactive.length ? ` · ${inactive.length} fora do site` : ""}. As logos aparecem na home e na página
-          de patrocinadores, sobre fundo escuro.
+          {active.length} no site{inactive.length ? ` · ${inactive.length} fora do site` : ""}. A logo aparece sobre fundo claro na home e
+          sobre fundo escuro na página de patrocinadores.
         </p>
         <button type="button" className="button-secondary" onClick={() => void load()}>
           <RefreshCw aria-hidden="true" /> Atualizar
