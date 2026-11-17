@@ -4651,15 +4651,15 @@ img[src^="/media/official/drivers/uniforme/"] {
   padding: 28px 36px;
 }
 .shell .pv-sponsor-mark.is-large {
-  height: 180px;
+  height: 132px;
   border-radius: 4px;
+  padding: 20px 32px;
 }
 .shell .pv-sponsor-mark.is-light {
   background: var(--cinema-paper-2);
 }
 .shell .pv-preview-pair {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 .shell .pv-preview-pair figure {
