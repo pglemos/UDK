@@ -19,12 +19,9 @@ const reports = [
   { key: "standings", label: "Classificação", description: "Pontos e posições por versão" },
   { key: "penalties", label: "Penalidades", description: "Efeito, situação e visibilidade" },
   { key: "appeals", label: "Recursos", description: "Protocolos e decisões" },
-  {
-    key: "endurance_teams",
-    label: "Equipes de resistência",
-    description: "Composição e homologação",
-  },
-  { key: "stints", label: "Trocas de piloto", description: "Tempos, voltas e validação" },
+  { key: "checkins", label: "Credenciamento", description: "Presença de cada piloto por etapa" },
+  { key: "kart_assignments", label: "Karts", description: "Kart sorteado por piloto e corrida" },
+  { key: "laps", label: "Voltas", description: "Volta a volta de todas as corridas" },
   { key: "audit_events", label: "Auditoria", description: "Histórico imutável de alterações" },
 ] as const;
 

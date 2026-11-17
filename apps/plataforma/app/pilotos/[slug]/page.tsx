@@ -182,7 +182,7 @@ export default async function DriverProfilePage({
               <h2>Sobre o piloto</h2>
               <p>
                 {driver.bio ??
-                  `${driver.name} compete na categoria ${driver.category}. A trajetória, equipe e objetivos serão publicados quando autorizados pelo piloto.`}
+                  `${driver.name} compete na categoria ${driver.category}. A trajetória e os objetivos serão publicados quando o piloto autorizar.`}
               </p>
               <div>
                 <span>
