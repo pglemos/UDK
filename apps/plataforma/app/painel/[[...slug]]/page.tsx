@@ -457,12 +457,13 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       if (document.querySelector("dialog[open], .modal-backdrop, .pilot-editor")) return;
       const content = document.querySelector(".content");
       if (!content) return;
-      if (event.key === "/") {
+      // "/" pelo caractere ou pela tecla física (no teclado ABNT a barra fica em outra posição)
+      if (event.key === "/" || event.code === "Slash" || event.code === "IntlRo" || event.code === "NumpadDivide") {
         const search = content.querySelector<HTMLInputElement>(".search-box input");
         if (!search) return;
         event.preventDefault();
         search.focus();
-      } else if (event.key === "n" || event.key === "N") {
+      } else if (event.key === "n" || event.key === "N" || event.code === "KeyN") {
         const create = content.querySelector<HTMLButtonElement>('[aria-keyshortcuts="N"]:not(:disabled)');
         if (!create) return;
         event.preventDefault();
