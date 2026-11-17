@@ -91,7 +91,8 @@ function formatValue(
       Number(value) / 100,
     );
   }
-  if (field.kind === "datetime") return new Date(String(value)).toLocaleString("pt-BR");
+  if (field.kind === "datetime")
+    return new Date(String(value)).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
   if (field.kind === "date")
     return new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString("pt-BR");
   if (typeof value === "object") return resumirObjeto(value);
@@ -928,7 +929,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
             {filteredRecords.length > pageSize ? (
               <div className="pv-more">
                 <button type="button" className="button-secondary" onClick={() => setPageSize((size) => size + 50)}>
-                  Mostrar mais {Math.min(50, filteredRecords.length - pageSize)} de {filteredRecords.length - pageSize} restantes
+                  Mostrar mais {Math.min(50, filteredRecords.length - pageSize)} ({filteredRecords.length - pageSize} restantes)
                 </button>
               </div>
             ) : null}

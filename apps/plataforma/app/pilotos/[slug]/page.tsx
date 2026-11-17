@@ -228,7 +228,7 @@ export default async function DriverProfilePage({
                       <div>
                         <h3>{localizeRaceText(entry.stageTitle) || "Sessão oficial"}</h3>
                         <p>
-                          Kart {entry.kartNumber ?? "—"} • {entry.laps} voltas • melhor volta{" "}
+                          Kart {entry.kartNumber ?? "—"} • {entry.laps} {entry.laps === 1 ? "volta" : "voltas"} • melhor volta{" "}
                           {formatLapTime(entry.bestLapMs)}
                         </p>
                       </div>
@@ -268,7 +268,7 @@ export default async function DriverProfilePage({
                               localizeRaceText(entry.stageTitle) ||
                               "Sessão oficial"}
                           </span>
-                          <h3>{sessionLaps.length} voltas registradas</h3>
+                          <h3>{sessionLaps.length} {sessionLaps.length === 1 ? "volta registrada" : "voltas registradas"}</h3>
                         </div>
                         <p>Melhor volta {formatLapTime(entry.bestLapMs)}</p>
                       </header>

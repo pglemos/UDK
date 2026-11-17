@@ -612,9 +612,9 @@ export function PilotCrud({
                         <strong className="pilot-table-name">{name}</strong>
                         <small>{text(record, "email") || "E-mail não informado"}</small>
                       </td>
-                      <td>{text(record, "whatsapp") || "—"}</td>
+                      <td className="pv-nowrap">{text(record, "whatsapp") || "—"}</td>
                       <td>{cityState}</td>
-                      <td>{physical}</td>
+                      <td className="pv-nowrap">{physical}</td>
                       <td>
                         <span className={statusClass(record.status)}>
                           {statusLabel(record.status)}

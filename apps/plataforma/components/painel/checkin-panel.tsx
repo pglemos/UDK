@@ -347,7 +347,7 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                       const status = cells.get(key)?.status;
                       const info = status ? statusInfo[status] : undefined;
                       return (
-                        <td key={stage.id} className="pv-center">
+                        <td key={stage.id} className="pv-center" data-label={`${stage.ordinal} etapa`}>
                           <button
                             type="button"
                             className={`pv-mark ${info?.tone ?? "is-empty"}`}

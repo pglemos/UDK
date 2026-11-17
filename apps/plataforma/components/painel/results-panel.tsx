@@ -105,9 +105,7 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
   return (
     <div className="pv-workspace">
       <div className="pv-toolbar">
-        <p className="pv-lede">
-          Cada tomada de tempo e corrida com o resultado oficial e o volta a volta em PDF, no padrão da cronometragem do kartódromo.
-        </p>
+        <span />
         <button type="button" className="button-secondary" onClick={() => void load()}>
           <RefreshCw aria-hidden="true" /> Atualizar
         </button>

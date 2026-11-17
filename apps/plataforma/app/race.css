@@ -6514,3 +6514,126 @@ img[src^="/media/official/drivers/uniforme/"] {
   justify-content: center;
   min-width: 28px;
 }
+
+/* ===== Crítica, rodada 3 ===== */
+/* cabeçalho fixo: a tabela rola dentro do cartão */
+.shell .data-card > .table-scroll {
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+}
+.shell .data-card > .table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--cinema-paper-2);
+}
+.shell .data-card > .table-scroll thead th:first-child {
+  z-index: 3;
+}
+
+/* ação em massa do credenciamento na cor de ação, não de risco */
+.shell .pv-stage-head .pv-link-button {
+  color: var(--op-accent);
+  text-decoration-color: color-mix(in srgb, var(--op-accent) 45%, transparent);
+}
+
+/* textos que não devem quebrar no meio */
+.shell .pv-sponsor-body a {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* papéis: sem hifenização, coluna com largura mínima */
+.shell .pv-roles thead th {
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.shell .pv-table.pv-roles {
+  min-width: 980px;
+}
+.shell .pv-level.is-edit svg {
+  color: var(--success);
+}
+.shell .pv-level.is-view svg {
+  color: var(--op-info);
+}
+
+/* início no celular: cartões de métrica com a mesma altura */
+.shell .metrics > a {
+  display: grid;
+}
+.shell .metrics > a > article {
+  height: 100%;
+}
+
+/* credenciamento no celular: um cartão por piloto, etapas em grade */
+@media (max-width: 760px) {
+  .shell .content[data-module="checkin"] .table-scroll {
+    max-height: none;
+    overflow: visible;
+    mask-image: none;
+    animation: none;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix,
+  .shell .content[data-module="checkin"] .pv-matrix tbody {
+    display: block;
+    min-width: 0;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix thead,
+  .shell .content[data-module="checkin"] .pv-matrix tfoot {
+    display: none;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody :where(th, td) {
+    position: static;
+    display: block;
+    max-width: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    text-align: left;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody th.pv-row-head {
+    grid-column: 1 / -1;
+    font-weight: 700;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody td:nth-of-type(1) {
+    grid-column: 1 / -1;
+    margin-top: -6px;
+    color: var(--cinema-muted-dark);
+    font-size: var(--op-meta);
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--op-head);
+    font: 600 var(--op-meta) var(--cinema-body);
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody td[data-label] .pv-mark {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody td:last-child {
+    grid-column: 1 / -1;
+    font-size: var(--op-meta);
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody td:last-child::before {
+    content: "Presenças: ";
+    color: var(--op-head);
+    font-weight: 600;
+  }
+}
+.shell .admin-table td.pv-nowrap {
+  white-space: nowrap;
+}

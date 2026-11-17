@@ -241,7 +241,7 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
                     <span className="pv-stack">
                       <b>{entry.driver}</b>
                       <small>
-                        {entry.category} · kart {entry.kart ?? "—"} · {entry.laps} voltas
+                        {entry.category} · kart {entry.kart ?? "—"} · {entry.laps} {entry.laps === 1 ? "volta" : "voltas"}
                       </small>
                     </span>
                     <span className={`pv-num${entry.bestMs === fastestOfRace ? " pv-fastest" : ""}`}>{formatLap(entry.bestMs)}</span>
@@ -258,7 +258,7 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
               </div>
               <p className="pv-note">
                 {selected
-                  ? `${selected.position}º · ${selected.points ?? 0} pts · melhor volta ${formatLap(selected.bestMs)}`
+                  ? `${selected.position}º · ${selected.points ? `${selected.points} pts` : "sem pontos"} · melhor volta ${formatLap(selected.bestMs)}`
                   : "Escolha um piloto."}
               </p>
               {selected ? (

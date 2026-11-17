@@ -430,6 +430,7 @@ export const moduleConfigs: ModuleConfig[] = [
     titleColumn: "protocol",
     orderBy: "created_at",
     ascending: false,
+    tableColumns: ["driver_id", "stage_id", "kind", "requested_category_id", "approved_category_id", "status"],
     fields: [
       relation("driver_id", "Piloto", "drivers", "sport_name"),
       relation("stage_id", "Etapa", "stages", "title", false),
