@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { RefreshCw } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
+import { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } from "../../lib/timing-pdf";
 import { PanelState, Segmented, errorMessage, formatLap, loadStages, type StageInfo } from "./shared";
 
 type Race = { id: string; stageId: string; label: string; startsAt: string };
@@ -19,6 +20,8 @@ type Entry = {
 type Lap = { id: string; number: number; timeMs: number | null; elapsedMs: number | null; valid: boolean; reason: string };
 
 function sessionLabel(name: string): string {
+  const tomada = /tomada de tempo\s*-\s*corrida\s*(\d)/i.exec(name);
+  if (tomada) return `Tomada de tempo · C${tomada[1]}`;
   return name.replace(" - Horário", " · horário").replace(" - Anti-horário", " · anti-horário");
 }
 
@@ -153,6 +156,27 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
     };
   }, [client, entryId]);
 
+  const [pdfBusy, setPdfBusy] = useState(false);
+  async function downloadPdf(kind: "resultado" | "voltas" | "piloto") {
+    const race = races.find((item) => item.id === raceId);
+    const stage = stages.find((item) => item.id === stageId);
+    if (!race || !stage) return;
+    setPdfBusy(true);
+    setError("");
+    try {
+      const report = await loadRaceReport(client, race.id);
+      const logo = `${window.location.origin}/brand/udk-wordmark-dark.svg`;
+      const pilot = entries.find((entry) => entry.id === entryId);
+      if (kind === "resultado") openPdf(resultHtml(report, logo), pdfFileName("UDK", "Resultado_Oficial", `${stage.ordinal}_etapa`, race.label));
+      else if (kind === "voltas") openPdf(lapsHtml(report, logo), pdfFileName("UDK", "Volta_a_Volta", `${stage.ordinal}_etapa`, race.label));
+      else if (pilot) openPdf(lapsHtml(report, logo, pilot.id), pdfFileName("UDK", "Volta_a_Volta", `${stage.ordinal}_etapa`, race.label, pilot.driver));
+    } catch (pdfError) {
+      setError(errorMessage(pdfError));
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
   const fastestOfRace = useMemo(
     () => Math.min(...entries.map((entry) => entry.bestMs ?? Infinity)),
     [entries],
@@ -182,6 +206,15 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
         ) : null}
         <button type="button" className="button-secondary" onClick={() => void loadRaces()}>
           <RefreshCw aria-hidden="true" /> Atualizar
+        </button>
+      </div>
+      <div className="pv-toolbar pv-pdf-bar">
+        <span className="pv-muted">PDF no padrão da cronometragem do kartódromo:</span>
+        <button type="button" className="button-secondary" disabled={pdfBusy || !raceId} onClick={() => void downloadPdf("resultado")}>
+          <Download aria-hidden="true" /> Resultado oficial
+        </button>
+        <button type="button" className="button-secondary" disabled={pdfBusy || !raceId} onClick={() => void downloadPdf("voltas")}>
+          <Download aria-hidden="true" /> Volta a volta de todos
         </button>
       </div>
 
@@ -228,6 +261,11 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
                   ? `${selected.position}º · ${selected.points ?? 0} pts · melhor volta ${formatLap(selected.bestMs)}`
                   : "Escolha um piloto."}
               </p>
+              {selected ? (
+                <button type="button" className="button-secondary pv-small" disabled={pdfBusy} onClick={() => void downloadPdf("piloto")}>
+                  <Download aria-hidden="true" /> PDF deste piloto
+                </button>
+              ) : null}
             </div>
             {laps.length ? (
               <div className="table-scroll">

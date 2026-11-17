@@ -52,6 +52,8 @@ import { SponsorsPanel } from "../../../components/painel/sponsors-panel";
 import { StandingsPanel } from "../../../components/painel/standings-panel";
 import { PointsRulesPanel } from "../../../components/painel/points-rules-panel";
 import { LapsPanel } from "../../../components/painel/laps-panel";
+import { PositionsMatrix } from "../../../components/painel/positions-matrix";
+import { ResultsPanel } from "../../../components/painel/results-panel";
 import { NewsPanel } from "../../../components/painel/news-panel";
 import { ChampionshipSettings } from "../../../components/painel/championship-settings";
 import { TeamAccessPanel } from "../../../components/painel/team-access-panel";
@@ -378,6 +380,10 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         return <KartsPanel client={client} />;
       case "voltas":
         return <LapsPanel client={client} />;
+      case "resultados":
+        return <ResultsPanel client={client} editor={canMutate ? crud("resultados") : null} />;
+      case "entradas-resultado":
+        return <PositionsMatrix client={client} editor={canMutate ? crud("entradas-resultado") : null} />;
       case "classificacao":
         return <StandingsPanel client={client} />;
       case "pontuacao":

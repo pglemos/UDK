@@ -23,7 +23,7 @@ import {
 import { dateTimeLocalToIso, isoToDateTimeLocal } from "../lib/datetime";
 
 type RecordRow = Record<string, unknown> & { id: string };
-type RelationOption = { value: string; label: string; pai?: string };
+type RelationOption = { value: string; label: string; pai?: string; fill?: Record<string, unknown> };
 type UploadedObject = { bucket: string; path: string; fieldKey: string };
 type StorageScope = { kind: "season" | "championship"; id: string };
 
@@ -329,9 +329,8 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         let query = client
           .from(relation.table)
           .select(
-            [valueColumn, relation.labelColumn, relation.dependsOn?.column]
-              .filter(Boolean)
-              .join(","),
+            relation.labelSelect ??
+              [valueColumn, relation.labelColumn, relation.dependsOn?.column].filter(Boolean).join(","),
           )
           .is("deleted_at", null)
           .limit(1000);
@@ -341,8 +340,11 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         if (relationError) throw relationError;
         const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
           value: String(row[valueColumn]),
-          label: shortRelationLabel(relation.table, String(row[relation.labelColumn] ?? row[valueColumn])),
+          label: relation.formatLabel
+            ? relation.formatLabel(row)
+            : shortRelationLabel(relation.table, String(row[relation.labelColumn] ?? row[valueColumn])),
           ...(relation.dependsOn ? { pai: String(row[relation.dependsOn.column] ?? "") } : {}),
+          ...(relation.fill ? { fill: relation.fill(row) } : {}),
         }));
         return [field.key, options] as const;
       }),
@@ -691,7 +693,12 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
 
   const updateValue = (field: ModuleField, value: unknown) =>
     setValues((current) => {
-      const proximo = { ...current, [field.key]: value };
+      const proximo: Record<string, unknown> = { ...current, [field.key]: value };
+      // Escolher um item do regulamento ou uma relação pode preencher outros campos.
+      const sugestao = field.suggestions?.find((item) => item.value === value);
+      if (sugestao?.fill) Object.assign(proximo, sugestao.fill);
+      const opcao = relationOptions[field.key]?.find((item) => item.value === value);
+      if (opcao?.fill) Object.assign(proximo, opcao.fill);
       // Trocar a etapa invalida a sessão escolhida: ela pertencia à etapa
       // anterior e o banco recusaria a combinação.
       for (const outro of config.fields) {
@@ -1011,8 +1018,16 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                           step={field.kind === "currency" ? "1" : undefined}
                           placeholder={field.placeholder}
                           value={String(value ?? "")}
+                          list={field.suggestions ? `sugestoes-${field.key}` : undefined}
                           onChange={(event) => updateValue(field, event.target.value)}
                         />
+                      ) : null}
+                      {field.suggestions ? (
+                        <datalist id={`sugestoes-${field.key}`}>
+                          {field.suggestions.map((item) => (
+                            <option key={item.value} value={item.value} label={item.label} />
+                          ))}
+                        </datalist>
                       ) : null}
                     </label>
                   );

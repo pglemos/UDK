@@ -1,3 +1,4 @@
+import { incidentCatalog, penaltyCatalog } from "./regulation-catalog";
 export type FieldKind =
   | "text"
   | "textarea"
@@ -27,6 +28,18 @@ export type RelationConfig = {
    * cobra isso com uma chave estrangeira composta.
    */
   dependsOn?: { field: string; column: string };
+  /** Select com relações (ex.: "id,code,stage:stages(title)") quando o rótulo junta várias colunas. */
+  labelSelect?: string;
+  formatLabel?: (row: Record<string, unknown>) => string;
+  /** Campos do formulário preenchidos ao escolher a opção (ex.: piloto da penalidade). */
+  fill?: (row: Record<string, unknown>) => Record<string, unknown>;
+};
+
+export type FieldSuggestion = {
+  value: string;
+  label: string;
+  /** Outros campos preenchidos quando esta sugestão é escolhida. */
+  fill?: Record<string, string | number | boolean>;
 };
 
 export type ModuleField = {
@@ -46,6 +59,8 @@ export type ModuleField = {
    * dos dois — e sem aviso o formulário só devolve a recusa depois de salvar.
    */
   exclusiveWith?: string[];
+  /** Lista de valores sugeridos (do regulamento); continua aceitando texto livre. */
+  suggestions?: FieldSuggestion[];
 };
 
 export type ModuleAction = {
@@ -74,6 +89,46 @@ export type ModuleConfig = {
 };
 
 const statusLabels: Record<string, string> = {
+  documents_pending: "Documentos pendentes",
+  payment_pending: "Pagamento pendente",
+  profile_photo: "Foto de perfil",
+  responsibility_term: "Termo de responsabilidade",
+  guardian_document: "Documento do responsável",
+  proof_sent: "Comprovante enviado",
+  refunded: "Reembolsado",
+  cancellation: "Cancelamento",
+  refund: "Reembolso",
+  overpayment: "Pagamento a maior",
+  courtesy: "Cortesia",
+  award: "Premiação",
+  adjustment: "Ajuste",
+  registration: "Inscrição",
+  duplicate: "Duplicado",
+  high: "Alta",
+  critical: "Crítica",
+  registered: "Registrada",
+  full: "Completa",
+  planned: "Planejada",
+  requested: "Solicitada",
+  running: "Em andamento",
+  invalid: "Inválido",
+  photo: "Foto",
+  report: "Relatório",
+  document: "Documento",
+  timing: "Cronometragem",
+  public: "Público",
+  starter: "Titular",
+  reserve: "Reserva",
+  accepted: "Aceito",
+  coupon: "Cupom",
+  banner: "Banner",
+  event_activation: "Ativação em evento",
+  adjustments: "Ajustes",
+  analyst: "Analista",
+  create: "Criar",
+  approve: "Aprovar",
+  publish: "Publicar",
+  manage: "Gerenciar",
   active: "Ativo",
   absent: "Faltou",
   blocked: "Bloqueado",
@@ -196,6 +251,23 @@ const statusOptions = (...values: string[]): SelectOption[] =>
       statusLabels[value] ??
       value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
   }));
+
+type Named = { sport_name?: string | null; full_name?: string | null } | null | undefined;
+const nameOf = (driver: unknown) => {
+  const value = driver as Named;
+  return value?.sport_name || value?.full_name || "sem piloto";
+};
+const stageOf = (stage: unknown) => (stage as { title?: string } | null)?.title ?? "sem etapa";
+
+function penaltyLabel(row: Record<string, unknown>): string {
+  const summary = String(row.summary ?? "").replace(/\s*\(.*?\)\.?$/, "");
+  return `${stageOf(row.stage)} · ${nameOf(row.driver)} · ${String(row.code ?? "")} — ${summary.slice(0, 70)}`;
+}
+
+function incidentLabel(row: Record<string, unknown>): string {
+  const lap = row.lap_number ? ` · volta ${String(row.lap_number)}` : "";
+  return `${stageOf(row.stage)} · ${nameOf(row.driver)} · ${String(row.incident_type ?? "")}${lap}`;
+}
 
 const relation = (
   key: string,
@@ -687,7 +759,7 @@ export const moduleConfigs: ModuleConfig[] = [
         storageBucket: "timing-imports",
         accept: "application/pdf,text/csv",
       },
-      { key: "content_hash", label: "Hash", kind: "text" },
+      { key: "content_hash", label: "Código de integridade do arquivo", kind: "text" },
       {
         key: "status",
         label: "Situação",
@@ -719,7 +791,18 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("driver_id", "Piloto", "drivers", "sport_name", false),
-      { key: "incident_type", label: "Tipo", kind: "text", required: true },
+      {
+        key: "incident_type",
+        label: "Tipo",
+        kind: "text",
+        required: true,
+        placeholder: "Escolha da lista ou descreva",
+        suggestions: incidentCatalog.map((item) => ({
+          value: item.type,
+          label: item.clause,
+          fill: { regulation_clause: item.clause, severity: item.severity },
+        })),
+      },
       {
         key: "severity",
         label: "Gravidade",
@@ -730,7 +813,7 @@ export const moduleConfigs: ModuleConfig[] = [
       { key: "description", label: "Descrição", kind: "textarea", required: true },
       { key: "occurred_at", label: "Momento", kind: "datetime", required: true },
       { key: "lap_number", label: "Volta", kind: "number" },
-      { key: "regulation_clause", label: "Cláusula", kind: "text" },
+      { key: "regulation_clause", label: "Artigo do regulamento", kind: "text" },
       {
         key: "status",
         label: "Situação",
@@ -762,7 +845,18 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("driver_id", "Piloto", "drivers", "sport_name", false),
-      { key: "code", label: "Código", kind: "text", required: true },
+      {
+        key: "code",
+        label: "Penalidade (regulamento)",
+        kind: "text",
+        required: true,
+        placeholder: "Escolha da lista ou escreva um código",
+        suggestions: penaltyCatalog.map((item) => ({
+          value: item.code,
+          label: `${item.name} — ${item.article}`,
+          fill: { summary: item.summary, effect: item.effect },
+        })),
+      },
       { key: "summary", label: "Resumo", kind: "textarea", required: true },
       { key: "effect", label: "Efeito", kind: "text", required: true },
       {
@@ -798,7 +892,19 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "created_at",
     ascending: false,
     fields: [
-      relation("penalty_id", "Penalidade", "penalties", "code"),
+      {
+        key: "penalty_id",
+        label: "Penalidade contestada",
+        kind: "relation",
+        required: true,
+        relation: {
+          table: "penalties",
+          labelColumn: "code",
+          labelSelect: "id,code,summary,driver_id,stage:stages(title,starts_at),driver:drivers(sport_name,full_name)",
+          formatLabel: penaltyLabel,
+          fill: (row) => ({ driver_id: row.driver_id ?? "" }),
+        },
+      },
       relation("driver_id", "Piloto", "drivers", "sport_name"),
       { key: "statement", label: "Manifestação", kind: "textarea", required: true },
       {
@@ -890,9 +996,9 @@ export const moduleConfigs: ModuleConfig[] = [
     ascending: false,
     fields: [
       relation("championship_id", "Campeonato", "championships", "name"),
-      { key: "slug", label: "Slug", kind: "text", required: true },
+      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
       { key: "title", label: "Título", kind: "text", required: true },
-      { key: "content", label: "Blocos JSON", kind: "json", required: true },
+      { key: "content", label: "Conteúdo", kind: "json", required: true },
       {
         key: "status",
         label: "Situação",
@@ -914,7 +1020,7 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("championship_id", "Campeonato", "championships", "name"),
       { key: "name", label: "Nome", kind: "text", required: true },
-      { key: "slug", label: "Slug", kind: "text", required: true },
+      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
       { key: "logo_url", label: "Logo", kind: "text" },
       { key: "website_url", label: "Site", kind: "text" },
       { key: "tier", label: "Categoria comercial", kind: "text", required: true },
@@ -947,7 +1053,7 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "name",
     fields: [
       relation("season_id", "Temporada", "seasons", "name"),
-      { key: "slug", label: "Slug", kind: "text", required: true },
+      { key: "slug", label: "Identificador no endereço", kind: "text", required: true },
       { key: "name", label: "Nome", kind: "text", required: true },
       { key: "color", label: "Cor", kind: "text", required: true },
       {
@@ -1227,7 +1333,18 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "created_at",
     ascending: false,
     fields: [
-      relation("incident_id", "Ocorrência", "incidents", "incident_type"),
+      {
+        key: "incident_id",
+        label: "Ocorrência",
+        kind: "relation",
+        required: true,
+        relation: {
+          table: "incidents",
+          labelColumn: "incident_type",
+          labelSelect: "id,incident_type,lap_number,stage:stages(title,starts_at),driver:drivers(sport_name,full_name)",
+          formatLabel: incidentLabel,
+        },
+      },
       {
         key: "evidence_type",
         label: "Tipo",
@@ -1250,7 +1367,7 @@ export const moduleConfigs: ModuleConfig[] = [
         required: true,
         options: statusOptions("private", "involved", "committee", "public", "restricted"),
       },
-      { key: "content_hash", label: "Hash", kind: "text" },
+      { key: "content_hash", label: "Código de integridade do arquivo", kind: "text" },
     ],
   },
   {

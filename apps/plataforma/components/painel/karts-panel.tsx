@@ -258,7 +258,7 @@ export function KartsPanel({ client }: { client: SupabaseClient }) {
                 <thead>
                   <tr>
                     <SortHeader label="Kart" column="kart" sort={kartSort.sort} onSort={kartSort.toggle} />
-                    <SortHeader label="Corridas" column="races" sort={kartSort.sort} onSort={kartSort.toggle} align="end" firstDirection="desc" />
+                    <SortHeader label="Sessões" column="races" sort={kartSort.sort} onSort={kartSort.toggle} align="end" firstDirection="desc" />
                     <SortHeader label="Melhor volta" column="best" sort={kartSort.sort} onSort={kartSort.toggle} align="end" />
                     <th scope="col">Feita por</th>
                     <SortHeader

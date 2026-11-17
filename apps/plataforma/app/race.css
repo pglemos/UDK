@@ -5653,3 +5653,95 @@ img[src^="/media/official/drivers/uniforme/"] {
     transition: none;
   }
 }
+
+/* posições: matriz piloto × prova */
+.shell .pv-positions {
+  min-width: 1100px;
+}
+.shell .pv-positions tbody th.pv-row-head {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.shell .pv-cell {
+  display: inline-grid;
+  justify-items: end;
+  gap: 1px;
+}
+.shell .pv-cell b {
+  color: var(--cinema-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.shell .pv-cell small {
+  color: var(--cinema-muted-dark);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+/* resultados: lista por etapa com PDFs */
+.shell .pv-result-group .data-card-head h2 {
+  margin: 0;
+  color: var(--cinema-ink);
+  font: 600 1.25rem var(--cinema-body);
+}
+.shell .pv-result-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shell .pv-result-list li {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--cinema-line-dark);
+  padding: 12px 20px;
+}
+.shell .pv-result-list li:last-child {
+  border-bottom: 0;
+}
+.shell .pv-kind {
+  justify-self: start;
+  border: 1px solid var(--cinema-ink);
+  border-radius: 3px;
+  padding: 3px 8px;
+  color: var(--cinema-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.shell .pv-kind.is-quali {
+  border-color: var(--cinema-cyan-deep);
+  color: var(--cinema-cyan-deep);
+}
+.shell .pv-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shell .pv-result-actions .button-secondary,
+.shell .data-card-head .button-secondary.pv-small,
+.shell .pv-pdf-bar .button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.shell .pv-result-actions svg,
+.shell .data-card-head .pv-small svg {
+  width: 15px;
+  height: 15px;
+}
+.shell .pv-pdf-bar {
+  margin-top: -6px;
+}
+.shell .pv-pdf-bar .pv-muted {
+  font-size: 0.8125rem;
+}
+@media (max-width: 760px) {
+  .shell .pv-result-list li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell .pv-result-actions {
+    flex-wrap: wrap;
+  }
+}

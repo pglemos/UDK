@@ -17,6 +17,8 @@ const customModules = new Set([
   "checkin",
   "karts",
   "voltas",
+  "entradas-resultado",
+  "resultados",
   "classificacao",
   "pontuacao",
   "conteudo",
