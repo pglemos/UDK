@@ -699,7 +699,6 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       relation("driver_id", "Piloto", "drivers", "sport_name", false),
-      relation("team_id", "Equipe", "endurance_teams", "name", false),
       { key: "incident_type", label: "Tipo", kind: "text", required: true },
       {
         key: "severity",
@@ -1126,7 +1125,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "karts",
     label: "Karts e sorteio",
-    description: "Kart por piloto ou equipe, confirmação, alteração e devolução.",
+    description: "Kart sorteado para cada piloto em cada corrida e a melhor volta feita com ele.",
     table: "kart_assignments",
     singular: "atribuição",
     titleColumn: "kart_number",
@@ -1134,14 +1133,7 @@ export const moduleConfigs: ModuleConfig[] = [
     fields: [
       relation("stage_id", "Etapa", "stages", "title"),
       sessionOfStage(),
-      {
-        ...relation("driver_id", "Piloto", "drivers", "sport_name", false),
-        exclusiveWith: ["team_id"],
-      },
-      {
-        ...relation("team_id", "Equipe", "endurance_teams", "name", false),
-        exclusiveWith: ["driver_id"],
-      },
+      relation("driver_id", "Piloto", "drivers", "sport_name"),
       { key: "kart_number", label: "Número do kart", kind: "number", required: true },
       {
         key: "status",

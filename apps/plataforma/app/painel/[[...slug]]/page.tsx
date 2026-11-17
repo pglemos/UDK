@@ -47,6 +47,11 @@ import { ModuleCrud } from "../../../components/module-crud";
 import { PilotCrud } from "../../../components/pilot-crud";
 import { Dashboard } from "../../../components/dashboard";
 import { ReportsPanel } from "../../../components/reports-panel";
+import { KartsPanel } from "../../../components/painel/karts-panel";
+import { CheckinPanel } from "../../../components/painel/checkin-panel";
+import { SponsorsPanel } from "../../../components/painel/sponsors-panel";
+import { StandingsPanel } from "../../../components/painel/standings-panel";
+import { PointsRulesPanel } from "../../../components/painel/points-rules-panel";
 
 type Role =
   | "admin"
@@ -81,12 +86,9 @@ const navigationGroups: NavigationGroup[] = [
       { key: "pilotos", label: "Pilotos", icon: Users },
       { key: "inscricoes", label: "Inscrições", icon: ClipboardCheck },
       { key: "documentos", label: "Documentos", icon: FileCheck2 },
-      { key: "responsaveis", label: "Responsáveis", icon: UsersRound },
       { key: "termos", label: "Termos", icon: BookOpenText },
-      { key: "aceites", label: "Aceites", icon: FileCheck2 },
       { key: "mudancas-categoria", label: "Mudanças de categoria", icon: ClipboardCheck },
       { key: "calendario", label: "Calendário", icon: CalendarDays },
-      { key: "sessoes", label: "Sessões", icon: CalendarDays },
       { key: "checkin", label: "Credenciamento", icon: ClipboardCheck },
       { key: "karts", label: "Karts", icon: Flag },
       { key: "financeiro", label: "Financeiro", icon: CircleDollarSign },
@@ -109,18 +111,9 @@ const navigationGroups: NavigationGroup[] = [
     ],
   },
   {
-    label: "Resistência",
-    items: [
-      { key: "endurance", label: "Equipes", icon: UsersRound },
-      { key: "membros-endurance", label: "Membros", icon: Users },
-      { key: "stints", label: "Trocas de piloto", icon: Sparkles },
-    ],
-  },
-  {
     label: "Comunicação",
     items: [
       { key: "conteudo", label: "Conteúdo", icon: LayoutGrid },
-      { key: "versoes-conteudo", label: "Versões", icon: BookOpenText },
       { key: "patrocinadores", label: "Patrocinadores", icon: Sparkles },
       { key: "usuarios-patrocinador", label: "Usuários de patrocinadores", icon: UsersRound },
       { key: "campanhas", label: "Campanhas", icon: Sparkles },
@@ -132,7 +125,24 @@ const navigationGroups: NavigationGroup[] = [
   },
 ];
 
-const allModuleKeys = navigationGroups.flatMap((group) => group.items.map((item) => item.key));
+/** Módulos sem item próprio no menu: aparecem dentro da tela que os usa. */
+const embeddedModules: Record<string, string> = {
+  responsaveis: "pilotos",
+  aceites: "termos",
+  sessoes: "calendario",
+  "versoes-conteudo": "conteudo",
+};
+/** Rotas antigas que deixaram de existir: o campeonato não tem equipes nem trocas de piloto. */
+const retiredRoutes: Record<string, string> = {
+  ...embeddedModules,
+  endurance: "dashboard",
+  "membros-endurance": "dashboard",
+  stints: "dashboard",
+};
+const allModuleKeys = [
+  ...navigationGroups.flatMap((group) => group.items.map((item) => item.key)),
+  ...Object.keys(embeddedModules),
+];
 
 const roleAccess: Record<Role, string[]> = {
   admin: allModuleKeys,
@@ -162,9 +172,6 @@ const roleAccess: Record<Role, string[]> = {
     "pilotos",
     "checkin",
     "karts",
-    "endurance",
-    "membros-endurance",
-    "stints",
     "ocorrencias",
     "evidencias",
     "notificacoes",
@@ -198,7 +205,6 @@ const roleAccess: Record<Role, string[]> = {
     "classificacao",
     "voltas",
     "recursos",
-    "endurance",
     "notificacoes",
   ],
   guardian: [
@@ -222,7 +228,6 @@ const roleAccess: Record<Role, string[]> = {
     "voltas",
     "julgamentos",
     "recursos",
-    "endurance",
     "notificacoes",
   ],
 };
@@ -246,9 +251,6 @@ const writableModulesByRole: Record<Role, string[]> = {
     "sessoes",
     "checkin",
     "karts",
-    "endurance",
-    "membros-endurance",
-    "stints",
     "ocorrencias",
     "evidencias",
   ],
@@ -300,6 +302,10 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   const resolvedParams = use(params);
   const activeKey = resolvedParams.slug?.[0] ?? "dashboard";
   const router = useRouter();
+  const retiredTarget = retiredRoutes[activeKey];
+  useEffect(() => {
+    if (retiredTarget) router.replace(retiredTarget === "dashboard" ? "/painel" : `/painel/${retiredTarget}`);
+  }, [retiredTarget, router]);
   const client = useMemo(() => supabase(), []);
   const projectUrl = useMemo(() => getSupabaseProjectUrl(), []);
   const [ready, setReady] = useState(false);
@@ -569,6 +575,24 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     ? { ...config, readOnly: config.readOnly || !canMutate }
     : undefined;
 
+  function embedded(key: string, title: string, description: string) {
+    const embeddedConfig = getModuleConfig(key);
+    if (!embeddedConfig || !offlineOwner || !client || !allowedKeys.has(key)) return null;
+    return (
+      <section className="embedded-module" aria-labelledby={`embedded-${key}`}>
+        <header>
+          <h2 id={`embedded-${key}`}>{title}</h2>
+          <p>{description}</p>
+        </header>
+        <ModuleCrud
+          client={client}
+          owner={offlineOwner}
+          config={{ ...embeddedConfig, readOnly: embeddedConfig.readOnly || !writableKeys.has(key) }}
+        />
+      </section>
+    );
+  }
+
   async function signOut() {
     if (client) await client.auth.signOut();
     router.replace("/login");
@@ -733,9 +757,38 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           ) : activeKey === "relatorios" ? (
             <ReportsPanel client={client} />
           ) : activeKey === "pilotos" ? (
-            <PilotCrud client={client} readOnly={!canMutate} />
+            <>
+              <PilotCrud client={client} readOnly={!canMutate} />
+              {embedded("responsaveis", "Responsáveis legais", "Vínculo de responsável para piloto menor de idade.")}
+            </>
+          ) : activeKey === "karts" ? (
+            <KartsPanel client={client} />
+          ) : activeKey === "checkin" ? (
+            <CheckinPanel client={client} readOnly={!canMutate} />
+          ) : activeKey === "patrocinadores" ? (
+            <SponsorsPanel client={client} readOnly={!canMutate} />
+          ) : activeKey === "classificacao" ? (
+            <StandingsPanel client={client} />
+          ) : activeKey === "pontuacao" ? (
+            <PointsRulesPanel
+              client={client}
+              editor={
+                canMutate && config && offlineOwner ? (
+                  <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
+                ) : null
+              }
+            />
           ) : config && offlineOwner ? (
-            <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
+            <>
+              <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
+              {activeKey === "termos"
+                ? embedded("aceites", "Aceites dos pilotos", "Quem aceitou cada versão do regulamento e dos termos.")
+                : activeKey === "calendario"
+                  ? embedded("sessoes", "Sessões das etapas", "Corridas e sessões de cada etapa, com horário de largada.")
+                  : activeKey === "conteudo"
+                    ? embedded("versoes-conteudo", "Versões do conteúdo", "Histórico de revisões das páginas publicadas.")
+                    : null}
+            </>
           ) : (
             <div className="access-denied">
               <Settings />
