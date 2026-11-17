@@ -4479,10 +4479,14 @@ img[src^="/media/official/drivers/uniforme/"] {
   color: var(--cinema-ink);
   font-weight: 600;
 }
-.shell .pv-row-head {
+.shell .pv-table tbody th.pv-row-head {
+  background: #fff;
   color: var(--cinema-ink);
   font: 500 0.875rem var(--cinema-body);
   text-align: left;
+}
+.shell .pv-table tbody tr:hover th.pv-row-head {
+  background: #f0fbfd;
 }
 .shell .pv-stack {
   display: grid;

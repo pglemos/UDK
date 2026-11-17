@@ -621,7 +621,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "classificacao",
     label: "Classificação",
-    description: "Versões oficiais, pontos, vitórias, pódios e posições.",
+    description: "Classificação vigente por categoria, com os pontos de cada etapa e os descartes.",
     table: "standings",
     singular: "posição",
     titleColumn: "position",
@@ -886,7 +886,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "patrocinadores",
     label: "Patrocinadores",
-    description: "Marca, categoria comercial, links e ativação pública.",
+    description: "Logos, links e quais marcas aparecem no site.",
     table: "sponsors",
     singular: "patrocinador",
     titleColumn: "name",
@@ -1101,7 +1101,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "checkin",
     label: "Credenciamento",
-    description: "Presença, atraso, ausência, bloqueio e observações operacionais.",
+    description: "Presença de cada piloto em cada etapa da temporada.",
     table: "checkins",
     singular: "credenciamento",
     titleColumn: "status",
@@ -1148,7 +1148,7 @@ export const moduleConfigs: ModuleConfig[] = [
   {
     key: "pontuacao",
     label: "Regras de pontuação",
-    description: "Tabela por formato, bônus, versão e ativação.",
+    description: "Pontos por posição e bônus de cada formato, conforme o regulamento.",
     table: "points_rules",
     singular: "regra",
     titleColumn: "event_format",
