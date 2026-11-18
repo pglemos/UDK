@@ -1,0 +1,227 @@
+{
+  "tool": "build-phase",
+  "version": 2,
+  "startedAt": "2026-10-08T14:20:53.399Z",
+  "comp": ".impeccable/mocks/beauty-20261006/a.png",
+  "direction": null,
+  "breakpoint": "1440x1100",
+  "artifact": null,
+  "phase": "plates",
+  "phases": {
+    "comps": {
+      "status": "skipped",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [
+        {
+          "at": "2026-10-08T14:20:53.399Z",
+          "text": "started with an approved comp; the comp round happened before this state (surface round or manual)"
+        }
+      ],
+      "gate": null,
+      "forced": null
+    },
+    "spec": {
+      "status": "closed",
+      "openedAt": "2026-10-08T14:20:53.399Z",
+      "closedAt": "2026-10-08T14:23:41.509Z",
+      "attempts": 2,
+      "notes": [],
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "23 regions, 1 plates, 9 text regions measured",
+        "at": "2026-10-08T14:23:41.509Z"
+      },
+      "forced": null
+    },
+    "plates": {
+      "status": "open",
+      "openedAt": "2026-10-08T14:23:41.509Z",
+      "closedAt": null,
+      "attempts": 3,
+      "notes": [
+        {
+          "at": "2026-10-08T14:44:06.628Z",
+          "text": "Approved A implemented with original sourced UDK photograph. Generation-only plates gate remains open; source-photo-exception.md records evidence. No force, no synthetic substitute. Current Home evidence home-final-desktop.png and diff-current/report.json; route matrix and functional-checks.md verified."
+        }
+      ],
+      "gate": {
+        "ok": false,
+        "reasons": [
+          "plate apps/plataforma/public/media/official/home/race-original.png is the comp crop of region race-photo (structure 100% against the raw region, a resample of the same pixels): a crop of the comp is never a plate; generate the plate from the crop as reference (/Users/pedroguilherme/.codex/plugins/cache/openai-curated-remote/impeccable/4.3.1/skills/impeccable/scripts/impeccable generate-image --ref <crop.png> --prompt-file <prompt.txt> --out <plate.png> for race-photo)"
+        ],
+        "summary": "1/1 plates",
+        "at": "2026-10-08T14:24:53.792Z"
+      },
+      "forced": null
+    },
+    "hero": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": {
+        "ok": false,
+        "reasons": [
+          "region ranking-link is missing (detail 1%, structure 67%): the comp shows material the build does not",
+          "region dates-link is missing (detail 4%, structure 68%): the comp shows material the build does not"
+        ],
+        "summary": "hero 95% (match)",
+        "score": 0.9458,
+        "verdict": "match",
+        "report": ".impeccable/review/diff/hero/report.json",
+        "sideBySide": "/Users/pedroguilherme/PROJETOS/UDK/.impeccable/review/diff/hero/side-by-side.png",
+        "worst": [
+          "ranking-link missing 64%",
+          "dates-link missing 65%",
+          "ranking-title drift 72%"
+        ],
+        "worstIds": [
+          "ranking-link",
+          "dates-link",
+          "ranking-title"
+        ],
+        "worstCrops": [
+          {
+            "id": "ranking-link",
+            "verdict": "missing",
+            "score": {
+              "overall": 0.6402,
+              "structure": 0.6717,
+              "color": 0.9584,
+              "colorIntersection": 0.944,
+              "paletteMatch": 0.9662,
+              "detail": 0.0127,
+              "detailRaw": 0.1221,
+              "detailAdded": 0.2188,
+              "bands": 0.175
+            },
+            "file": ".impeccable/review/diff/hero/regions/ranking-link.png"
+          },
+          {
+            "id": "dates-link",
+            "verdict": "missing",
+            "score": {
+              "overall": 0.6527,
+              "structure": 0.6846,
+              "color": 0.9592,
+              "colorIntersection": 0.9389,
+              "paletteMatch": 0.9701,
+              "detail": 0.0445,
+              "detailRaw": 0.1486,
+              "detailAdded": 0.2083,
+              "bands": 0
+            },
+            "file": ".impeccable/review/diff/hero/regions/dates-link.png"
+          },
+          {
+            "id": "ranking-title",
+            "verdict": "drift",
+            "score": {
+              "overall": 0.724,
+              "structure": 0.7939,
+              "color": 0.9231,
+              "colorIntersection": 0.8933,
+              "paletteMatch": 0.9392,
+              "detail": 0.4019,
+              "detailRaw": 0.4644,
+              "detailAdded": 0.125,
+              "bands": 0.36
+            },
+            "file": ".impeccable/review/diff/hero/regions/ranking-title.png"
+          }
+        ],
+        "advisories": [
+          "(advisory, above the 72% bar; fix in the polish pass before responsive) 5 readings:",
+          "  text ranking-title: letter-spacing is wider than the comp's (gap 0.096 vs 0.052 of the cap height); set letter-spacing to close it by about 1px",
+          "  text dates-title: letter-spacing is wider than the comp's (gap 0.075 vs 0.044 of the cap height); set letter-spacing to close it by about 1px",
+          "  control navigation: its rule sits 16px into the box in the comp and 24px in the build (+8px), so the strip is taller than the comp's; match the height, not only the position",
+          "  control signup: its rule sits 46px into the box in the comp and 2px in the build (-44px), so the strip is shorter than the comp's; match the height, not only the position",
+          "  control ranking-link: its rule sits 21px into the box in the comp and 33px in the build (+12px), so the strip is taller than the comp's; match the height, not only the position"
+        ],
+        "regionVerdicts": {
+          "header": "match",
+          "brand": "match",
+          "navigation": "drift",
+          "signup-header": "drift",
+          "lead": "match",
+          "intro": "drift",
+          "signup": "drift",
+          "results": "drift",
+          "location": "match",
+          "race-photo": "match",
+          "ticket": "match",
+          "next-label": "match",
+          "date": "match",
+          "stage": "match",
+          "participate": "match",
+          "categories": "drift",
+          "calendar-link": "match",
+          "ranking-title": "drift",
+          "ranking-link": "missing",
+          "dates-title": "drift",
+          "dates-link": "missing",
+          "ranking-row": "match",
+          "future-stage": "drift"
+        },
+        "at": "2026-10-08T14:48:39.074Z"
+      },
+      "forced": null,
+      "readingsSeen": {
+        "text ranking-title: letter-spacing is wider than the comp's (gap 0.096 vs 0.052 of the cap height); set letter-spacing to close it by about 1px": 2,
+        "text dates-title: letter-spacing is wider than the comp's (gap 0.075 vs 0.044 of the cap height); set letter-spacing to close it by about 1px": 2,
+        "control navigation: its rule sits 16px into the box in the comp and 24px in the build (+8px), so the strip is taller than the comp's; match the height, not only the position": 2,
+        "control signup: its rule sits 46px into the box in the comp and 2px in the build (-44px), so the strip is shorter than the comp's; match the height, not only the position": 2,
+        "control ranking-link: its rule sits 21px into the box in the comp and 33px in the build (+12px), so the strip is taller than the comp's; match the height, not only the position": 2
+      },
+      "records": 2
+    },
+    "sections": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "motion": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "responsive": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "review": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    }
+  },
+  "finish": null,
+  "plates": {
+    "race-photo": {
+      "status": "ok",
+      "score": 0.9772,
+      "size": "1532x1000"
+    }
+  }
+}

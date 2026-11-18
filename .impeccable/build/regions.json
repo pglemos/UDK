@@ -1,0 +1,283 @@
+{
+  "regions": [
+    {
+      "id": "header",
+      "kind": "chrome",
+      "box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 0.08
+      },
+      "snap": false,
+      "note": "Dark navigation strip"
+    },
+    {
+      "id": "brand",
+      "kind": "chrome",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.023636363636363636,
+        "w": 0.06944444444444445,
+        "h": 0.03272727272727273
+      },
+      "snap": false,
+      "note": "Official white UDK wordmark"
+    },
+    {
+      "id": "navigation",
+      "kind": "control",
+      "box": {
+        "x": 0.4652777777777778,
+        "y": 0.02181818181818182,
+        "w": 0.3701388888888889,
+        "h": 0.038181818181818185
+      },
+      "snap": false,
+      "note": "Calendar classification results pilots news and login links"
+    },
+    {
+      "id": "signup-header",
+      "kind": "control",
+      "box": {
+        "x": 0.84375,
+        "y": 0.01818181818181818,
+        "w": 0.11458333333333333,
+        "h": 0.04363636363636364
+      },
+      "snap": false,
+      "note": "Cyan registration button"
+    },
+    {
+      "id": "lead",
+      "kind": "text",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.23636363636363636,
+        "w": 0.3402777777777778,
+        "h": 0.1590909090909091
+      },
+      "snap": false,
+      "note": "Two-line ULTRAS DO KART heading, white then cyan"
+    },
+    {
+      "id": "intro",
+      "kind": "text",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.4309090909090909,
+        "w": 0.2708333333333333,
+        "h": 0.025454545454545455
+      },
+      "snap": false,
+      "note": "Campeonato 2026 no Kartódromo de Betim."
+    },
+    {
+      "id": "signup",
+      "kind": "control",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.48363636363636364,
+        "w": 0.11458333333333333,
+        "h": 0.04363636363636364
+      },
+      "snap": false,
+      "note": "Cyan Inscreva-se action"
+    },
+    {
+      "id": "results",
+      "kind": "control",
+      "box": {
+        "x": 0.1673611111111111,
+        "y": 0.48363636363636364,
+        "w": 0.12638888888888888,
+        "h": 0.04363636363636364
+      },
+      "snap": false,
+      "note": "Outlined Ver resultados action"
+    },
+    {
+      "id": "location",
+      "kind": "text",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.5363636363636364,
+        "w": 0.3402777777777778,
+        "h": 0.06363636363636363
+      },
+      "snap": false,
+      "note": "Temporada 2026 and Betim MG"
+    },
+    {
+      "id": "race-photo",
+      "kind": "image",
+      "box": {
+        "x": 0.4263888888888889,
+        "y": 0.11636363636363636,
+        "w": 0.5319444444444444,
+        "h": 0.45454545454545453
+      },
+      "snap": false,
+      "note": "Original UDK night race photograph with two karts, cropped",
+      "bleed": true,
+      "plate": "apps/plataforma/public/media/official/home/race-original.png",
+      "source": "255A.mp4 @ 1.40s; original UDK file from commit b85be62"
+    },
+    {
+      "id": "ticket",
+      "kind": "chrome",
+      "box": {
+        "x": 0.4263888888888889,
+        "y": 0.5709090909090909,
+        "w": 0.5319444444444444,
+        "h": 0.12818181818181817
+      },
+      "snap": false,
+      "note": "Flat cyan upcoming race ticket"
+    },
+    {
+      "id": "next-label",
+      "kind": "text",
+      "box": {
+        "x": 0.44583333333333336,
+        "y": 0.5927272727272728,
+        "w": 0.10069444444444445,
+        "h": 0.023636363636363636
+      },
+      "snap": false,
+      "note": "Próxima etapa"
+    },
+    {
+      "id": "date",
+      "kind": "text",
+      "box": {
+        "x": 0.44583333333333336,
+        "y": 0.63,
+        "w": 0.11805555555555555,
+        "h": 0.04
+      },
+      "snap": false,
+      "note": "13 OUT race date"
+    },
+    {
+      "id": "stage",
+      "kind": "text",
+      "box": {
+        "x": 0.6097222222222223,
+        "y": 0.6127272727272727,
+        "w": 0.2152777777777778,
+        "h": 0.04
+      },
+      "snap": false,
+      "note": "21h Etapa regular and Traçado 05 normal e invertido"
+    },
+    {
+      "id": "participate",
+      "kind": "control",
+      "box": {
+        "x": 0.8333333333333334,
+        "y": 0.6127272727272727,
+        "w": 0.10555555555555556,
+        "h": 0.04454545454545455
+      },
+      "snap": false,
+      "note": "Outlined Participar action"
+    },
+    {
+      "id": "categories",
+      "kind": "text",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.7090909090909091,
+        "w": 0.24305555555555555,
+        "h": 0.056363636363636366
+      },
+      "snap": false,
+      "note": "Ultras Insanos and Ultras Rápidos"
+    },
+    {
+      "id": "calendar-link",
+      "kind": "control",
+      "box": {
+        "x": 0.8645833333333334,
+        "y": 0.7090909090909091,
+        "w": 0.09375,
+        "h": 0.056363636363636366
+      },
+      "snap": false,
+      "note": "Ver calendário link"
+    },
+    {
+      "id": "ranking-title",
+      "kind": "text",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.8390909090909091,
+        "w": 0.2777777777777778,
+        "h": 0.03636363636363636
+      },
+      "snap": false,
+      "note": "Classificação section heading"
+    },
+    {
+      "id": "ranking-link",
+      "kind": "control",
+      "box": {
+        "x": 0.39444444444444443,
+        "y": 0.8354545454545454,
+        "w": 0.08888888888888889,
+        "h": 0.03636363636363636
+      },
+      "snap": false,
+      "note": "Ver completa classification link"
+    },
+    {
+      "id": "dates-title",
+      "kind": "text",
+      "box": {
+        "x": 0.5381944444444444,
+        "y": 0.8390909090909091,
+        "w": 0.2916666666666667,
+        "h": 0.03636363636363636
+      },
+      "snap": false,
+      "note": "Próximas etapas section heading"
+    },
+    {
+      "id": "dates-link",
+      "kind": "control",
+      "box": {
+        "x": 0.8784722222222222,
+        "y": 0.8354545454545454,
+        "w": 0.0798611111111111,
+        "h": 0.03636363636363636
+      },
+      "snap": false,
+      "note": "Calendário link"
+    },
+    {
+      "id": "ranking-row",
+      "kind": "control",
+      "box": {
+        "x": 0.041666666666666664,
+        "y": 0.9036363636363637,
+        "w": 0.44166666666666665,
+        "h": 0.08181818181818182
+      },
+      "snap": false,
+      "note": "Rank 01 André Felisberto Ultras Insanos and 247 points"
+    },
+    {
+      "id": "future-stage",
+      "kind": "control",
+      "box": {
+        "x": 0.5381944444444444,
+        "y": 0.9036363636363637,
+        "w": 0.4201388888888889,
+        "h": 0.08727272727272728
+      },
+      "snap": false,
+      "note": "10 NOV Etapa regular track and time"
+    }
+  ]
+}

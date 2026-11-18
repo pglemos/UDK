@@ -1,0 +1,1428 @@
+{
+  "tool": "comp-spec",
+  "version": 1,
+  "createdAt": "2026-10-08T14:22:33.731Z",
+  "comp": ".impeccable/mocks/beauty-20261006/a.png",
+  "warnings": [
+    "region race-photo: \"bleed\": true set in the regions file (the clipped-artwork refusal is overridden: the page crops it there)"
+  ],
+  "uncoveredInkCells": [
+    "I7"
+  ],
+  "compSize": {
+    "width": 1440,
+    "height": 1100
+  },
+  "aspect": 1.3091,
+  "orientation": "landscape",
+  "palette": [
+    {
+      "hex": "#0b1618",
+      "coverage": 0.6073
+    },
+    {
+      "hex": "#f7f7f7",
+      "coverage": 0.2561
+    },
+    {
+      "hex": "#68c8e6",
+      "coverage": 0.0851
+    },
+    {
+      "hex": "#3a403a",
+      "coverage": 0.037
+    },
+    {
+      "hex": "#b4b6bd",
+      "coverage": 0.0145
+    }
+  ],
+  "bands": [
+    {
+      "y": 0.0306,
+      "strength": 0.3048
+    },
+    {
+      "y": 0.0612,
+      "strength": 0.2623
+    },
+    {
+      "y": 0.2449,
+      "strength": 0.681
+    },
+    {
+      "y": 0.3061,
+      "strength": 0.4563
+    },
+    {
+      "y": 0.3367,
+      "strength": 0.5391
+    },
+    {
+      "y": 0.3878,
+      "strength": 0.2789
+    },
+    {
+      "y": 0.4796,
+      "strength": 0.3615
+    },
+    {
+      "y": 0.5,
+      "strength": 0.3342
+    },
+    {
+      "y": 0.5714,
+      "strength": 0.5672
+    },
+    {
+      "y": 0.6939,
+      "strength": 0.7055
+    },
+    {
+      "y": 0.7755,
+      "strength": 1
+    },
+    {
+      "y": 0.8469,
+      "strength": 0.4546
+    },
+    {
+      "y": 0.8673,
+      "strength": 0.7134
+    },
+    {
+      "y": 0.9592,
+      "strength": 0.2116
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "kind": "chrome",
+      "note": "Dark navigation strip",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.08
+      },
+      "px": {
+        "x": 0,
+        "y": 0,
+        "w": 1440,
+        "h": 88
+      },
+      "aspect": 16.3636,
+      "palette": [
+        {
+          "hex": "#081818",
+          "coverage": 0.893
+        },
+        {
+          "hex": "#67c8e4",
+          "coverage": 0.0548
+        },
+        {
+          "hex": "#273737",
+          "coverage": 0.0372
+        },
+        {
+          "hex": "#f5f6f6",
+          "coverage": 0.0134
+        },
+        {
+          "hex": "#828282",
+          "coverage": 0.0015
+        }
+      ],
+      "detail": {
+        "energy": 22.6622
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "brand",
+      "kind": "chrome",
+      "note": "Official white UDK wordmark",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.0236,
+        "w": 0.0694,
+        "h": 0.0327
+      },
+      "px": {
+        "x": 60,
+        "y": 26,
+        "w": 100,
+        "h": 36
+      },
+      "aspect": 2.7778,
+      "palette": [
+        {
+          "hex": "#0a1517",
+          "coverage": 0.6593
+        },
+        {
+          "hex": "#f8f8f8",
+          "coverage": 0.2426
+        },
+        {
+          "hex": "#494d4f",
+          "coverage": 0.0539
+        },
+        {
+          "hex": "#85898a",
+          "coverage": 0.0368
+        },
+        {
+          "hex": "#bdc3c3",
+          "coverage": 0.0074
+        }
+      ],
+      "detail": {
+        "energy": 26.9454
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "navigation",
+      "kind": "control",
+      "note": "Calendar classification results pilots news and login links",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.4653,
+        "y": 0.0218,
+        "w": 0.3701,
+        "h": 0.0382
+      },
+      "px": {
+        "x": 670,
+        "y": 24,
+        "w": 533,
+        "h": 42
+      },
+      "aspect": 12.6905,
+      "palette": [
+        {
+          "hex": "#091718",
+          "coverage": 0.92
+        },
+        {
+          "hex": "#f1f5f5",
+          "coverage": 0.0315
+        },
+        {
+          "hex": "#bac1c4",
+          "coverage": 0.021
+        },
+        {
+          "hex": "#2f3538",
+          "coverage": 0.0178
+        },
+        {
+          "hex": "#83888b",
+          "coverage": 0.0097
+        }
+      ],
+      "detail": {
+        "energy": 36.2265
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "signup-header",
+      "kind": "control",
+      "note": "Cyan registration button",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.8438,
+        "y": 0.0182,
+        "w": 0.1146,
+        "h": 0.0436
+      },
+      "px": {
+        "x": 1215,
+        "y": 20,
+        "w": 165,
+        "h": 48
+      },
+      "aspect": 3.4375,
+      "palette": [
+        {
+          "hex": "#68c8e4",
+          "coverage": 0.9101
+        },
+        {
+          "hex": "#2b5f6f",
+          "coverage": 0.0369
+        },
+        {
+          "hex": "#0b2433",
+          "coverage": 0.0288
+        },
+        {
+          "hex": "#559aab",
+          "coverage": 0.0161
+        },
+        {
+          "hex": "#6fcfcf",
+          "coverage": 0.0081
+        }
+      ],
+      "detail": {
+        "energy": 13.3808
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "lead",
+      "kind": "text",
+      "note": "Two-line ULTRAS DO KART heading, white then cyan",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.2364,
+        "w": 0.3403,
+        "h": 0.1591
+      },
+      "px": {
+        "x": 60,
+        "y": 260,
+        "w": 490,
+        "h": 175
+      },
+      "aspect": 2.8,
+      "palette": [
+        {
+          "hex": "#091618",
+          "coverage": 0.641
+        },
+        {
+          "hex": "#67c7e3",
+          "coverage": 0.1792
+        },
+        {
+          "hex": "#f7f7f8",
+          "coverage": 0.1719
+        },
+        {
+          "hex": "#8c9393",
+          "coverage": 0.0045
+        },
+        {
+          "hex": "#508d9d",
+          "coverage": 0.0033
+        }
+      ],
+      "detail": {
+        "energy": 39.0616
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 10,
+          "capHeightPx": 64.5,
+          "inkIsDark": false,
+          "allCaps": true,
+          "advance": 0.9611,
+          "advTall": 0.9611,
+          "advX": null,
+          "gap": 0.1628,
+          "xRatio": null,
+          "stemW": 0.2965,
+          "contrast": 1.3049,
+          "serif": null,
+          "densTall": 0.6445,
+          "densX": null,
+          "weight": 0.6445
+        },
+        "widthClass": "wide",
+        "weightClass": "bold",
+        "chosen": {
+          "family": "Archivo",
+          "weight": 850,
+          "fontSizePx": 93,
+          "source": "index",
+          "fp": {
+            "lines": 1,
+            "glyphs": 11,
+            "capHeightPx": 64.6,
+            "inkIsDark": true,
+            "allCaps": true,
+            "advance": 0.9597,
+            "advTall": 0.9597,
+            "advX": null,
+            "gap": 0.209,
+            "xRatio": null,
+            "stemW": 0.3014,
+            "contrast": 1.2511,
+            "serif": null,
+            "densTall": 0.6862,
+            "densX": null,
+            "weight": 0.6862
+          },
+          "stamp": "561b856d342f"
+        }
+      }
+    },
+    {
+      "id": "intro",
+      "kind": "text",
+      "note": "Campeonato 2026 no Kartódromo de Betim.",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.4309,
+        "w": 0.2708,
+        "h": 0.0255
+      },
+      "px": {
+        "x": 60,
+        "y": 474,
+        "w": 390,
+        "h": 28
+      },
+      "aspect": 13.9286,
+      "palette": [
+        {
+          "hex": "#091618",
+          "coverage": 0.8292
+        },
+        {
+          "hex": "#adb6bd",
+          "coverage": 0.0938
+        },
+        {
+          "hex": "#758085",
+          "coverage": 0.0423
+        },
+        {
+          "hex": "#3e494e",
+          "coverage": 0.0285
+        },
+        {
+          "hex": "#2e2e3e",
+          "coverage": 0.0062
+        }
+      ],
+      "detail": {
+        "energy": 50.2597
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 27,
+          "capHeightPx": 11.7,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.7121,
+          "advTall": 0.7121,
+          "advX": 0.7121,
+          "gap": 0.0854,
+          "xRatio": 0.8098,
+          "stemW": 0.1858,
+          "contrast": 1.0369,
+          "serif": 0.4964,
+          "densTall": 0.5543,
+          "densX": 0.616,
+          "weight": 0.5543
+        },
+        "widthClass": "normal",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "signup",
+      "kind": "control",
+      "note": "Cyan Inscreva-se action",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.4836,
+        "w": 0.1146,
+        "h": 0.0436
+      },
+      "px": {
+        "x": 60,
+        "y": 532,
+        "w": 165,
+        "h": 48
+      },
+      "aspect": 3.4375,
+      "palette": [
+        {
+          "hex": "#68c8e4",
+          "coverage": 0.9302
+        },
+        {
+          "hex": "#082331",
+          "coverage": 0.0244
+        },
+        {
+          "hex": "#69a6bc",
+          "coverage": 0.0174
+        },
+        {
+          "hex": "#2f6172",
+          "coverage": 0.0163
+        },
+        {
+          "hex": "#0a1636",
+          "coverage": 0.0116
+        }
+      ],
+      "detail": {
+        "energy": 12.7584
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "results",
+      "kind": "control",
+      "note": "Outlined Ver resultados action",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.1674,
+        "y": 0.4836,
+        "w": 0.1264,
+        "h": 0.0436
+      },
+      "px": {
+        "x": 241,
+        "y": 532,
+        "w": 182,
+        "h": 48
+      },
+      "aspect": 3.7917,
+      "palette": [
+        {
+          "hex": "#081718",
+          "coverage": 0.8445
+        },
+        {
+          "hex": "#f5f7f7",
+          "coverage": 0.0721
+        },
+        {
+          "hex": "#798788",
+          "coverage": 0.0669
+        },
+        {
+          "hex": "#a4a6a6",
+          "coverage": 0.0093
+        },
+        {
+          "hex": "#c8cfd3",
+          "coverage": 0.0072
+        }
+      ],
+      "detail": {
+        "energy": 27.5367
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "location",
+      "kind": "text",
+      "note": "Temporada 2026 and Betim MG",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.5364,
+        "w": 0.3403,
+        "h": 0.0636
+      },
+      "px": {
+        "x": 60,
+        "y": 590,
+        "w": 490,
+        "h": 70
+      },
+      "aspect": 7,
+      "palette": [
+        {
+          "hex": "#081818",
+          "coverage": 0.9819
+        },
+        {
+          "hex": "#aeb8bf",
+          "coverage": 0.0082
+        },
+        {
+          "hex": "#556165",
+          "coverage": 0.0038
+        },
+        {
+          "hex": "#838893",
+          "coverage": 0.0033
+        },
+        {
+          "hex": "#2e3e3e",
+          "coverage": 0.0028
+        }
+      ],
+      "detail": {
+        "energy": 7.5955
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 17,
+          "capHeightPx": 10.4,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.6726,
+          "advTall": 0.6726,
+          "advX": 0.9129,
+          "gap": 0.0961,
+          "xRatio": 0.8148,
+          "stemW": 0.2052,
+          "contrast": 1.0981,
+          "serif": null,
+          "densTall": 0.6146,
+          "densX": 0.6564,
+          "weight": 0.6146
+        },
+        "widthClass": "wide",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "race-photo",
+      "kind": "image",
+      "note": "Original UDK night race photograph with two karts, cropped",
+      "grid": null,
+      "bleed": true,
+      "snap": false,
+      "box": {
+        "x": 0.4264,
+        "y": 0.1164,
+        "w": 0.5319,
+        "h": 0.4545
+      },
+      "px": {
+        "x": 614,
+        "y": 128,
+        "w": 766,
+        "h": 500
+      },
+      "aspect": 1.532,
+      "palette": [
+        {
+          "hex": "#141218",
+          "coverage": 0.6699
+        },
+        {
+          "hex": "#333932",
+          "coverage": 0.1563
+        },
+        {
+          "hex": "#61635e",
+          "coverage": 0.0629
+        },
+        {
+          "hex": "#bfc0c5",
+          "coverage": 0.0599
+        },
+        {
+          "hex": "#edecf2",
+          "coverage": 0.0509
+        }
+      ],
+      "detail": {
+        "energy": 23.7369
+      },
+      "medium": "raster",
+      "plate": "apps/plataforma/public/media/official/home/race-original.png",
+      "text": null
+    },
+    {
+      "id": "ticket",
+      "kind": "chrome",
+      "note": "Flat cyan upcoming race ticket",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.4264,
+        "y": 0.5709,
+        "w": 0.5319,
+        "h": 0.1282
+      },
+      "px": {
+        "x": 614,
+        "y": 628,
+        "w": 766,
+        "h": 141
+      },
+      "aspect": 5.4326,
+      "palette": [
+        {
+          "hex": "#68c8e6",
+          "coverage": 0.9583
+        },
+        {
+          "hex": "#081b26",
+          "coverage": 0.0262
+        },
+        {
+          "hex": "#33687f",
+          "coverage": 0.0082
+        },
+        {
+          "hex": "#639faf",
+          "coverage": 0.004
+        },
+        {
+          "hex": "#081838",
+          "coverage": 0.0033
+        }
+      ],
+      "detail": {
+        "energy": 14.743
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "next-label",
+      "kind": "text",
+      "note": "Próxima etapa",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.4458,
+        "y": 0.5927,
+        "w": 0.1007,
+        "h": 0.0236
+      },
+      "px": {
+        "x": 642,
+        "y": 652,
+        "w": 145,
+        "h": 26
+      },
+      "aspect": 5.5769,
+      "palette": [
+        {
+          "hex": "#68c8e6",
+          "coverage": 0.7736
+        },
+        {
+          "hex": "#09182d",
+          "coverage": 0.1297
+        },
+        {
+          "hex": "#08211d",
+          "coverage": 0.0377
+        },
+        {
+          "hex": "#68cace",
+          "coverage": 0.0354
+        },
+        {
+          "hex": "#0d3e4b",
+          "coverage": 0.0236
+        }
+      ],
+      "detail": {
+        "energy": 28.0049
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 6,
+          "capHeightPx": 12,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.8041,
+          "advTall": 1.5112,
+          "advX": 0.8041,
+          "gap": 0.0277,
+          "xRatio": 0.7651,
+          "stemW": 0.2462,
+          "contrast": 1.3041,
+          "serif": null,
+          "densTall": 0.5859,
+          "densX": 0.7088,
+          "weight": 0.5859
+        },
+        "widthClass": "wide",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "date",
+      "kind": "text",
+      "note": "13 OUT race date",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.4458,
+        "y": 0.63,
+        "w": 0.1181,
+        "h": 0.04
+      },
+      "px": {
+        "x": 642,
+        "y": 693,
+        "w": 170,
+        "h": 44
+      },
+      "aspect": 3.8636,
+      "palette": [
+        {
+          "hex": "#68c7e1",
+          "coverage": 0.75
+        },
+        {
+          "hex": "#0a131c",
+          "coverage": 0.2202
+        },
+        {
+          "hex": "#0a2018",
+          "coverage": 0.0119
+        },
+        {
+          "hex": "#64d0d6",
+          "coverage": 0.0095
+        },
+        {
+          "hex": "#4f8a91",
+          "coverage": 0.0083
+        }
+      ],
+      "detail": {
+        "energy": 23.5147
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 5,
+          "capHeightPx": 28,
+          "inkIsDark": true,
+          "allCaps": true,
+          "advance": 0.7868,
+          "advTall": 0.7868,
+          "advX": null,
+          "gap": 0.1967,
+          "xRatio": null,
+          "stemW": 0.2736,
+          "contrast": 1.2231,
+          "serif": null,
+          "densTall": 0.623,
+          "densX": null,
+          "weight": 0.623
+        },
+        "widthClass": "wide",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "stage",
+      "kind": "text",
+      "note": "21h Etapa regular and Traçado 05 normal e invertido",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.6097,
+        "y": 0.6127,
+        "w": 0.2153,
+        "h": 0.04
+      },
+      "px": {
+        "x": 878,
+        "y": 674,
+        "w": 310,
+        "h": 44
+      },
+      "aspect": 7.0455,
+      "palette": [
+        {
+          "hex": "#68c7e5",
+          "coverage": 0.8707
+        },
+        {
+          "hex": "#4a8da1",
+          "coverage": 0.0427
+        },
+        {
+          "hex": "#082635",
+          "coverage": 0.0354
+        },
+        {
+          "hex": "#1f5a6f",
+          "coverage": 0.0295
+        },
+        {
+          "hex": "#092545",
+          "coverage": 0.0217
+        }
+      ],
+      "detail": {
+        "energy": 29.2695
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 29,
+          "capHeightPx": 10.6,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.6941,
+          "advTall": 0.6935,
+          "advX": 0.7256,
+          "gap": 0.0946,
+          "xRatio": 0.8009,
+          "stemW": 0.191,
+          "contrast": 1.1274,
+          "serif": 0.2732,
+          "densTall": 0.5818,
+          "densX": 0.6027,
+          "weight": 0.5818
+        },
+        "widthClass": "wide",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "participate",
+      "kind": "control",
+      "note": "Outlined Participar action",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.8333,
+        "y": 0.6127,
+        "w": 0.1056,
+        "h": 0.0445
+      },
+      "px": {
+        "x": 1200,
+        "y": 674,
+        "w": 152,
+        "h": 49
+      },
+      "aspect": 3.102,
+      "palette": [
+        {
+          "hex": "#68c8e3",
+          "coverage": 0.8593
+        },
+        {
+          "hex": "#092838",
+          "coverage": 0.0814
+        },
+        {
+          "hex": "#357b8c",
+          "coverage": 0.0349
+        },
+        {
+          "hex": "#164e60",
+          "coverage": 0.0198
+        },
+        {
+          "hex": "#6cbcbc",
+          "coverage": 0.0047
+        }
+      ],
+      "detail": {
+        "energy": 19.0126
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "categories",
+      "kind": "text",
+      "note": "Ultras Insanos and Ultras Rápidos",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.7091,
+        "w": 0.2431,
+        "h": 0.0564
+      },
+      "px": {
+        "x": 60,
+        "y": 780,
+        "w": 350,
+        "h": 62
+      },
+      "aspect": 5.6452,
+      "palette": [
+        {
+          "hex": "#081718",
+          "coverage": 0.9494
+        },
+        {
+          "hex": "#a6b2b8",
+          "coverage": 0.031
+        },
+        {
+          "hex": "#636f73",
+          "coverage": 0.0106
+        },
+        {
+          "hex": "#354247",
+          "coverage": 0.0061
+        },
+        {
+          "hex": "#2d2d3d",
+          "coverage": 0.0029
+        }
+      ],
+      "detail": {
+        "energy": 13.7746
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 16,
+          "capHeightPx": 11,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.7554,
+          "advTall": 0.7554,
+          "advX": 0.6949,
+          "gap": 0.0906,
+          "xRatio": 0.7686,
+          "stemW": 0.1944,
+          "contrast": 1.057,
+          "serif": 0.256,
+          "densTall": 0.5712,
+          "densX": 0.6878,
+          "weight": 0.5712
+        },
+        "widthClass": "normal",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "calendar-link",
+      "kind": "control",
+      "note": "Ver calendário link",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.8646,
+        "y": 0.7091,
+        "w": 0.0938,
+        "h": 0.0564
+      },
+      "px": {
+        "x": 1245,
+        "y": 780,
+        "w": 135,
+        "h": 62
+      },
+      "aspect": 2.1774,
+      "palette": [
+        {
+          "hex": "#081718",
+          "coverage": 0.9164
+        },
+        {
+          "hex": "#eef1f2",
+          "coverage": 0.0508
+        },
+        {
+          "hex": "#b8bdc0",
+          "coverage": 0.018
+        },
+        {
+          "hex": "#464f51",
+          "coverage": 0.0074
+        },
+        {
+          "hex": "#868a91",
+          "coverage": 0.0074
+        }
+      ],
+      "detail": {
+        "energy": 15.8934
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "ranking-title",
+      "kind": "text",
+      "note": "Classificação section heading",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.8391,
+        "w": 0.2778,
+        "h": 0.0364
+      },
+      "px": {
+        "x": 60,
+        "y": 923,
+        "w": 400,
+        "h": 40
+      },
+      "aspect": 10,
+      "palette": [
+        {
+          "hex": "#f6f7f7",
+          "coverage": 0.8426
+        },
+        {
+          "hex": "#0d1216",
+          "coverage": 0.1242
+        },
+        {
+          "hex": "#afb3b6",
+          "coverage": 0.0209
+        },
+        {
+          "hex": "#63696b",
+          "coverage": 0.0075
+        },
+        {
+          "hex": "#8d919c",
+          "coverage": 0.0048
+        }
+      ],
+      "detail": {
+        "energy": 54.8657
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 9,
+          "capHeightPx": 23.8,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.7143,
+          "advTall": 0.7143,
+          "advX": 0.7143,
+          "gap": 0.0525,
+          "xRatio": 0.7304,
+          "stemW": 0.2284,
+          "contrast": 1.2544,
+          "serif": 1.3811,
+          "densTall": 0.6558,
+          "densX": 0.6904,
+          "weight": 0.6558
+        },
+        "widthClass": "normal",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "ranking-link",
+      "kind": "control",
+      "note": "Ver completa classification link",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.3944,
+        "y": 0.8355,
+        "w": 0.0889,
+        "h": 0.0364
+      },
+      "px": {
+        "x": 568,
+        "y": 919,
+        "w": 128,
+        "h": 40
+      },
+      "aspect": 3.2,
+      "palette": [
+        {
+          "hex": "#f6f7f7",
+          "coverage": 0.9106
+        },
+        {
+          "hex": "#0f1318",
+          "coverage": 0.0388
+        },
+        {
+          "hex": "#92939a",
+          "coverage": 0.0169
+        },
+        {
+          "hex": "#3e4548",
+          "coverage": 0.0169
+        },
+        {
+          "hex": "#c0c8cd",
+          "coverage": 0.0169
+        }
+      ],
+      "detail": {
+        "energy": 21.0875
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "dates-title",
+      "kind": "text",
+      "note": "Próximas etapas section heading",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.5382,
+        "y": 0.8391,
+        "w": 0.2917,
+        "h": 0.0364
+      },
+      "px": {
+        "x": 775,
+        "y": 923,
+        "w": 420,
+        "h": 40
+      },
+      "aspect": 10.5,
+      "palette": [
+        {
+          "hex": "#f7f7f8",
+          "coverage": 0.81
+        },
+        {
+          "hex": "#0d1216",
+          "coverage": 0.1402
+        },
+        {
+          "hex": "#c3c7ce",
+          "coverage": 0.018
+        },
+        {
+          "hex": "#383d3f",
+          "coverage": 0.0159
+        },
+        {
+          "hex": "#6c7173",
+          "coverage": 0.0159
+        }
+      ],
+      "detail": {
+        "energy": 63.2612
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 10,
+          "capHeightPx": 22.9,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.853,
+          "advTall": 0.6562,
+          "advX": 1.1374,
+          "gap": 0.0437,
+          "xRatio": 0.7598,
+          "stemW": 0.2413,
+          "contrast": 1.2988,
+          "serif": 0.9906,
+          "densTall": 0.6128,
+          "densX": 0.6891,
+          "weight": 0.6128
+        },
+        "widthClass": "wide",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "dates-link",
+      "kind": "control",
+      "note": "Calendário link",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.8785,
+        "y": 0.8355,
+        "w": 0.0799,
+        "h": 0.0364
+      },
+      "px": {
+        "x": 1265,
+        "y": 919,
+        "w": 115,
+        "h": 40
+      },
+      "aspect": 2.875,
+      "palette": [
+        {
+          "hex": "#f6f7f7",
+          "coverage": 0.8965
+        },
+        {
+          "hex": "#bbbdc3",
+          "coverage": 0.0296
+        },
+        {
+          "hex": "#0e1217",
+          "coverage": 0.0277
+        },
+        {
+          "hex": "#36383e",
+          "coverage": 0.0259
+        },
+        {
+          "hex": "#777b7f",
+          "coverage": 0.0203
+        }
+      ],
+      "detail": {
+        "energy": 19.7842
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "ranking-row",
+      "kind": "control",
+      "note": "Rank 01 André Felisberto Ultras Insanos and 247 points",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.0417,
+        "y": 0.9036,
+        "w": 0.4417,
+        "h": 0.0818
+      },
+      "px": {
+        "x": 60,
+        "y": 994,
+        "w": 636,
+        "h": 90
+      },
+      "aspect": 7.0667,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9665
+        },
+        {
+          "hex": "#0d1216",
+          "coverage": 0.0153
+        },
+        {
+          "hex": "#bbbfc5",
+          "coverage": 0.0076
+        },
+        {
+          "hex": "#48494e",
+          "coverage": 0.0055
+        },
+        {
+          "hex": "#6d7a7d",
+          "coverage": 0.0051
+        }
+      ],
+      "detail": {
+        "energy": 13.1644
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "future-stage",
+      "kind": "control",
+      "note": "10 NOV Etapa regular track and time",
+      "grid": null,
+      "snap": false,
+      "box": {
+        "x": 0.5382,
+        "y": 0.9036,
+        "w": 0.4201,
+        "h": 0.0873
+      },
+      "px": {
+        "x": 775,
+        "y": 994,
+        "w": 605,
+        "h": 96
+      },
+      "aspect": 6.3021,
+      "palette": [
+        {
+          "hex": "#f7f8f8",
+          "coverage": 0.9439
+        },
+        {
+          "hex": "#0d1216",
+          "coverage": 0.0198
+        },
+        {
+          "hex": "#687075",
+          "coverage": 0.0188
+        },
+        {
+          "hex": "#a9b1b6",
+          "coverage": 0.0157
+        },
+        {
+          "hex": "#4d4d53",
+          "coverage": 0.0019
+        }
+      ],
+      "detail": {
+        "energy": 17.0876
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    }
+  ]
+}

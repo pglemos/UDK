@@ -36,3 +36,14 @@ pnpm-debug.log*
 # TypeScript incremental state
 *.tsbuildinfo
 .vercel
+
+# Saídas locais de ferramentas (não versionar)
+.playwright-mcp/
+node-compile-cache/
+__pycache__/
+output/*
+!output/UDK-System-Design.docx
+exports/
+/*.png
+.impeccable/mocks/
+.impeccable/review/
