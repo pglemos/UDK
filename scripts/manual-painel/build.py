@@ -292,7 +292,7 @@ kbd {{ display:inline-block; min-width:18px; padding:0 5px; border:1px solid var
 .prose p {{ font-size:11pt; line-height:1.6; margin:0 0 4mm; }}
 .cards {{ display:grid; grid-template-columns:1fr 1fr; gap:4mm; margin-top:4mm; }}
 .card {{ border:1px solid var(--line); border-radius:8px; padding:5mm; }}
-.card h3 {{ font:700 12pt Archivo; margin-bottom:2mm; }}
+.card h2 {{ font:700 12pt Archivo; margin-bottom:2mm; }}
 .card p, .card li {{ font-size:10pt; line-height:1.5; color:var(--ink); margin:0; }}
 .card ol {{ margin:2mm 0 0 4mm; padding:0; }}
 .num {{ display:inline-grid; place-items:center; width:7mm; height:7mm; border-radius:50%; background:var(--navy); color:var(--cyan); font:800 10pt Archivo; border:1.5px solid var(--cyan); margin-right:2mm; }}
@@ -315,7 +315,7 @@ kbd {{ display:inline-block; min-width:18px; padding:0 5px; border:1px solid var
 .steps {{ list-style:none; margin:0; padding:0; display:grid; gap:2.5mm; }}
 .steps li {{ display:grid; grid-template-columns:8mm 1fr; gap:3mm; font-size:10pt; line-height:1.45; }}
 .steps .n {{ width:7mm; height:7mm; border-radius:50%; background:var(--navy); color:var(--cyan); border:1.5px solid var(--cyan); display:grid; place-items:center; font:800 9.5pt Archivo; }}
-.tip {{ margin-top:4mm; border-left:3px solid var(--cyan); background:#e3f6f9; padding:3mm 4mm; font-size:9.5pt; line-height:1.5; border-radius:0 6px 6px 0; }}
+.tip {{ margin-top:4mm; border:1px solid #b9e6ee; background:#e3f6f9; padding:3mm 4mm; font-size:9.5pt; line-height:1.5; border-radius:6px; }}
 .tip b {{ display:block; color:var(--deep); font-size:8.5pt; letter-spacing:.1em; text-transform:uppercase; margin-bottom:1mm; }}
 table.roles {{ width:100%; border-collapse:collapse; font-size:10pt; }}
 table.roles th, table.roles td {{ text-align:left; padding:3mm 2mm; border-bottom:1px solid var(--line); vertical-align:top; }}
@@ -360,12 +360,12 @@ dd {{ margin:1mm 0 0; font-size:10pt; line-height:1.5; color:var(--ink); }}
 <section class="page prose">
   <p class="kicker">Primeiros passos</p><h1>Como entrar no painel</h1>
   <div class="cards">
-    <div class="card"><h3><span class="num">1</span>Receba o convite</h3><p>Um administrador libera seu acesso em Equipe e acessos. Chega o e-mail <b>“Seu acesso ao painel do Ultras do Kart”</b>, de <b>nao-responda@ultrasdokart.com.br</b>. Se não aparecer, olhe o spam.</p></div>
-    <div class="card"><h3><span class="num">2</span>Crie sua senha</h3><p>Clique em <b>Criar minha senha</b>. A tela “Nova senha” abre no site com o link validado. Digite a senha duas vezes (mínimo 8 caracteres) e clique em <b>Salvar nova senha</b>.</p></div>
-    <div class="card"><h3><span class="num">3</span>Entre</h3><p>Acesse <b>ultrasdokart.com.br/login</b> com seu e-mail e a senha criada. Você cai no <b>Início</b> do painel.</p></div>
-    <div class="card"><h3><span class="num">4</span>Esqueceu a senha?</h3><p>Na tela de login, use <b>Esqueci minha senha</b>. Chega o e-mail “Redefina sua senha do Ultras do Kart” com um link novo.</p></div>
+    <div class="card"><h2><span class="num">1</span>Receba o convite</h3><p>Um administrador libera seu acesso em Equipe e acessos. Chega o e-mail <b>“Seu acesso ao painel do Ultras do Kart”</b>, de <b>nao-responda@ultrasdokart.com.br</b>. Se não aparecer, olhe o spam.</p></div>
+    <div class="card"><h2><span class="num">2</span>Crie sua senha</h3><p>Clique em <b>Criar minha senha</b>. A tela “Nova senha” abre no site com o link validado. Digite a senha duas vezes (mínimo 8 caracteres) e clique em <b>Salvar nova senha</b>.</p></div>
+    <div class="card"><h2><span class="num">3</span>Entre</h3><p>Acesse <b>ultrasdokart.com.br/login</b> com seu e-mail e a senha criada. Você cai no <b>Início</b> do painel.</p></div>
+    <div class="card"><h2><span class="num">4</span>Esqueceu a senha?</h3><p>Na tela de login, use <b>Esqueci minha senha</b>. Chega o e-mail “Redefina sua senha do Ultras do Kart” com um link novo.</p></div>
   </div>
-  <h3 style="margin:9mm 0 3mm;font:800 15pt Archivo">Como a tela é organizada</h3>
+  <h2 style="margin:9mm 0 3mm;font:800 15pt Archivo">Como a tela é organizada</h2>
   <p>À esquerda fica o <b>menu</b> com as 10 áreas. No alto de cada área há <b>abas</b> com as telas daquela área. Toda lista segue o mesmo padrão: <b>busca</b>, filtros, botão de <b>cadastro novo</b>, colunas que se ordenam com um clique e as ações <b>Editar</b> e <b>Arquivar</b> em cada linha.</p>
   <p>Nas imagens deste manual, os <b>círculos numerados</b> apontam cada parte da tela. O texto abaixo da imagem explica cada número. E-mails e telefones dos pilotos aparecem como •••, de propósito.</p>
 </section>
@@ -376,9 +376,9 @@ dd {{ margin:1mm 0 0; font-size:10pt; line-height:1.5; color:var(--ink); }}
   <p class="kicker">Rotina da etapa</p><h1>O que fazer em cada etapa</h1>
   <figure style="margin:0 0 6mm;border:1px solid var(--line);border-radius:8px;overflow:hidden"><img src="shots/00b-roteiro.png" style="width:100%;display:block"></figure>
   <div class="cards" style="grid-template-columns:1fr 1fr 1fr">
-    <div class="card"><h3>Antes da etapa</h3><ol><li>Conferir as inscrições da etapa (Pilotos › Inscrições).</li><li>Confirmar os pagamentos (Financeiro › Pagamentos, Art. 10).</li><li>Revisar horário e traçado (Etapas › Calendário).</li></ol></div>
-    <div class="card"><h3>No dia</h3><ol><li>Marcar a presença (Etapas › Credenciamento).</li><li>Registrar o sorteio de karts (Etapas › Karts).</li><li>Anotar ocorrências de pista (Disciplina › Ocorrências).</li></ol></div>
-    <div class="card"><h3>Depois da prova</h3><ol><li>Publicar os resultados (Resultados).</li><li>Lançar penalidades e julgar recursos (Disciplina).</li><li>Conferir a classificação.</li><li>Publicar a notícia da etapa (Site › Notícias).</li></ol></div>
+    <div class="card"><h2>Antes da etapa</h2><ol><li>Conferir as inscrições da etapa (Pilotos › Inscrições).</li><li>Confirmar os pagamentos (Financeiro › Pagamentos, Art. 10).</li><li>Revisar horário e traçado (Etapas › Calendário).</li></ol></div>
+    <div class="card"><h2>No dia</h2><ol><li>Marcar a presença (Etapas › Credenciamento).</li><li>Registrar o sorteio de karts (Etapas › Karts).</li><li>Anotar ocorrências de pista (Disciplina › Ocorrências).</li></ol></div>
+    <div class="card"><h2>Depois da prova</h2><ol><li>Publicar os resultados (Resultados).</li><li>Lançar penalidades e julgar recursos (Disciplina).</li><li>Conferir a classificação.</li><li>Publicar a notícia da etapa (Site › Notícias).</li></ol></div>
   </div>
 </section>
 
@@ -395,7 +395,7 @@ dd {{ margin:1mm 0 0; font-size:10pt; line-height:1.5; color:var(--ink); }}
     <figure style="margin:0"><img src="shots/m2-celular-credenciamento.png"><figcaption style="font-size:9pt;color:var(--muted);margin-top:2mm"><span class="num">1</span>Grupo da categoria · <span class="num">2</span>Presença da etapa</figcaption></figure>
   </div>
   <p style="margin-top:6mm">No celular o menu fica atrás do botão ☰. Listas viram cartões, com o nome de cada campo acima do valor e botões grandes. O credenciamento mostra um cartão por piloto com as etapas em grade.</p>
-  <h3 style="margin:6mm 0 3mm;font:800 14pt Archivo">Atalhos de teclado (computador)</h3>
+  <h2 style="margin:6mm 0 3mm;font:800 14pt Archivo">Atalhos de teclado (computador)</h2>
   <p><kbd>/</kbd> vai para a busca da tela · <kbd>N</kbd> abre um cadastro novo · <kbd>Esc</kbd> fecha janelas e confirmações.</p>
 </section>
 
