@@ -4589,12 +4589,12 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-mark.is-present {
   background: color-mix(in srgb, var(--cinema-success) 12%, #fff);
   border-color: color-mix(in srgb, var(--cinema-success) 35%, #fff);
-  color: #17583d;
+  color: var(--op-present-ink);
 }
 .shell .pv-mark.is-absent {
   background: color-mix(in srgb, var(--cinema-danger) 10%, #fff);
   border-color: color-mix(in srgb, var(--cinema-danger) 32%, #fff);
-  color: #8f2129;
+  color: var(--op-absent-ink);
 }
 .shell .pv-mark.is-excused {
   background: color-mix(in srgb, var(--cinema-warning) 12%, #fff);
@@ -5013,7 +5013,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-laps tr.is-best td {
   background: color-mix(in srgb, var(--cinema-success) 10%, #fff);
-  color: #17583d;
+  color: var(--op-present-ink);
   font-weight: 600;
 }
 
@@ -5370,13 +5370,13 @@ img[src^="/media/official/drivers/uniforme/"] {
   height: 14px;
 }
 .shell .pv-level.is-edit {
-  color: #17583d;
+  color: var(--op-present-ink);
 }
 .shell .pv-level.is-view {
   color: var(--cinema-cyan-deep);
 }
 .shell .pv-level.is-none {
-  color: #8796a0;
+  color: var(--op-muted-ui);
 }
 .shell .pv-visually-hidden {
   position: absolute;
@@ -5769,6 +5769,14 @@ img[src^="/media/official/drivers/uniforme/"] {
   --op-muted-ui: #627580;
   --op-on-accent: #ffffff;
   --op-row-hover: #f0fbfd;
+  /* pódio: metais com texto acima de 4,5:1 */
+  --op-silver: #c3ccd1;
+  --op-gold-ink: #1d1404;
+  --op-silver-ink: #0e171c;
+  --op-present-ink: #17583d;
+  --op-absent-ink: #8f2129;
+  --op-row-line: #e3eaee;
+  --op-nav-count-bg: #ffffff1f;
 }
 
 /* cabeçalho da página: título + descrição juntos, papéis discretos à direita */
@@ -5840,7 +5848,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   color: var(--danger);
 }
 .shell .nav-group a .count {
-  background: #ffffff1f;
+  background: var(--op-nav-count-bg);
   color: var(--cinema-white);
 }
 
@@ -5940,7 +5948,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .admin-table tbody tr + tr td,
 .shell .admin-table tbody tr + tr th {
-  border-top-color: #e3eaee;
+  border-top-color: var(--op-row-line);
 }
 
 /* números: pontos e totais em ciano profundo; pódio com metais */
@@ -5958,12 +5966,12 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell tr:nth-child(1) .pv-pos.is-podium,
 .shell li:nth-child(1) .pv-pos.is-podium {
   background: var(--cinema-gold);
-  color: #1d1404;
+  color: var(--op-gold-ink);
 }
 .shell tr:nth-child(2) .pv-pos.is-podium,
 .shell li:nth-child(2) .pv-pos.is-podium {
-  background: var(--op-muted-ui);
-  color: #0e171c;
+  background: var(--op-silver);
+  color: var(--op-silver-ink);
 }
 .shell tr:nth-child(3) .pv-pos.is-podium,
 .shell li:nth-child(3) .pv-pos.is-podium {
@@ -7177,6 +7185,19 @@ img[src^="/media/official/drivers/uniforme/"] {
     min-height: 44px;
   }
   .shell .pending-list li a {
+    min-height: 44px;
+  }
+}
+
+/* ===== Auditoria técnica, rodada 2 ===== */
+/* busca com anel de foco visível */
+.shell .search-box:focus-within {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 2px;
+}
+/* toque: ações de linha com 44px em qualquer largura */
+@media (pointer: coarse) {
+  .shell .row-action {
     min-height: 44px;
   }
 }
