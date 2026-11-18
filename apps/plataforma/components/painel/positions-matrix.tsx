@@ -11,7 +11,7 @@ import {
   formatPoints,
   loadStages,
   normalizeSearch,
-  useSortable, Glossary } from "./shared";
+  useSortable, Glossary, LazyDetails } from "./shared";
 
 type Race = { id: string; label: string; title: string; order: string };
 type Cell = { position: number; points: number; pole: boolean; fastest: boolean; penalty: number; status: string };
@@ -254,10 +254,7 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
           ) : null}
         </section>
         {editor ? (
-          <details className="pv-details">
-            <summary>Corrigir uma posição à mão (abre o formulário de edição)</summary>
-            {editor}
-          </details>
+          <LazyDetails summary="Corrigir uma posição à mão (abre o formulário de edição)">{editor}</LazyDetails>
         ) : null}
       </PanelState>
     </div>

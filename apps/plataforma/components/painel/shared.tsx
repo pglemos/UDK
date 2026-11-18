@@ -225,3 +225,14 @@ export function Glossary({ terms }: { terms: [string, string][] }) {
     </details>
   );
 }
+
+/** <details> que só monta o conteúdo depois de aberto pela primeira vez (editor pesado fora do DOM). */
+export function LazyDetails({ summary, children }: { summary: string; children: ReactNode }) {
+  const [opened, setOpened] = useState(false);
+  return (
+    <details className="pv-details" onToggle={(event) => event.currentTarget.open && setOpened(true)}>
+      <summary>{summary}</summary>
+      {opened ? children : null}
+    </details>
+  );
+}

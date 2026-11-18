@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Download, RefreshCw, Timer } from "lucide-react";
-import { PanelState, errorMessage, formatLap, loadStages, type StageInfo } from "./shared";
+import { PanelState, errorMessage, formatLap, loadStages, type StageInfo, LazyDetails } from "./shared";
 import { moduleHref } from "../../lib/painel-structure";
 
 type Row = {
@@ -153,10 +153,7 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
           </section>
         ))}
         {editor ? (
-          <details className="pv-details">
-            <summary>Corrigir um resultado à mão (abre o formulário de edição)</summary>
-            {editor}
-          </details>
+          <LazyDetails summary="Corrigir um resultado à mão (abre o formulário de edição)">{editor}</LazyDetails>
         ) : null}
       </PanelState>
     </div>

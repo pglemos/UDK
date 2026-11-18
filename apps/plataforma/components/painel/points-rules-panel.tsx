@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { RefreshCw } from "lucide-react";
-import { PanelState, errorMessage, formatPoints } from "./shared";
+import { PanelState, errorMessage, formatPoints, LazyDetails } from "./shared";
 
 type Rule = {
   id: string;
@@ -164,10 +164,7 @@ export function PointsRulesPanel({ client, editor }: { client: SupabaseClient; e
         ) : null}
 
         {editor ? (
-          <details className="pv-details">
-            <summary>Editar a tabela de pontos (abre o formulário de edição)</summary>
-            {editor}
-          </details>
+          <LazyDetails summary="Editar a tabela de pontos (abre o formulário de edição)">{editor}</LazyDetails>
         ) : null}
       </PanelState>
     </div>
