@@ -2,6 +2,7 @@
 
 import { use, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -43,21 +44,6 @@ import {
   type Role,
 } from "../../../lib/painel-structure";
 import { ModuleCrud } from "../../../components/module-crud";
-import { PilotCrud } from "../../../components/pilot-crud";
-import { Dashboard } from "../../../components/dashboard";
-import { ReportsPanel } from "../../../components/reports-panel";
-import { KartsPanel } from "../../../components/painel/karts-panel";
-import { CheckinPanel } from "../../../components/painel/checkin-panel";
-import { SponsorsPanel } from "../../../components/painel/sponsors-panel";
-import { StandingsPanel } from "../../../components/painel/standings-panel";
-import { PointsRulesPanel } from "../../../components/painel/points-rules-panel";
-import { LapsPanel } from "../../../components/painel/laps-panel";
-import { PositionsMatrix } from "../../../components/painel/positions-matrix";
-import { ResultsPanel } from "../../../components/painel/results-panel";
-import { NewsPanel } from "../../../components/painel/news-panel";
-import { ChampionshipSettings } from "../../../components/painel/championship-settings";
-import { TeamAccessPanel } from "../../../components/painel/team-access-panel";
-import { RolesMatrix } from "../../../components/painel/roles-matrix";
 
 const sectionIcons: Record<string, LucideIcon> = {
   home: House,
@@ -91,6 +77,34 @@ const customTabDescriptions: Record<string, string> = {
   equipe: "Quem acessa o painel e com qual papel.",
   papeis: "O que cada papel pode ver e alterar em cada área.",
 };
+
+
+/** Cada tela do painel vem num pacote próprio: abrir uma aba não baixa o código das outras. */
+function PanelLoading() {
+  return (
+    <div className="pv-skeleton" role="status" aria-busy="true">
+      <span className="pv-skeleton-label">Carregando…</span>
+      <i aria-hidden="true" />
+      <i aria-hidden="true" />
+      <i aria-hidden="true" />
+    </div>
+  );
+}
+const PilotCrud = dynamic(() => import("../../../components/pilot-crud").then((loaded) => loaded.PilotCrud), { loading: PanelLoading });
+const Dashboard = dynamic(() => import("../../../components/dashboard").then((loaded) => loaded.Dashboard), { loading: PanelLoading });
+const ReportsPanel = dynamic(() => import("../../../components/reports-panel").then((loaded) => loaded.ReportsPanel), { loading: PanelLoading });
+const KartsPanel = dynamic(() => import("../../../components/painel/karts-panel").then((loaded) => loaded.KartsPanel), { loading: PanelLoading });
+const CheckinPanel = dynamic(() => import("../../../components/painel/checkin-panel").then((loaded) => loaded.CheckinPanel), { loading: PanelLoading });
+const SponsorsPanel = dynamic(() => import("../../../components/painel/sponsors-panel").then((loaded) => loaded.SponsorsPanel), { loading: PanelLoading });
+const StandingsPanel = dynamic(() => import("../../../components/painel/standings-panel").then((loaded) => loaded.StandingsPanel), { loading: PanelLoading });
+const PointsRulesPanel = dynamic(() => import("../../../components/painel/points-rules-panel").then((loaded) => loaded.PointsRulesPanel), { loading: PanelLoading });
+const LapsPanel = dynamic(() => import("../../../components/painel/laps-panel").then((loaded) => loaded.LapsPanel), { loading: PanelLoading });
+const PositionsMatrix = dynamic(() => import("../../../components/painel/positions-matrix").then((loaded) => loaded.PositionsMatrix), { loading: PanelLoading });
+const ResultsPanel = dynamic(() => import("../../../components/painel/results-panel").then((loaded) => loaded.ResultsPanel), { loading: PanelLoading });
+const NewsPanel = dynamic(() => import("../../../components/painel/news-panel").then((loaded) => loaded.NewsPanel), { loading: PanelLoading });
+const ChampionshipSettings = dynamic(() => import("../../../components/painel/championship-settings").then((loaded) => loaded.ChampionshipSettings), { loading: PanelLoading });
+const TeamAccessPanel = dynamic(() => import("../../../components/painel/team-access-panel").then((loaded) => loaded.TeamAccessPanel), { loading: PanelLoading });
+const RolesMatrix = dynamic(() => import("../../../components/painel/roles-matrix").then((loaded) => loaded.RolesMatrix), { loading: PanelLoading });
 
 const countClass: Record<ModuleCount["tom"], string> = {
   quiet: "count count-quiet",

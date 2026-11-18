@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Download, RefreshCw } from "lucide-react";
-import { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } from "../../lib/timing-pdf";
 import { PanelState, Segmented, errorMessage, formatLap, loadStages, type StageInfo, Glossary } from "./shared";
 
 type Race = { id: string; stageId: string; label: string; startsAt: string };
@@ -164,6 +163,8 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
     setPdfBusy(true);
     setError("");
     try {
+      // gerador de PDF só é baixado quando alguém pede um PDF
+      const { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } = await import("../../lib/timing-pdf");
       const report = await loadRaceReport(client, race.id);
       const logo = `${window.location.origin}/brand/udk-wordmark-dark.svg`;
       const pilot = entries.find((entry) => entry.id === entryId);

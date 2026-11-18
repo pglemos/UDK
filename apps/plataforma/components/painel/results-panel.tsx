@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Download, RefreshCw, Timer } from "lucide-react";
 import { PanelState, errorMessage, formatLap, loadStages, type StageInfo } from "./shared";
-import { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } from "../../lib/timing-pdf";
 import { moduleHref } from "../../lib/painel-structure";
 
 type Row = {
@@ -86,6 +85,8 @@ export function ResultsPanel({ client, editor }: { client: SupabaseClient; edito
     setBusy(`${row.id}-${kind}`);
     setError("");
     try {
+      // gerador de PDF só é baixado quando alguém pede um PDF
+      const { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } = await import("../../lib/timing-pdf");
       const report = await loadRaceReport(client, row.id);
       const logo = `${window.location.origin}/brand/udk-wordmark-dark.svg`;
       const label = sessionTitle(row.session, row.kind);

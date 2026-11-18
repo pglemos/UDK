@@ -7201,3 +7201,29 @@ img[src^="/media/official/drivers/uniforme/"] {
     min-height: 44px;
   }
 }
+
+/* ===== Auditoria técnica, rodada 3 ===== */
+/* toque: todo controle do painel com 44px; caixa de seleção com área de toque ampliada */
+@media (pointer: coarse) {
+  .shell :is(button, .button-primary, .button-secondary, .pv-tabs a, .pv-sort, .pv-link-button, summary, select, .pending-list li a, .stage-actions a) {
+    min-height: 44px;
+  }
+  .shell .pv-check {
+    min-width: 44px;
+  }
+  .shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
+    width: 28px;
+    height: 28px;
+  }
+  .shell .pv-check label,
+  .shell .pv-check {
+    padding: 8px;
+  }
+}
+/* listas longas: o navegador só desenha o que está na tela */
+.shell .pv-entry-list > li,
+.shell .pv-result-list > li,
+.shell .pv-news-list > li {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
+}
