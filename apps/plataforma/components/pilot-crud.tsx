@@ -257,6 +257,15 @@ export function PilotCrud({
   const [search, setSearch] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [pageSize, setPageSize] = useState(25);
+  // monta só a versão da tela atual (tabela no computador, cartões no celular); mesmo corte do pilot-crud.css
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 720px)");
+    const sync = () => setCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -642,6 +651,7 @@ export function PilotCrud({
           </div>
         ) : (
           <div className="table-scroll">
+            {compact ? null : (
             <table className="admin-table pilot-table">
               <thead>
                 <tr>
@@ -711,6 +721,8 @@ export function PilotCrud({
                 })}
               </tbody>
             </table>
+            )}
+            {compact ? (
             <div className="pilot-mobile-list" aria-label="Lista de pilotos">
               {visibleRecords.slice(0, pageSize).map((record) => {
                 const name = text(record, "full_name") || "Piloto sem nome";
@@ -779,6 +791,7 @@ export function PilotCrud({
                 );
               })}
             </div>
+            ) : null}
             {visibleRecords.length > pageSize ? (
               <div className="pv-more">
                 <button type="button" className="button-secondary" onClick={() => setPageSize((size) => size + 25)}>
