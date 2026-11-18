@@ -6944,3 +6944,182 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pilot-table th:first-child {
   width: 52px;
 }
+
+/* carregamento inicial: esqueleto do próprio painel */
+.pv-boot {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: var(--canvas);
+}
+.pv-boot-side {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background: var(--cinema-black);
+  padding: 28px 22px;
+}
+.pv-boot-side img,
+.pv-boot-side svg {
+  margin-bottom: 18px;
+}
+.pv-boot-side i {
+  display: block;
+  height: 14px;
+  border-radius: 4px;
+  background: #ffffff14;
+}
+.pv-boot-main {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 88px 32px 32px;
+}
+.pv-boot-main p {
+  margin: 0;
+  color: var(--cinema-muted-dark);
+  font: 500 0.875rem var(--cinema-body);
+}
+.pv-boot-main i,
+.pv-boot-cards i {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--cinema-paper-2) 0, var(--cinema-paper) 50%, var(--cinema-paper-2) 100%);
+  background-size: 200% 100%;
+  animation: op-skeleton 1.2s linear infinite;
+}
+.pv-boot-main .is-title {
+  width: 220px;
+  height: 32px;
+}
+.pv-boot-main .is-text {
+  width: min(480px, 80%);
+  height: 16px;
+}
+.pv-boot-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.pv-boot-cards i {
+  height: 120px;
+}
+.pv-boot-main .is-block {
+  height: 260px;
+}
+@media (max-width: 980px) {
+  .pv-boot {
+    grid-template-columns: 1fr;
+  }
+  .pv-boot-side {
+    display: none;
+  }
+  .pv-boot-main {
+    padding: 24px 16px;
+  }
+  .pv-boot-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-boot-main i,
+  .pv-boot-cards i {
+    animation: none;
+  }
+}
+
+/* dica embaixo do campo */
+.shell .field-help {
+  display: block;
+  margin-top: -2px;
+  color: var(--cinema-muted-dark);
+  font: 400 var(--op-meta) / 1.4 var(--cinema-body);
+}
+
+/* glossário da tela */
+.shell .pv-glossary {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.shell .pv-glossary summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  color: var(--op-accent);
+  font: 600 var(--op-body) var(--cinema-body);
+  cursor: pointer;
+}
+.shell .pv-glossary dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  padding: 16px;
+}
+.shell .pv-glossary dt {
+  color: var(--cinema-ink);
+  font-weight: 700;
+}
+.shell .pv-glossary dd {
+  margin: 2px 0 0;
+  color: var(--cinema-muted-dark);
+  font-size: var(--op-body);
+  line-height: 1.45;
+}
+
+/* cabeçalho ordenável nas listas genéricas */
+.shell .admin-table:not(.pv-table) th[aria-sort] {
+  padding: 0;
+}
+.shell .admin-table:not(.pv-table) th[aria-sort] .pv-sort {
+  min-height: 44px;
+  padding: 0 10px;
+  font-weight: 600;
+}
+
+/* credenciamento: grupos por categoria */
+.shell .pv-group-toggle {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--cinema-ink);
+  font: 700 var(--op-body) var(--cinema-body);
+  cursor: pointer;
+}
+.shell .pv-group-toggle small {
+  color: var(--cinema-muted-dark);
+  font-weight: 500;
+}
+.shell .pv-group-toggle:focus-visible {
+  outline: 3px solid var(--cinema-cyan-deep);
+  outline-offset: 2px;
+}
+.shell .content[data-module="checkin"] .pv-group-row th {
+  position: sticky;
+  left: 0;
+  background: var(--cinema-paper);
+  padding: 4px 14px;
+}
+@media (max-width: 760px) {
+  .shell .content[data-module="checkin"] .pv-matrix tbody tr.pv-group-row {
+    display: block;
+    border-bottom: 1px solid var(--line);
+    background: var(--cinema-paper);
+    padding: 6px 16px;
+  }
+  .shell .content[data-module="checkin"] .pv-matrix tbody tr.pv-group-row th {
+    background: transparent;
+    padding: 0;
+  }
+  .shell .pv-group-toggle {
+    min-height: 44px;
+    width: 100%;
+  }
+}

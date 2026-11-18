@@ -208,3 +208,20 @@ export function errorMessage(error: unknown): string {
   if (error && typeof error === "object" && "message" in error) return String(error.message);
   return "Não foi possível carregar os dados agora. Tente atualizar a página.";
 }
+
+/** Glossário recolhível com os termos e siglas da tela. */
+export function Glossary({ terms }: { terms: [string, string][] }) {
+  return (
+    <details className="pv-glossary">
+      <summary>O que significa cada coluna?</summary>
+      <dl>
+        {terms.map(([term, meaning]) => (
+          <div key={term}>
+            <dt>{term}</dt>
+            <dd>{meaning}</dd>
+          </div>
+        ))}
+      </dl>
+    </details>
+  );
+}

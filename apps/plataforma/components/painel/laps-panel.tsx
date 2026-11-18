@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Download, RefreshCw } from "lucide-react";
 import { lapsHtml, loadRaceReport, openPdf, pdfFileName, resultHtml } from "../../lib/timing-pdf";
-import { PanelState, Segmented, errorMessage, formatLap, loadStages, type StageInfo } from "./shared";
+import { PanelState, Segmented, errorMessage, formatLap, loadStages, type StageInfo, Glossary } from "./shared";
 
 type Race = { id: string; stageId: string; label: string; startsAt: string };
 type Entry = {
@@ -218,6 +218,15 @@ export function LapsPanel({ client }: { client: SupabaseClient }) {
         </button>
       </div>
 
+      <Glossary
+            terms={[
+              ["Tempo", "Duração da volta (minuto:segundo.milésimos)."],
+              ["Para a melhor", "Quanto a volta ficou acima da melhor volta do próprio piloto."],
+              ["Acumulado", "Tempo total de prova até o fim daquela volta."],
+              ["Anulada", "Volta descartada pela cronometragem ou pela direção de prova."],
+              ["Tomada de tempo", "Sessão de classificação que define o grid; não pontua."],
+            ]}
+      />
       <PanelState loading={loading || loadingRace} error={error} empty={!loading && !loadingRace && !entries.length ? "Nenhum resultado nessa corrida." : undefined}>
         <div className="pv-split">
           <section className="data-card">

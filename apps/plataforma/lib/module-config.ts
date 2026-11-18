@@ -45,6 +45,8 @@ export type FieldSuggestion = {
 export type ModuleField = {
   key: string;
   label: string;
+  /** Dica curta mostrada embaixo do campo no formulário. */
+  help?: string;
   kind: FieldKind;
   required?: boolean;
   readOnly?: boolean;
@@ -1568,3 +1570,30 @@ export const moduleConfigByKey = new Map(moduleConfigs.map((module) => [module.k
 export function getModuleConfig(key: string): ModuleConfig | undefined {
   return moduleConfigByKey.get(key);
 }
+
+/** Dicas dos campos que costumam gerar dúvida, por "módulo.campo". */
+export const fieldHelp: Record<string, string> = {
+  "julgamentos.code": "Escolha a penalidade do regulamento: resumo e efeito são preenchidos sozinhos.",
+  "julgamentos.effect": "O que a penalidade muda no tempo ou nos pontos. Já vem do código escolhido.",
+  "julgamentos.status": "Homologada = decisão final, já vale para o resultado e a classificação.",
+  "julgamentos.public_visibility": "Pública aparece na página do piloto e nos resultados do site.",
+  "ocorrencias.incident_type": "Escolha o tipo do regulamento: artigo e gravidade são preenchidos sozinhos.",
+  "ocorrencias.severity": "Leve, média, grave ou gravíssima, conforme o Art. 22.",
+  "recursos.penalty_id": "A penalidade contestada. O piloto é preenchido a partir dela.",
+  "inscricoes.kind": "Temporada inteira ou uma etapa avulsa.",
+  "inscricoes.requested_category_id": "Categoria que o piloto pediu ao se inscrever.",
+  "inscricoes.approved_category_id": "Categoria em que a organização homologou o piloto. Deixe igual quando não houver mudança.",
+  "inscricoes.amount_cents": "Valor da inscrição em reais.",
+  "documentos.status": "Aprovado libera o piloto; Correção pedida avisa o piloto para reenviar.",
+  "financeiro.status": "Confirme o pagamento só depois de conferir o comprovante.",
+  "creditos.amount_cents": "Valor em reais que o piloto pode usar em inscrições futuras.",
+  "calendario.format": "Etapa regular soma as duas corridas; Resistência é a Endurance.",
+  "calendario.track": "Traçado do kartódromo usado na etapa.",
+  "configuracoes.slug": "Parte do endereço da página da categoria no site, sem espaços nem acentos.",
+  "configuracoes.color": "Cor da categoria nos cartões e na classificação do site (formato #RRGGBB).",
+  "termos.required": "Obrigatório: o piloto só conclui o cadastro depois de aceitar.",
+  "termos.effective_at": "Data a partir da qual esta versão vale.",
+  "notificacoes.user_id": "Pessoa que recebe o aviso no painel.",
+  "importacoes.status": "Importado = os resultados deste arquivo já estão no sistema.",
+  "pontuacao.position_points": "Pontos por posição de chegada, do 1º em diante.",
+};

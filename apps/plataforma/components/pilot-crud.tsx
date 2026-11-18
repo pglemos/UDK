@@ -1,5 +1,6 @@
 "use client";
 
+import { SortHeader } from "./painel/shared";
 import { confirmAction } from "../lib/confirm-action";
 import {
   useCallback,
@@ -348,7 +349,13 @@ export function PilotCrud({
   }, [photoFile, values.avatar_url]);
 
   const archivedCount = useMemo(() => records.filter((record) => record.status === "archived").length, [records]);
-  const visibleRecords = useMemo(() => {
+  const [sort, setSort] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "name", direction: "asc" });
+  function toggleSort(key: string, first: "asc" | "desc" = "asc") {
+    setSort((current) =>
+      current.key === key ? { key, direction: current.direction === "asc" ? "desc" : "asc" } : { key, direction: first },
+    );
+  }
+  const filteredPilots = useMemo(() => {
     const term = search.trim().toLowerCase();
     const base = showArchived ? records : records.filter((record) => record.status !== "archived");
     if (!term) return base;
@@ -367,6 +374,19 @@ export function PilotCrud({
         .some((value) => value.includes(term)),
     );
   }, [records, search, showArchived]);
+  const visibleRecords = useMemo(() => {
+    const valueOf = (record: PilotRecord): string => {
+      if (sort.key === "name") return text(record, "full_name");
+      if (sort.key === "city") return `${text(record, "city")} ${text(record, "state")}`.trim();
+      if (sort.key === "status") return statusLabel(record.status);
+      if (sort.key === "weight") return String(record.weight_kg ?? "").padStart(6, "0");
+      return "";
+    };
+    const factor = sort.direction === "asc" ? 1 : -1;
+    return [...filteredPilots].sort(
+      (a, b) => valueOf(a).localeCompare(valueOf(b), "pt-BR", { numeric: true, sensitivity: "base" }) * factor,
+    );
+  }, [filteredPilots, sort]);
 
   const selectedCategories = useMemo(
     () => categories.filter((category) => category.season_id === String(values.season_id)),
@@ -620,11 +640,11 @@ export function PilotCrud({
               <thead>
                 <tr>
                   <th>Foto</th>
-                  <th>Piloto</th>
+                  <SortHeader label="Piloto" column="name" sort={sort} onSort={toggleSort} />
                   <th>Contato</th>
-                  <th>Cidade/UF</th>
-                  <th>Dados físicos</th>
-                  <th>Situação</th>
+                  <SortHeader label="Cidade/UF" column="city" sort={sort} onSort={toggleSort} />
+                  <SortHeader label="Dados físicos" column="weight" sort={sort} onSort={toggleSort} />
+                  <SortHeader label="Situação" column="status" sort={sort} onSort={toggleSort} />
                   {!readOnly ? <th className="actions-column">Ações</th> : null}
                 </tr>
               </thead>

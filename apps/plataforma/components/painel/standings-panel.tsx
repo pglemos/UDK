@@ -12,8 +12,7 @@ import {
   loadStages,
   normalizeSearch,
   useSortable,
-  type StageInfo,
-} from "./shared";
+  type StageInfo, Glossary } from "./shared";
 
 type Category = { id: string; name: string; slug: string };
 
@@ -185,6 +184,14 @@ export function StandingsPanel({ client }: { client: SupabaseClient }) {
         </button>
       </div>
 
+      <Glossary
+            terms={[
+              ["Brutos", "Soma de todos os pontos do piloto na temporada."],
+              ["Descartes", "Os 2 piores resultados regulares saem da conta (Art. 20). − tira pontos; + quando o resultado descartado era negativo."],
+              ["Válidos", "Brutos menos os descartes: é o que define a posição."],
+              ["Vitórias, Pódios, Poles", "Usados para desempatar quando os válidos são iguais."],
+            ]}
+      />
       <PanelState loading={loading} error={error} empty={!loading && !visible.length ? "Nenhum piloto classificado nessa categoria." : undefined}>
         <section className="data-card">
           <div className="data-card-head">

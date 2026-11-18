@@ -11,8 +11,7 @@ import {
   formatPoints,
   loadStages,
   normalizeSearch,
-  useSortable,
-} from "./shared";
+  useSortable, Glossary } from "./shared";
 
 type Race = { id: string; label: string; title: string; order: string };
 type Cell = { position: number; points: number; pole: boolean; fastest: boolean; penalty: number; status: string };
@@ -169,6 +168,16 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
         </button>
       </div>
 
+      <Glossary
+            terms={[
+              ["Pontos", "Pontos da prova pela chegada geral, já com bônus e penalidades."],
+              ["P", "Pole position da Super Pole: +1 ponto."],
+              ["MV", "Melhor volta da corrida: +1 ponto."],
+              ["−10", "Pontos tirados por penalidade (Art. 22)."],
+              ["Provas", "Quantas corridas o piloto disputou."],
+              ["Total", "Soma de todas as provas, sem descartes. Os válidos estão em Classificação."],
+            ]}
+      />
       <PanelState loading={loading} error={error} empty={!loading && !visible.length ? "Nenhum resultado nesse filtro." : undefined}>
         <section className="data-card">
           <div className="data-card-head">

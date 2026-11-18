@@ -228,6 +228,13 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
     }
   }
 
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof sorted>();
+    for (const row of sorted) map.set(row.category, [...(map.get(row.category) ?? []), row]);
+    return Array.from(map, ([name, rows]) => ({ name, rows })).sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  }, [sorted]);
+
   const totals = useMemo(
     () =>
       stages.map(
@@ -336,8 +343,35 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                   />
                 </tr>
               </thead>
-              <tbody>
-                {sorted.map((row) => (
+              {groups.map((group) => (
+                <tbody key={group.name}>
+                  <tr className="pv-group-row">
+                    <th scope="rowgroup" colSpan={stages.length + 3}>
+                      <button
+                        type="button"
+                        className="pv-group-toggle"
+                        aria-expanded={!collapsed.has(group.name)}
+                        onClick={() =>
+                          setCollapsed((current) => {
+                            const next = new Set(current);
+                            if (next.has(group.name)) next.delete(group.name);
+                            else next.add(group.name);
+                            return next;
+                          })
+                        }
+                      >
+                        <span aria-hidden="true">{collapsed.has(group.name) ? "▸" : "▾"}</span> {group.name}
+                        <small>
+                          {group.rows.length} {group.rows.length === 1 ? "piloto" : "pilotos"}
+                        </small>
+                      </button>
+                    </th>
+                  </tr>
+                  {collapsed.has(group.name)
+                    ? null
+                    : (
+                      <>
+                {group.rows.map((row) => (
                   <tr key={row.id}>
                     <th scope="row" className="pv-row-head">
                       {row.name}
@@ -372,7 +406,10 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                     </td>
                   </tr>
                 ))}
-              </tbody>
+                      </>
+                    )}
+                </tbody>
+              ))}
               <tfoot>
                 <tr>
                   <th scope="row" colSpan={2}>

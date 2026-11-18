@@ -1,5 +1,6 @@
 "use client";
 
+import { SortHeader } from "./painel/shared";
 import { confirmAction } from "../lib/confirm-action";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -17,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import type { ModuleAction, ModuleConfig, ModuleField } from "../lib/module-config";
+import { fieldHelp } from "../lib/module-config";
 import {
   enqueueOfflineOperation,
   flushOfflineQueue,
@@ -270,6 +272,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [editing, setEditing] = useState<RecordRow>();
   const [search, setSearch] = useState("");
   const [invalidKeys, setInvalidKeys] = useState<Set<string>>(new Set());
+  const [sort, setSort] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "", direction: "asc" });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [lastArchived, setLastArchived] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
@@ -300,13 +303,42 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       ),
     );
   }, [config.fields, records, relationOptions, search, statusFilter]);
+  function helpFor(field: ModuleField): string | undefined {
+    return field.help ?? fieldHelp[`${config.key}.${field.key}`];
+  }
+
   function rowTitle(record: RecordRow): string {
     const field = config.fields.find((item) => item.key === config.titleColumn);
     const label = field ? formatValue(record[config.titleColumn], field, relationOptions) : "";
     return label && label !== "—" ? label : (config.singular ?? "registro");
   }
 
-  const shown = useMemo(() => filteredRecords.slice(0, pageSize), [filteredRecords, pageSize]);
+  const sortedRecords = useMemo(() => {
+    if (!sort.key) return filteredRecords;
+    const field = config.fields.find((item) => item.key === sort.key);
+    const valueOf = (record: RecordRow): string | number => {
+      const raw = record[sort.key];
+      if (raw === null || raw === undefined || raw === "") return "";
+      if (typeof raw === "number") return raw;
+      if (field && (field.kind === "relation" || field.kind === "select")) return formatValue(raw, field, relationOptions);
+      return String(raw);
+    };
+    const factor = sort.direction === "asc" ? 1 : -1;
+    return [...filteredRecords].sort((a, b) => {
+      const left = valueOf(a);
+      const right = valueOf(b);
+      if (left === "" && right !== "") return 1;
+      if (right === "" && left !== "") return -1;
+      if (typeof left === "number" && typeof right === "number") return (left - right) * factor;
+      return String(left).localeCompare(String(right), "pt-BR", { numeric: true, sensitivity: "base" }) * factor;
+    });
+  }, [filteredRecords, sort, config.fields, relationOptions]);
+  const shown = useMemo(() => sortedRecords.slice(0, pageSize), [sortedRecords, pageSize]);
+  function toggleSort(key: string, first: "asc" | "desc" = "asc") {
+    setSort((current) =>
+      current.key === key ? { key, direction: current.direction === "asc" ? "desc" : "asc" } : { key, direction: first },
+    );
+  }
 
 
 
@@ -951,7 +983,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                     </th>
                   )}
                   {visibleFields.map((field) => (
-                    <th key={field.key}>{field.label}</th>
+                    <SortHeader key={field.key} label={field.label} column={field.key} sort={sort} onSort={toggleSort} />
                   ))}
                   {config.tableColumns ? null : <th>Atualizado</th>}
                   {config.readOnly ? null : <th className="actions-column">Ações</th>}
@@ -1093,6 +1125,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                       field.kind === "file" ? Boolean(field.required && !value) : field.required,
                     disabled: field.readOnly || saving,
                     "aria-invalid": invalidKeys.has(field.key) || undefined,
+                    "aria-describedby": helpFor(field) ? `help-${field.key}` : undefined,
                   };
                   return (
                     <label
@@ -1105,6 +1138,11 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                         {field.label}
                         {field.required ? <b> *</b> : null}
                       </span>
+                      {helpFor(field) ? (
+                        <small className="field-help" id={`help-${field.key}`}>
+                          {helpFor(field)}
+                        </small>
+                      ) : null}
                       {field.kind === "textarea" || field.kind === "json" ? (
                         <textarea
                           {...common}

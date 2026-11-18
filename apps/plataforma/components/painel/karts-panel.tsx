@@ -12,8 +12,7 @@ import {
   loadStages,
   normalizeSearch,
   useSortable,
-  type StageInfo,
-} from "./shared";
+  type StageInfo, Glossary } from "./shared";
 
 type Race = { stageId: string; stage: StageInfo; session: string; fastestMs: number | null };
 
@@ -235,6 +234,15 @@ export function KartsPanel({ client }: { client: SupabaseClient }) {
         </button>
       </div>
 
+      <Glossary
+            terms={[
+              ["Melhor volta", "Volta mais rápida feita com o kart."],
+              ["Ritmo", "Quanto a melhor volta do kart ficou acima da volta mais rápida da mesma corrida. Menor é melhor."],
+              ["Ritmo médio", "Média do ritmo do kart em todas as sessões."],
+              ["Pior corrida", "O ritmo mais lento que o kart teve numa sessão."],
+              ["Sessões", "Quantas tomadas e corridas o kart fez."],
+            ]}
+      />
       <PanelState
         loading={loading}
         error={error}

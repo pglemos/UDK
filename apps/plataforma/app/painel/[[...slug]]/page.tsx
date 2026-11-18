@@ -479,12 +479,25 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
 
   if (!ready) {
     return (
-      <main className="loading-screen">
-        <OfficialLogo variant="dark" width={140} />
-        <div className="loading-line">
-          <span />
-        </div>
-        <p>Carregando sua conta...</p>
+      <main className="pv-boot" aria-busy="true">
+        <aside className="pv-boot-side" aria-hidden="true">
+          <OfficialLogo variant="negative" width={112} />
+          {Array.from({ length: 10 }, (_, index) => (
+            <i key={index} />
+          ))}
+        </aside>
+        <section className="pv-boot-main">
+          <p role="status">Carregando o painel…</p>
+          <i className="is-title" aria-hidden="true" />
+          <i className="is-text" aria-hidden="true" />
+          <div className="pv-boot-cards" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+          </div>
+          <i className="is-block" aria-hidden="true" />
+        </section>
       </main>
     );
   }
