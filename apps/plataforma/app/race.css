@@ -3988,11 +3988,15 @@ race index and expandable panels. */
   html {
     scroll-behavior: auto;
   }
+  /* sem deslocamentos nem animações longas; mudanças de cor e opacidade
+     continuam curtas para o estado (seleção, foco, hover) seguir legível */
   *,
   *::before,
   *::after {
-    animation: none !important;
-    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: color, background-color, border-color, opacity, outline-color, box-shadow !important;
+    transition-duration: 120ms !important;
   }
 }
 /* Keep labels available to assistive technology and protect long content. */
@@ -4226,7 +4230,7 @@ race index and expandable panels. */
 }
 .shell .modal-backdrop {
   backdrop-filter: none;
-  background: #081116a6;
+  background: var(--op-scrim);
 }
 .shell .modal-head {
   background: var(--surface);
@@ -4587,19 +4591,19 @@ img[src^="/media/official/drivers/uniforme/"] {
   color: var(--cinema-muted-dark);
 }
 .shell .pv-mark.is-present {
-  background: color-mix(in srgb, var(--cinema-success) 12%, #fff);
-  border-color: color-mix(in srgb, var(--cinema-success) 35%, #fff);
+  background: color-mix(in srgb, var(--cinema-success) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--cinema-success) 35%, var(--surface));
   color: var(--op-present-ink);
 }
 .shell .pv-mark.is-absent {
-  background: color-mix(in srgb, var(--cinema-danger) 10%, #fff);
-  border-color: color-mix(in srgb, var(--cinema-danger) 32%, #fff);
+  background: color-mix(in srgb, var(--cinema-danger) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--cinema-danger) 32%, var(--surface));
   color: var(--op-absent-ink);
 }
 .shell .pv-mark.is-excused {
-  background: color-mix(in srgb, var(--cinema-warning) 12%, #fff);
-  border-color: color-mix(in srgb, var(--cinema-warning) 35%, #fff);
-  color: #6d4a06;
+  background: color-mix(in srgb, var(--cinema-warning) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--cinema-warning) 35%, var(--surface));
+  color: var(--op-warning-ink);
 }
 .shell .pv-mark:not(:disabled):hover {
   border-color: var(--cinema-ink);
@@ -5012,7 +5016,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   font-weight: 600;
 }
 .shell .pv-laps tr.is-best td {
-  background: color-mix(in srgb, var(--cinema-success) 10%, #fff);
+  background: color-mix(in srgb, var(--cinema-success) 10%, var(--surface));
   color: var(--op-present-ink);
   font-weight: 600;
 }
@@ -5769,6 +5773,8 @@ img[src^="/media/official/drivers/uniforme/"] {
   --op-muted-ui: #627580;
   --op-on-accent: #ffffff;
   --op-row-hover: #f0fbfd;
+  --op-scrim: #081116a6;
+  --op-warning-ink: #6d4a06;
   /* pódio: metais com texto acima de 4,5:1 */
   --op-silver: #c3ccd1;
   --op-gold-ink: #1d1404;
@@ -6345,7 +6351,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   padding: 24px;
 }
 .op-confirm::backdrop {
-  background: #081116a6;
+  background: var(--op-scrim);
 }
 .op-confirm p {
   margin: 0 0 20px;
@@ -6375,7 +6381,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   color: var(--op-on-accent);
 }
 .op-confirm .button-danger:hover {
-  background: #8f1f28;
+  background: color-mix(in srgb, var(--danger) 82%, black);
 }
 .op-confirm button:focus-visible {
   outline: 3px solid var(--cinema-cyan-deep);
@@ -6982,7 +6988,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   display: block;
   height: 14px;
   border-radius: 4px;
-  background: #ffffff14;
+  background: color-mix(in srgb, var(--cinema-white) 8%, transparent);
 }
 .pv-boot-main {
   display: grid;
@@ -7226,4 +7232,33 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-news-list > li {
   content-visibility: auto;
   contain-intrinsic-size: auto 64px;
+}
+
+/* ===== Auditoria técnica, rodada 4 ===== */
+/* toque: caixa de seleção com 44px de área, desenho de 20px no centro */
+@media (pointer: coarse) {
+  .shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    box-shadow: inset 0 0 0 10px var(--surface), inset 0 0 0 12px var(--op-muted-ui), inset 0 0 0 22px var(--surface);
+  }
+  .shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:checked {
+    background: var(--op-accent)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / 16px no-repeat;
+    box-shadow: inset 0 0 0 10px var(--surface);
+  }
+  .shell .pv-check {
+    padding: 0;
+  }
+  .shell .content :is(a, button):not(.pv-legend *) {
+    min-height: 44px;
+  }
+  .shell .content a:not([class]) {
+    display: inline-flex;
+    align-items: center;
+  }
 }

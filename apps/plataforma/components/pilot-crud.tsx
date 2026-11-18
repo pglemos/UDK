@@ -256,6 +256,7 @@ export function PilotCrud({
   const [removePhoto, setRemovePhoto] = useState(false);
   const [search, setSearch] = useState("");
   const [showArchived, setShowArchived] = useState(false);
+  const [pageSize, setPageSize] = useState(25);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -654,7 +655,7 @@ export function PilotCrud({
                 </tr>
               </thead>
               <tbody>
-                {visibleRecords.map((record) => {
+                {visibleRecords.slice(0, pageSize).map((record) => {
                   const name = text(record, "full_name") || "Piloto sem nome";
                   const cityState =
                     [text(record, "city"), text(record, "state")].filter(Boolean).join("/") || "—";
@@ -671,7 +672,7 @@ export function PilotCrud({
                       <td>
                         <div className="pilot-table-photo">
                           {text(record, "avatar_url") ? (
-                            <img src={text(record, "avatar_url")} alt={`Foto de ${name}`} />
+                            <img src={text(record, "avatar_url")} alt={`Foto de ${name}`} width={40} height={40} loading="lazy" decoding="async" />
                           ) : (
                             <span>{initials(name) || <UserRound size={17} />}</span>
                           )}
@@ -711,7 +712,7 @@ export function PilotCrud({
               </tbody>
             </table>
             <div className="pilot-mobile-list" aria-label="Lista de pilotos">
-              {visibleRecords.map((record) => {
+              {visibleRecords.slice(0, pageSize).map((record) => {
                 const name = text(record, "full_name") || "Piloto sem nome";
                 const cityState =
                   [text(record, "city"), text(record, "state")].filter(Boolean).join("/") || "—";
@@ -728,7 +729,7 @@ export function PilotCrud({
                     <div className="pilot-mobile-card-head">
                       <div className="pilot-table-photo">
                         {text(record, "avatar_url") ? (
-                          <img src={text(record, "avatar_url")} alt={`Foto de ${name}`} />
+                          <img src={text(record, "avatar_url")} alt={`Foto de ${name}`} width={40} height={40} loading="lazy" decoding="async" />
                         ) : (
                           <span>{initials(name) || <UserRound size={17} />}</span>
                         )}
@@ -778,6 +779,13 @@ export function PilotCrud({
                 );
               })}
             </div>
+            {visibleRecords.length > pageSize ? (
+              <div className="pv-more">
+                <button type="button" className="button-secondary" onClick={() => setPageSize((size) => size + 25)}>
+                  Mostrar mais {Math.min(25, visibleRecords.length - pageSize)} ({visibleRecords.length - pageSize} restantes)
+                </button>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

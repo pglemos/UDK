@@ -31,6 +31,7 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
   const [category, setCategory] = useState("todas");
   const [view, setView] = useState<"pontos" | "posicao">("pontos");
   const [query, setQuery] = useState("");
+  const [pageSize, setPageSize] = useState(25);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -215,7 +216,7 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                 </tr>
               </thead>
               <tbody>
-                {sorted.map((row) => (
+                {sorted.slice(0, pageSize).map((row) => (
                   <tr key={row.driverId}>
                     <th scope="row" className="pv-row-head">
                       {row.name}
@@ -246,6 +247,13 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
               </tbody>
             </table>
           </div>
+          {sorted.length > pageSize ? (
+            <div className="pv-more">
+              <button type="button" className="button-secondary" onClick={() => setPageSize((size) => size + 25)}>
+                Mostrar mais {Math.min(25, sorted.length - pageSize)} ({sorted.length - pageSize} restantes)
+              </button>
+            </div>
+          ) : null}
         </section>
         {editor ? (
           <details className="pv-details">

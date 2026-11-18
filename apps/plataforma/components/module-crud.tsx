@@ -308,9 +308,17 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }
 
   function rowTitle(record: RecordRow): string {
-    const field = config.fields.find((item) => item.key === config.titleColumn);
-    const label = field ? formatValue(record[config.titleColumn], field, relationOptions) : "";
-    return label && label !== "—" ? label : (config.singular ?? "registro");
+    // nome legível da linha: coluna de título, ou a primeira relação (ex.: piloto), ou a primeira coluna visível
+    const candidates = [
+      config.fields.find((item) => item.key === config.titleColumn),
+      config.fields.find((item) => item.kind === "relation" && item.key === "driver_id"),
+      ...visibleFields,
+    ].filter((item): item is ModuleField => Boolean(item));
+    for (const field of candidates) {
+      const label = formatValue(record[field.key], field, relationOptions);
+      if (label && label !== "—" && !/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(label)) return label;
+    }
+    return config.singular ?? "registro";
   }
 
   const sortedRecords = useMemo(() => {
@@ -997,7 +1005,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                       <td className="pv-check">
                         <input
                           type="checkbox"
-                          aria-label="Selecionar registro"
+                          aria-label={`Selecionar ${rowTitle(record)}`}
                           checked={selected.has(String(record.id))}
                           onChange={(event) =>
                             setSelected((current) => {
