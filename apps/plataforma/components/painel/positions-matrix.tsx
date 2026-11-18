@@ -232,13 +232,11 @@ export function PositionsMatrix({ client, editor }: { client: SupabaseClient; ed
                         .join(" ");
                       return (
                         <td key={race.id} className="pv-num" title={`${race.title}: ${cell.position}º, ${formatPoints(cell.points)} pts`}>
-                          <span className="pv-cell">
-                            <b>{view === "pontos" ? formatPoints(cell.points) : `${cell.position}º`}</b>
-                            <small>
-                              {view === "pontos" ? `${cell.position}º` : `${formatPoints(cell.points)} pts`}
-                              {marks ? ` · ${marks}` : ""}
-                            </small>
-                          </span>
+                          <b className="pv-cell-main">{view === "pontos" ? formatPoints(cell.points) : `${cell.position}º`}</b>
+                          <small className="pv-cell-sub">
+                            {view === "pontos" ? `${cell.position}º` : `${formatPoints(cell.points)} pts`}
+                            {marks ? ` · ${marks}` : ""}
+                          </small>
                         </td>
                       );
                     })}

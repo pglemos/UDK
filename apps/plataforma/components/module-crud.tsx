@@ -314,7 +314,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       config.fields.find((item) => item.kind === "relation" && item.key === "driver_id"),
       ...visibleFields,
     ].filter((item): item is ModuleField => Boolean(item));
-    const stage = config.fields.find((item) => item.key === "stage_id");
+    const stage = config.fields.find((item) => item.key === "stage_id" || item.key === "result_id");
     if (stage) candidates.splice(1, 0, stage);
     // até duas partes distintas (ex.: "Fernando Godoy, 4ª Etapa") para cada linha ter nome único
     const parts: string[] = [];
@@ -322,7 +322,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       const label = formatValue(record[field.key], field, relationOptions);
       if (!label || label === "—" || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(label) || parts.includes(label)) continue;
       parts.push(label);
-      if (parts.length === 2) break;
+      if (parts.length === 3) break;
     }
     return parts.length ? parts.join(", ") : (config.singular ?? "registro");
   }
@@ -1064,6 +1064,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                               type="button"
                               className="row-action"
                               onClick={() => void runAction(record, action)}
+                              aria-label={`${action.label}: ${rowTitle(record)}`}
                               key={action.key}
                               disabled={saving}
                             >

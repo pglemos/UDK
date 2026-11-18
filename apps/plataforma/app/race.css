@@ -7267,3 +7267,14 @@ img[src^="/media/official/drivers/uniforme/"] {
     align-items: center;
   }
 }
+
+/* posições: célula com dois níveis sem elemento extra */
+.shell .pv-positions td .pv-cell-main {
+  display: block;
+  font-size: var(--op-body);
+}
+.shell .pv-positions td .pv-cell-sub {
+  display: block;
+  color: var(--cinema-muted-dark);
+  font-size: var(--op-meta);
+}

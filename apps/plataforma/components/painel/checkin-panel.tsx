@@ -325,6 +325,7 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                             className="pv-link-button"
                             disabled={saving !== null || rows.every((row) => cells.get(`${row.id}|${stage.id}`))}
                             onClick={() => void markAllPresent(stage)}
+                            aria-label={`Todos presentes na ${stage.ordinal} etapa`}
                             title="Marca presente quem ainda está sem registro nesta etapa"
                           >
                             Todos presentes

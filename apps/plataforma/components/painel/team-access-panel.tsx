@@ -306,6 +306,7 @@ export function TeamAccessPanel({
                       <button
                         type="button"
                         className="button-secondary pv-small"
+                        aria-label={`Gerenciar acesso de ${person.name}`}
                         onClick={() => {
                           setSelectedId(person.id);
                           setInviteOpen(false);
