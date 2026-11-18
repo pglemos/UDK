@@ -950,13 +950,13 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
           search.trim() ? (
             <div className="empty-state">
               <SearchX aria-hidden="true" />
-              <h3>Nada encontrado para “{search.trim()}”</h3>
+              <h2>Nada encontrado para “{search.trim()}”</h2>
               <p>Confira a grafia ou limpe a busca para ver todos.</p>
             </div>
           ) : (
             <div className="empty-state">
               <Inbox aria-hidden="true" />
-              <h3>Ainda não há {emptyNoun(config.label)}</h3>
+              <h2>Ainda não há {emptyNoun(config.label)}</h2>
               <p>
                 {config.emptyHint ??
                   (config.readOnly

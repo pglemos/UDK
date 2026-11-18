@@ -4071,7 +4071,7 @@ race index and expandable panels. */
   font: 500 0.75rem var(--cinema-body);
   letter-spacing: 0;
   text-transform: none;
-  background: #fff;
+  background: var(--surface);
   border-radius: 4px;
 }
 .shell .sidebar-brand {
@@ -4108,7 +4108,7 @@ race index and expandable panels. */
   letter-spacing: 0;
 }
 .shell .metrics article {
-  background: #fff;
+  background: var(--surface);
   border-top: 1px solid var(--line);
   padding: 24px;
   gap: 12px;
@@ -4125,7 +4125,7 @@ race index and expandable panels. */
   font-size: 0.75rem;
 }
 .shell .dashboard-panel {
-  background: #fff;
+  background: var(--surface);
   padding: 26px;
 }
 .shell .panel-title span {
@@ -4211,12 +4211,12 @@ race index and expandable panels. */
   padding-block: 16px;
 }
 .shell .admin-table tr:hover td {
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .empty-state {
   min-height: 240px;
 }
-.shell .empty-state h3 {
+.shell .empty-state :is(h2, h3) {
   font: 600 1.8rem var(--cinema-display);
   text-transform: none;
 }
@@ -4229,7 +4229,7 @@ race index and expandable panels. */
   background: #081116a6;
 }
 .shell .modal-head {
-  background: #fff;
+  background: var(--surface);
   backdrop-filter: none;
 }
 .shell .modal-head h2 {
@@ -4241,7 +4241,7 @@ race index and expandable panels. */
 }
 .shell .pilot-editor {
   box-shadow: none;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pilot-editor-head {
   background: var(--surface);
@@ -4393,7 +4393,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   flex-wrap: wrap;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 3px;
   gap: 2px;
 }
@@ -4413,7 +4413,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-segmented button.is-active {
   background: var(--cinema-ink);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .shell .pv-segmented button:focus-visible,
 .shell .pv-sort:focus-visible,
@@ -4480,13 +4480,13 @@ img[src^="/media/official/drivers/uniforme/"] {
   font-weight: 600;
 }
 .shell .pv-table tbody th.pv-row-head {
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   font: 500 0.875rem var(--cinema-body);
   text-align: left;
 }
 .shell .pv-table tbody tr:hover th.pv-row-head {
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .pv-stack {
   display: grid;
@@ -4523,7 +4523,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-pos.is-podium {
   background: var(--cinema-ink);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .shell .pv-state {
   display: flex;
@@ -4546,10 +4546,10 @@ img[src^="/media/official/drivers/uniforme/"] {
   position: sticky;
   left: 0;
   z-index: 1;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pv-matrix tr:hover th {
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .pv-stage-head {
   display: grid;
@@ -4636,7 +4636,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   overflow: hidden;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   position: relative;
 }
 .shell .pv-sponsor.is-off .pv-sponsor-mark img {
@@ -4701,7 +4701,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   gap: 4px;
   padding: 16px 18px 18px;
 }
-.shell .pv-sponsor-body h3 {
+.shell .pv-sponsor-body :is(h2, h3) {
   margin: 0;
   color: var(--cinema-ink);
   font: 600 1rem/1.3 var(--cinema-body);
@@ -4743,7 +4743,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-editor {
   border: 1px solid var(--cinema-ink);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   scroll-margin-top: 96px;
 }
 .shell .pv-editor > header {
@@ -4774,7 +4774,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-dropzone.is-dragging {
   border-color: var(--cinema-cyan-deep);
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .pv-dropzone-actions {
   display: flex;
@@ -4880,7 +4880,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-details {
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pv-details > summary {
   min-height: 52px;
@@ -4998,7 +4998,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-entry-list button.is-active {
   border-color: var(--cinema-ink);
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .pv-entry-list button:focus-visible {
   outline: 3px solid var(--cinema-cyan-deep);
@@ -5025,7 +5025,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   list-style: none;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pv-news {
   display: grid;
@@ -5150,7 +5150,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-chip.is-strong {
   border-color: var(--cinema-ink);
   background: var(--cinema-ink);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .shell .pv-chip.is-expired {
   border-style: dashed;
@@ -5164,7 +5164,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-table tr.is-selected td,
 .shell .pv-table tr.is-selected th {
-  background: #f0fbfd;
+  background: var(--op-row-hover);
 }
 .shell .pv-left {
   display: flex;
@@ -5211,7 +5211,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-role-picker label.is-active {
   border-color: var(--cinema-cyan-deep);
-  background: #f0fbfd;
+  background: var(--op-row-hover);
   box-shadow: inset 0 0 0 1px var(--cinema-cyan-deep);
 }
 .shell .pv-role-picker input {
@@ -5287,7 +5287,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   min-height: 40px;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 0 10px;
   color: var(--cinema-ink);
   font: 400 0.875rem var(--cinema-body);
@@ -5330,7 +5330,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   gap: 4px;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 12px 14px;
 }
 .shell .pv-role-cards b {
@@ -5404,7 +5404,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   margin: 0;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 20px;
 }
 .shell .pv-settings-form legend {
@@ -5424,7 +5424,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-settings-aside {
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 18px;
 }
 .shell .pv-settings-aside h2 {
@@ -5462,7 +5462,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   grid-column: 1 / -1;
   border: 1px solid var(--cinema-ink);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pv-setup-head {
   display: grid;
@@ -5563,7 +5563,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   grid-column: 1 / -1;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 20px;
 }
 .shell .pv-runbook h2 {
@@ -5765,6 +5765,10 @@ img[src^="/media/official/drivers/uniforme/"] {
   --op-info: #1d5c86;
   --op-info-bg: #e5f0f8;
   --op-head: #5b6f79;
+  /* cinza de interface com 4,6:1 sobre branco: bordas de controle, ícones, texto auxiliar */
+  --op-muted-ui: #627580;
+  --op-on-accent: #ffffff;
+  --op-row-hover: #f0fbfd;
 }
 
 /* cabeçalho da página: título + descrição juntos, papéis discretos à direita */
@@ -5862,21 +5866,21 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .pv-segmented button.is-active {
   background: var(--op-accent);
-  color: #fff;
+  color: var(--op-on-accent);
   font-weight: 600;
 }
 
 /* botões: principal escuro, hover em ciano profundo; secundário com borda clara */
 .shell .button-primary {
   background: var(--cinema-ink);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .shell .button-primary:hover:not(:disabled) {
   background: var(--op-accent);
 }
 .shell .button-secondary {
   border-color: var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
 }
 .shell .button-secondary:hover:not(:disabled) {
@@ -5932,7 +5936,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell .admin-table tr:hover td,
 .shell .admin-table tr:hover th {
-  background: #f2fafc;
+  background: var(--op-row-hover);
 }
 .shell .admin-table tbody tr + tr td,
 .shell .admin-table tbody tr + tr th {
@@ -5958,13 +5962,13 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .shell tr:nth-child(2) .pv-pos.is-podium,
 .shell li:nth-child(2) .pv-pos.is-podium {
-  background: #8a9aa3;
+  background: var(--op-muted-ui);
   color: #0e171c;
 }
 .shell tr:nth-child(3) .pv-pos.is-podium,
 .shell li:nth-child(3) .pv-pos.is-podium {
   background: var(--cinema-bronze);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .shell .pv-cell b {
   font-size: var(--op-body);
@@ -6046,7 +6050,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   margin-top: 0;
   letter-spacing: -0.01em;
 }
-.shell .empty-state h3,
+.shell .empty-state :is(h2, h3),
 .shell .report-card h2,
 .shell .modal-head h2 {
   font-size: 1.5rem;
@@ -6105,7 +6109,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   margin-bottom: 6px;
   color: var(--op-head);
 }
-.shell .empty-state h3 {
+.shell .empty-state :is(h2, h3) {
   margin: 0;
   font-size: var(--op-section);
   text-wrap: balance;
@@ -6231,7 +6235,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   gap: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   padding: 20px;
 }
 .shell .pv-skeleton i {
@@ -6328,7 +6332,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   width: min(440px, calc(100% - 32px));
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   padding: 24px;
 }
@@ -6354,13 +6358,13 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 .op-confirm .button-secondary {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
 }
 .op-confirm .button-danger {
   border: 1px solid var(--danger);
   background: var(--danger);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .op-confirm .button-danger:hover {
   background: #8f1f28;
@@ -6389,7 +6393,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   gap: 6px;
   border: 1px solid var(--line);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 0 12px;
   color: var(--cinema-ink);
   font: 600 var(--op-meta) var(--cinema-body);
@@ -6483,7 +6487,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   gap: 8px;
   border: 1px solid var(--line);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 0 4px 0 12px;
 }
 .shell .pv-select span {
@@ -6687,7 +6691,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   border: 1px solid var(--line);
   border-bottom-width: 2px;
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   padding: 0 5px;
   color: var(--cinema-ink);
   font: 600 var(--op-meta) / 1.5 var(--cinema-body);
@@ -6734,7 +6738,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
   appearance: auto;
   border: 0;
-  background: #fff;
+  background: var(--surface);
   box-shadow: none;
   padding: 0;
 }
@@ -6746,7 +6750,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   bottom: 0;
   z-index: 2;
   border-top: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   padding: 12px 0;
 }
 
@@ -6756,7 +6760,7 @@ img[src^="/media/official/drivers/uniforme/"] {
   height: 18px;
 }
 .shell .pv-level.is-none svg {
-  color: #8a9aa3;
+  color: var(--op-muted-ui);
 }
 .shell .pv-roles + .pv-legend,
 .shell .data-card-head .pv-legend {
@@ -6830,9 +6834,9 @@ img[src^="/media/official/drivers/uniforme/"] {
   height: 20px;
   margin: 0;
   place-content: center;
-  border: 2px solid #8a9aa3;
+  border: 2px solid var(--op-muted-ui);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
   cursor: pointer;
   transition: background-color 120ms var(--cinema-ease), border-color 120ms var(--cinema-ease);
 }
@@ -6872,7 +6876,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .op-confirm .button-primary {
   border: 1px solid var(--cinema-ink);
   background: var(--cinema-ink);
-  color: #fff;
+  color: var(--op-on-accent);
 }
 .op-confirm .button-primary:hover {
   background: var(--cinema-cyan-deep);
@@ -6885,7 +6889,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 
 /* credenciamento: "a marcar" visível e alvo de 44px */
 .shell .pv-mark.is-empty {
-  border: 1px dashed #8a9aa3;
+  border: 1px dashed var(--op-muted-ui);
   color: var(--cinema-muted-dark);
 }
 .shell .pv-matrix .pv-mark {
@@ -6902,7 +6906,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 
 /* amostra de cor sempre com contorno visível */
 .shell .pv-swatch i {
-  border-color: #8a9aa3;
+  border-color: var(--op-muted-ui);
 }
 
 /* configurações no celular: barra de salvar não cobre o último campo */
@@ -6935,7 +6939,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-future {
   display: inline-block;
   padding: 8px 0;
-  color: #8a9aa3;
+  color: var(--op-muted-ui);
   font-size: var(--op-meta);
 }
 /* listas mais justas: ações cabem a 1440px */
@@ -7043,7 +7047,7 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell .pv-glossary {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .pv-glossary summary {
   min-height: 44px;
@@ -7144,5 +7148,35 @@ img[src^="/media/official/drivers/uniforme/"] {
 @media (max-width: 760px) {
   .shell .page-heading .role-chips {
     display: none;
+  }
+}
+
+/* ===== Auditoria técnica (2026-11-18) ===== */
+/* caixa de seleção com 24px (WCAG 2.5.8) e borda com 4,8:1 */
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  border-color: var(--op-muted-ui);
+}
+.shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:checked {
+  background-size: 16px;
+}
+/* textos pequenos nunca abaixo de 12px */
+.shell .pv-group-toggle small,
+.shell .pv-stage-head small,
+.shell .pv-cell small {
+  font-size: var(--op-meta);
+}
+/* "Em breve" legível */
+.shell .pv-future {
+  color: var(--cinema-muted-dark);
+}
+/* celular: todo alvo de toque com 44px */
+@media (max-width: 760px) {
+  .shell :is(.row-action, .pv-tabs a, .pv-segmented button, .button-secondary, .button-primary, .stage-actions a, .pv-setup-step, .pv-link-button) {
+    min-height: 44px;
+  }
+  .shell .pending-list li a {
+    min-height: 44px;
   }
 }

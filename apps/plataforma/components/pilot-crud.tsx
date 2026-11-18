@@ -632,7 +632,7 @@ export function PilotCrud({
         ) : visibleRecords.length === 0 ? (
           <div className="empty-state">
             <UserRound />
-            <h3>Nenhum piloto encontrado</h3>
+            <h2>Nenhum piloto encontrado</h2>
             <p>
               {readOnly
                 ? "Os pilotos disponíveis aparecerão aqui."

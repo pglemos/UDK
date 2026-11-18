@@ -240,7 +240,7 @@ export function SponsorsPanel({ client, readOnly }: { client: SupabaseClient; re
           )}
         </div>
         <div className="pv-sponsor-body">
-          <h3>{sponsor.name}</h3>
+          <h2>{sponsor.name}</h2>
           <p>
             {sponsor.tier}
             {sponsor.status === "active" ? "" : " · fora do site"}
