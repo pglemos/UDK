@@ -6926,3 +6926,21 @@ img[src^="/media/official/drivers/uniforme/"] {
   border-color: var(--line);
   border-radius: 8px;
 }
+
+/* ===== Crítica, rodada 9 ===== */
+/* etapa futura: texto, não botão */
+.shell .pv-future {
+  display: inline-block;
+  padding: 8px 0;
+  color: #8a9aa3;
+  font-size: var(--op-meta);
+}
+/* listas mais justas: ações cabem a 1440px */
+.shell .module-workspace .admin-table :is(th, td),
+.shell .pilot-table :is(th, td) {
+  padding-inline: 10px;
+}
+.shell .pilot-table td:first-child,
+.shell .pilot-table th:first-child {
+  width: 52px;
+}

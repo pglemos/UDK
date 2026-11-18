@@ -1045,10 +1045,23 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "created_at",
     ascending: false,
     fields: [
-      relation("user_id", "Usuário", "profiles", "full_name"),
+      relation("user_id", "Para quem (destinatário)", "profiles", "full_name"),
       { key: "title", label: "Título", kind: "text", required: true },
       { key: "body", label: "Mensagem", kind: "textarea", required: true },
-      { key: "kind", label: "Tipo", kind: "text", required: true },
+      {
+        key: "kind",
+        label: "Tipo",
+        kind: "select",
+        required: true,
+        options: [
+          { value: "general", label: "Aviso geral" },
+          { value: "deadline", label: "Prazo" },
+          { value: "payment", label: "Pagamento" },
+          { value: "document", label: "Documento" },
+          { value: "result", label: "Resultado" },
+          { value: "penalty", label: "Penalidade" },
+        ],
+      },
     ],
   },
   {

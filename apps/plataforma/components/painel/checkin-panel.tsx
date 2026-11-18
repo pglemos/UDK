@@ -174,7 +174,7 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
     const missing = rows.filter((row) => !cells.get(`${row.id}|${stage.id}`));
     if (!missing.length) return;
     const ok = await confirmAction(
-      `Marcar ${missing.length} piloto(s) como presentes na ${stage.ordinal} etapa? Quem já tem registro não muda.`,
+      `Marcar ${missing.length} ${missing.length === 1 ? "piloto" : "pilotos"} como presente${missing.length === 1 ? "" : "s"} na ${stage.ordinal} etapa? Quem já tem registro não muda.`,
       "Marcar presentes",
       "primary",
     );
@@ -349,6 +349,9 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                       const info = status ? statusInfo[status] : undefined;
                       return (
                         <td key={stage.id} className="pv-center" data-label={`${stage.ordinal} etapa`}>
+                          {!info && new Date(stage.startsAt).getTime() > now ? (
+                            <span className="pv-future" title="Etapa ainda não realizada">Em breve</span>
+                          ) : (
                           <button
                             type="button"
                             className={`pv-mark ${info?.tone ?? "is-empty"}`}
@@ -358,8 +361,9 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
                             title={info?.label ?? (new Date(stage.startsAt).getTime() <= now ? "Sem registro" : "Etapa ainda não realizada")}
                           >
                             <StatusIcon status={status} />
-                            <span>{info?.short ?? (new Date(stage.startsAt).getTime() <= now ? "A marcar" : "Em breve")}</span>
+                            <span>{info?.short ?? "A marcar"}</span>
                           </button>
+                          )}
                         </td>
                       );
                     })}

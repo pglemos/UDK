@@ -300,6 +300,12 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       ),
     );
   }, [config.fields, records, relationOptions, search, statusFilter]);
+  function rowTitle(record: RecordRow): string {
+    const field = config.fields.find((item) => item.key === config.titleColumn);
+    const label = field ? formatValue(record[config.titleColumn], field, relationOptions) : "";
+    return label && label !== "—" ? label : (config.singular ?? "registro");
+  }
+
   const shown = useMemo(() => filteredRecords.slice(0, pageSize), [filteredRecords, pageSize]);
 
 
@@ -884,7 +890,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       {selected.size ? (
         <div className="pv-bulk" role="region" aria-label="Ações em lote">
           <b>{selected.size} selecionado(s)</b>
-          <button type="button" className="row-action is-quiet" onClick={() => void archiveSelected()} disabled={saving}>
+          <button type="button" className="button-secondary pv-small" onClick={() => void archiveSelected()} disabled={saving}>
             <Archive size={15} aria-hidden="true" /> Arquivar selecionados
           </button>
           <button type="button" className="pv-link-button" onClick={() => setSelected(new Set())}>
@@ -1020,10 +1026,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                         : null}
                       {!config.readOnly && !config.createOnly ? (
                         <>
-                          <button type="button" className="row-action" onClick={() => openEdit(record)}>
+                          <button type="button" className="row-action" onClick={() => openEdit(record)} aria-label={`Editar ${rowTitle(record)}`}>
                             <Pencil size={15} aria-hidden="true" /> Editar
                           </button>
-                          <button type="button" className="row-action is-quiet" onClick={() => void deleteRecord(record)}>
+                          <button type="button" className="row-action is-quiet" onClick={() => void deleteRecord(record)} aria-label={`Arquivar ${rowTitle(record)}`}>
                             <Archive size={15} aria-hidden="true" /> Arquivar
                           </button>
                         </>
