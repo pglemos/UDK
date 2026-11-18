@@ -450,9 +450,6 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
 
   // título da aba do navegador com a tela atual
   const tabTitle = route ? (route.tab.slug ? route.tab.label : route.section.key === "inicio" ? "Início" : route.section.label) : "Painel";
-  useEffect(() => {
-    document.title = `${tabTitle} · Painel UDK`;
-  }, [tabTitle]);
 
   // atalhos do painel: "/" vai para a busca da tela, "N" abre o cadastro novo
   useEffect(() => {
@@ -602,6 +599,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
           </div>
         </header>
 
+        <title>{`${tabTitle} · Painel UDK`}</title>
         <section className="content" data-module={activeModule || "nao-encontrado"}>
           <div className="page-heading">
             <div>
