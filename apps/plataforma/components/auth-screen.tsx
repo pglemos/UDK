@@ -35,8 +35,10 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     if (!client) return;
 
     let active = true;
-    const recoveryRequested =
-      initialMode === "recovery" || window.location.hash.includes("type=recovery");
+    const hash = window.location.hash;
+    const invited = hash.includes("type=invite");
+    const recoveryRequested = initialMode === "recovery" || hash.includes("type=recovery") || invited;
+    if (invited) setNotice("Convite confirmado. Crie sua senha para entrar no painel do UDK.");
 
     if (new URLSearchParams(window.location.search).get("senha") === "alterada") {
       setNotice("Senha alterada. Entre novamente com a nova senha.");
@@ -47,6 +49,9 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
       if (data.session && recoveryRequested) {
         setMode("recovery");
         return;
+      }
+      if (!data.session && recoveryRequested && initialMode === "recovery" && !hash.includes("access_token")) {
+        setNotice("Abra esta página pelo link do e-mail (convite ou nova senha) para criar sua senha.");
       }
       if (data.session) router.replace("/painel");
     });

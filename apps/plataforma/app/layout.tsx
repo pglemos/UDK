@@ -3,6 +3,7 @@ import { Archivo } from "next/font/google";
 import { PwaRegister } from "../components/pwa-register";
 import { premiumVisuals } from "../lib/visual-assets";
 import "./globals.css";
+import { AuthLinkRedirect } from "../components/auth-link-redirect";
 import "./pilot-crud.css";
 import "./race.css";
 
@@ -59,6 +60,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <html lang="pt-BR" data-scroll-behavior="smooth" className={archivo.variable}>
       <body>
         <PwaRegister />
+        <AuthLinkRedirect />
         {children}
       </body>
     </html>
