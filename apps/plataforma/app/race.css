@@ -7131,3 +7131,18 @@ img[src^="/media/official/drivers/uniforme/"] {
   min-width: 44px;
   min-height: 44px;
 }
+
+/* ===== Crítica, rodada 11 ===== */
+.shell .pv-skeleton-label {
+  color: var(--cinema-muted-dark);
+  font: 500 var(--op-body) var(--cinema-body);
+}
+.shell .pv-stage-head .pv-link-button {
+  min-height: 32px;
+  padding: 0 4px;
+}
+@media (max-width: 760px) {
+  .shell .page-heading .role-chips {
+    display: none;
+  }
+}

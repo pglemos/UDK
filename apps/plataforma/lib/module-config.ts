@@ -1164,6 +1164,7 @@ export const moduleConfigs: ModuleConfig[] = [
     orderBy: "accepted_at",
     ascending: false,
     createOnly: true,
+    emptyHint: "Cada piloto aceita o regulamento e os termos no próprio cadastro, ao entrar no site. Os aceites aparecem aqui assim que acontecerem.",
     fields: [
       relation("term_id", "Termo", "terms", "title"),
       relation("user_id", "Signatário", "profiles", "full_name"),

@@ -593,6 +593,11 @@ export function PilotCrud({
             <Plus size={18} /> Novo piloto
           </button>
         ) : null}
+        {!readOnly ? (
+          <span className="pv-kbd-hint" aria-hidden="true">
+            <kbd>/</kbd> busca · <kbd>N</kbd> novo
+          </span>
+        ) : null}
       </div>
 
       {error && !editorOpen ? (

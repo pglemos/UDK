@@ -153,7 +153,7 @@ export function PanelState({
   if (loading) {
     return (
       <div className="pv-skeleton" role="status" aria-busy="true">
-        <span className="pv-visually-hidden">Carregando…</span>
+        <span className="pv-skeleton-label">Carregando…</span>
         {Array.from({ length: 6 }, (_, index) => (
           <i key={index} aria-hidden="true" />
         ))}
