@@ -48,6 +48,13 @@ describe("UDK 2026 official championship rules", () => {
     expect(fallback).not.toContain("08 corridas regulares");
   });
 
+  it("descarta os 2 piores resultados em corridas regulares (Art. 20)", () => {
+    const migration = readRepo("supabase/migrations/20261118120000_art20_two_regular_race_discards.sql");
+    expect(migration).toContain("case when endurance_absence then 0 else 2 end");
+    expect(migration).toContain("partition by driver_id, is_endurance");
+    expect(migration).not.toContain("event_count - 6");
+  });
+
   it("exposes gross and discarded points to the public classification experience", () => {
     const publicData = readApp("lib/public-data.ts");
     const standingsPage = readApp("app/classificacao/page.tsx");
@@ -57,7 +64,7 @@ describe("UDK 2026 official championship rules", () => {
     expect(publicData).toContain("discardedPoints");
     expect(standingsPage).toContain("grossPoints");
     expect(standingsPage).toContain("discardedPoints");
-    expect(standingsPage).toContain("melhores 6 de 8 resultados");
+    expect(compactStandingsPage).toContain("saem da conta os 2 piores resultados em corridas regulares");
     expect(standingsPage).toContain("tg-scoring-explainer");
     expect(standingsPage).toContain("formatPoints");
     expect(compactStandingsPage).toContain(

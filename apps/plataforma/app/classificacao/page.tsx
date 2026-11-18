@@ -484,9 +484,10 @@ export default async function StandingsPage({
                 </div>
               </dl>
               <p>
-                <strong>Regra 2026: melhores 6 de 8 resultados.</strong> A temporada tem 6 corridas
-                regulares e 2 provas de resistência. Até o 6º evento não há descarte; após o 7º, o
-                pior resultado é descartado; após o 8º, os dois piores.
+                <strong>Descartes (Art. 20):</strong> saem da conta os 2 piores resultados em
+                corridas regulares, de quaisquer etapas. A Endurance não é descartada. Corrida
+                regular em que o piloto faltou vale 0 e entra como descarte; quem falta numa
+                Endurance perde o direito aos descartes das corridas regulares.
               </p>
               {category === "geral" ? (
                 <p>
