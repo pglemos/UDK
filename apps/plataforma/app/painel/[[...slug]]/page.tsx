@@ -26,7 +26,7 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { OfficialLogo } from "../../../components/race/official-logo";
 import { getSupabaseProjectUrl, supabase } from "../../../lib/supabase";
-import { getModuleConfig } from "../../../lib/module-config";
+import { hasModuleConfig, moduleDescriptions } from "../../../lib/module-descriptions";
 import { createOfflineQueueOwner, getOfflineQueue } from "../../../lib/offline-queue";
 import {
   computeAllowedModules,
@@ -89,7 +89,7 @@ function PanelLoading() {
     </div>
   );
 }
-const ModuleCrud = dynamic(() => import("../../../components/module-crud").then((loaded) => loaded.ModuleCrud), { loading: PanelLoading });
+const ModuleCrudByKey = dynamic(() => import("../../../components/module-crud-by-key").then((loaded) => loaded.ModuleCrudByKey), { loading: PanelLoading });
 const PilotCrud = dynamic(() => import("../../../components/pilot-crud").then((loaded) => loaded.PilotCrud), { loading: PanelLoading });
 const Dashboard = dynamic(() => import("../../../components/dashboard").then((loaded) => loaded.Dashboard), { loading: PanelLoading });
 const ReportsPanel = dynamic(() => import("../../../components/reports-panel").then((loaded) => loaded.ReportsPanel), { loading: PanelLoading });
@@ -368,19 +368,10 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
   const activeSection = route ? visibleSections.find((section) => section.key === route.section.key) : undefined;
   const authorized = Boolean(route && allowedKeys.has(activeModule));
   const canMutate = writableKeys.has(activeModule);
-  const config = getModuleConfig(activeModule);
-  const effectiveConfig = config ? { ...config, readOnly: config.readOnly || !canMutate } : undefined;
 
   function crud(module: string): ReactNode {
-    const moduleConfig = getModuleConfig(module);
-    if (!moduleConfig || !offlineOwner || !client) return null;
-    return (
-      <ModuleCrud
-        client={client}
-        owner={offlineOwner}
-        config={{ ...moduleConfig, readOnly: moduleConfig.readOnly || !writableKeys.has(module) }}
-      />
-    );
+    if (!hasModuleConfig(module) || !offlineOwner || !client) return null;
+    return <ModuleCrudByKey client={client} owner={offlineOwner} moduleKey={module} readOnly={!writableKeys.has(module)} />;
   }
 
   function embedded(module: string, title: string, description: string): ReactNode {
@@ -451,8 +442,8 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
       case "papeis":
         return <RolesMatrix />;
       default:
-        return config && offlineOwner ? (
-          <ModuleCrud client={client} owner={offlineOwner} config={effectiveConfig ?? config} />
+        return hasModuleConfig(activeModule) && offlineOwner ? (
+          <ModuleCrudByKey client={client} owner={offlineOwner} moduleKey={activeModule} readOnly={!canMutate} />
         ) : null;
     }
   }
@@ -537,7 +528,7 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
         : route.section.label;
   const description = route
     ? (customTabDescriptions[route.tab.module] ??
-      (route.section.tabs.length > 1 ? getModuleConfig(route.tab.module)?.description : undefined) ??
+      (route.section.tabs.length > 1 ? moduleDescriptions[route.tab.module] : undefined) ??
       route.section.description)
     : "Este endereço não existe mais no painel.";
 

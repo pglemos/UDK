@@ -314,11 +314,17 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       config.fields.find((item) => item.kind === "relation" && item.key === "driver_id"),
       ...visibleFields,
     ].filter((item): item is ModuleField => Boolean(item));
+    const stage = config.fields.find((item) => item.key === "stage_id");
+    if (stage) candidates.splice(1, 0, stage);
+    // até duas partes distintas (ex.: "Fernando Godoy, 4ª Etapa") para cada linha ter nome único
+    const parts: string[] = [];
     for (const field of candidates) {
       const label = formatValue(record[field.key], field, relationOptions);
-      if (label && label !== "—" && !/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(label)) return label;
+      if (!label || label === "—" || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(label) || parts.includes(label)) continue;
+      parts.push(label);
+      if (parts.length === 2) break;
     }
-    return config.singular ?? "registro";
+    return parts.length ? parts.join(", ") : (config.singular ?? "registro");
   }
 
   const sortedRecords = useMemo(() => {

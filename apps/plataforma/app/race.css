@@ -48,6 +48,11 @@
   --shadow: 0 16px 48px #14242d12;
   --radius: 10px;
   --cinema-placeholder-ink: #538497;
+  --row-hover: #f0fbfd;
+  --registration-bg: #e1faff;
+  --muted-on-dark: #d2dce1;
+  --scrim-strong: #081116f5;
+  --scrim-soft: #08111655;
 }
 html {
   background: var(--cinema-paper);
@@ -1487,7 +1492,7 @@ tabs and official data. */
   padding-left: 42px;
 }
 .race-site :where(input:not([type="hidden"]), select) {
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   border: 1px solid var(--cinema-line-dark);
   min-height: 48px;
@@ -1559,7 +1564,7 @@ tabs and official data. */
   margin-block: 18px;
 }
 .tg-standing-table-wrap {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--cinema-line-dark);
   border-radius: 6px;
   overflow-x: auto;
@@ -1588,7 +1593,7 @@ tabs and official data. */
   border-bottom: 0;
 }
 .udk-data-table tbody tr:hover {
-  background: #f0fbfd;
+  background: var(--row-hover);
 }
 .udk-data-table td:first-child {
   width: 80px;
@@ -1712,7 +1717,7 @@ tabs and official data. */
 .tg-pdf-link {
   flex: 1;
   justify-content: space-between;
-  background: #fff;
+  background: var(--surface);
   border-color: var(--cinema-line-dark);
 }
 .tg-pdf-link > span {
@@ -1737,7 +1742,7 @@ tabs and official data. */
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
   margin-top: 28px;
-  background: #fff;
+  background: var(--surface);
 }
 .tg-data-help p {
   font-size: 0.875rem;
@@ -1783,23 +1788,23 @@ tabs and official data. */
 .race-status-registration-open,
 .race-status-registration {
   color: var(--cinema-cyan-deep);
-  background: #e1faff;
+  background: var(--registration-bg);
 }
 .race-status-published,
 .race-status-homologated,
 .race-status-official,
 .race-status-completed {
-  color: #176342;
-  background: #e4f4eb;
+  color: var(--success);
+  background: var(--success-bg);
 }
 .race-status-rectified,
 .race-status-provisional {
-  color: #80530a;
-  background: #fff3d8;
+  color: var(--warning);
+  background: var(--warning-bg);
 }
 .race-status-cancelled {
-  color: #ae2933;
-  background: #fce9eb;
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 /* Calendar. */
 .tg-calendar-timeline {
@@ -1815,7 +1820,7 @@ tabs and official data. */
   padding: 26px;
   border: 1px solid var(--cinema-line-dark);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
 }
 .tg-calendar-stage.is-current {
   outline: 2px solid var(--cinema-cyan-deep);
@@ -1990,7 +1995,7 @@ race index and expandable panels. */
   gap: 8px;
   padding: 18px;
   padding-right: 34px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--cinema-line-dark);
   border-radius: 4px;
 }
@@ -2012,7 +2017,7 @@ race index and expandable panels. */
   border: 1px solid var(--cinema-line-dark);
   border-radius: 6px;
   margin-bottom: 18px;
-  background: #fff;
+  background: var(--surface);
   scroll-margin-top: 110px;
 }
 .tg-result-disclosure-summary {
@@ -2080,7 +2085,7 @@ race index and expandable panels. */
 }
 .tg-result-status-note {
   font-size: 0.75rem;
-  background: #fff3d8;
+  background: var(--warning-bg);
   padding: 12px;
   border-radius: 4px;
   margin-top: 16px;
@@ -2254,7 +2259,7 @@ race index and expandable panels. */
 .tg-article-header p {
   max-width: 65ch;
   font-size: 1rem;
-  color: #d2dce1;
+  color: var(--muted-on-dark);
 }
 .tg-article-header > div > a {
   color: var(--cinema-muted);
@@ -2330,7 +2335,7 @@ race index and expandable panels. */
   align-items: center;
   gap: 24px;
   padding: 24px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--cinema-line-dark);
   border-radius: 6px;
   margin-bottom: 32px;
@@ -2648,7 +2653,7 @@ race index and expandable panels. */
 }
 .tg-laps-table-wrap {
   overflow: auto;
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   border-radius: 0 0 4px 4px;
 }
@@ -2730,7 +2735,7 @@ race index and expandable panels. */
 }
 .race-category-choice button {
   text-align: left;
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   border: 1px solid var(--cinema-line-dark);
   padding: 24px;
@@ -2761,16 +2766,16 @@ race index and expandable panels. */
   line-height: 1.7;
 }
 .race-alert-warning {
-  background: #fff3d8;
-  color: #80530a;
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 .race-alert-error {
-  background: #fce9eb;
-  color: #ae2933;
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 .race-alert-success {
-  background: #e4f4eb;
-  color: #176342;
+  background: var(--success-bg);
+  color: var(--success);
 }
 .race-registration-actions {
   display: flex;
@@ -2780,7 +2785,7 @@ race index and expandable panels. */
 }
 .race-registration-summary {
   padding: 28px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--cinema-line-dark);
   border-radius: 6px;
   position: sticky;
@@ -2817,7 +2822,7 @@ race index and expandable panels. */
   gap: 50px;
   padding: clamp(28px, 5vw, 80px);
   background:
-    linear-gradient(0deg, #081116f5, #08111655),
+    linear-gradient(0deg, var(--scrim-strong), var(--scrim-soft)),
     url("/media/official/home/hero-desktop.webp") 70% center/cover;
   color: var(--cinema-white);
 }
@@ -2837,7 +2842,7 @@ race index and expandable panels. */
   color: var(--cinema-cyan);
 }
 .race-auth-copy p {
-  color: #d2dce1;
+  color: var(--muted-on-dark);
   max-width: 40ch;
   font-size: 0.875rem;
   line-height: 1.8;
@@ -2903,7 +2908,7 @@ race index and expandable panels. */
   gap: 12px;
   padding: 0 14px;
   border: 1px solid var(--cinema-line-dark);
-  background: #fff;
+  background: var(--surface);
   border-radius: 4px;
 }
 .race-field-control > svg {
@@ -3004,7 +3009,7 @@ race index and expandable panels. */
   color: var(--cinema-muted);
 }
 .sidebar .nav-group a {
-  color: #d2dce1;
+  color: var(--muted-on-dark);
   border-left: 0;
   border-radius: 6px;
 }
@@ -3022,7 +3027,7 @@ race index and expandable panels. */
   color: var(--cinema-muted);
 }
 .operations-header {
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .page-heading h1 {
@@ -3052,7 +3057,7 @@ race index and expandable panels. */
   background: var(--cinema-cyan-deep);
 }
 .button-secondary {
-  background: #fff;
+  background: var(--surface);
   color: var(--cinema-ink);
   box-shadow: none;
 }
@@ -3068,7 +3073,7 @@ race index and expandable panels. */
 }
 .shell .modal {
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
 }
 .shell .admin-table thead {
   background: var(--cinema-paper-2);
@@ -3589,7 +3594,7 @@ race index and expandable panels. */
   }
   .tg-mobile-standing-item,
   .tg-mobile-result-item {
-    background: #fff;
+    background: var(--surface);
     border-bottom: 1px solid var(--cinema-line-dark);
     padding: 18px;
   }
