@@ -43,7 +43,6 @@ import {
   type PanelSection,
   type Role,
 } from "../../../lib/painel-structure";
-import { ModuleCrud } from "../../../components/module-crud";
 
 const sectionIcons: Record<string, LucideIcon> = {
   home: House,
@@ -90,6 +89,7 @@ function PanelLoading() {
     </div>
   );
 }
+const ModuleCrud = dynamic(() => import("../../../components/module-crud").then((loaded) => loaded.ModuleCrud), { loading: PanelLoading });
 const PilotCrud = dynamic(() => import("../../../components/pilot-crud").then((loaded) => loaded.PilotCrud), { loading: PanelLoading });
 const Dashboard = dynamic(() => import("../../../components/dashboard").then((loaded) => loaded.Dashboard), { loading: PanelLoading });
 const ReportsPanel = dynamic(() => import("../../../components/reports-panel").then((loaded) => loaded.ReportsPanel), { loading: PanelLoading });
