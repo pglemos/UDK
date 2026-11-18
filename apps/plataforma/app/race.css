@@ -6852,8 +6852,11 @@ img[src^="/media/official/drivers/uniforme/"] {
 
 /* ===== Crítica, rodada 8 ===== */
 /* listas: ações cabem sem coluna fixa; ações compactas */
-.shell .module-workspace .admin-table td.row-actions {
-  width: 1%;
+.shell .admin-table td.row-actions {
+  width: auto;
+  min-width: max-content;
+  overflow: visible;
+  white-space: nowrap;
 }
 .shell .module-workspace .row-action {
   padding: 0 10px;
@@ -7122,4 +7125,9 @@ img[src^="/media/official/drivers/uniforme/"] {
     min-height: 44px;
     width: 100%;
   }
+}
+/* sair com alvo de toque de 44px */
+.shell .sidebar-user button {
+  min-width: 44px;
+  min-height: 44px;
 }

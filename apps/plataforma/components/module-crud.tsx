@@ -670,7 +670,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
       setInvalidKeys(new Set(missing.map((field) => field.key)));
       if (missing.length) {
         const first = missing[0];
-        if (first) window.requestAnimationFrame(() => document.getElementById(`field-${first.key}`)?.focus());
+        if (first) window.setTimeout(() => document.getElementById(`field-${first.key}`)?.focus(), 80);
         throw new Error(
           missing.length === 1
             ? `Preencha o campo ${missing[0]?.label}.`
@@ -903,7 +903,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
           </button>
         </div>
       ) : null}
-      {error ? (
+      {error && !modalOpen ? (
         <div className="alert alert-error" role="alert">
           {error}
         </div>
@@ -972,6 +972,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                 <tr>
                   {config.readOnly || config.createOnly ? null : (
                     <th className="pv-check">
+                      <span className="pv-visually-hidden">Seleção</span>
                       <input
                         type="checkbox"
                         aria-label="Selecionar todos os visíveis"
