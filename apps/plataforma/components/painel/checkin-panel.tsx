@@ -176,6 +176,7 @@ export function CheckinPanel({ client, readOnly }: { client: SupabaseClient; rea
     const ok = await confirmAction(
       `Marcar ${missing.length} piloto(s) como presentes na ${stage.ordinal} etapa? Quem já tem registro não muda.`,
       "Marcar presentes",
+      "primary",
     );
     if (!ok) return;
     setSaving(`todos|${stage.id}`);

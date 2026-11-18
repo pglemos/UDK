@@ -2,7 +2,7 @@
  * Confirmação no padrão visual do painel, no lugar do window.confirm do navegador.
  * Usa <dialog> nativo: foco preso, Esc cancela e o foco volta para quem abriu.
  */
-export function confirmAction(message: string, confirmLabel = "Confirmar"): Promise<boolean> {
+export function confirmAction(message: string, confirmLabel = "Confirmar", tone: "danger" | "primary" = "danger"): Promise<boolean> {
   if (typeof document === "undefined" || typeof HTMLDialogElement === "undefined") {
     return Promise.resolve(window.confirm(message));
   }
@@ -23,7 +23,7 @@ export function confirmAction(message: string, confirmLabel = "Confirmar"): Prom
   cancel.textContent = "Cancelar";
   const accept = document.createElement("button");
   accept.type = "button";
-  accept.className = "button-danger";
+  accept.className = tone === "danger" ? "button-danger" : "button-primary";
   accept.textContent = confirmLabel;
   actions.append(cancel, accept);
   dialog.append(text, actions);

@@ -269,6 +269,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   const [fileValues, setFileValues] = useState<Record<string, File | undefined>>({});
   const [editing, setEditing] = useState<RecordRow>();
   const [search, setSearch] = useState("");
+  const [invalidKeys, setInvalidKeys] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [lastArchived, setLastArchived] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
@@ -462,6 +463,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }, [loadRecords, owner, syncOffline]);
 
   function openCreate() {
+    setInvalidKeys(new Set());
     setEditing(undefined);
     setValues(initialValues(config));
     setFileValues({});
@@ -470,6 +472,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }
 
   function openEdit(record: RecordRow) {
+    setInvalidKeys(new Set());
     setEditing(record);
     setValues(editValues(config, record));
     setFileValues({});
@@ -626,7 +629,10 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
         const value = values[field.key];
         return value === "" || value === null || value === undefined;
       });
+      setInvalidKeys(new Set(missing.map((field) => field.key)));
       if (missing.length) {
+        const first = missing[0];
+        if (first) window.requestAnimationFrame(() => document.getElementById(`field-${first.key}`)?.focus());
         throw new Error(
           missing.length === 1
             ? `Preencha o campo ${missing[0]?.label}.`
@@ -693,7 +699,8 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
   }
 
   async function deleteRecord(record: RecordRow) {
-    if (!(await confirmAction(`Arquivar este registro de ${config.singular ?? "cadastro"}? Ele sai da lista, mas o histórico fica guardado.`, "Arquivar")))
+    const applied = ["homologated", "published", "approved"].includes(String(record.status ?? ""));
+    if (!(await confirmAction(`Arquivar este registro de ${config.singular ?? "cadastro"}? Ele sai da lista, mas o histórico fica guardado.${applied ? " Atenção: ele já está valendo (homologado/publicado); arquivar não recalcula resultados nem classificação." : ""}`, "Arquivar")))
       return;
     setSaving(true);
     setError("");
@@ -975,7 +982,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                                 : record[field.key],
                             );
                       return (
-                        <td key={field.key} data-label={field.label} title={completo || formatted} className={field.kind === "select" || field.kind === "relation" || field.kind === "date" || field.kind === "datetime" ? "pv-nowrap" : undefined}>
+                        <td key={field.key} data-label={field.label} title={completo || formatted} className={field.kind === "select" || field.kind === "date" || field.kind === "datetime" ? "pv-nowrap" : undefined}>
                           {field.key === "status" ? (
                             <span className={statusClass(record[field.key])}>{formatted}</span>
                           ) : field.key === "color" && /^#[0-9a-f]{3,8}$/i.test(formatted) ? (
@@ -1079,6 +1086,7 @@ export function ModuleCrud({ client, config, owner }: ModuleCrudProps) {
                     required:
                       field.kind === "file" ? Boolean(field.required && !value) : field.required,
                     disabled: field.readOnly || saving,
+                    "aria-invalid": invalidKeys.has(field.key) || undefined,
                   };
                   return (
                     <label

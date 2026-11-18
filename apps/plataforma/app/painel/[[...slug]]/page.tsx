@@ -448,6 +448,12 @@ export default function OperationsPage({ params }: { params: Promise<{ slug?: st
     router.replace("/login");
   }
 
+  // título da aba do navegador com a tela atual
+  const tabTitle = route ? (route.tab.slug ? route.tab.label : route.section.key === "inicio" ? "Início" : route.section.label) : "Painel";
+  useEffect(() => {
+    document.title = `${tabTitle} · Painel UDK`;
+  }, [tabTitle]);
+
   // atalhos do painel: "/" vai para a busca da tela, "N" abre o cadastro novo
   useEffect(() => {
     function onKey(event: KeyboardEvent) {

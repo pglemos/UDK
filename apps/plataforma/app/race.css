@@ -6740,22 +6740,6 @@ img[src^="/media/official/drivers/uniforme/"] {
 }
 
 /* ===== Crítica, rodada 7 ===== */
-/* coluna de ações sempre visível à direita das listas */
-.shell .admin-table :is(td.row-actions, th.actions-column) {
-  position: sticky;
-  right: 0;
-  z-index: 1;
-  background: #fff;
-  box-shadow: -1px 0 0 var(--line);
-}
-.shell .admin-table thead th.actions-column {
-  z-index: 3;
-  background: var(--cinema-paper-2);
-}
-.shell .admin-table tr:hover td.row-actions {
-  background: #f2fafc;
-}
-
 /* configurações: salvar sempre à mão */
 .shell .pv-editor-actions {
   position: sticky;
@@ -6864,4 +6848,81 @@ img[src^="/media/official/drivers/uniforme/"] {
 .shell :where(.pv-check, .pv-toggle) input[type="checkbox"]:focus-visible {
   outline: 3px solid var(--cinema-cyan-deep);
   outline-offset: 2px;
+}
+
+/* ===== Crítica, rodada 8 ===== */
+/* listas: ações cabem sem coluna fixa; ações compactas */
+.shell .module-workspace .admin-table td.row-actions {
+  width: 1%;
+}
+.shell .module-workspace .row-action {
+  padding: 0 10px;
+}
+
+/* campo obrigatório vazio marcado em vermelho */
+.shell :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--danger) !important;
+  background: var(--danger-bg);
+}
+
+/* confirmação positiva usa o botão principal */
+.op-confirm .button-primary {
+  border: 1px solid var(--cinema-ink);
+  background: var(--cinema-ink);
+  color: #fff;
+}
+.op-confirm .button-primary:hover {
+  background: var(--cinema-cyan-deep);
+}
+
+/* seleção: limpar não é ação destrutiva */
+.shell .pv-bulk .pv-link-button {
+  color: var(--op-accent);
+}
+
+/* credenciamento: "a marcar" visível e alvo de 44px */
+.shell .pv-mark.is-empty {
+  border: 1px dashed #8a9aa3;
+  color: var(--cinema-muted-dark);
+}
+.shell .pv-matrix .pv-mark {
+  min-height: 40px;
+}
+.shell .pv-legend .pv-mark.is-empty {
+  border-style: dashed;
+}
+
+/* dica de atalhos com respiro */
+.shell .pv-kbd-hint {
+  margin-right: 4px;
+}
+
+/* amostra de cor sempre com contorno visível */
+.shell .pv-swatch i {
+  border-color: #8a9aa3;
+}
+
+/* configurações no celular: barra de salvar não cobre o último campo */
+.shell .pv-settings-form {
+  padding-bottom: 8px;
+}
+
+/* caixa de seleção no cartão do celular com rótulo */
+@media (max-width: 760px) {
+  .shell .module-workspace .admin-table tbody td.pv-check::after {
+    content: " Selecionar";
+    color: var(--cinema-muted-dark);
+    font-size: var(--op-meta);
+    vertical-align: middle;
+  }
+  .shell .module-workspace .admin-table tbody td.pv-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+/* guia do início com borda de cartão comum, não de foco */
+.shell .pv-setup {
+  border-color: var(--line);
+  border-radius: 8px;
 }

@@ -783,6 +783,11 @@ export function PilotCrud({
             </button>
           </div>
           <form noValidate onSubmit={(event) => void save(event)}>
+            {error ? (
+              <div className="alert alert-error" role="alert" id="pilot-form-error">
+                {error}
+              </div>
+            ) : null}
             <section className="pilot-form-section">
               <div className="pilot-section-heading">
                 <div>
@@ -1154,11 +1159,7 @@ export function PilotCrud({
               </div>
             </section>
 
-            {error ? (
-              <div className="alert alert-error" role="alert" id="pilot-form-error">
-                {error}
-              </div>
-            ) : null}
+
             <div className="modal-actions">
               <button
                 className="button-secondary"
